@@ -43,7 +43,7 @@ namespace BotsMod
 				prefab = EnemyBuilder.BuildPrefab("PrimalShotgrub", guid, spritePaths[1], new IntVector2(0, 0), new IntVector2(8, 9), true);
 				EnemyBehavior companion = prefab.AddComponent<EnemyBehavior>(); ;
 				companion.aiActor.knockbackDoer.weight = 800;
-				companion.aiActor.MovementSpeed = 2f;
+				companion.aiActor.MovementSpeed = 15f;
 				companion.aiActor.healthHaver.PreventAllDamage = false;
 				companion.aiActor.CollisionDamage = 1f;
 				companion.aiActor.HasShadow = false;
@@ -108,8 +108,6 @@ namespace BotsMod
 
 
 				});
-
-				ETGModConsole.Log("2");
 
 				companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid("044a9f39712f456597b9762893fbc19c").CorpseObject;
 				companion.aiActor.PreventBlackPhantom = false;
@@ -306,6 +304,8 @@ namespace BotsMod
 			};
 				bs.MovementBehaviors = new List<MovementBehaviorBase>
 			{
+
+
 				new SeekTargetBehavior
 				{
 					StopWhenInRange = true,

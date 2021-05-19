@@ -10,6 +10,7 @@ using System.Collections;
 using System.Reflection;
 using System.IO;
 using MultiplayerBasicExample;
+using Brave.BulletScript;
 
 namespace BotsMod
 {
@@ -75,8 +76,6 @@ namespace BotsMod
 
 		static AIActor victum;
 
-
-
 		public override bool CanBeUsed(PlayerController user)
 		{
 
@@ -113,11 +112,25 @@ namespace BotsMod
 			}
 
 			//var targetObject = enemy.gameObject;
-			BotsMindControlEffect orAddComponent = victum.gameObject.GetOrAddComponent<BotsMindControlEffect>();
-			orAddComponent.owner = (user);
-
-			if (victum != null && user.CurrentRoom != null)
+			//BotsMindControlEffect orAddComponent = victum.gameObject.GetOrAddComponent<BotsMindControlEffect>();
+			//orAddComponent.owner = (user);
+			
+			if (victum != null && user.CurrentRoom != null )
 			{
+				foreach (var attack in victum.behaviorSpeculator.AttackBehaviors)
+				{
+					if (attack is ShootBehavior)
+					{
+						var script = (attack as ShootBehavior).BulletScript;
+						SpawnManager.SpawnBulletScript(null, user.transform.position, victum.GetComponent<AIBulletBank>(), script, "bullet :)", user.specRigidbody, null, false, new Action<Bullet, Projectile>(this.OnBulletCreated));
+						break;
+					}
+				}
+
+
+				
+
+				yield break;
 				user.ReceivesTouchDamage = false;
 				//user.IsVisible = false;
 				user.IsEthereal = true;
@@ -171,10 +184,10 @@ namespace BotsMod
 
 					
 
-					float num = Vector2.Distance(user.CenterPosition, victum.CenterPosition);
+					float num = Vector2.Distance(user.specRigidbody.UnitCenter, victum.specRigidbody.UnitCenter);
 					if (num > 1)
 					{
-						victum.specRigidbody.Position = new Position(user.CenterPosition);
+						user.specRigidbody.Position = new Position(victum.specRigidbody.UnitCenter);
 						BotsModule.Log("Moved " + victum.name, BotsModule.TEXT_COLOR);
 					}
 						//}
@@ -208,6 +221,16 @@ namespace BotsMod
 				//	Pixelator.Instance.LerpToLetterbox(0.5f, 0f);
 				//}
 			}
+		}
+
+		private void Component_OnDestruction(Projectile obj)
+		{
+
+		}
+
+		private void OnBulletCreated(Bullet b, Projectile p)
+		{
+			p.ChangeColor(30, Color.blue);
 		}
 	}
 }

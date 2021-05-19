@@ -69,7 +69,7 @@ namespace BotsMod
 			var bs = prefab.GetComponent<BehaviorSpeculator>();
 
 			bs.MovementBehaviors.Add(new BotsCompanionFollowPlayerBehavior() {
-
+				
 				PathInterval = 0.25f,
 				DisableInCombat = true,
 				IdealRadius = 3,

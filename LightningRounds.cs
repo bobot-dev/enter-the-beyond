@@ -11,7 +11,7 @@ using UnityEngine;
 namespace BotsMod
 {
     class LightningRounds : PassiveItem
-    {
+	{
         public static void Init()
         {
 

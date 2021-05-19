@@ -41,6 +41,8 @@ namespace BotsMod
 
             item.PlaceItemInAmmonomiconAfterItemById(414);
 
+            Tools.BeyondItems.Add(item.PickupObjectId);
+
         }
 
         static PassiveItem m_item;

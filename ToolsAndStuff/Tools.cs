@@ -17,6 +17,10 @@ namespace BotsMod
 	{
 		public static GameObject Mines_Cave_In;
 		public static AssetBundle AHHH;
+		public static List<int> BeyondItems = new List<int>();
+
+
+
 		// Token: 0x06000172 RID: 370 RVA: 0x00013060 File Offset: 0x00011260
 		public static void Init()
 		{
@@ -86,6 +90,43 @@ namespace BotsMod
 			Tools.DefaultBlobulonGoop = EnemyDatabase.GetOrLoadByGuid("0239c0680f9f467dbe5c4aab7dd1eca6").GetComponent<GoopDoer>().goopDefinition;
 			Tools.DefaultPoopulonGoop = EnemyDatabase.GetOrLoadByGuid("116d09c26e624bca8cca09fc69c714b3").GetComponent<GoopDoer>().goopDefinition;
 		}
+
+
+		public static Texture2D SpriteToTexture(tk2dSprite sourceSprite)
+		{
+
+			Texture2D sourceTexture = (Texture2D)sourceSprite.GetCurrentSpriteDef().material.mainTexture;
+
+			Vector2[] UVs = sourceSprite.GetCurrentSpriteDef().uvs;
+
+			// Get the raw uv-pixel co-ordinates of the image.
+			float fX = (sourceTexture.width) * UVs[0].x;
+			float fY = (sourceTexture.height) * UVs[2].y;
+			float fX2 = (sourceTexture.width) * UVs[1].x; ;
+			float fY2 = (sourceTexture.height) * UVs[0].y;
+
+			// Calculate the width and height of the sprite.
+			float fWidth = fX2 - fX;
+			float fHeight = -(fY2 - fY);
+
+			// Round the values to pixel units.
+			int x = Mathf.RoundToInt(fX);
+			int y = Mathf.RoundToInt(fY - fHeight);
+			int width = Mathf.RoundToInt(fWidth);
+			int height = Mathf.RoundToInt(fHeight);
+
+			// Get the pixels contained within the pixel units of the atlas.
+			Color[] pixelRect = sourceTexture.GetPixels(x, y, width, height);
+
+			// Generate a new texture and populate it with the pixel data.
+			Texture2D newTexture = new Texture2D(width, height);
+			newTexture.SetPixels(pixelRect);
+			newTexture.Apply();
+
+			return newTexture;
+		}
+
+
 		public static GameObject ProcessGameObject(this GameObject obj)
 		{
 			obj.SetActive(false);
@@ -133,6 +174,36 @@ namespace BotsMod
 					}
 				}
 			}
+		}
+
+		/// <summary>
+		/// Adds a trail to a GameObject
+		/// </summary>
+		/// <param name="obj">Object the trail will be added to</param> 
+		/// <param name="color">Color of the trail</param>
+		/// <param name="texture">Texture the trail will use</param>
+		/// <param name="time">The time (in seconds) that the trail will last</param>
+		/// <param name="minVertexDistance">"Set the minimum distance the trail can travel before a new vertex is added to it. Smaller values with give smoother trails, consisting of more vertices, but costing more performance." - unity docs</param>
+		/// <param name="startWidth">Width at the start of the trail</param>
+		/// <param name="endWidth">Width at the end of the trail</param>
+		/// <param name="startColor">Color at the start of the trail</param>
+		/// <param name="endColor">Color at the end of the trail</param>
+		/// <returns></returns>
+		public static void AddTrailToObject(GameObject obj, Color color, Texture texture, float time, float minVertexDistance, float startWidth, float endWidth, Color startColor, Color endColor)
+		{
+			var tr = obj.AddComponent<TrailRenderer>();
+			tr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+			tr.receiveShadows = false;
+			var mat = new Material(Shader.Find("Sprites/Default"));
+			mat.mainTexture = texture;
+			mat.SetColor("_Color", color);
+			tr.material = mat;
+			tr.time = time;
+			tr.minVertexDistance = minVertexDistance;
+			tr.startWidth = startWidth;
+			tr.endWidth = endWidth;
+			tr.startColor = startColor;
+			tr.endColor = endColor;
 		}
 
 

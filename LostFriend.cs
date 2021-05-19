@@ -40,6 +40,7 @@ namespace BotsMod
 			BuildPrefab();
 			item.PlaceItemInAmmonomiconAfterItemById(664);
 
+			Tools.BeyondItems.Add(item.PickupObjectId);
 		}
 
 		public static void BuildPrefab()

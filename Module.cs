@@ -20,7 +20,9 @@ using Ionic.Zip;
 using SaveAPI;
 using MonoMod.RuntimeDetour;
 using System.Reflection;
-using ChallengeAPI;
+using AmmonomiconAPI;
+//using ChallengeAPI;
+
 
 namespace BotsMod
 {
@@ -112,7 +114,7 @@ namespace BotsMod
                 ItemBuilder.Init();
                 ItemAPI.FakePrefabHooks.Init();
 
-                ChallengeInit.Init();
+                //ChallengeInit.Init();
 
 
                 //GungeonAP.Init();
@@ -126,11 +128,18 @@ namespace BotsMod
                 BossBuilder.Init();
                 FrostAndGunfireItems.EnemyTools.Init();
                 FrostAndGunfireItems.Hooks.Init();
+
+                //funny book api
+                AmmonomiconAPI.Tools.Init();
+
+
                 //my stuff
                 Tools.Init();
                 Hooks.Init();
                 Rooms.Init();
                 //StuffIStoleFromApacheForChallengeMode.Init();
+
+                Ammonomicon.Init();
 
                 InitGameObjects.Init();
                 ChestInitStuff.Init();
@@ -153,7 +162,8 @@ namespace BotsMod
                 SpecialDungeon.Init();
                 SpecialDungeon2CozFuckYou.Init();
                 RichPresenceItem.Register();
-                
+
+                CompletlyRandomGun.Add();
 
                 PossetionItem.Init();
 
@@ -176,9 +186,13 @@ namespace BotsMod
 
                 Sin.Init();
 
+                Roomba.Init();
+
                 //GameManager.Instance.PrimaryPlayer.star
 
                 InitSynergies.Init();
+
+                //Ammonomicon.Init();
 
                 ChamberGun = (PickupObjectDatabase.GetById(647) as Gun);
                 if (ChamberGun.gameObject.GetComponent<ChamberGunProcessor>())
@@ -187,7 +201,7 @@ namespace BotsMod
                     ChamberGun.gameObject.AddComponent<BotChamberGunProcessor>();
                 }
 
-                //MakeThemAllPetable.Init();
+                MakeThemAllPetable.Init();
                 //RichPresence.init();
 
                 //GameStatsManager.Instance.SetStat(TrackedStats.NUMBER_DEATHS, 27615);
@@ -198,6 +212,17 @@ namespace BotsMod
 
 
                 }*/
+
+
+                var bulletGun = (PickupObjectDatabase.GetById(503) as Gun);
+                var shotgunGun = (PickupObjectDatabase.GetById(512) as Gun);
+                var anotherGun = (PickupObjectDatabase.GetById(169) as Gun);
+
+                var moreBullet = bulletGun.DefaultModule.projectiles[0].gameObject.GetComponent<SpawnProjModifier>();
+                var moreBulletShotgun = shotgunGun.DefaultModule.projectiles[0].gameObject.GetComponent<SpawnProjModifier>();
+
+                moreBullet.projectileToSpawnInFlight = bulletGun.DefaultModule.projectiles[0];
+
 
                 AlphabetSoupSynergyProcessor alphabetSoupSynergyProcessor = PickupObjectDatabase.GetById(340).gameObject.GetComponent<AlphabetSoupSynergyProcessor>();
 
@@ -224,16 +249,9 @@ namespace BotsMod
 }
                 };
 
+                var funnylist = alphabetSoupSynergyProcessor.Entries.ToList();
+                funnylist.Add(iShouldntHaveBeenGivenThisPower6);
 
-                alphabetSoupSynergyProcessor.Entries = new AlphabetSoupEntry[]
-                {
-                    //iShouldntHaveBeenGivenThisPower,
-                   // iShouldntHaveBeenGivenThisPower2,
-                    //iShouldntHaveBeenGivenThisPower3,
-                    //iShouldntHaveBeenGivenThisPower4,
-                    //iShouldntHaveBeenGivenThisPower5,
-                    iShouldntHaveBeenGivenThisPower6
-                };
                 
                 //alphabetSoupSynergyProcessor.Entries[];
 
@@ -301,6 +319,12 @@ namespace BotsMod
                 {
 
                     GameManager.Instance.LoadCustomLevel("beyond");
+                });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("randomize_gun", delegate (string[] args)
+                {
+
+                    CompletlyRandomGun.DoRandomizeGun(CompletlyRandomGun.completlyRandomGun);
                 });
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("shield", delegate (string[] args)
@@ -541,6 +565,13 @@ namespace BotsMod
                     {
                         ETGModConsole.Log(str);
                     }
+                });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("audioSwitch", delegate (string[] args)
+                {
+                    var player = GameManager.Instance.PrimaryPlayer;
+                    player.OverridePlayerSwitchState = args[0];
+                    ETGModConsole.Log(args[0]);
                 });
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("room", delegate (string[] args)

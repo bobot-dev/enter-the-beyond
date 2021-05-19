@@ -116,14 +116,22 @@ namespace GungeonAPI
             BreakdownComponentsInternal(obj, 0);
         }
 
-        public static void ExportTexture(Texture texture, string folder = "")
+        public static void ExportTexture(Texture texture, string folder = "", string name = "")
         {
             string path = Path.Combine(ETGMod.ResourcesDirectory, folder);
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);
             }
-            File.WriteAllBytes(Path.Combine(path, texture.name + ".png"), ((Texture2D)texture).EncodeToPNG());
+            if (string.IsNullOrEmpty(name))
+            {
+                File.WriteAllBytes(Path.Combine(path, texture.name + ".png"), ((Texture2D)texture).EncodeToPNG());
+            }
+            else
+            {
+                File.WriteAllBytes(Path.Combine(path, name + ".png"), ((Texture2D)texture).EncodeToPNG());
+            }
+           
         }
 
         public static T GetEnumValue<T>(string val) where T : Enum

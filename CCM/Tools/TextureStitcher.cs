@@ -146,7 +146,7 @@ namespace CustomCharacters
 
             return output;
         }
-
+        /*
         public static Texture2D Rotated(this Texture2D texture, bool clockwise = false)
         {
             Color32[] original = texture.GetPixels32();
@@ -187,7 +187,7 @@ namespace CustomCharacters
             }
             output.Apply();
             return output;
-        }
+        }*/
 
     }
 }

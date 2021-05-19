@@ -26,7 +26,7 @@ namespace BotsMod
             ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
             item.quality = ItemQuality.SPECIAL;
 
-            EncounterDatabase.GetEntry(item.encounterTrackable.EncounterGuid).usesPurpleNotifications = true;
+            //EncounterDatabase.GetEntry(item.encounterTrackable.EncounterGuid).usesPurpleNotifications = true;
 
             //ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.Health, 1f, StatModifier.ModifyMethod.ADDITIVE);
 
@@ -41,6 +41,8 @@ namespace BotsMod
 
             item.PlaceItemInAmmonomiconAfterItemById(467);
 
+
+            Tools.BeyondItems.Add(item.PickupObjectId);
             //item.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/RainbowChestShader");
             //item.sprite.usesOverrideMaterial = true;
 

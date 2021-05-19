@@ -17,14 +17,15 @@ namespace BotsMod
         public static void Init()
         {
 
-            string itemName = "Test passive Item";
+            string itemName = "happyiness";
             string resourceName = "BotsMod/sprites/wip";
             GameObject obj = new GameObject();
-            var item = BotsModule.WarCrime2;//obj.AddComponent<PirmalShotgrub>().GetComponent<PickupObject>();
+            //var item = BotsModule.WarCrime2;//obj.AddComponent<PirmalShotgrub>().GetComponent<PickupObject>();
+            var item = obj.AddComponent<TestPassive>();
             ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
             string shortDesc = "testing item";
             string longDesc = "this item is purly for testing";
-            ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
+            ItemBuilder.SetupItem(item, shortDesc, longDesc, "");
             item.quality = ItemQuality.EXCLUDED;
 
             //ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.MovementSpeed, 5f, StatModifier.ModifyMethod.MULTIPLICATIVE);
@@ -51,8 +52,8 @@ namespace BotsMod
             player.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/RainbowChestShader");
             zoomy.spawnShadows = true;
 
-            
 
+            player.healthHaver.ApplyDamage(10000, Vector2.zero, "happiness");
 
             base.Pickup(player);
         }
@@ -64,13 +65,7 @@ namespace BotsMod
         private Shader m_glintShader;
         protected override void Update()
         {
-            if (Input.GetKeyDown(KeyCode.F5))
-            {
-                TestGUI.OnGUI();
 
-
-            }
-            base.Update();
         }
 
 

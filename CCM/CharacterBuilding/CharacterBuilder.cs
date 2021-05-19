@@ -65,6 +65,7 @@ namespace CustomCharacters
 
             basePrefab = null;
             storedCharacters.Add(data.nameInternal.ToLower(), new Tuple<CustomCharacterData, GameObject>(data, gameObject));
+            BotsModule.Log("nameInternal: " + data.nameInternal, BotsModule.TEXT_COLOR);
 
             gameObject.SetActive(false);
             GungeonAPI.FakePrefab.MarkAsFakePrefab(gameObject);
@@ -105,24 +106,18 @@ namespace CustomCharacters
 
             AkSoundEngine.SetSwitch("CHR_Player", (player.OverridePlayerSwitchState == null) ? data.nameShort : player.OverridePlayerSwitchState, player.gameObject);
 
-            uint idk;
+            uint idk = 3263119794;
 
             AkSoundEngine.GetSwitch("CHR_Player", player.gameObject, out idk);
 
-            BotsModule.Log(""+idk);
-
-            //BotsModule.Log((player.OverridePlayerSwitchState == null) ? data.nameShort : player.OverridePlayerSwitchState);
+            BotsModule.Log("" + idk);
+            BotsModule.Log("player name: " + data.nameShort);
 
             
 
-            player.animationAudioEvents = new List<ActorAudioEvent>
-            {
-                new ActorAudioEvent
-                {
-                    eventTag = "step",
-                    eventName = "Play_Bot_Hammer"
-                },
-            };
+            //BotsModule.Log((player.OverridePlayerSwitchState == null) ? data.nameShort : player.OverridePlayerSwitchState);
+
+
 
             //BotsModule.Strings.Core.Set("#PLAYER_NICK_LOST", "Dead Thing");
             //BotsModule.Strings.Core.Set("#PLAYER_NAME_LOST", "Lost");

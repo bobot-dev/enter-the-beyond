@@ -13,6 +13,7 @@ using MultiplayerBasicExample;
 using CustomCharacters;
 using Pathfinding;
 
+
 namespace BotsMod
 {
 	public class TestActive : PlayerItem
@@ -252,6 +253,8 @@ namespace BotsMod
 		static AIActor victum;
 		protected override void DoEffect(PlayerController user)
 		{
+			
+			
 			CollectionDumper.DumpCollection(user.sprite.Collection);
 			StartCoroutine(Destrot());
 

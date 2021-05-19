@@ -26,10 +26,11 @@ namespace BotsMod
 			gun.gameObject.AddComponent<LostSidearm>();
 			gun.SetShortDescription("Decay");
 			gun.SetLongDescription("Add text here before releasing");
-
+			
 			gun.SetupSprite(null, "lost_revolver_idle_001", 8);
 			gun.SetAnimationFPS(gun.shootAnimation, 12);
 			gun.SetAnimationFPS(gun.reloadAnimation, 10);
+			
 			
 			Gun other = PickupObjectDatabase.GetById(810) as Gun;
 			gun.AddProjectileModuleFrom(other, true, false);
@@ -42,7 +43,7 @@ namespace BotsMod
 			
 			gun.DefaultModule.shootStyle = ProjectileModule.ShootStyle.SemiAutomatic;
 			gun.StarterGunForAchievement = true;
-
+			
 			
 			//gun.damageModifier = 1;
 			gun.reloadTime = 1.3f;
@@ -82,8 +83,6 @@ namespace BotsMod
 			UnityEngine.Object.DontDestroyOnLoad(projectile);
 			gun.DefaultModule.projectiles[0] = projectile;
 
-			
-
 			gun.shellsToLaunchOnReload = 14;
 			gun.shellCasing = gun3.shellCasing;
 
@@ -95,35 +94,7 @@ namespace BotsMod
 			projectile.baseData.speed = 16f;
 			projectile.baseData.force = 10f;
 			projectile.baseData.range = 16f;
-			
-			/*
-			gun.AddProjectileModule(new ProjectileModule
-			{
-				projectiles = new List<Projectile>
-				{
-					projectile
-				},
-				alternateAngle = true,
-				ammoCost = 1,
-				ammoType = GameUIAmmoType.AmmoType.ARROW,
-				angleFromAim = 0,
-				angleVariance = 360,
-				burstCooldownTime = 0.1f,
-				burstShotCount = 5,
-				finalAmmoType = GameUIAmmoType.AmmoType.BLUE_SHOTGUN,
-				finalProjectile = gun5.DefaultModule.projectiles[0],
-				ignoredForReloadPurposes = true,
-				numberOfFinalProjectiles = 3,
-				numberOfShotsInClip = 10,
-				shootStyle = ProjectileModule.ShootStyle.Burst,
-				usesOptionalFinalProjectile = true,
-				sequenceStyle = ProjectileModule.ProjectileSequenceStyle.Random,
-				
-			});
-			*/
 
-
-			//Tools.CreateAmmoType("BotsMod/sprites/wip", "Test");
 
 
 
@@ -134,6 +105,8 @@ namespace BotsMod
 
 			lostSidearm = gun;
 			BotsItemIds.LostSidearm = gun.PickupObjectId;
+
+			Tools.BeyondItems.Add(gun.PickupObjectId);
 		}
 
 		static TrailRenderer tr;
@@ -143,7 +116,7 @@ namespace BotsMod
 			base.PostProcessProjectile(projectile);
 
 
-			if (!setup)
+			if (setup)
 			{
 				setup = true;
 

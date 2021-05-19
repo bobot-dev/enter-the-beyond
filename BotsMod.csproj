@@ -109,6 +109,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BotsPingPongAroundBehavior.cs" />
+    <Compile Include="AmmonomiconAPI\Ammonomicon.cs" />
+    <Compile Include="AmmonomiconAPI\AmmonomiconHooks.cs" />
+    <Compile Include="AmmonomiconAPI\Tools.cs" />
+    <Compile Include="CompletlyRandomGun.cs" />
+    <Compile Include="Roomba.cs" />
     <Compile Include="DiscordGameSDK\DiscordController.cs" />
     <Compile Include="DiscordGameSDK\ActivityManager.cs" />
     <Compile Include="DiscordGameSDK\Constants.cs" />
@@ -140,16 +146,6 @@
     <Compile Include="CCM\Tools\Tools.cs" />
     <Compile Include="CCM\Tools\ZipExtensions.cs" />
     <Compile Include="BotsCompanionFollowPlayerBehavior.cs" />
-    <Compile Include="ChallengeAPI\ChallengeBuilder.cs" />
-    <Compile Include="ChallengeAPI\ChallengeTools.cs" />
-    <Compile Include="ChallengeAPI\ChambersCurseChallenge.cs" />
-    <Compile Include="ChallengeAPI\ChallengeInit.cs" />
-    <Compile Include="ChallengeAPI\dfLanguageExtraStringHolder.cs" />
-    <Compile Include="ChallengeAPI\Examples\ExampleBossChallenge.cs" />
-    <Compile Include="ChallengeAPI\Examples\FreezeChallengeModifier.cs" />
-    <Compile Include="ChallengeAPI\Examples\ExampleChallengeModifier.cs" />
-    <Compile Include="ChallengeAPI\FakePrefabHandler.cs" />
-    <Compile Include="ChallengeAPI\ResourceGetter.cs" />
     <Compile Include="Chests\ChestInitStuff.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="Class2.cs" />
@@ -161,7 +157,6 @@
     <Compile Include="RedKey.cs" />
     <Compile Include="Enemies\BossFinalLostDeathController.cs" />
     <Compile Include="ETGR\EtgRandomizerController.cs" />
-    <Compile Include="GUI\TestGUI.cs" />
     <Compile Include="PossetionItem.cs" />
     <Compile Include="Debuff\BotsMindControlEffect.cs" />
     <Compile Include="Debuff\DecayDebuffEffect .cs" />
@@ -259,6 +254,7 @@
     <Compile Include="ToolsAndStuff\Hooks.cs" />
     <Compile Include="ToolsAndStuff\SpecialDungeon.cs" />
     <Compile Include="ToolsAndStuff\Tools.cs" />
+    <Compile Include="ToolsAndStuff\VFXLibrary.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Audio\Bot_SFX.bnk" />
@@ -336,6 +332,10 @@
     <EmbeddedResource Include="sprites\ammonomicon_enemy_lpb_001.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="sprites\Roomba\roomba_idle_N_001.png" />
+    <EmbeddedResource Include="sprites\Roomba\roomba_idle_E_001.png" />
+    <EmbeddedResource Include="sprites\Roomba\roomba_idle_S_001.png" />
+    <EmbeddedResource Include="sprites\Roomba\roomba_idle_W_001.png" />
     <EmbeddedResource Include="sprites\overseer_floor\overseerf_spin_001.png" />
     <EmbeddedResource Include="sprites\overseer_floor\overseerf_spin_002.png" />
     <EmbeddedResource Include="sprites\overseer_floor\overseerf_spin_003.png" />
@@ -378,10 +378,6 @@
     <EmbeddedResource Include="Marks\Sprites\readme.png" />
     <EmbeddedResource Include="Marks\Sprites\xpbar.png" />
     <EmbeddedResource Include="Marks\Sprites\page.png" />
-    <Content Include="ChallengeAPI\Resources\blankChallengeFrame.png" />
-    <Content Include="ChallengeAPI\Resources\curseOfTheChamberFrame.png" />
-    <Content Include="ChallengeAPI\Resources\exampleBossChallengeFrame.png" />
-    <Content Include="ChallengeAPI\Resources\exampleChallengeFrame.png" />
     <EmbeddedResource Include="sprites\PerlinHalfRough.png" />
     <EmbeddedResource Include="sprites\mistakecharm.png" />
     <EmbeddedResource Include="sprites\ministake\idle_right\mistake_pet_idle_001.png" />
@@ -453,6 +449,18 @@
   <ItemGroup>
     <Folder Include="sprites\PastBoss\" />
     <Folder Include="StuffIOnlyUnderstandCozRoR2Modders\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\NotificationSprites\crosshair_beyond.png" />
+    <EmbeddedResource Include="sprites\NotificationSprites\notification_box_beyond_001.png" />
+    <EmbeddedResource Include="sprites\NotificationSprites\notification_box_beyond_002.png" />
+    <EmbeddedResource Include="sprites\NotificationSprites\notification_box_beyond_003.png" />
+    <EmbeddedResource Include="sprites\NotificationSprites\notification_box_beyond_004.png" />
+    <EmbeddedResource Include="sprites\NotificationSprites\notification_box_beyond_005.png" />
+    <EmbeddedResource Include="sprites\NotificationSprites\notification_box_beyond_006.png" />
+    <EmbeddedResource Include="sprites\NotificationSprites\notification_box_beyond_007.png" />
+    <EmbeddedResource Include="sprites\NotificationSprites\notification_box_beyond_008.png" />
+    <EmbeddedResource Include="sprites\NotificationSprites\object_box_beyond_001.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

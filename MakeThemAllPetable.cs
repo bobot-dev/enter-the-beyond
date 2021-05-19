@@ -16,16 +16,16 @@ namespace BotsMod
 
             //chicken.CompanionGuid
 
-            AIActor chickenAiActor = EnemyDatabase.GetOrLoadByGuid("76bc43539fc24648bff4568c75c686d1");
+            AIActor chickenAiActor = EnemyDatabase.GetOrLoadByGuid("e456b66ed3664a4cb590eab3a8ff3814");
 
-            
+            CompanionController orAddComponent = chickenAiActor.gameObject.GetOrAddComponent<CompanionController>();
 
-            CompanionController chickenFriend = chicken.gameObject.GetOrAddComponent<CompanionController>();
+            //CompanionController chickenFriend = chicken.gameObject.GetOrAddComponent<CompanionController>();
 
 
 
-            chickenFriend.gameObject.AddAnimation("pet", "BotsMod/sprites/pet", fps: 5, AnimationType.Idle, DirectionType.None);
-            chickenFriend.CanBePet = true;
+            orAddComponent.gameObject.AddAnimation("pet", "BotsMod/sprites/pet", fps: 5, AnimationType.Idle, DirectionType.TwoWayHorizontal);
+            orAddComponent.CanBePet = true;
         }
     }
 }
