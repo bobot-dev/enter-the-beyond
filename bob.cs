@@ -39,6 +39,8 @@ namespace BotsMod
 
 			//Set the rarity of the item
 			item.quality = PickupObject.ItemQuality.EXCLUDED;
+
+			
 		}
 	}
 }

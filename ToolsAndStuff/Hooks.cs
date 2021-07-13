@@ -1,9 +1,12 @@
 ﻿
-using AmmonomiconAPI;
+//using AmmonomiconAPI;
+using Brave.BulletScript;
 using CustomCharacters;
 using Dungeonator;
 using ETGGUI.Inspector;
+using FrostAndGunfireItems;
 using GungeonAPI;
+using HutongGames.PlayMaker;
 using InControl;
 using ItemAPI;
 using MonoMod.RuntimeDetour;
@@ -16,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 using static AIAnimator;
 
@@ -34,6 +38,40 @@ namespace BotsMod
 
 			try
 			{
+				/*
+
+				var UIRootPrefab = AmmonomiconAPI.Tools.LoadAssetFromAnywhere<GameObject>("UI Root").GetComponent<GameUIRoot>();
+				if (UIRootPrefab.Manager.DefaultAtlas == null)
+				{
+					BotsModule.Log("BoxSprite.Atlas is null");
+				}
+
+				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_001" + ".png"), "notification_box_beyond_001");
+				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_002" + ".png"), "notification_box_beyond_002");
+				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_003" + ".png"), "notification_box_beyond_003");
+				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_004" + ".png"), "notification_box_beyond_004");
+				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_005" + ".png"), "notification_box_beyond_005");
+				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_006" + ".png"), "notification_box_beyond_006");
+				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_007" + ".png"), "notification_box_beyond_007");
+				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_008" + ".png"), "notification_box_beyond_008");
+
+				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_001" + ".png"), "notification_box_beyondns_001");
+
+				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/crosshair_beyond" + ".png"), "crosshair_beyond");
+				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/object_box_beyond_001" + ".png"), "object_box_beyond_001");
+
+
+				beyondClip = new dfAnimationClip
+				{
+					Atlas = UIRootPrefab.Manager.DefaultAtlas,
+				};
+
+				FieldInfo _sprites = typeof(dfAnimationClip).GetField("sprites", BindingFlags.NonPublic | BindingFlags.Instance);
+
+				_sprites.SetValue(beyondClip, new List<string> { "notification_box_beyond_001", "notification_box_beyond_002", "notification_box_beyond_003", "notification_box_beyond_004", "notification_box_beyond_005", "notification_box_beyond_006", "notification_box_beyond_007", "notification_box_beyond_008", "notification_box_beyondns_001" });
+				*/
+
+
 				getOrLoadByName_Hook = new Hook(
 					typeof(DungeonDatabase).GetMethod("GetOrLoadByName", BindingFlags.Static | BindingFlags.Public),
 					typeof(Hooks).GetMethod("GetOrLoadByNameHook", BindingFlags.Static | BindingFlags.Public));
@@ -55,9 +93,7 @@ namespace BotsMod
 				//= new Hook(typeof(AmmonomiconDeathPageController).GetMethod("SetWinPic", BindingFlags.Instance | BindingFlags.NonPublic), typeof(Hooks).GetMethod("SetWinPicHook"));
 
 
-				setWinPicHook = new Hook(
-					typeof(AmmonomiconDeathPageController).GetMethod("SetWinPic", BindingFlags.Instance | BindingFlags.NonPublic),
-					typeof(Hooks).GetMethod("SetWinPicHook", BindingFlags.Static | BindingFlags.NonPublic));
+
 
 
 
@@ -111,7 +147,7 @@ namespace BotsMod
 				var dumbHookINeedCozZatherzDumb2 = new Hook(
 					typeof(CharacterSelectController).GetMethod("GetCharacterPathFromQuickStart", BindingFlags.Static | BindingFlags.Public),
 					typeof(Hooks).GetMethod("GetCharacterPathFromQuickStartHookHook", BindingFlags.Static | BindingFlags.Public));
-
+				/*
 				ETGModConsole.Log("pre shitty hook");
 				var stupidFuckingHookIMadeForAShittyJoke = new Hook(typeof(MinorBreakable).GetMethods().Single(
 					m =>
@@ -120,50 +156,1784 @@ namespace BotsMod
 						m.GetParameters()[0].ParameterType == typeof(Vector2)),
 					typeof(Hooks).GetMethod("BreakHook", BindingFlags.Static | BindingFlags.Public));
 				ETGModConsole.Log("post shitty hook");
+				*/
 
-				/*
 				var doNotificationInternalHook = new Hook(
 					typeof(UINotificationController).GetMethod("DoNotificationInternal", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("DoNotificationInternalHook", BindingFlags.Static | BindingFlags.NonPublic));
-				*/
+				
+
+				var purchaseItemHook = new Hook(
+					typeof(BaseShopController).GetMethod("PurchaseItem", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("PurchaseItemHook", BindingFlags.Static | BindingFlags.Public));
+
+				var interactHook = new Hook(
+					typeof(ShopItemController).GetMethod("Interact", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("InteractHook", BindingFlags.Static | BindingFlags.Public));
+
+				var OnEnteredRangeHook = new Hook(
+					typeof(ShopItemController).GetMethod("OnEnteredRange", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("OnEnteredRangeHook", BindingFlags.Static | BindingFlags.Public));
+
+				var DoSetupHook = new Hook(
+					typeof(BaseShopController).GetMethod("DoSetup", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("DoSetupHook", BindingFlags.Static | BindingFlags.Public));
+
+				var ModifiedPriceHook = new Hook(
+				   typeof(ShopItemController).GetProperty("ModifiedPrice", BindingFlags.Public | BindingFlags.Instance).GetGetMethod(),
+				   typeof(Hooks).GetMethod("ModifiedPriceHook"));
+
+
+				var ApplyDamageDirectionalHook = new Hook(
+					typeof(HealthHaver).GetMethod("ApplyDamageDirectional", BindingFlags.NonPublic | BindingFlags.Instance),
+					typeof(Hooks).GetMethod("ApplyDamageDirectionalHook", BindingFlags.Static | BindingFlags.Public));
+
+				BotsModule.Log("pre unfix hook");
+				var HandlePreDropHook = new Hook(
+					typeof(OnActiveItemUsedSynergyProcessor).GetMethod("HandlePreDrop", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("HandlePreDropHook", BindingFlags.Static | BindingFlags.NonPublic));
+
+				BotsModule.Log("pre unfix hook2");
+				var HandleActivationStatusChangedHook = new Hook(
+					typeof(OnActiveItemUsedSynergyProcessor).GetMethod("HandleActivationStatusChanged", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("HandleActivationStatusChangedHook", BindingFlags.Static | BindingFlags.NonPublic));
+
+				var HandlePostProcessProjectileHook = new Hook(
+					typeof(AlphabetSoupSynergyProcessor).GetMethod("HandlePostProcessProjectile", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("HandlePostProcessProjectileHook", BindingFlags.Static | BindingFlags.NonPublic));
+
+
+				var HookToWriteLogToTxtFile = new Hook(
+					typeof(ETGModConsole).GetMethod("Log", BindingFlags.Static | BindingFlags.Public),
+					typeof(Hooks).GetMethod("LogHook", BindingFlags.Static | BindingFlags.Public));
+
+				var HookToWriteLogToTxtFile2 = new Hook(typeof(Debug).GetMethods().Single(
+					m =>
+						m.Name == "Log" &&
+						m.GetParameters().Length == 1 &&
+						m.GetParameters()[0].ParameterType == typeof(object)),
+					typeof(Hooks).GetMethod("LogHookU", BindingFlags.Static | BindingFlags.Public));
+				ETGModConsole.Log("post shitty hook");
+
+				var Crime = new Hook(
+					typeof(CharacterCostumeSwapper).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("StartHook", BindingFlags.Static | BindingFlags.NonPublic));
+
+
+				var ReloadText = new Hook(
+					typeof(GameUIRoot).GetMethod("InformNeedsReload", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("InformNeedsReloadHook", BindingFlags.Static | BindingFlags.Public));
+
+				var SpawnProjectiles = new Hook(
+					typeof(SuperReaperController).GetMethod("SpawnProjectiles", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("SpawnProjectilesHook", BindingFlags.Static | BindingFlags.NonPublic));
+
+				/*var UpdateHealthHook = new Hook(
+					typeof(GameUIHeartController).GetMethod("UpdateHealth", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("UpdateHealthHook", BindingFlags.Static | BindingFlags.Public));
+
+				var AddHeartHook = new Hook(
+					typeof(GameUIHeartController).GetMethod("AddHeart", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("AddHeart", BindingFlags.Static | BindingFlags.Public));
+
+				var AddArmourHook = new Hook(
+					typeof(GameUIHeartController).GetMethod("AddArmor", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("AddArmorHook", BindingFlags.Static | BindingFlags.Public));*/
 			}
 			catch (Exception arg)
 			{
 				BotsModule.Log("oh no thats not good (hooks broke): " + arg, "#eb1313");
 				//LostItemsMod.Log(string.Format("D:", ), "#eb1313");
+
 			}
 		}
+
+		public static void UpdateHealthHook(GameUIHeartController self, HealthHaver hh)
+		{
+
+			FieldInfo _currentHalfHeartName = typeof(GameUIHeartController).GetField("m_currentHalfHeartName", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _currentEmptyHeartName = typeof(GameUIHeartController).GetField("m_currentEmptyHeartName", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _currentFullHeartName = typeof(GameUIHeartController).GetField("m_currentFullHeartName", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _currentArmorName = typeof(GameUIHeartController).GetField("m_currentArmorName", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			float num = hh.GetCurrentHealth();
+			float maxHealth = hh.GetMaxHealth();
+
+			float num2 = hh.Armor;
+			if (hh.NextShotKills)
+			{
+				num = 0.5f;
+				num2 = 0f;
+			}
+			int num3 = Mathf.CeilToInt(maxHealth);
+			int num4 = Mathf.CeilToInt(num2);
+			if (self.extantHearts.Count < num3)
+			{
+				for (int i = self.extantHearts.Count; i < num3; i++)
+				{
+					dfSprite dfSprite = self.AddHeart();
+					if ((float)(i + 1) > num)
+					{
+						if ((float)Mathf.FloorToInt(num) != num && num + 1f > (float)(i + 1))
+						{
+							dfSprite.SpriteName = _currentHalfHeartName.GetValue(self) as string;
+						}
+						else
+						{
+							dfSprite.SpriteName = _currentEmptyHeartName.GetValue(self) as string;
+						}
+					}
+				}
+			}
+			else if (self.extantHearts.Count > num3)
+			{
+				while (self.extantHearts.Count > num3)
+				{
+					self.RemoveHeart();
+				}
+			}
+			if (self.extantArmors.Count < num4)
+			{
+				for (int j = self.extantArmors.Count; j < num4; j++)
+				{
+					self.AddArmor();
+				}
+			}
+			else if (self.extantArmors.Count > num4)
+			{
+				while (self.extantArmors.Count > num4)
+				{
+					self.RemoveArmor();
+				}
+			}
+
+			if (SoulHeartController.extantSoulHearts.Count < SoulHeartController.soulHeartCount)
+			{
+				for (int k = SoulHeartController.extantSoulHearts.Count; k < SoulHeartController.soulHeartCount; k++)
+				{
+					SoulHeartController.AddSoulHeart(self);
+				}
+			}
+			else if (SoulHeartController.extantSoulHearts.Count > SoulHeartController.soulHeartCount)
+			{
+				while (SoulHeartController.extantSoulHearts.Count > SoulHeartController.soulHeartCount)
+				{
+					SoulHeartController.RemoveSoulHeart(self);
+				}
+			}
+
+			int num5 = Mathf.FloorToInt(num);
+			for (int k = 0; k < self.extantHearts.Count; k++)
+			{
+				dfSprite dfSprite2 = self.extantHearts[k];
+				if (dfSprite2)
+				{
+					if (k < num5)
+					{
+						dfSprite2.SpriteName = _currentFullHeartName.GetValue(self) as string;
+					}
+					else if (k != num5 || num - (float)num5 <= 0f)
+					{
+						if (dfSprite2.SpriteName == _currentFullHeartName.GetValue(self) as string || dfSprite2.SpriteName == _currentHalfHeartName.GetValue(self) as string)
+						{
+							GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(self.damagedHeartAnimationPrefab.gameObject);
+							gameObject.transform.parent = self.transform.parent;
+							gameObject.layer = self.gameObject.layer;
+							dfSprite component = gameObject.GetComponent<dfSprite>();
+							component.BringToFront();
+							dfSprite2.Parent.AddControl(component);
+							dfSprite2.Parent.BringToFront();
+							component.ZOrder = dfSprite2.ZOrder - 1;
+							component.RelativePosition = dfSprite2.RelativePosition + self.damagedPrefabOffset;
+						}
+						dfSprite2.SpriteName = _currentEmptyHeartName.GetValue(self) as string;
+					}
+				}
+			}
+			if (num - (float)num5 > 0f && self.extantHearts != null && self.extantHearts.Count > 0)
+			{
+				dfSprite dfSprite3 = self.extantHearts[num5];
+				if (dfSprite3)
+				{
+					if (dfSprite3.SpriteName == _currentFullHeartName.GetValue(self) as string)
+					{
+						GameObject gameObject2 = UnityEngine.Object.Instantiate<GameObject>(self.damagedHeartAnimationPrefab.gameObject);
+						gameObject2.transform.parent = self.transform.parent;
+						gameObject2.layer = self.gameObject.layer;
+						dfSprite component2 = gameObject2.GetComponent<dfSprite>();
+						component2.BringToFront();
+						dfSprite3.Parent.AddControl(component2);
+						dfSprite3.Parent.BringToFront();
+						component2.ZOrder = dfSprite3.ZOrder - 1;
+						component2.RelativePosition = dfSprite3.RelativePosition + self.damagedPrefabOffset;
+					}
+					dfSprite3.SpriteName = _currentHalfHeartName.GetValue(self) as string;
+				}
+			}
+			PlayerController associatedPlayer = hh.gameActor as PlayerController;
+			typeof(GameUIHeartController).GetMethod("ProcessHeartSpriteModifications", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { associatedPlayer });
+			//self.ProcessHeartSpriteModifications(associatedPlayer);
+			if (hh.HasCrest && num2 > 0f)
+			{
+				for (int l = 0; l < self.extantArmors.Count; l++)
+				{
+					dfSprite dfSprite4 = self.extantArmors[l];
+					if (dfSprite4)
+					{
+						if (l < self.extantArmors.Count - 1)
+						{
+							if (dfSprite4.SpriteName != _currentArmorName.GetValue(self) as string)
+							{
+								dfSprite4.SpriteName = _currentArmorName.GetValue(self) as string;
+								dfSprite4.Color = self.armorSpritePrefab.Color;
+								dfPanel motionGroupParent = GameUIRoot.Instance.GetMotionGroupParent(dfSprite4);
+								motionGroupParent.Width -= Pixelator.Instance.CurrentTileScale;
+								motionGroupParent.Height -= Pixelator.Instance.CurrentTileScale;
+								dfSprite4.RelativePosition = dfSprite4.RelativePosition.WithY(0f);
+							}
+						}
+						else if (dfSprite4.SpriteName != self.crestSpritePrefab.SpriteName)
+						{
+							dfSprite4.SpriteName = self.crestSpritePrefab.SpriteName;
+							dfSprite4.Color = self.crestSpritePrefab.Color;
+							dfPanel motionGroupParent2 = GameUIRoot.Instance.GetMotionGroupParent(dfSprite4);
+							motionGroupParent2.Width += Pixelator.Instance.CurrentTileScale;
+							motionGroupParent2.Height += Pixelator.Instance.CurrentTileScale;
+							dfSprite4.RelativePosition = dfSprite4.RelativePosition.WithY(Pixelator.Instance.CurrentTileScale);
+						}
+					}
+				}
+			}
+			else
+			{
+				for (int m = 0; m < self.extantArmors.Count; m++)
+				{
+					dfSprite dfSprite5 = self.extantArmors[m];
+					if (dfSprite5)
+					{
+						if (dfSprite5.SpriteName != _currentArmorName.GetValue(self) as string)
+						{
+							dfSprite5.SpriteName = _currentArmorName.GetValue(self) as string;
+							dfPanel motionGroupParent3 = GameUIRoot.Instance.GetMotionGroupParent(dfSprite5);
+							motionGroupParent3.Width -= Pixelator.Instance.CurrentTileScale;
+							motionGroupParent3.Height -= Pixelator.Instance.CurrentTileScale;
+							dfSprite5.RelativePosition = dfSprite5.RelativePosition.WithY(0f);
+							GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite5, true, false, true);
+							GameUIRoot.Instance.UpdateControlMotionGroup(dfSprite5);
+							GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite5, GameUIRoot.Instance.IsCoreUIVisible(), false, true);
+						}
+						dfSprite5.Color = self.armorSpritePrefab.Color;
+						dfSprite5.RelativePosition = dfSprite5.RelativePosition.WithY(0f);
+					}
+				}
+			}
+			for (int n = 0; n < self.extantHearts.Count; n++)
+			{
+				dfSprite dfSprite6 = self.extantHearts[n];
+				if (dfSprite6)
+				{
+					dfSprite6.Size = dfSprite6.SpriteInfo.sizeInPixels * Pixelator.Instance.CurrentTileScale;
+				}
+			}
+			for (int num6 = 0; num6 < self.extantArmors.Count; num6++)
+			{
+				dfSprite dfSprite7 = self.extantArmors[num6];
+				if (dfSprite7)
+				{
+					dfSprite7.Size = dfSprite7.SpriteInfo.sizeInPixels * Pixelator.Instance.CurrentTileScale;
+				}
+			}
+			for (int deez = 0; deez < SoulHeartController.extantSoulHearts.Count; deez++)
+			{
+				dfSprite dfSprite6 = SoulHeartController.extantSoulHearts[deez];
+				if (dfSprite6)
+				{
+					dfSprite6.Size = dfSprite6.SpriteInfo.sizeInPixels * Pixelator.Instance.CurrentTileScale;
+				}
+			}
+		}
+
+
+		public dfSprite AddHeartHook(GameUIHeartController self)
+		{
+			FieldInfo _panel = typeof(GameUIHeartController).GetField("m_panel", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			int count = self.extantArmors.Count;
+			typeof(GameUIHeartController).GetMethod("ClearAllArmor", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null);
+			Vector3 position = self.transform.position;
+			GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(self.heartSpritePrefab.gameObject, position, Quaternion.identity);
+			gameObject.transform.parent = self.transform.parent;
+			gameObject.layer = self.gameObject.layer;
+			dfSprite component = gameObject.GetComponent<dfSprite>();
+			if (self.IsRightAligned)
+			{
+				component.Anchor = (dfAnchorStyle.Top | dfAnchorStyle.Right);
+			}
+			Vector2 sizeInPixels = component.SpriteInfo.sizeInPixels;
+			component.Size = sizeInPixels * Pixelator.Instance.CurrentTileScale;
+			component.IsInteractive = false;
+			if (!self.IsRightAligned)
+			{
+				float x = (component.Width + Pixelator.Instance.CurrentTileScale) * (float)self.extantHearts.Count;
+				component.RelativePosition = (_panel.GetValue(self) as dfPanel).RelativePosition + new Vector3(x, 0f, 0f);
+			}
+			else
+			{
+				component.RelativePosition = (_panel.GetValue(self) as dfPanel).RelativePosition - new Vector3(component.Width, 0f, 0f);
+				for (int i = 0; i < self.extantHearts.Count; i++)
+				{
+					dfSprite dfSprite = self.extantHearts[i];
+					if (dfSprite)
+					{
+						GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite, true, false, true);
+						dfSprite.RelativePosition += new Vector3(-1f * (component.Width + Pixelator.Instance.CurrentTileScale), 0f, 0f);
+						GameUIRoot.Instance.UpdateControlMotionGroup(dfSprite);
+						GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite, GameUIRoot.Instance.IsCoreUIVisible(), false, true);
+					}
+				}
+				for (int j = 0; j < self.extantArmors.Count; j++)
+				{
+					dfSprite dfSprite2 = self.extantArmors[j];
+					if (dfSprite2)
+					{
+						GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite2, true, false, true);
+						dfSprite2.RelativePosition += new Vector3(-1f * (component.Width + Pixelator.Instance.CurrentTileScale), 0f, 0f);
+						GameUIRoot.Instance.UpdateControlMotionGroup(dfSprite2);
+						GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite2, GameUIRoot.Instance.IsCoreUIVisible(), false, true);
+					}
+				}
+
+				for (int j = 0; j < SoulHeartController.extantSoulHearts.Count; j++)
+				{
+					dfSprite dfSprite3 = SoulHeartController.extantSoulHearts[j];
+					if (dfSprite3)
+					{
+						GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite3, true, false, true);
+						dfSprite3.RelativePosition += new Vector3(-1f * (component.Width + Pixelator.Instance.CurrentTileScale), 0f, 0f);
+						GameUIRoot.Instance.UpdateControlMotionGroup(dfSprite3);
+						GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite3, GameUIRoot.Instance.IsCoreUIVisible(), false, true);
+					}
+				}
+			}
+			self.extantHearts.Add(component);
+			GameUIRoot.Instance.AddControlToMotionGroups(component, (!self.IsRightAligned) ? DungeonData.Direction.WEST : DungeonData.Direction.EAST, false);
+			for (int k = 0; k < count; k++)
+			{
+				self.AddArmor();
+			}
+			return component;
+		}
+
+
+		public void AddArmorHook(GameUIHeartController self)
+		{
+
+			FieldInfo _panel = typeof(GameUIHeartController).GetField("m_panel", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			Vector3 position = self.transform.position;
+			GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(self.armorSpritePrefab.gameObject, position, Quaternion.identity);
+			gameObject.transform.parent = self.transform.parent;
+			gameObject.layer = self.gameObject.layer;
+			dfSprite component = gameObject.GetComponent<dfSprite>();
+			if (self.IsRightAligned)
+			{
+				component.Anchor = (dfAnchorStyle.Top | dfAnchorStyle.Right);
+			}
+			Vector2 sizeInPixels = component.SpriteInfo.sizeInPixels;
+			component.Size = sizeInPixels * Pixelator.Instance.CurrentTileScale;
+			component.IsInteractive = false;
+			if (!self.IsRightAligned)
+			{
+				float num = (self.extantHearts.Count <= 0) ? 0f : ((self.extantHearts[0].Width + Pixelator.Instance.CurrentTileScale) * (float)self.extantHearts.Count);
+				float num2 = (component.Width + Pixelator.Instance.CurrentTileScale) * (float)self.extantArmors.Count;
+				component.RelativePosition = (_panel.GetValue(self) as dfPanel).RelativePosition + new Vector3(num + num2, 0f, 0f);
+			}
+			else
+			{
+				component.RelativePosition = (_panel.GetValue(self) as dfPanel).RelativePosition - new Vector3(component.Width, 0f, 0f);
+				for (int i = 0; i < self.extantArmors.Count; i++)
+				{
+					dfSprite dfSprite = self.extantArmors[i];
+					if (dfSprite)
+					{
+						GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite, true, false, true);
+						dfSprite.RelativePosition += new Vector3(-1f * (component.Width + Pixelator.Instance.CurrentTileScale), 0f, 0f);
+						GameUIRoot.Instance.UpdateControlMotionGroup(dfSprite);
+						GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite, GameUIRoot.Instance.IsCoreUIVisible(), false, true);
+					}
+				}
+				for (int j = 0; j < self.extantHearts.Count; j++)
+				{
+					dfSprite dfSprite2 = self.extantHearts[j];
+					if (dfSprite2)
+					{
+						GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite2, true, false, true);
+						dfSprite2.RelativePosition += new Vector3(-1f * (component.Width + Pixelator.Instance.CurrentTileScale), 0f, 0f);
+						GameUIRoot.Instance.UpdateControlMotionGroup(dfSprite2);
+						GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite2, GameUIRoot.Instance.IsCoreUIVisible(), false, true);
+					}
+				}
+
+				for (int j = 0; j < SoulHeartController.extantSoulHearts.Count; j++)
+				{
+					dfSprite dfSprite3 = SoulHeartController.extantSoulHearts[j];
+					if (dfSprite3)
+					{
+						GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite3, true, false, true);
+						dfSprite3.RelativePosition += new Vector3(-1f * (component.Width + Pixelator.Instance.CurrentTileScale), 0f, 0f);
+						GameUIRoot.Instance.UpdateControlMotionGroup(dfSprite3);
+						GameUIRoot.Instance.TransitionTargetMotionGroup(dfSprite3, GameUIRoot.Instance.IsCoreUIVisible(), false, true);
+					}
+				}
+			}
+			self.extantArmors.Add(component);
+			GameUIRoot.Instance.AddControlToMotionGroups(component, (!self.IsRightAligned) ? DungeonData.Direction.WEST : DungeonData.Direction.EAST, false);
+		}
+
+		private static void SpawnProjectilesHook(SuperReaperController self)
+		{
+
+			FieldInfo _bulletSource = typeof(SuperReaperController).GetField("m_bulletSource", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			if (GameManager.Instance.PreventPausing || BossKillCam.BossDeathCamRunning)
+			{
+				return;
+			}
+			if (SuperReaperController.PreventShooting)
+			{
+				return;
+			}
+			CellData cellData = GameManager.Instance.Dungeon.data[self.ShootPoint.position.IntXY(VectorConversions.Floor)];
+			if (cellData == null || cellData.type == CellType.WALL)
+			{
+				return;
+			}
+			if (!(_bulletSource.GetValue(self) as BulletScriptSource))
+			{
+				_bulletSource.SetValue(self, self.ShootPoint.gameObject.GetOrAddComponent<BulletScriptSource>());
+			}
+			(_bulletSource.GetValue(self) as BulletScriptSource).BulletManager = self.bulletBank;
+			(_bulletSource.GetValue(self) as BulletScriptSource).BulletScript = self.BulletScript;
+			BotsModule.Log(self.BulletScript.GetType().ToString());
+			//(_bulletSource.GetValue(self) as BulletScriptSource).BulletScript = new CustomBulletScriptSelector(typeof(PrimalShotgrubScrip));
+			(_bulletSource.GetValue(self) as BulletScriptSource).Initialize();
+		}
+
+		public class PrimalShotgrubScrip : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
+		{
+
+
+			protected override IEnumerator Top()
+			{
+
+				//AkSoundEngine.PostEvent("Play_WPN_stickycrossbow_shot_01", this.BulletBank.aiActor.gameObject);
+				if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
+				{
+					//base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("044a9f39712f456597b9762893fbc19c").bulletBank.GetBullet("bigBullet"));
+					base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("383175a55879441d90933b5c4e60cf6f").bulletBank.GetBullet("bigBullet"));
+					base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("044a9f39712f456597b9762893fbc19c").bulletBank.GetBullet("gross"));
+					base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("796a7ed4ad804984859088fc91672c7f").bulletBank.GetBullet("default"));
+				}
+
+				//float num2 = -22.5f;
+				float num2 = 0;
+				float num3 = 9f;
+				for (int i = 0; i < 40; i++)
+				{
+					base.Fire(new Direction(0f, DirectionType.Aim, -1f), new Speed(9f, SpeedType.Absolute), new ShotgrubManAttack1.GrossBullet(num2 + (float)i * num3));
+				}
+
+				yield return base.Wait(20);
+
+				//float num = -45f;
+				float desiredAngle = this.GetAimDirection(1f, 12f);
+				float angle = Mathf.MoveTowardsAngle(this.Direction, desiredAngle, 40f);
+				bool isBlackPhantom = this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.IsBlackPhantom;
+				//Bullet bullet = new BurstingBullet(isBlackPhantom, num);
+
+
+				for (int i = 0; i < 3; i++)
+				{
+					float num = -45f + (float)i * 30f;
+					base.Fire(new Offset(0.5f, 0f, this.Direction + num, string.Empty, DirectionType.Aim), new Direction(num, DirectionType.Aim, -1f), new Speed(9f, SpeedType.Absolute), new BurstingBullet(isBlackPhantom));
+				}
+
+				yield return null;
+			}
+			public class BurstingBullet : Bullet
+			{
+				// Token: 0x060006C0 RID: 1728 RVA: 0x0001F513 File Offset: 0x0001D713
+				public BurstingBullet(bool isBlackPhantom) : base("bigBullet", false, false, false)
+				{
+
+					//this.deltaAngle = deltaAngle;
+					base.ForceBlackBullet = true;
+					this.m_isBlackPhantom = isBlackPhantom;
+
+				}
+
+				private float deltaAngle;
+
+
+				public override void OnBulletDestruction(Bullet.DestroyType destroyType, SpeculativeRigidbody hitRigidbody, bool preventSpawningProjectiles)
+				{
+					if (preventSpawningProjectiles)
+					{
+						return;
+					}
+					float num = base.RandomAngle();
+					float num2 = 20f;
+					for (int i = 0; i < 18; i++)
+					{
+						//Bullet bullet = new Bullet(null, false, false, false);
+
+						float num3 = -22.5f;
+						float num4 = 9f;
+
+						ShotgrubManAttack1.GrossBullet bullet = new ShotgrubManAttack1.GrossBullet(num3 + (float)i * num4);
+						base.Fire(new Direction(num + (float)i * num2, DirectionType.Absolute, -1f), new Speed(9f, SpeedType.Absolute), bullet);
+						if (!this.m_isBlackPhantom)
+						{
+							bullet.ForceBlackBullet = false;
+							bullet.Projectile.ForceBlackBullet = false;
+							bullet.Projectile.ReturnFromBlackBullet();
+
+						}
+					}
+				}
+
+				// Token: 0x04000697 RID: 1687
+				private const int NumBullets = 18;
+
+				// Token: 0x04000698 RID: 1688
+				private bool m_isBlackPhantom;
+			}
+
+		}
+
+
+		public static void InformNeedsReloadHook(GameUIRoot self, PlayerController attachPlayer, Vector3 offset, float customDuration = -1f, string customKey = "")
+		{
+
+			FieldInfo _displayingReloadNeeded = typeof(GameUIRoot).GetField("m_displayingReloadNeeded", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _extantReloadLabels = typeof(GameUIRoot).GetField("m_extantReloadLabels", BindingFlags.NonPublic | BindingFlags.Instance);
+			
+				
+			if (!attachPlayer)
+			{
+				return;
+			}
+			int num = (!attachPlayer.IsPrimaryPlayer) ? 1 : 0;
+			if ((_displayingReloadNeeded.GetValue(self) as List<bool>) == null || num >= (_displayingReloadNeeded.GetValue(self) as List<bool>).Count)
+			{
+				return;
+			}
+			if ((_extantReloadLabels.GetValue(self) as List<dfLabel>) == null || num >= (_extantReloadLabels.GetValue(self) as List<dfLabel>).Count)
+			{
+				return;
+			}
+			if ((_displayingReloadNeeded.GetValue(self) as List<bool>)[num])
+			{
+				return;
+			}
+			dfLabel dfLabel = (_extantReloadLabels.GetValue(self) as List<dfLabel>)[num];
+			if (dfLabel == null || dfLabel.IsVisible)
+			{
+				return;
+			}
+			dfFollowObject component = dfLabel.GetComponent<dfFollowObject>();
+			dfLabel.IsVisible = true;
+			if (component)
+			{
+				component.enabled = false;
+			}
+			self.StartCoroutine(FlashReloadLabel(self, dfLabel, attachPlayer, offset, customDuration, customKey));
+
+		}
+
+
+		private static IEnumerator FlashReloadLabel(GameUIRoot self, dfControl target, PlayerController attachPlayer, Vector3 offset, float customDuration = -1f, string customStringKey = "")
+		{
+
+			FieldInfo _displayingReloadNeeded = typeof(GameUIRoot).GetField("m_displayingReloadNeeded", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _isDisplayingCustomReload = typeof(GameUIRoot).GetField("m_isDisplayingCustomReload", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _deltaTime = typeof(GameUIRoot).GetField("m_deltaTime", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			int targetIndex = (!attachPlayer.IsPrimaryPlayer) ? 1 : 0;
+			(_displayingReloadNeeded.GetValue(self) as List<bool>)[targetIndex] = true;
+			target.transform.localScale = Vector3.one / GameUIRoot.GameUIScalar;
+			dfLabel targetLabel = target as dfLabel;
+			string customString = string.Empty;
+			if (!string.IsNullOrEmpty(customStringKey))
+			{
+				customString = typeof(dfControl).GetMethod("getLocalizedValue", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(target, new object[] { customStringKey }) as string;
+				
+			}
+			string reloadString = (string)typeof(dfControl).GetMethod("getLocalizedValue", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(target, new object[] { "#RELOAD" });
+			string emptyString = (string)typeof(dfControl).GetMethod("getLocalizedValue", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(target, new object[] { "#RELOAD_EMPTY" });
+
+			if (customDuration > 0f)
+			{
+				_isDisplayingCustomReload.SetValue(self, true);
+				float outerElapsed = 0f;
+				while (outerElapsed < customDuration && !GameManager.Instance.IsPaused)
+				{
+					target.IsVisible = true;
+					targetLabel.Text = customString;
+					targetLabel.Color = Color.white;
+					outerElapsed += BraveTime.DeltaTime;
+					yield return null;
+				}
+				_isDisplayingCustomReload.SetValue(self, false);
+			}
+			else
+			{
+				while ((_displayingReloadNeeded.GetValue(self) as List<bool>)[targetIndex] && !GameManager.Instance.IsPaused)
+				{
+					target.IsVisible = true;
+					if (!string.IsNullOrEmpty(customString))
+					{
+						targetLabel.Text = customString;
+						targetLabel.Color = Color.white;
+					}
+					else if (attachPlayer.CurrentGun.CurrentAmmo != 0)
+					{
+						if (attachPlayer.CurrentGun.name.Contains("Beholster_Gun") && GameManager.Options.CurrentLanguage == StringTableManager.GungeonSupportedLanguages.ENGLISH)
+						{
+							targetLabel.Text = typeof(dfControl).GetMethod("getLocalizedValue", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(target, new object[] { "#RELOAD_BEHOLD" }) as string;
+						} 
+						else if (attachPlayer.CurrentGun.GetComponent<CustomReloadText>() != null && GameManager.Options.CurrentLanguage == StringTableManager.GungeonSupportedLanguages.ENGLISH)
+						{
+							targetLabel.Text = attachPlayer.CurrentGun.GetComponent<CustomReloadText>().customReloadMessage;
+						}
+						else
+						{
+							targetLabel.Text = reloadString;
+						}
+						targetLabel.Color = Color.white;
+					}
+					else
+					{
+						targetLabel.Text = emptyString;
+						targetLabel.Color = Color.red;
+					}
+					bool shouldShowEver = customDuration > 0f || attachPlayer.CurrentGun.CurrentAmmo != 0 || attachPlayer.IsInCombat;
+					float elapsed = 0f;
+					while (elapsed < 0.6f)
+					{
+						elapsed += (float)_deltaTime.GetValue(self);
+						if (!(_displayingReloadNeeded.GetValue(self) as List<bool>)[targetIndex])
+						{
+							target.IsVisible = false;
+							yield break;
+						}
+						if (!shouldShowEver)
+						{
+							target.IsVisible = false;
+						}
+						if (GameManager.Instance.IsPaused)
+						{
+							target.IsVisible = false;
+						}
+						yield return null;
+					}
+					target.IsVisible = false;
+					elapsed = 0f;
+					while (elapsed < 0.6f)
+					{
+						elapsed += (float)_deltaTime.GetValue(self);
+						if (!(_displayingReloadNeeded.GetValue(self) as List<bool>)[targetIndex])
+						{
+							target.IsVisible = false;
+							yield break;
+						}
+						yield return null;
+					}
+				}
+			}
+			(_displayingReloadNeeded.GetValue(self) as List<bool>)[targetIndex] = false;
+			target.IsVisible = false;
+			yield break;
+		}
+
+		private static void StartHook(Action<CharacterCostumeSwapper> orig, CharacterCostumeSwapper self)
+		{
+
+			FieldInfo _active = typeof(CharacterCostumeSwapper).GetField("m_active", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			bool flag = GameStatsManager.Instance.GetCharacterSpecificFlag(self.TargetCharacter, CharacterSpecificGungeonFlags.KILLED_PAST);
+			if (self.HasCustomTrigger)
+			{
+				if (self.CustomTriggerIsFlag)
+				{
+					flag = GameStatsManager.Instance.GetFlag(self.TriggerFlag);
+				}
+				else if (self.CustomTriggerIsSpecialReserve)
+				{
+					flag = (GameStatsManager.Instance.GetFlag(GungeonFlags.SECRET_BULLETMAN_SEEN_05));
+				}
+			}
+			if (flag)
+			{
+				_active.SetValue(self, true);
+				if (self.TargetCharacter == PlayableCharacters.Guide)
+				{
+					self.CostumeSprite.HeightOffGround = 0.25f;
+					self.AlternateCostumeSprite.HeightOffGround = 0.25f;
+					self.CostumeSprite.UpdateZDepth();
+					self.AlternateCostumeSprite.UpdateZDepth();
+				}
+				self.AlternateCostumeSprite.renderer.enabled = true;
+				self.CostumeSprite.renderer.enabled = false;
+			}
+			else
+			{
+				_active.SetValue(self, false);
+				self.AlternateCostumeSprite.renderer.enabled = false;
+				self.CostumeSprite.renderer.enabled = false;
+			}
+		}
+
+		public static void LogHook(Action<string, bool> orig, string text, bool debuglog = false)
+		{
+			using (StreamWriter file2 = File.AppendText(ETGMod.ResourcesDirectory + "/etbLog.txt")) 
+			{
+				file2.WriteLine(text);
+			}
+				
+
+
+			orig(text, debuglog);
+		}
+
+
+		public static void LogHookU(Action<object> orig, object message)
+		{
+			using (StreamWriter file2 = File.AppendText(ETGMod.ResourcesDirectory + "/etbLogDebug.txt"))
+			{
+				file2.WriteLine(message.ToString());
+			}
+			orig(message);
+		}
+
+		private static void HandlePostProcessProjectileHook(Action<AlphabetSoupSynergyProcessor, Projectile> orig, AlphabetSoupSynergyProcessor self, Projectile targetProjectile)
+		{
+
+			FieldInfo _gun = typeof(AlphabetSoupSynergyProcessor).GetField("m_gun", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _currentEntryCount = typeof(AlphabetSoupSynergyProcessor).GetField("m_currentEntryCount", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _currentEntry = typeof(AlphabetSoupSynergyProcessor).GetField("m_currentEntry", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			if (!targetProjectile || !targetProjectile.sprite)
+			{
+				return;
+			}
+			if (_gun.GetValue(self) as Gun && (_gun.GetValue(self) as Gun).gunClass == GunClass.EXPLOSIVE)
+			{
+				return;
+			}
+
+			if ((_currentEntry.GetValue(self) as string).ToLower() == "transrights")
+			{
+				switch ((int)_currentEntryCount.GetValue(self))
+				{
+					case 0:
+					case 1:
+					case 9:
+					case 10:
+						targetProjectile.AdjustPlayerProjectileTint(new Color32(148, 218, 255, 255), 100000);
+						break;
+
+					case 2:
+					case 3:
+					case 7:
+					case 8:
+						targetProjectile.AdjustPlayerProjectileTint(new Color32(239, 148, 255, 255), 100000);
+						break;
+
+					case 4:
+					case 5:
+					case 6:
+						targetProjectile.AdjustPlayerProjectileTint(new Color32(255, 255, 255, 255), 100000);
+						break;
+				}
+			}
+			// tr-an-s ri-gh-ts
+			// 01-23-4 56-78-910
+			targetProjectile.sprite.SetSprite(typeof(AlphabetSoupSynergyProcessor).GetMethod("GetLetterForWordPosition", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { _currentEntry.GetValue(self) as string }) as string);
+
+			_currentEntryCount.SetValue(self, (int)_currentEntryCount.GetValue(self) + 1);
+		}
+
+
+
+		private static void HandleActivationStatusChangedHook(Action<OnActiveItemUsedSynergyProcessor, PlayerItem> orig, OnActiveItemUsedSynergyProcessor self, PlayerItem sourceItem)
+		{
+
+			FieldInfo _item = typeof(OnActiveItemUsedSynergyProcessor).GetField("m_item", BindingFlags.NonPublic | BindingFlags.Instance);
+
+
+			if ((_item.GetValue(self) as PlayerItem).LastOwner && (_item.GetValue(self) as PlayerItem).LastOwner.HasActiveBonusSynergy(self.SynergyToCheck, false))
+			{
+				if (sourceItem.IsCurrentlyActive)
+				{
+					typeof(OnActiveItemUsedSynergyProcessor).GetMethod("HandleActivated", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null);
+					
+				}
+				else
+				{
+					//self.HandleDeactivated();
+				}
+			}
+		}
+
+		private static void HandlePreDropHook(Action<OnActiveItemUsedSynergyProcessor> orig, OnActiveItemUsedSynergyProcessor self)
+		{
+			if (self.CreatesHoveringGun)
+			{
+				//typeof(OnActiveItemUsedSynergyProcessor).GetMethod("DisableAllHoveringGuns", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null);
+			}
+		}
+
+		Dictionary<string, List<object>> problemSolver = new Dictionary<string, List<object>>();
+
+		public static void ApplyDamageDirectionalHook(Action<HealthHaver, float, Vector2, string, CoreDamageTypes, DamageCategory, bool, PixelCollider, bool> orig, HealthHaver self, float damage, Vector2 direction, string damageSource, CoreDamageTypes damageTypes, DamageCategory damageCategory = DamageCategory.Normal, bool ignoreInvulnerabilityFrames = false, PixelCollider hitPixelCollider = null, bool ignoreDamageCaps = false)
+		{
+
+			FieldInfo isPlayerCharacter = typeof(HealthHaver).GetField("isPlayerCharacter", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _player = typeof(HealthHaver).GetField("m_player", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			if (self.Armor <= 0)
+			{
+				OtherworldlyConnections.gotHitThisFloor = true;
+			}
+
+			if (!self.NextDamageIgnoresArmor && !self.NextShotKills)
+			{
+				if (self.Armor <= 0f && SoulHeartController.soulHeartCount > 0 && (bool)isPlayerCharacter.GetValue(self))
+				{
+					SoulHeartController.soulHeartCount -= 1f;
+					damage = 0.00000000000000000000000000000000000000000001f;
+					if ((bool)isPlayerCharacter.GetValue(self))
+					{
+						SoulHeartController.OnSoulHeartLost(_player.GetValue(self) as PlayerController);
+					}
+				}
+			}
+
+			orig(self, damage, direction, damageSource, damageTypes, damageCategory, ignoreInvulnerabilityFrames, hitPixelCollider, ignoreDamageCaps);
+		}
+
+
+		public delegate void Action<T, T2, T3, T4, T5, T6, T7, T8, T9>(T arg, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9);
+
+		public static void DoSetupHook(Action<BaseShopController> orig, BaseShopController self)
+		{ 
+			try
+			{
+
+				FieldInfo _room = typeof(BaseShopController).GetField("m_room", BindingFlags.NonPublic | BindingFlags.Instance);
+				FieldInfo _numberThingsPurchased = typeof(BaseShopController).GetField("m_numberThingsPurchased", BindingFlags.NonPublic | BindingFlags.Instance);
+				FieldInfo _itemControllers = typeof(BaseShopController).GetField("m_itemControllers", BindingFlags.NonPublic | BindingFlags.Instance);
+				FieldInfo _shopItems = typeof(BaseShopController).GetField("m_shopItems", BindingFlags.NonPublic | BindingFlags.Instance);
+				FieldInfo _numberOfFirstTypeItems = typeof(BaseShopController).GetField("m_numberOfFirstTypeItems", BindingFlags.NonPublic | BindingFlags.Instance);
+				FieldInfo _onLastStockBeetle = typeof(BaseShopController).GetField("m_onLastStockBeetle", BindingFlags.NonPublic | BindingFlags.Instance);
+
+
+
+
+				_shopItems.SetValue(self, new List<GameObject>());
+
+				List<int> list = new List<int>();
+				Func<GameObject, float, float> weightModifier = null;
+				if (SecretHandshakeItem.NumActive > 0)
+				{
+					weightModifier = delegate (GameObject prefabObject, float sourceWeight)
+					{
+						PickupObject component10 = prefabObject.GetComponent<PickupObject>();
+						float num7 = sourceWeight;
+						if (component10 != null)
+						{
+							int quality = (int)component10.quality;
+							num7 *= 1f + (float)quality / 10f;
+						}
+						return num7;
+					};
+				}
+				System.Random safeRandom = null;
+				if (self.baseShopType == BaseShopController.AdditionalShopType.RESRAT_SHORTCUT)
+				{
+					if (GameStatsManager.Instance.CurrentResRatShopSeed < 0)
+					{
+						GameStatsManager.Instance.CurrentResRatShopSeed = UnityEngine.Random.Range(1, 1000000);
+					}
+					safeRandom = new System.Random(GameStatsManager.Instance.CurrentResRatShopSeed);
+				}
+				bool flag = GameStatsManager.Instance.IsRainbowRun && (self.baseShopType == BaseShopController.AdditionalShopType.BLANK || self.baseShopType == BaseShopController.AdditionalShopType.CURSE || self.baseShopType == BaseShopController.AdditionalShopType.GOOP || self.baseShopType == BaseShopController.AdditionalShopType.KEY || self.baseShopType == BaseShopController.AdditionalShopType.TRUCK);
+				for (int i = 0; i < self.spawnPositions.Length; i++)
+				{
+					if (flag)
+					{
+						(_shopItems.GetValue(self) as List<GameObject>).Add(null);
+					}
+					else if (self.baseShopType == BaseShopController.AdditionalShopType.RESRAT_SHORTCUT)
+					{
+						GameObject shopItemResourcefulRatStyle = GameManager.Instance.RewardManager.GetShopItemResourcefulRatStyle((_shopItems.GetValue(self) as List<GameObject>), safeRandom);
+						(_shopItems.GetValue(self) as List<GameObject>).Add(shopItemResourcefulRatStyle);
+					}
+					else if (self.baseShopType == BaseShopController.AdditionalShopType.FOYER_META && self.ExampleBlueprintPrefab != null)
+					{
+						if (self.FoyerMetaShopForcedTiers)
+						{
+							List<WeightedGameObject> compiledRawItems = self.shopItems.GetCompiledRawItems();
+							int num = 0;
+							bool flag2 = true;
+							while (flag2)
+							{
+								for (int j = num; j < num + self.spawnPositions.Length; j++)
+								{
+									if (j >= compiledRawItems.Count)
+									{
+										flag2 = false;
+										break;
+									}
+									GameObject gameObject = compiledRawItems[j].gameObject;
+									PickupObject component = gameObject.GetComponent<PickupObject>();
+									if (!component.encounterTrackable.PrerequisitesMet())
+									{
+										flag2 = false;
+										break;
+									}
+								}
+								if (flag2)
+								{
+									num += self.spawnPositions.Length;
+								}
+							}
+							if (num >= compiledRawItems.Count - self.spawnPositions.Length)
+							{
+								_onLastStockBeetle.SetValue(self, true);
+							}
+							for (int k = num; k < num + self.spawnPositions.Length; k++)
+							{
+								if (k >= compiledRawItems.Count)
+								{
+									(_shopItems.GetValue(self) as List<GameObject>).Add(null);
+									list.Add(1);
+								}
+								else
+								{
+									GameObject gameObject2 = compiledRawItems[k].gameObject;
+									PickupObject component2 = gameObject2.GetComponent<PickupObject>();
+									if ((_shopItems.GetValue(self) as List<GameObject>).Contains(gameObject2) || component2.encounterTrackable.PrerequisitesMet())
+									{
+										(_shopItems.GetValue(self) as List<GameObject>).Add(null);
+										list.Add(1);
+									}
+									else
+									{
+										(_shopItems.GetValue(self) as List<GameObject>).Add(gameObject2);
+										list.Add(Mathf.RoundToInt(compiledRawItems[k].weight));
+									}
+								}
+							}
+						}
+						else
+						{
+							List<WeightedGameObject> compiledRawItems2 = self.shopItems.GetCompiledRawItems();
+							GameObject gameObject3 = null;
+							for (int l = 0; l < compiledRawItems2.Count; l++)
+							{
+								GameObject gameObject4 = compiledRawItems2[l].gameObject;
+								PickupObject component3 = gameObject4.GetComponent<PickupObject>();
+								if (!(_shopItems.GetValue(self) as List<GameObject>).Contains(gameObject4))
+								{
+									if (!component3.encounterTrackable.PrerequisitesMet())
+									{
+										gameObject3 = gameObject4;
+										list.Add(Mathf.RoundToInt(compiledRawItems2[l].weight));
+										break;
+									}
+								}
+							}
+							(_shopItems.GetValue(self) as List<GameObject>).Add(gameObject3);
+							if (gameObject3 == null)
+							{
+								list.Add(1);
+							}
+						}
+					}
+					else
+					{
+						GameObject gameObject5 = self.shopItems.SubshopSelectByWeightWithoutDuplicatesFullPrereqs((_shopItems.GetValue(self) as List<GameObject>), weightModifier, 1, GameManager.Instance.IsSeeded);
+						(_shopItems.GetValue(self) as List<GameObject>).Add(gameObject5);
+						if (gameObject5)
+						{
+							BotsModule.Log(gameObject5.name);
+							_numberOfFirstTypeItems.SetValue(self, (int)_numberOfFirstTypeItems.GetValue(self) + 1);
+
+						}
+					}
+				}
+				BotsModule.Log("it got to that one point before the other point");
+				_itemControllers.SetValue(self, new List<ShopItemController>());
+				for (int m = 0; m < self.spawnPositions.Length; m++)
+				{
+					Transform transform = self.spawnPositions[m];
+					if (!flag && !((_shopItems.GetValue(self) as List<GameObject>)[m] == null))
+					{
+						PickupObject component4 = (_shopItems.GetValue(self) as List<GameObject>)[m].GetComponent<PickupObject>();
+						if (!(component4 == null))
+						{
+							GameObject gameObject6 = new GameObject("Shop item " + m.ToString());
+							BotsModule.Log(gameObject6.name);
+
+							Transform transform2 = gameObject6.transform;
+							transform2.parent = transform;
+							transform2.localPosition = Vector3.zero;
+							EncounterTrackable component5 = component4.GetComponent<EncounterTrackable>();
+							if (component5 != null)
+							{
+								GameManager.Instance.ExtantShopTrackableGuids.Add(component5.EncounterGuid);
+							}
+							ShopItemController shopItemController = gameObject6.AddComponent<ShopItemController>();
+
+							typeof(BaseShopController).GetMethod("AssignItemFacing", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { transform, shopItemController });
+							BotsModule.Log("thing thats likely breaking this is about to run");
+							if (!(_room.GetValue(self) as RoomHandler).IsRegistered(shopItemController))
+							{
+								(_room.GetValue(self) as RoomHandler).RegisterInteractable(shopItemController);
+							}
+							BotsModule.Log("thing thats likely breaking just ran");
+							if (self.baseShopType == BaseShopController.AdditionalShopType.FOYER_META && self.ExampleBlueprintPrefab != null)
+							{
+								GameObject gameObject7 = UnityEngine.Object.Instantiate<GameObject>(self.ExampleBlueprintPrefab, new Vector3(150f, -50f, -100f), Quaternion.identity);
+								ItemBlueprintItem component6 = gameObject7.GetComponent<ItemBlueprintItem>();
+								EncounterTrackable component7 = gameObject7.GetComponent<EncounterTrackable>();
+								component7.journalData.PrimaryDisplayName = component4.encounterTrackable.journalData.PrimaryDisplayName;
+								component7.journalData.NotificationPanelDescription = component4.encounterTrackable.journalData.NotificationPanelDescription;
+								component7.journalData.AmmonomiconFullEntry = component4.encounterTrackable.journalData.AmmonomiconFullEntry;
+								component7.journalData.AmmonomiconSprite = component4.encounterTrackable.journalData.AmmonomiconSprite;
+								component7.DoNotificationOnEncounter = false;
+								component6.UsesCustomCost = true;
+								component6.CustomCost = list[m];
+								GungeonFlags saveFlagToSetOnAcquisition = GungeonFlags.NONE;
+								for (int n = 0; n < component4.encounterTrackable.prerequisites.Length; n++)
+								{
+									if (component4.encounterTrackable.prerequisites[n].prerequisiteType == DungeonPrerequisite.PrerequisiteType.FLAG)
+									{
+										saveFlagToSetOnAcquisition = component4.encounterTrackable.prerequisites[n].saveFlagToCheck;
+									}
+								}
+								component6.SaveFlagToSetOnAcquisition = saveFlagToSetOnAcquisition;
+								component6.HologramIconSpriteName = component7.journalData.AmmonomiconSprite;
+								shopItemController.Initialize(component6, self);
+								gameObject7.SetActive(false);
+							}
+							else
+							{
+								shopItemController.Initialize(component4, self);
+							}
+							(_itemControllers.GetValue(self) as List<ShopItemController>).Add(shopItemController);
+						}
+					}
+				}
+				BotsModule.Log("it got to that one point");
+				bool flag3 = false;
+				if (self.shopItemsGroup2 != null && self.spawnPositionsGroup2.Length > 0)
+				{
+					int count = (_shopItems.GetValue(self) as List<GameObject>).Count;
+					for (int num2 = 0; num2 < self.spawnPositionsGroup2.Length; num2++)
+					{
+						if (flag)
+						{
+							(_shopItems.GetValue(self) as List<GameObject>).Add(null);
+						}
+						else
+						{
+							float num3 = self.spawnGroupTwoItem1Chance;
+							if (num2 == 1)
+							{
+								num3 = self.spawnGroupTwoItem2Chance;
+							}
+							else if (num2 == 2)
+							{
+								num3 = self.spawnGroupTwoItem3Chance;
+							}
+							bool isSeeded = GameManager.Instance.IsSeeded;
+							if (((!isSeeded) ? UnityEngine.Random.value : BraveRandom.GenerationRandomValue()) < num3)
+							{
+								if (self.baseShopType == BaseShopController.AdditionalShopType.BLACKSMITH)
+								{
+									if (!GameStatsManager.Instance.IsRainbowRun)
+									{
+										if (((!isSeeded) ? UnityEngine.Random.value : BraveRandom.GenerationRandomValue()) > 0.5f)
+										{
+											GameObject item = self.shopItemsGroup2.SelectByWeightWithoutDuplicatesFullPrereqs((_shopItems.GetValue(self) as List<GameObject>), true, GameManager.Instance.IsSeeded);
+											(_shopItems.GetValue(self) as List<GameObject>).Add(item);
+										}
+										else
+										{
+											GameObject rewardObjectShopStyle = GameManager.Instance.RewardManager.GetRewardObjectShopStyle(GameManager.Instance.PrimaryPlayer, true, false, (_shopItems.GetValue(self) as List<GameObject>));
+											(_shopItems.GetValue(self) as List<GameObject>).Add(rewardObjectShopStyle);
+										}
+									}
+									else
+									{
+										(_shopItems.GetValue(self) as List<GameObject>).Add(null);
+									}
+								}
+								else
+								{
+									float replaceFirstRewardWithPickup = GameManager.Instance.RewardManager.CurrentRewardData.ReplaceFirstRewardWithPickup;
+									if (!flag3 && ((!isSeeded) ? UnityEngine.Random.value : BraveRandom.GenerationRandomValue()) < replaceFirstRewardWithPickup)
+									{
+										flag3 = true;
+										GameObject item2 = self.shopItems.SelectByWeightWithoutDuplicatesFullPrereqs((_shopItems.GetValue(self) as List<GameObject>), weightModifier, GameManager.Instance.IsSeeded);
+										(_shopItems.GetValue(self) as List<GameObject>).Add(item2);
+									}
+									else if (!GameStatsManager.Instance.IsRainbowRun)
+									{
+										GameObject rewardObjectShopStyle2 = GameManager.Instance.RewardManager.GetRewardObjectShopStyle(GameManager.Instance.PrimaryPlayer, false, false, (_shopItems.GetValue(self) as List<GameObject>));
+										(_shopItems.GetValue(self) as List<GameObject>).Add(rewardObjectShopStyle2);
+									}
+									else
+									{
+										(_shopItems.GetValue(self) as List<GameObject>).Add(null);
+									}
+								}
+							}
+							else
+							{
+								(_shopItems.GetValue(self) as List<GameObject>).Add(null);
+							}
+						}
+					}
+					bool flag4 = GameStatsManager.Instance.GetFlag(GungeonFlags.ACHIEVEMENT_BIGGEST_WALLET) || UnityEngine.Random.value < 0.05f;
+					if (self.baseShopType == BaseShopController.AdditionalShopType.NONE && flag4 && !flag)
+					{
+
+						PickupObject randomLockedPaydayItem = (PickupObject)typeof(BaseShopController).GetMethod("GetRandomLockedPaydayItem", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null); ;
+						if (randomLockedPaydayItem)
+						{
+							if ((_shopItems.GetValue(self) as List<GameObject>).Count - count < self.spawnPositionsGroup2.Length)
+							{
+								(_shopItems.GetValue(self) as List<GameObject>).Add(randomLockedPaydayItem.gameObject);
+							}
+							else
+							{
+								(_shopItems.GetValue(self) as List<GameObject>)[UnityEngine.Random.Range(count, (_shopItems.GetValue(self) as List<GameObject>).Count)] = randomLockedPaydayItem.gameObject;
+							}
+						}
+					}
+					for (int num4 = 0; num4 < self.spawnPositionsGroup2.Length; num4++)
+					{
+						Transform transform3 = self.spawnPositionsGroup2[num4];
+						if (!flag && !((_shopItems.GetValue(self) as List<GameObject>)[count + num4] == null))
+						{
+							PickupObject component8 = (_shopItems.GetValue(self) as List<GameObject>)[count + num4].GetComponent<PickupObject>();
+							if (!(component8 == null))
+							{
+								GameObject gameObject8 = new GameObject("Shop 2 item " + num4.ToString());
+								Transform transform4 = gameObject8.transform;
+								transform4.parent = transform3;
+								transform4.localPosition = Vector3.zero;
+								EncounterTrackable component9 = component8.GetComponent<EncounterTrackable>();
+								if (component9 != null)
+								{
+									GameManager.Instance.ExtantShopTrackableGuids.Add(component9.EncounterGuid);
+								}
+								ShopItemController shopItemController2 = gameObject8.AddComponent<ShopItemController>();
+								typeof(BaseShopController).GetMethod("AssignItemFacing", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { transform3, shopItemController2 });
+								if (!(_room.GetValue(self) as RoomHandler).IsRegistered(shopItemController2))
+								{
+									(_room.GetValue(self) as RoomHandler).RegisterInteractable(shopItemController2);
+								}
+								shopItemController2.Initialize(component8, self);
+								(_itemControllers.GetValue(self) as List<ShopItemController>).Add(shopItemController2);
+							}
+						}
+					}
+				}
+				BotsModule.Log("it got to that other point");
+				if (self.baseShopType == BaseShopController.AdditionalShopType.NONE || self.baseShopType == BaseShopController.AdditionalShopType.BLACKSMITH || self.baseShopType == BaseShopController.AdditionalShopType.FOYER_META)
+				{
+					List<ShopSubsidiaryZone> componentsInRoom = (_room.GetValue(self) as RoomHandler).GetComponentsInRoom<ShopSubsidiaryZone>();
+					for (int num5 = 0; num5 < componentsInRoom.Count; num5++)
+					{
+						componentsInRoom[num5].HandleSetup(self, (_room.GetValue(self) as RoomHandler), (_shopItems.GetValue(self) as List<GameObject>), (_itemControllers.GetValue(self) as List<ShopItemController>));
+					}
+				}
+				for (int num6 = 0; num6 < (_itemControllers.GetValue(self) as List<ShopItemController>).Count; num6++)
+				{
+					if (self.baseShopType == BaseShopController.AdditionalShopType.KEY)
+					{
+						(_itemControllers.GetValue(self) as List<ShopItemController>)[num6].CurrencyType = ShopItemController.ShopCurrencyType.KEYS;
+					}
+					if (self.baseShopType == BaseShopController.AdditionalShopType.FOYER_META)
+					{
+						(_itemControllers.GetValue(self) as List<ShopItemController>)[num6].CurrencyType = ShopItemController.ShopCurrencyType.META_CURRENCY;
+					}
+					if (self.baseShopType == (BaseShopController.AdditionalShopType)CustomEnums.CustomAdditionalShopType.DEVIL_DEAL)
+					{
+						(_itemControllers.GetValue(self) as List<ShopItemController>)[num6].CurrencyType = (ShopItemController.ShopCurrencyType)CustomEnums.CustomShopCurrencyType.HEARTS;
+					}
+				}
+				BotsModule.Log("done");
+			}
+		    catch (Exception message)
+            {
+				BotsModule.Log(message.ToString());
+			}
+		}
+
+
+		public static int ModifiedPriceHook(Func<ShopItemController, int> orig, ShopItemController self)//your return type shoud be bool. for Func<> unlike Action its basically Func<Arg1,arg2,arg3... however many , return type
+		{
+
+			FieldInfo _baseParentShop = typeof(ShopItemController).GetField("m_baseParentShop", BindingFlags.NonPublic | BindingFlags.Instance);
+			
+			if ((_baseParentShop.GetValue(self) as BaseShopController) && (_baseParentShop.GetValue(self) as BaseShopController).baseShopType == BaseShopController.AdditionalShopType.RESRAT_SHORTCUT)
+			{
+				return 0;
+			}
+			if (self.IsResourcefulRatKey)
+			{
+				int num = Mathf.RoundToInt(GameStatsManager.Instance.GetPlayerStatValue(TrackedStats.AMOUNT_PAID_FOR_RAT_KEY));
+				int num2 = 1000 - num;
+				if (num2 <= 0)
+				{
+					return self.CurrentPrice;
+				}
+				return num2;
+			}
+			else
+			{
+				if (self.CurrencyType == ShopItemController.ShopCurrencyType.META_CURRENCY)
+				{
+					return self.CurrentPrice;
+				}
+				if (self.CurrencyType == ShopItemController.ShopCurrencyType.KEYS)
+				{
+					return self.CurrentPrice;
+				}
+
+				if (self.CurrencyType == (ShopItemController.ShopCurrencyType)CustomEnums.CustomShopCurrencyType.HEARTS)
+				{
+					return 1;
+				}
+				if (self.OverridePrice != null)
+				{
+					return self.OverridePrice.Value;
+				}
+				if (self.PrecludeAllDiscounts)
+				{
+					return self.CurrentPrice;
+				}
+				float num3 = GameManager.Instance.PrimaryPlayer.stats.GetStatValue(PlayerStats.StatType.GlobalPriceMultiplier);
+				if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER && GameManager.Instance.SecondaryPlayer)
+				{
+					num3 *= GameManager.Instance.SecondaryPlayer.stats.GetStatValue(PlayerStats.StatType.GlobalPriceMultiplier);
+				}
+				GameLevelDefinition lastLoadedLevelDefinition = GameManager.Instance.GetLastLoadedLevelDefinition();
+				float num4 = (lastLoadedLevelDefinition == null) ? 1f : lastLoadedLevelDefinition.priceMultiplier;
+				float num5 = 1f;
+				if ((_baseParentShop.GetValue(self) as BaseShopController) != null && (_baseParentShop.GetValue(self) as BaseShopController).ShopCostModifier != 1f)
+				{
+					num5 *= (_baseParentShop.GetValue(self) as BaseShopController).ShopCostModifier;
+				}
+				if ((_baseParentShop.GetValue(self) as BaseShopController).GetAbsoluteParentRoom().area.PrototypeRoomName.Contains("Black Market"))
+				{
+					num5 *= 0.5f;
+				}
+				return Mathf.RoundToInt((float)self.CurrentPrice * num3 * num4 * num5);
+				//return orig(self);
+			}
+		}
+		
+
+		public static void OnEnteredRangeHook(Action<ShopItemController, PlayerController> orig, ShopItemController self, PlayerController interactor)
+		{
+
+			FieldInfo _baseParentShop = typeof(ShopItemController).GetField("m_baseParentShop", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _parentShop = typeof(ShopItemController).GetField("m_parentShop", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			if (!self)
+			{
+				return;
+			}
+			SpriteOutlineManager.RemoveOutlineFromSprite(self.sprite, false);
+			SpriteOutlineManager.AddOutlineToSprite(self.sprite, Color.white);
+			Vector3 offset = new Vector3(self.sprite.GetBounds().max.x + 0.1875f, self.sprite.GetBounds().min.y, 0f);
+			EncounterTrackable component = self.item.GetComponent<EncounterTrackable>();
+			string arg = (!(component != null)) ? self.item.DisplayName : component.journalData.GetPrimaryDisplayName(false);
+			string text = self.ModifiedPrice.ToString();
+			if ((_baseParentShop.GetValue(self) as BaseShopController) != null)
+			{
+				if ((_baseParentShop.GetValue(self) as BaseShopController).baseShopType == BaseShopController.AdditionalShopType.FOYER_META)
+				{
+					text += "[sprite \"hbux_text_icon\"]";
+				}
+				else if ((_baseParentShop.GetValue(self) as BaseShopController).baseShopType == BaseShopController.AdditionalShopType.CURSE)
+				{
+					text += "[sprite \"ui_coin\"]?";
+				}
+				else if ((_baseParentShop.GetValue(self) as BaseShopController).baseShopType == BaseShopController.AdditionalShopType.RESRAT_SHORTCUT)
+				{
+					text = "0[sprite \"ui_coin\"]?";
+				}
+				else if ((_baseParentShop.GetValue(self) as BaseShopController).baseShopType == BaseShopController.AdditionalShopType.KEY)
+				{
+					text += "[sprite \"ui_key\"]";
+				}
+				else if ((_baseParentShop.GetValue(self) as BaseShopController).baseShopType == (BaseShopController.AdditionalShopType)CustomEnums.CustomAdditionalShopType.DEVIL_DEAL)
+				{
+					text += "[sprite \"heart_big_idle_001\"]";
+					
+				}
+				else
+				{
+					text += "[sprite \"ui_coin\"]";
+				}
+			}
+			if ((_parentShop.GetValue(self) as ShopController) != null && (_parentShop.GetValue(self) as ShopController) is MetaShopController)
+			{
+				text += "[sprite \"hbux_text_icon\"]";
+				MetaShopController metaShopController = (_parentShop.GetValue(self) as ShopController) as MetaShopController;
+				if (metaShopController.Hologramophone && self.item is ItemBlueprintItem)
+				{
+					ItemBlueprintItem itemBlueprintItem = self.item as ItemBlueprintItem;
+					tk2dSpriteCollectionData encounterIconCollection = AmmonomiconController.ForceInstance.EncounterIconCollection;
+					metaShopController.Hologramophone.ChangeToSprite(self.gameObject, encounterIconCollection, encounterIconCollection.GetSpriteIdByName(itemBlueprintItem.HologramIconSpriteName));
+				}
+			}
+			string text2;
+			if (((_baseParentShop.GetValue(self) as BaseShopController) && (_baseParentShop.GetValue(self) as BaseShopController).IsCapableOfBeingStolenFrom) || interactor.IsCapableOfStealing)
+			{
+				text2 = string.Format("[color red]{0}: {1} {2}[/color]", arg, text, StringTableManager.GetString("#STEAL"));
+			}
+			else
+			{
+				text2 = string.Format("{0}: {1}", arg, text);
+			}
+			if (self.IsResourcefulRatKey)
+			{
+				int num = Mathf.RoundToInt(GameStatsManager.Instance.GetPlayerStatValue(TrackedStats.AMOUNT_PAID_FOR_RAT_KEY));
+				if (num < 1000)
+				{
+					int num2 = Mathf.Min(interactor.carriedConsumables.Currency, 1000 - num);
+					if (num2 > 0)
+					{
+						text2 = text2 + "[color green] (-" + num2.ToString() + ")[/color]";
+					}
+				}
+			}
+			GameObject gameObject = GameUIRoot.Instance.RegisterDefaultLabel(self.transform, offset, text2);
+			dfLabel componentInChildren = gameObject.GetComponentInChildren<dfLabel>();
+			componentInChildren.ColorizeSymbols = false;
+			componentInChildren.ProcessMarkup = true;
+		}
+
+		public static void InteractHook(Action<ShopItemController, PlayerController> orig, ShopItemController self, PlayerController player)
+		{
+			FieldInfo _baseParentShop = typeof(ShopItemController).GetField("m_baseParentShop", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _parentShop = typeof(ShopItemController).GetField("m_parentShop", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _pickedUp = typeof(ShopItemController).GetField("pickedUp", BindingFlags.NonPublic | BindingFlags.Instance);
+			
+			
+
+
+			if (self.item && self.item is HealthPickup)
+			{
+				if ((self.item as HealthPickup).healAmount > 0f && (self.item as HealthPickup).armorAmount <= 0 && player.healthHaver.GetCurrentHealthPercentage() >= 1f)
+				{
+					return;
+				}
+			}
+			else if (self.item && self.item is AmmoPickup && (player.CurrentGun == null || player.CurrentGun.ammo == player.CurrentGun.AdjustedMaxAmmo || !player.CurrentGun.CanGainAmmo || player.CurrentGun.InfiniteAmmo))
+			{
+				GameUIRoot.Instance.InformNeedsReload(player, new Vector3(player.specRigidbody.UnitCenter.x - player.transform.position.x, 1.25f, 0f), 1f, "#RELOAD_FULL");
+				return;
+			}
+			//BotsModule.Log($"Health is {player.stats.GetStatValue(PlayerStats.StatType.Health)} and the Price is {self.ModifiedPrice}");
+			self.LastInteractingPlayer = player;
+			if (self.CurrencyType == ShopItemController.ShopCurrencyType.COINS || self.CurrencyType == ShopItemController.ShopCurrencyType.BLANKS || self.CurrencyType == ShopItemController.ShopCurrencyType.KEYS || self.CurrencyType == (ShopItemController.ShopCurrencyType)CustomEnums.CustomShopCurrencyType.HEARTS)
+			{
+				bool flag = false;
+				bool flag2 = true;
+				
+				if ((bool)typeof(ShopItemController).GetMethod("ShouldSteal", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { player }))
+				{
+					flag = (_baseParentShop.GetValue(self) as BaseShopController).AttemptToSteal();
+					flag2 = false;
+					if (!flag)
+					{
+						player.DidUnstealthyAction();
+						(_baseParentShop.GetValue(self) as BaseShopController).NotifyStealFailed();
+						return;
+					}
+				}
+				if (flag2)
+				{
+					BotsModule.Log(self.CurrencyType.ToString());
+					BotsModule.Log("pre money checks");
+					bool flag3 = false;
+					if (self.CurrencyType == ShopItemController.ShopCurrencyType.COINS || self.CurrencyType == ShopItemController.ShopCurrencyType.BLANKS)
+					{
+						flag3 = (player.carriedConsumables.Currency >= self.ModifiedPrice);
+						BotsModule.Log("coins");
+					}
+
+					else if (self.CurrencyType == ShopItemController.ShopCurrencyType.KEYS)
+					{
+						flag3 = (player.carriedConsumables.KeyBullets >= self.ModifiedPrice);
+						BotsModule.Log("keys");
+					}
+					
+					else if (self.CurrencyType == (ShopItemController.ShopCurrencyType)CustomEnums.CustomShopCurrencyType.HEARTS)
+					{
+						BotsModule.Log($"Health is {player.stats.GetStatValue(PlayerStats.StatType.Health)} and the Price is {self.ModifiedPrice}");
+
+						flag3 = (player.stats.GetStatValue(PlayerStats.StatType.Health) >= self.ModifiedPrice);
+						BotsModule.Log("health");
+						BotsModule.Log(flag3.ToString());
+
+					}
+
+					
+					if (self.IsResourcefulRatKey)
+					{
+						if (!flag3)
+						{
+							int num = Mathf.RoundToInt(GameStatsManager.Instance.GetPlayerStatValue(TrackedStats.AMOUNT_PAID_FOR_RAT_KEY));
+							if (num >= 1000)
+							{
+								AkSoundEngine.PostEvent("Play_OBJ_purchase_unable_01", self.gameObject);
+								if ((_parentShop.GetValue(self) as ShopController) != null)
+								{
+									(_parentShop.GetValue(self) as ShopController).NotifyFailedPurchase(self);
+								}
+								if ((_baseParentShop.GetValue(self) as BaseShopController) != null)
+								{
+									(_baseParentShop.GetValue(self) as BaseShopController).NotifyFailedPurchase(self);
+								}
+								return;
+							}
+							if (player.carriedConsumables.Currency > 0)
+							{
+								GameStatsManager.Instance.RegisterStatChange(TrackedStats.AMOUNT_PAID_FOR_RAT_KEY, (float)player.carriedConsumables.Currency);
+								player.carriedConsumables.Currency = 0;
+								self.OnExitRange(player);
+								self.OnEnteredRange(player);
+							}
+							else
+							{
+								AkSoundEngine.PostEvent("Play_OBJ_purchase_unable_01", self.gameObject);
+								if ((_parentShop.GetValue(self) as ShopController) != null)
+								{
+									(_parentShop.GetValue(self) as ShopController).NotifyFailedPurchase(self);
+								}
+								if ((_baseParentShop.GetValue(self) as BaseShopController) != null)
+								{
+									(_baseParentShop.GetValue(self) as BaseShopController).NotifyFailedPurchase(self);
+								}
+							}
+							return;
+						}
+						else
+						{
+							player.carriedConsumables.Currency -= self.ModifiedPrice;
+							GameStatsManager.Instance.RegisterStatChange(TrackedStats.AMOUNT_PAID_FOR_RAT_KEY, (float)self.ModifiedPrice);
+							flag2 = false;
+						}
+					}
+					else if (!flag3)
+					{
+						AkSoundEngine.PostEvent("Play_OBJ_purchase_unable_01", self.gameObject);
+						if ((_parentShop.GetValue(self) as ShopController) != null)
+						{
+							(_parentShop.GetValue(self) as ShopController).NotifyFailedPurchase(self);
+						}
+						if ((_baseParentShop.GetValue(self) as BaseShopController) != null)
+						{
+							(_baseParentShop.GetValue(self) as BaseShopController).NotifyFailedPurchase(self);
+						}
+						return;
+					}
+				}
+				if (!(bool)_pickedUp.GetValue(self))
+				{
+					_pickedUp.SetValue(self, !self.item.PersistsOnPurchase);
+					LootEngine.GivePrefabToPlayer(self.item.gameObject, player);
+					if (flag2)
+					{
+						if (self.CurrencyType == ShopItemController.ShopCurrencyType.COINS || self.CurrencyType == ShopItemController.ShopCurrencyType.BLANKS)
+						{
+							player.carriedConsumables.Currency -= self.ModifiedPrice;
+						}
+						else if (self.CurrencyType == ShopItemController.ShopCurrencyType.KEYS)
+						{
+							player.carriedConsumables.KeyBullets -= self.ModifiedPrice;
+						}
+						else if (self.CurrencyType == (ShopItemController.ShopCurrencyType)CustomEnums.CustomShopCurrencyType.HEARTS)
+						{
+							if (player.stats.GetStatValue(PlayerStats.StatType.Health) <= self.ModifiedPrice)
+							{
+								player.healthHaver.ApplyDamage(10000000, Vector2.zero, "you fucking idiot you die without health", CoreDamageTypes.Void, DamageCategory.Unstoppable, true);
+							}
+							StatModifier statModifier = new StatModifier();
+							statModifier.statToBoost = PlayerStats.StatType.Health;
+							statModifier.amount = (self.ModifiedPrice) * -1;
+							statModifier.modifyType = StatModifier.ModifyMethod.ADDITIVE;
+							player.ownerlessStatModifiers.Add(statModifier);
+							player.stats.RecalculateStats(player, false, false);
+
+						}
+					}
+					if ((_parentShop.GetValue(self) as ShopController) != null)
+					{
+						(_parentShop.GetValue(self) as ShopController).PurchaseItem(self, !flag, true);
+					}
+					if ((_baseParentShop.GetValue(self) as BaseShopController) != null)
+					{
+						(_baseParentShop.GetValue(self) as BaseShopController).PurchaseItem(self, !flag, true);
+					}
+					if (flag)
+					{
+						StatModifier statModifier = new StatModifier();
+						statModifier.statToBoost = PlayerStats.StatType.Curse;
+						statModifier.amount = 1f;
+						statModifier.modifyType = StatModifier.ModifyMethod.ADDITIVE;
+						player.ownerlessStatModifiers.Add(statModifier);
+						player.stats.RecalculateStats(player, false, false);
+						player.HandleItemStolen(self);
+						(_baseParentShop.GetValue(self) as BaseShopController).NotifyStealSucceeded();
+						player.IsThief = true;
+						GameStatsManager.Instance.RegisterStatChange(TrackedStats.MERCHANT_ITEMS_STOLEN, 1f);
+						if (self.SetsFlagOnSteal)
+						{
+							GameStatsManager.Instance.SetFlag(self.FlagToSetOnSteal, true);
+						}
+					}
+					else
+					{
+						if (self.CurrencyType == ShopItemController.ShopCurrencyType.BLANKS)
+						{
+							player.Blanks++;
+						}
+						player.HandleItemPurchased(self);
+					}
+					if (!self.item.PersistsOnPurchase)
+					{
+						GameUIRoot.Instance.DeregisterDefaultLabel(self.transform);
+					}
+					AkSoundEngine.PostEvent("Play_OBJ_item_purchase_01", self.gameObject);
+				}
+			}
+			else if (self.CurrencyType == ShopItemController.ShopCurrencyType.META_CURRENCY)
+			{
+				int num2 = Mathf.RoundToInt(GameStatsManager.Instance.GetPlayerStatValue(TrackedStats.META_CURRENCY));
+				if (num2 < self.ModifiedPrice)
+				{
+					AkSoundEngine.PostEvent("Play_OBJ_purchase_unable_01", self.gameObject);
+					if ((_parentShop.GetValue(self) as ShopController) != null)
+					{
+						(_parentShop.GetValue(self) as ShopController).NotifyFailedPurchase(self);
+					}
+					if ((_baseParentShop.GetValue(self) as BaseShopController) != null)
+					{
+						(_baseParentShop.GetValue(self) as BaseShopController).NotifyFailedPurchase(self);
+					}
+					return;
+				}
+				if (!(bool)_pickedUp.GetValue(self))
+				{
+					_pickedUp.SetValue(self, !self.item.PersistsOnPurchase);
+					GameStatsManager.Instance.ClearStatValueGlobal(TrackedStats.META_CURRENCY);
+					GameStatsManager.Instance.SetStat(TrackedStats.META_CURRENCY, (float)(num2 - self.ModifiedPrice));
+					GameStatsManager.Instance.RegisterStatChange(TrackedStats.META_CURRENCY_SPENT_AT_META_SHOP, (float)self.ModifiedPrice);
+					LootEngine.GivePrefabToPlayer(self.item.gameObject, player);
+					if ((_parentShop.GetValue(self) as ShopController) != null)
+					{
+						(_parentShop.GetValue(self) as ShopController).PurchaseItem(self, true, true);
+					}
+					if ((_baseParentShop.GetValue(self) as BaseShopController) != null)
+					{
+						(_baseParentShop.GetValue(self) as BaseShopController).PurchaseItem(self, true, true);
+					}
+					player.HandleItemPurchased(self);
+					if (!self.item.PersistsOnPurchase)
+					{
+						GameUIRoot.Instance.DeregisterDefaultLabel(self.transform);
+					}
+					AkSoundEngine.PostEvent("Play_OBJ_item_purchase_01", self.gameObject);
+				}
+			}
+		}
+
+
+		public static void PurchaseItemHook(Action<BaseShopController, ShopItemController, bool, bool> orig, BaseShopController self, ShopItemController item, bool actualPurchase = true, bool allowSign = true)
+		{
+			FieldInfo _room = typeof(BaseShopController).GetField("m_room", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _numberThingsPurchased = typeof(BaseShopController).GetField("m_numberThingsPurchased", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _itemControllers = typeof(BaseShopController).GetField("m_itemControllers", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _shopkeep = typeof(BaseShopController).GetField("m_shopkeep", BindingFlags.NonPublic | BindingFlags.Instance);
+
+
+			float heightOffGround = -1f;
+			if (item && item.sprite)
+			{
+				heightOffGround = item.sprite.HeightOffGround;
+			}
+			if (actualPurchase)
+			{
+				if (self.baseShopType == BaseShopController.AdditionalShopType.TRUCK)
+				{
+					GameStatsManager.Instance.RegisterStatChange(TrackedStats.MERCHANT_PURCHASES_TRUCK, 1f);
+					GameStatsManager.Instance.RegisterStatChange(TrackedStats.MONEY_SPENT_AT_TRUCK_SHOP, (float)item.ModifiedPrice);
+				}
+				if (self.baseShopType == BaseShopController.AdditionalShopType.GOOP)
+				{
+					GameStatsManager.Instance.RegisterStatChange(TrackedStats.MERCHANT_PURCHASES_GOOP, 1f);
+					GameStatsManager.Instance.RegisterStatChange(TrackedStats.MONEY_SPENT_AT_GOOP_SHOP, (float)item.ModifiedPrice);
+				}
+				if (self.baseShopType == BaseShopController.AdditionalShopType.CURSE)
+				{
+					GameStatsManager.Instance.RegisterStatChange(TrackedStats.MERCHANT_PURCHASES_CURSE, 1f);
+					GameStatsManager.Instance.RegisterStatChange(TrackedStats.MONEY_SPENT_AT_CURSE_SHOP, (float)item.ModifiedPrice);
+					StatModifier statModifier = new StatModifier();
+					statModifier.amount = 2.5f;
+					statModifier.modifyType = StatModifier.ModifyMethod.ADDITIVE;
+					statModifier.statToBoost = PlayerStats.StatType.Curse;
+					item.LastInteractingPlayer.ownerlessStatModifiers.Add(statModifier);
+					item.LastInteractingPlayer.stats.RecalculateStats(item.LastInteractingPlayer, false, false);
+				}
+				if (self.baseShopType == BaseShopController.AdditionalShopType.BLANK)
+				{
+					GameStatsManager.Instance.RegisterStatChange(TrackedStats.MERCHANT_PURCHASES_BLANK, 1f);
+					GameStatsManager.Instance.RegisterStatChange(TrackedStats.MONEY_SPENT_AT_BLANK_SHOP, (float)item.ModifiedPrice);
+				}
+				if (self.baseShopType == BaseShopController.AdditionalShopType.KEY)
+				{
+					GameStatsManager.Instance.RegisterStatChange(TrackedStats.MERCHANT_PURCHASES_KEY, 1f);
+					GameStatsManager.Instance.RegisterStatChange(TrackedStats.MONEY_SPENT_AT_KEY_SHOP, (float)item.ModifiedPrice);
+				}
+
+				if (self.baseShopType == (BaseShopController.AdditionalShopType)CustomEnums.CustomAdditionalShopType.DEVIL_DEAL)
+				{
+					SaveAPIManager.RegisterStatChange(CustomTrackedStats.MERCHANT_PURCHASES_HEART, 1f);
+					SaveAPIManager.RegisterStatChange(CustomTrackedStats.MONEY_SPENT_AT_HEART_SHOP, (float)item.ModifiedPrice);
+				}
+				if (self.shopkeepFSM != null && self.baseShopType != BaseShopController.AdditionalShopType.RESRAT_SHORTCUT)
+				{
+					FsmObject fsmObject = self.shopkeepFSM.FsmVariables.FindFsmObject("referencedItem");
+					if (fsmObject != null)
+					{
+						fsmObject.Value = item;
+					}
+					self.shopkeepFSM.SendEvent("succeedPurchase");
+				}
+			}
+			if (!item.item.PersistsOnPurchase)
+			{
+				if (allowSign)
+				{
+					GameObject gameObject = (GameObject)UnityEngine.Object.Instantiate(BraveResources.Load("Global Prefabs/Sign_SoldOut", ".prefab"));
+					tk2dBaseSprite component = gameObject.GetComponent<tk2dBaseSprite>();
+					component.PlaceAtPositionByAnchor(item.sprite.WorldCenter, tk2dBaseSprite.Anchor.MiddleCenter);
+					gameObject.transform.position = gameObject.transform.position.Quantize(0.0625f);
+					component.HeightOffGround = heightOffGround;
+					component.UpdateZDepth();
+				}
+				GameObject gameObject2 = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
+				tk2dBaseSprite component2 = gameObject2.GetComponent<tk2dBaseSprite>();
+				component2.PlaceAtPositionByAnchor(item.sprite.WorldCenter.ToVector3ZUp(0f), tk2dBaseSprite.Anchor.MiddleCenter);
+				component2.transform.position = component2.transform.position.Quantize(0.0625f);
+				component2.HeightOffGround = 5f;
+				component2.UpdateZDepth();
+
+
+
+				(_room.GetValue(self) as RoomHandler).DeregisterInteractable(item);
+				UnityEngine.Object.Destroy(item.gameObject);
+			}
+			if (self.baseShopType == BaseShopController.AdditionalShopType.RESRAT_SHORTCUT)
+			{
+				_numberThingsPurchased.SetValue(self, (int)_numberThingsPurchased.GetValue(self) + 1);
+				GlobalDungeonData.ValidTilesets tilesetId = GameManager.Instance.Dungeon.tileIndices.tilesetId;
+				int num;
+				if (tilesetId != GlobalDungeonData.ValidTilesets.GUNGEON)
+				{
+					if (tilesetId != GlobalDungeonData.ValidTilesets.MINEGEON)
+					{
+						if (tilesetId != GlobalDungeonData.ValidTilesets.CATACOMBGEON)
+						{
+							if (tilesetId != GlobalDungeonData.ValidTilesets.FORGEGEON)
+							{
+								num = 1;
+							}
+							else
+							{
+								num = 3;
+							}
+						}
+						else
+						{
+							num = 2;
+						}
+					}
+					else
+					{
+						num = 1;
+					}
+				}
+				else
+				{
+					num = 1;
+				}
+				if ((int)_numberThingsPurchased.GetValue(self) >= num)
+				{
+					for (int i = 0; i < (_itemControllers.GetValue(self) as List<ShopItemController>).Count; i++)
+					{
+						if (!(_itemControllers.GetValue(self) as List<ShopItemController>)[i].Acquired)
+						{
+							(_itemControllers.GetValue(self) as List<ShopItemController>)[i].ForceOutOfStock();
+						}
+					}
+					if (self.shopkeepFSM != null)
+					{
+						FsmObject fsmObject2 = self.shopkeepFSM.FsmVariables.FindFsmObject("referencedItem");
+						if (fsmObject2 != null)
+						{
+							fsmObject2.Value = item;
+						}
+						self.shopkeepFSM.SendEvent("succeedPurchase");
+						(_shopkeep.GetValue(self) as TalkDoerLite).IsInteractable = false;
+					}
+				}
+			}
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		static bool setup = false;
 		static dfAnimationClip beyondClip;
 		private static void DoNotificationInternalHook(UINotificationController self, NotificationParams notifyParams)
 		{
 			if (!setup)
 			{
-
-				self.BoxSprite.Atlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_001" + ".png"), "notification_box_beyond_001");
-				self.BoxSprite.Atlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_002" + ".png"), "notification_box_beyond_002");
-				self.BoxSprite.Atlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_003" + ".png"), "notification_box_beyond_003");
-				self.BoxSprite.Atlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_004" + ".png"), "notification_box_beyond_004");
-				self.BoxSprite.Atlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_005" + ".png"), "notification_box_beyond_005");
-				self.BoxSprite.Atlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_006" + ".png"), "notification_box_beyond_006");
-				self.BoxSprite.Atlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_007" + ".png"), "notification_box_beyond_007");
-				self.BoxSprite.Atlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_008" + ".png"), "notification_box_beyond_008");
-
-				self.BoxSprite.Atlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_001" + ".png"), "notification_box_beyondns_001");
-
-				self.CrosshairSprite.Atlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/crosshair_beyond" + ".png"), "crosshair_beyond");
-				self.ObjectBoxSprite.Atlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/object_box_beyond_001" + ".png"), "object_box_beyond_001");
-
-
-				beyondClip = new dfAnimationClip
-				{
-					Atlas = self.BoxSprite.Atlas,
-				};
-
-				FieldInfo _sprites = typeof(dfAnimationClip).GetField("sprites", BindingFlags.NonPublic | BindingFlags.Instance);
-
-				_sprites.SetValue(beyondClip, new List<string> { "notification_box_beyond_001", "notification_box_beyond_002", "notification_box_beyond_003", "notification_box_beyond_004", "notification_box_beyond_005", "notification_box_beyond_006", "notification_box_beyond_007", "notification_box_beyond_008", "notification_box_beyondns_001" });
-
 
 				setup = true;
 			}
@@ -501,7 +2271,7 @@ namespace BotsMod
 
 		public static string GetCharacterPathFromQuickStartHookHook()
 		{
-			return "PlayerLost";
+			//return "PlayerLost";
 			if (ETGMod.Player.QuickstartReplacement != null)
 			{
 				return ETGMod.Player.QuickstartReplacement;
@@ -690,7 +2460,7 @@ namespace BotsMod
 			}
 			else
 			{
-				BotsModule.Log("if you see this before \"List of Custom Characters From Enter the Beyond:\" then you fucked it up", BotsModule.LOST_COLOR);
+				//BotsModule.Log("if you see this before \"List of Custom Characters From Enter the Beyond:\" then you fucked it up", BotsModule.LOST_COLOR);
 				GameManager.PlayerPrefabForNewGame = (GameObject)BraveResources.Load(CharacterSelectController.GetCharacterPathFromQuickStart(), ".prefab");
 
 
@@ -1004,39 +2774,6 @@ namespace BotsMod
 			typeof(BraveOptionsMenuItem).GetMethod("UpdateSelectedLabelText", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null);
 			typeof(BraveOptionsMenuItem).GetMethod("UpdateInfoControl", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null);
 		}
-
-
-		/*public void Interact(Action<ArkController, PlayerController> orig, ArkController self,PlayerController interactor)
-		{
-			SpriteOutlineManager.RemoveOutlineFromSprite(self.sprite, false);
-			SpriteOutlineManager.RemoveOutlineFromSprite(self.LidAnimator.sprite, false);
-			if (!self.m_hasBeenInteracted)
-			{
-				self.m_hasBeenInteracted = true;
-			}
-			for (int i = 0; i < GameManager.Instance.AllPlayers.Length; i++)
-			{
-				GameManager.Instance.AllPlayers[i].RemoveBrokenInteractable(self);
-			}
-			BraveInput.DoVibrationForAllPlayers(Vibration.Time.Normal, Vibration.Strength.Medium);
-			if (GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
-			{
-				PlayerController otherPlayer = GameManager.Instance.GetOtherPlayer(interactor);
-				float num = Vector2.Distance(otherPlayer.CenterPosition, interactor.CenterPosition);
-				if (num > 8f || num < 0.75f)
-				{
-					Vector2 a = Vector2.right;
-					if (interactor.CenterPosition.x < self.ChestAnimator.sprite.WorldCenter.x)
-					{
-						a = Vector2.left;
-					}
-					otherPlayer.WarpToPoint(otherPlayer.transform.position.XY() + a * 2f, true, false);
-				}
-			}
-			self.StartCoroutine(self.Open(interactor));
-		}*/
-
-
 
 		public static Hook getOrLoadByName_Hook;
 		public static Hook setWinPicHook;
@@ -1550,19 +3287,29 @@ namespace BotsMod
 			}
 			else
 			{
-				bool flag2 = self.name == "PlayerLost(Clone)";
+				bool flag2 = self.characterIdentity == (PlayableCharacters)CustomPlayableCharacters.Lost;
 				if (flag2)
 				{
-
-					Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
-					material.SetTexture("_MainTexture", self.sprite.renderer.material.GetTexture("_MainTex"));
-					material.SetColor("_EmissiveColor", new Color32(255, 0, 38, 255));
-					material.SetFloat("_EmissiveColorPower", 4.55f);
-					material.SetFloat("_EmissivePower", 55);
-					self.sprite.renderer.material = material;
-					result = material.shader.name;
-					
-
+					if (self.IsUsingAlternateCostume)
+					{
+						Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+						material.SetTexture("_MainTexture", self.sprite.renderer.material.GetTexture("_MainTex"));
+						material.SetColor("_EmissiveColor", new Color32(255, 69, 248, 255));
+						material.SetFloat("_EmissiveColorPower", 4.55f);
+						material.SetFloat("_EmissivePower", 55);
+						self.sprite.renderer.material = material;
+						result = material.shader.name;
+					}
+					else
+					{
+						Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+						material.SetTexture("_MainTexture", self.sprite.renderer.material.GetTexture("_MainTex"));
+						material.SetColor("_EmissiveColor", new Color32(255, 0, 38, 255));
+						material.SetFloat("_EmissiveColorPower", 4.55f);
+						material.SetFloat("_EmissivePower", 55);
+						self.sprite.renderer.material = material;
+						result = material.shader.name;
+					}
 
 				}
 				else

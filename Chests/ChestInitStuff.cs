@@ -1,4 +1,5 @@
 ﻿using Brave.BulletScript;
+using CustomCharacters;
 using FrostAndGunfireItems;
 using Gungeon;
 using ItemAPI;
@@ -23,16 +24,324 @@ namespace BotsMod
         static Texture2D texture = ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod\\sprites\\paradox_test.png");
         public static void InitKeyChest()
         {
-            Chest chest = UnityEngine.Object.Instantiate<Chest>(GameManager.Instance.RewardManager.B_Chest);
-            chest.gameObject.SetActive(false);
-            FakePrefab.MarkAsFakePrefab(chest.gameObject);
-            UnityEngine.Object.DontDestroyOnLoad(chest);
+
+            GameObject chestAnimator = Tools.shared_auto_001.LoadAsset<GameObject>("Chest_Animation");
+
+
+            var spriteAnimator = chestAnimator.GetComponent<tk2dSpriteAnimation>();
+
+            var animations = spriteAnimator.clips.ToList();
+
+            var collection = animations[0].frames[0].spriteCollection;
+
+            var idList = new List<int>();
+
+            foreach (var frame in spriteAnimator.GetClipByName("green_chest_appear").frames)
+            {
+                var spriteDef = frame.spriteCollection.spriteDefinitions[frame.spriteId];
+                var copy = spriteDef.Copy();
+                copy.ReplaceTexture(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/chest/" + spriteDef.name.Replace("green", "beyond") + ".png"));
+                copy.name = spriteDef.name.Replace("green", "beyond");
+                idList.Add(SpriteHandler.AddSpriteToCollection(copy, collection));
+                BotsModule.Log(copy.name);
+            }
 
 
 
-			
+            animations.Add(new tk2dSpriteAnimationClip
+            {
+                fps = 11,
+                loopStart = 0,
+                maxFidgetDuration = 2,
+                minFidgetDuration = 1,
+                wrapMode = tk2dSpriteAnimationClip.WrapMode.Once,
+                name = "beyond_chest_appear",
 
-			if (chest != null && chest.sprite != null && chest.sprite.renderer != null && chest.sprite.renderer.material != null)
+                frames = new tk2dSpriteAnimationFrame[]
+                {
+                   new tk2dSpriteAnimationFrame
+                   {
+                       invulnerableFrame = false,
+                       groundedFrame = true,
+                       requiresOffscreenUpdate = false,
+                       eventAudio = "Play_OBJ_smallchest_spawn_01",
+                       eventVfx = null,
+                       eventStopVfx = null,
+                       eventLerpEmissive = false,
+                       eventLerpEmissivePower = 30.0f,
+                       eventLerpEmissiveTime = 0.5f,
+                       forceMaterialUpdate = false,
+                       finishedSpawning = false,
+                       triggerEvent = true,
+                       eventInfo = "",
+                       eventInt = 0,
+                       eventFloat = 0,
+                       eventOutline = tk2dSpriteAnimationFrame.OutlineModifier.Unspecified,
+                       spriteId = idList[0],
+                       spriteCollection = collection
+
+                   },
+
+                   new tk2dSpriteAnimationFrame
+                   {
+                       invulnerableFrame = false,
+                       groundedFrame = true,
+                       requiresOffscreenUpdate = false,
+                       eventAudio = "",
+                       eventVfx = null,
+                       eventStopVfx = null,
+                       eventLerpEmissive = false,
+                       eventLerpEmissivePower = 30.0f,
+                       eventLerpEmissiveTime = 0.5f,
+                       forceMaterialUpdate = false,
+                       finishedSpawning = false,
+                       triggerEvent = true,
+                       eventInfo = "",
+                       eventInt = 0,
+                       eventFloat = 0,
+                       eventOutline = tk2dSpriteAnimationFrame.OutlineModifier.Unspecified,
+                       spriteId = idList[1],
+                       spriteCollection = collection
+
+                   },
+
+                   new tk2dSpriteAnimationFrame
+                   {
+                       invulnerableFrame = false,
+                       groundedFrame = true,
+                       requiresOffscreenUpdate = false,
+                       eventAudio = "",
+                       eventVfx = null,
+                       eventStopVfx = null,
+                       eventLerpEmissive = false,
+                       eventLerpEmissivePower = 30.0f,
+                       eventLerpEmissiveTime = 0.5f,
+                       forceMaterialUpdate = false,
+                       finishedSpawning = false,
+                       triggerEvent = true,
+                       eventInfo = "",
+                       eventInt = 0,
+                       eventFloat = 0,
+                       eventOutline = tk2dSpriteAnimationFrame.OutlineModifier.Unspecified,
+                       spriteId = idList[2],
+                       spriteCollection = collection
+
+                   },
+
+                   new tk2dSpriteAnimationFrame
+                   {
+                       invulnerableFrame = false,
+                       groundedFrame = true,
+                       requiresOffscreenUpdate = false,
+                       eventAudio = "",
+                       eventVfx = null,
+                       eventStopVfx = null,
+                       eventLerpEmissive = false,
+                       eventLerpEmissivePower = 30.0f,
+                       eventLerpEmissiveTime = 0.5f,
+                       forceMaterialUpdate = false,
+                       finishedSpawning = false,
+                       triggerEvent = true,
+                       eventInfo = "",
+                       eventInt = 0,
+                       eventFloat = 0,
+                       eventOutline = tk2dSpriteAnimationFrame.OutlineModifier.Unspecified,
+                       spriteId = idList[3],
+                       spriteCollection = collection
+
+                   },
+                   new tk2dSpriteAnimationFrame
+                   {
+                       invulnerableFrame = false,
+                       groundedFrame = true,
+                       requiresOffscreenUpdate = false,
+                       eventAudio = "",
+                       eventVfx = null,
+                       eventStopVfx = null,
+                       eventLerpEmissive = false,
+                       eventLerpEmissivePower = 30.0f,
+                       eventLerpEmissiveTime = 0.5f,
+                       forceMaterialUpdate = false,
+                       finishedSpawning = false,
+                       triggerEvent = true,
+                       eventInfo = "",
+                       eventInt = 0,
+                       eventFloat = 0,
+                       eventOutline = tk2dSpriteAnimationFrame.OutlineModifier.Unspecified,
+                       spriteId = idList[4],
+                       spriteCollection = collection
+
+                   },
+                   new tk2dSpriteAnimationFrame
+                   {
+                       invulnerableFrame = false,
+                       groundedFrame = true,
+                       requiresOffscreenUpdate = false,
+                       eventAudio = "",
+                       eventVfx = null,
+                       eventStopVfx = null,
+                       eventLerpEmissive = false,
+                       eventLerpEmissivePower = 30.0f,
+                       eventLerpEmissiveTime = 0.5f,
+                       forceMaterialUpdate = false,
+                       finishedSpawning = false,
+                       triggerEvent = true,
+                       eventInfo = "",
+                       eventInt = 0,
+                       eventFloat = 0,
+                       eventOutline = tk2dSpriteAnimationFrame.OutlineModifier.Unspecified,
+                       spriteId = idList[5],
+                       spriteCollection = collection
+
+                   },
+                   new tk2dSpriteAnimationFrame
+                   {
+                       invulnerableFrame = false,
+                       groundedFrame = true,
+                       requiresOffscreenUpdate = false,
+                       eventAudio = "",
+                       eventVfx = null,
+                       eventStopVfx = null,
+                       eventLerpEmissive = false,
+                       eventLerpEmissivePower = 30.0f,
+                       eventLerpEmissiveTime = 0.5f,
+                       forceMaterialUpdate = false,
+                       finishedSpawning = false,
+                       triggerEvent = true,
+                       eventInfo = "",
+                       eventInt = 0,
+                       eventFloat = 0,
+                       eventOutline = tk2dSpriteAnimationFrame.OutlineModifier.Unspecified,
+                       spriteId = idList[6],
+                       spriteCollection = collection
+
+                   },
+                   new tk2dSpriteAnimationFrame
+                   {
+                       invulnerableFrame = false,
+                       groundedFrame = true,
+                       requiresOffscreenUpdate = false,
+                       eventAudio = "",
+                       eventVfx = null,
+                       eventStopVfx = null,
+                       eventLerpEmissive = false,
+                       eventLerpEmissivePower = 30.0f,
+                       eventLerpEmissiveTime = 0.5f,
+                       forceMaterialUpdate = false,
+                       finishedSpawning = false,
+                       triggerEvent = true,
+                       eventInfo = "",
+                       eventInt = 0,
+                       eventFloat = 0,
+                       eventOutline = tk2dSpriteAnimationFrame.OutlineModifier.Unspecified,
+                       spriteId = idList[7],
+                       spriteCollection = collection
+
+                   },
+                   new tk2dSpriteAnimationFrame
+                   {
+                       invulnerableFrame = false,
+                       groundedFrame = true,
+                       requiresOffscreenUpdate = false,
+                       eventAudio = "",
+                       eventVfx = null,
+                       eventStopVfx = null,
+                       eventLerpEmissive = false,
+                       eventLerpEmissivePower = 30.0f,
+                       eventLerpEmissiveTime = 0.5f,
+                       forceMaterialUpdate = false,
+                       finishedSpawning = false,
+                       triggerEvent = true,
+                       eventInfo = "",
+                       eventInt = 0,
+                       eventFloat = 0,
+                       eventOutline = tk2dSpriteAnimationFrame.OutlineModifier.Unspecified,
+                       spriteId = idList[8],
+                       spriteCollection = collection
+
+                   },
+                   new tk2dSpriteAnimationFrame
+                   {
+                       invulnerableFrame = false,
+                       groundedFrame = true,
+                       requiresOffscreenUpdate = false,
+                       eventAudio = "",
+                       eventVfx = null,
+                       eventStopVfx = null,
+                       eventLerpEmissive = false,
+                       eventLerpEmissivePower = 30.0f,
+                       eventLerpEmissiveTime = 0.5f,
+                       forceMaterialUpdate = false,
+                       finishedSpawning = false,
+                       triggerEvent = true,
+                       eventInfo = "",
+                       eventInt = 0,
+                       eventFloat = 0,
+                       eventOutline = tk2dSpriteAnimationFrame.OutlineModifier.Unspecified,
+                       spriteId = idList[9],
+                       spriteCollection = collection
+
+                   },
+                   new tk2dSpriteAnimationFrame
+                   {
+                       invulnerableFrame = false,
+                       groundedFrame = true,
+                       requiresOffscreenUpdate = false,
+                       eventAudio = "",
+                       eventVfx = null,
+                       eventStopVfx = null,
+                       eventLerpEmissive = false,
+                       eventLerpEmissivePower = 30.0f,
+                       eventLerpEmissiveTime = 0.5f,
+                       forceMaterialUpdate = false,
+                       finishedSpawning = false,
+                       triggerEvent = true,
+                       eventInfo = "",
+                       eventInt = 0,
+                       eventFloat = 0,
+                       eventOutline = tk2dSpriteAnimationFrame.OutlineModifier.Unspecified,
+                       spriteId = idList[10],
+                       spriteCollection = collection
+
+                   },
+                   new tk2dSpriteAnimationFrame
+                   {
+                       invulnerableFrame = false,
+                       groundedFrame = true,
+                       requiresOffscreenUpdate = false,
+                       eventAudio = "",
+                       eventVfx = null,
+                       eventStopVfx = null,
+                       eventLerpEmissive = false,
+                       eventLerpEmissivePower = 30.0f,
+                       eventLerpEmissiveTime = 0.5f,
+                       forceMaterialUpdate = false,
+                       finishedSpawning = false,
+                       triggerEvent = true,
+                       eventInfo = "",
+                       eventInt = 0,
+                       eventFloat = 0,
+                       eventOutline = tk2dSpriteAnimationFrame.OutlineModifier.Unspecified,
+                       spriteId = idList[11],
+                       spriteCollection = collection
+
+                   },
+                }
+
+            });
+
+
+            var chestObj = FakePrefab.Clone(GameManager.Instance.RewardManager.B_Chest.gameObject);
+            chestObj.SetActive(false);
+            FakePrefab.MarkAsFakePrefab(chestObj);
+            UnityEngine.Object.DontDestroyOnLoad(chestObj);
+
+            var chest = chestObj.GetComponent<Chest>();
+
+            chest.spawnAnimName = "beyond_chest_appear";
+
+
+            /*if (chest != null && chest.sprite != null && chest.sprite.renderer != null && chest.sprite.renderer.material != null)
 			{
 
 				chest.sprite.usesOverrideMaterial = true;
@@ -45,9 +354,9 @@ namespace BotsMod
 
 
 
-			}
+			}*/
 
-			chest.lootTable.overrideItemLootTables.Clear();
+            chest.lootTable.overrideItemLootTables.Clear();
 			chest.lootTable.lootTable = ItemBuilder.LoadShopTable("Shop_Key_Items_01");
 			chest.ChestIdentifier = (Chest.SpecialChestIdentifier)CustomEnums.CustomSpecialChestIdentifier.TEST;
 			chest.ChestType = Chest.GeneralChestType.UNSPECIFIED;

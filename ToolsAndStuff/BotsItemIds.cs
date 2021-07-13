@@ -11,5 +11,6 @@ namespace BotsMod
         public static int BeyondChamberGun;
         public static int LostSidearm;
         public static int LostCloak;
+        public static int Wand;
     }
 }

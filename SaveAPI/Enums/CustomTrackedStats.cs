@@ -9,6 +9,11 @@ namespace SaveAPI
     {
         //Add your custom tracked stats here
         //You can remove any stats here
-        EXAMPLE_STATS
+        EXAMPLE_STATS,
+
+        MERCHANT_PURCHASES_HEART,
+        MONEY_SPENT_AT_HEART_SHOP
+
+
     }
 }

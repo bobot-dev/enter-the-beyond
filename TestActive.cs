@@ -12,7 +12,7 @@ using System.IO;
 using MultiplayerBasicExample;
 using CustomCharacters;
 using Pathfinding;
-
+using BotsMod.ToolsAndStuff;
 
 namespace BotsMod
 {
@@ -36,12 +36,14 @@ namespace BotsMod
 			item.consumable = false;
 			item.quality = ItemQuality.EXCLUDED;
 
+
+
 		}
 		private Dictionary<string, StringTableManager.StringCollection> leadMaidan;
 		public override void Pickup(PlayerController player)
 		{
 
-
+			
 			dfLabel nameLabel = GameUIRoot.Instance.notificationController.NameLabel;
 
 			GameUIRoot.Instance.notificationController.DoCustomNotification(StringTableManager.PostprocessString(nameLabel.ForceGetLocalizedValue("#SUPERDUPERAUTOAIM_POPUP_TITLE")), StringTableManager.PostprocessString(nameLabel.ForceGetLocalizedValue("#SUPERDUPERAUTOAIM_WARNING_BODY_B")), null, -1, UINotificationController.NotificationColor.SILVER, false, false);
@@ -81,6 +83,8 @@ namespace BotsMod
 
 			//player.CurrentGun.OnReloadPressed += this.OnReload;
 
+			textures.Add(GungeonAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/flags/trans.png"));
+
 		}
 		public tk2dSpriteAnimation altSkinThingo;
 		public void DoAmbientTalk(Transform baseTransform, Vector3 offset, string stringKey, float duration)
@@ -94,27 +98,28 @@ namespace BotsMod
 		private float y;
 		private Vector3 rotateValue;
 
+		List<Texture2D> textures = new List<Texture2D>();
 
 		int value = 0;
 
-		private IEnumerator HandleFireShortBeam(Projectile projectileToSpawn, PlayerController source, float duration)
+		private IEnumerator HandleFireShortBeam(Projectile projectileToSpawn, PlayerController source, float duration, Vector3 pos,  PlayerOrbital obj, float angle = 0)
 		{
 			float elapsed = 0f;
-			BeamController beam = this.BeginFiringBeam(projectileToSpawn, source, source.CurrentGun.CurrentAngle, source.transform.position);
+			BeamController beam = this.BeginFiringBeam(projectileToSpawn, source, source.CurrentGun.CurrentAngle, pos, obj);
 			yield return null;
 			while (elapsed < duration)
 			{
 				elapsed += BraveTime.DeltaTime;
-				this.ContinueFiringBeam(beam, source, source.CurrentGun.CurrentAngle, source.transform.position);
+				this.ContinueFiringBeam(beam, source, angle, pos, obj);
 				yield return null;
 			}
 			this.CeaseBeam(beam);
 			yield break;
 		}
 
-		private BeamController BeginFiringBeam(Projectile projectileToSpawn, PlayerController source, float targetAngle, Vector2? overrideSpawnPoint)
+		private BeamController BeginFiringBeam(Projectile projectileToSpawn, PlayerController source, float targetAngle, Vector2? overrideSpawnPoint, PlayerOrbital obj)
 		{
-			Vector2 vector = (overrideSpawnPoint == null) ? source.CenterPosition : overrideSpawnPoint.Value;
+			Vector2 vector = obj.transform.position;
 			GameObject gameObject = SpawnManager.SpawnProjectile(projectileToSpawn.gameObject, vector, Quaternion.identity, true);
 			Projectile component = gameObject.GetComponent<Projectile>();
 			component.Owner = source;
@@ -128,10 +133,10 @@ namespace BotsMod
 			return component2;
 		}
 
-		private void ContinueFiringBeam(BeamController beam, PlayerController source, float angle, Vector2? overrideSpawnPoint)
+		private void ContinueFiringBeam(BeamController beam, PlayerController source, float angle, Vector2? overrideSpawnPoint, PlayerOrbital obj)
 		{
-			Vector2 vector = (overrideSpawnPoint == null) ? source.CenterPosition : overrideSpawnPoint.Value;
-			beam.Direction = BraveMathCollege.DegreesToVector(angle, 1f);
+			Vector2 vector = obj.transform.position;
+			beam.Direction = BraveMathCollege.DegreesToVector(source.CurrentGun.CurrentAngle, 1f);
 			beam.Origin = vector;
 			beam.LateUpdatePosition(vector);
 		}
@@ -248,13 +253,230 @@ namespace BotsMod
 			yield return this;
 		}
 
-		public static Action<Action<IEnumerator>> destrotAct;
 
+		public IEnumerator dofunnybeam(PlayerOrbital obj)
+		{
+			yield return new WaitForSeconds(5f);
+			Gun fuckYouDie = PickupObjectDatabase.GetById(100) as Gun;
+
+			Projectile currentProjectile = fuckYouDie.DefaultModule.GetCurrentProjectile();
+
+			var beam = currentProjectile.GetComponent<BeamController>();
+			//beam.AdjustPlayerBeamTint(colorKeys[num], 10000);
+
+
+			BotsModule.Log(obj.sprite.WorldCenter.ToString());
+			BotsModule.Log(obj.transform.localRotation.z.ToString());
+			StartCoroutine(this.HandleFireShortBeam(currentProjectile, this.LastOwner, 100, obj.sprite.WorldCenter, obj, obj.transform.localRotation.z));
+			yield break;
+		}
+
+		public static Action<Action<IEnumerator>> destrotAct;
+		bool doneReset = false;
 		static AIActor victum;
+		GameObject LinkVFXPrefab;
+		tk2dTiledSprite extantLink;
+
+		Vector2 pos3 = Vector2.zero;
+		Vector2 pos4 = Vector2.zero;
+
+		/*public override void Update()
+		{
+
+
+			PlayerController player = GameManager.Instance.PrimaryPlayer;
+			if (player && this.extantLink == null)
+			{
+				tk2dTiledSprite component = SpawnManager.SpawnVFX(this.LinkVFXPrefab, false).GetComponent<tk2dTiledSprite>();
+				this.extantLink = component;
+			}
+			else if (player && this.extantLink != null)
+			{
+				if (this.extantLink.GetComponent<Renderer>().material.shader != ShaderCache.Acquire("Brave/Internal/HologramShader"))
+				{
+					this.extantLink.GetComponent<Renderer>().material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
+				}
+				
+
+
+				foreach (var pickup in UnityEngine.Object.FindObjectsOfType<PickupObject>())
+				{
+
+					if (pain != null && suffering != null)
+					{
+						Tools.UpdateLink(pain, this.extantLink, suffering);
+					}
+				}
+
+			}
+			else if (extantLink != null)// || actor == null)
+			{
+				SpawnManager.Despawn(extantLink.gameObject);
+				extantLink = null;
+			}
+
+			base.Update();
+		}*/
+
+		DebrisObject pain;
+		DebrisObject suffering;
+
+
 		protected override void DoEffect(PlayerController user)
 		{
+
+			user.CurrentRoom.ApplyActionToNearbyEnemies(user.CenterPosition, 100f, delegate (AIActor enemy, float dist)
+			{
+				if (enemy && enemy.healthHaver)
+				{
+					enemy.OverrideBlackPhantomShader = ShaderCache.Acquire("Brave/PlayerShaderEevee");
+					enemy.sprite.renderer.material.SetTexture("_EeveeTex", textures[0]);
+					//enemy.sprite.renderer.material.DisableKeyword("BRIGHTNESS_CLAMP_ON");
+					//enemy.sprite.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
+					enemy.CanTargetPlayers = false;
+
+					enemy.BecomeBlackPhantom();
+				}
+			});
+
+
+
+			var linkController = LootEngine.SpewLoot(new List<GameObject> { PickupObjectDatabase.GetById(UnityEngine.Random.Range(0, 824)).gameObject }, GameManager.Instance.PrimaryPlayer.sprite.WorldBottomCenter + Vector2.right)[0].gameObject.AddComponent<LinkControllerComp>();
+			var item2 = LootEngine.SpewLoot(new List<GameObject> { PickupObjectDatabase.GetById(UnityEngine.Random.Range(0, 824)).gameObject }, GameManager.Instance.PrimaryPlayer.sprite.WorldBottomCenter + Vector2.left);
+
 			
+
+			var linkVFXPrefab = GungeonAPI.FakePrefab.Clone((PickupObjectDatabase.GetById(29) as Gun).DefaultModule.projectiles[0].GetComponent<ChainLightningModifier>().LinkVFXPrefab);
+
+			tk2dTiledSprite component = SpawnManager.SpawnVFX(linkVFXPrefab, false).GetComponent<tk2dTiledSprite>();
+
+			linkController.extantLink = component;
+			linkController.otherItem = item2[0];
+			linkController.LinkVFXPrefab = linkVFXPrefab;
+
+			this.extantLink = component;
+			Tools.UpdateLink(linkController.GetComponent<DebrisObject>(), component, item2[0]);
+
+			return;
+			foreach (var dumbpeiceofshit in UnityEngine.Object.FindObjectsOfType<PickupObject>())
+			{
+
+				//dumbpeiceofshit.Pickup(user);
+				if (dumbpeiceofshit.gameObject.GetComponent<DoDamage>() == null)
+				{
+					var diepls = dumbpeiceofshit.gameObject.AddComponent<DoDamage>();
+
+					diepls.idToCopy = dumbpeiceofshit.PickupObjectId;
+				}
+				
+				
+			}
+			return;
+			CollectionDumper.DumpCollection(user.sprite.Collection);
+			if (user.AlternateCostumeLibrary != null)
+			{
+				CollectionDumper.DumpCollection(user.AlternateCostumeLibrary.clips[0].frames[0].spriteCollection);
+			}
 			
+
+			//var portal = BraveResources.Load<GameObject>("VFX_PortalDirectlyToHell", ".prefab");
+			//var portal = (GameObject)Tools.brave.LoadAsset("VFX_PortalDirectlyToHell");
+			var portal = (PickupObjectDatabase.GetById(155) as SpawnObjectPlayerItem).objectToSpawn.GetComponent<BlackHoleDoer>().HellSynergyVFX;
+			GameObject portalButReal = UnityEngine.Object.Instantiate<GameObject>(portal, user.sprite.WorldCenter, Quaternion.Euler(0f, 0f, 0f));
+
+			portalButReal.GetComponent<MeshRenderer>().material.SetTexture("_PortalTex", ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/lostTransFlag.png"));
+
+
+
+			return;
+			var num = 0;
+
+			var colorKeys = new List<Color32>();
+			colorKeys.Add(new Color32(255, 0, 0, 255));
+			colorKeys.Add(new Color32(255, 102, 0, 255));
+			colorKeys.Add(new Color32(255, 174, 0, 255));
+			colorKeys.Add(new Color32(255, 242, 0, 255));
+			colorKeys.Add(new Color32(234, 255, 0, 255));
+			colorKeys.Add(new Color32(174, 255, 0, 255));
+			colorKeys.Add(new Color32(81, 255, 0, 255));
+			colorKeys.Add(new Color32(0, 255, 98, 255));
+			colorKeys.Add(new Color32(0, 255, 200, 255));
+			colorKeys.Add(new Color32(0, 234, 255, 255));
+			colorKeys.Add(new Color32(0, 149, 255, 255));
+			colorKeys.Add(new Color32(0, 38, 255, 255));
+			colorKeys.Add(new Color32(119, 0, 255, 255));
+			colorKeys.Add(new Color32(174, 0, 255, 255));
+			colorKeys.Add(new Color32(242, 0, 255, 255));
+
+			for (var i = 0; i < colorKeys.Count*2 - 2; i++)
+			{
+				LootEngine.TryGivePrefabToPlayer(PickupObjectDatabase.GetById(260).gameObject, user);
+			}
+
+			foreach (var obj in UnityEngine.Object.FindObjectsOfType<PlayerOrbital>())
+			{
+				//obj.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/RainbowChestShader");
+				//obj.gameActor.RegisterOverrideColor(colorKeys[num], "idfk" + num);
+				var tr = obj.gameObject.AddComponent<TrailRenderer>();
+				obj.shouldRotate = true;
+				tr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+				tr.receiveShadows = false;
+				var mat = new Material(Shader.Find("Sprites/Default"));
+				//mat.SetColor(, colorKeys[num]);
+				mat.mainTexture = texture;
+				mat.SetColor("_Color", colorKeys[num]);
+				tr.material = mat;
+				tr.time = 1;
+				tr.minVertexDistance = 0.5f;
+				tr.startWidth = 0.5f;
+				tr.endWidth = 0;
+				tr.startColor = Color.white;
+				tr.endColor = Color.white;
+
+
+				var alphaKeys = new GradientAlphaKey[2];
+
+				alphaKeys[0].alpha = 1;
+				alphaKeys[0].time = 0;
+				alphaKeys[1].alpha = 0;
+				alphaKeys[1].time = 1;
+
+
+
+				//tr.colorGradient = new Gradient
+				//{
+				//	alphaKeys = alphaKeys,
+				//	colorKeys = colorKeys,
+				//};
+				BotsModule.Log(num.ToString());
+				if (num < (colorKeys.Count - 1) && !doneReset)
+				{
+					num++;
+				} 
+				else if (num > 0)
+				{
+					num = 0;
+					//doneReset = true;
+				}
+				else
+				{
+					
+					//doneReset = false;
+				}
+				StartCoroutine(dofunnybeam(obj));
+
+			}
+			//var gayRock = (PickupObjectDatabase.GetById(260) as PlayerOrbitalItem).OrbitalPrefab.gameObject;
+
+
+			
+
+			/**/
+
+			//PlayerOrbitalItem.CreateOrbital(user, gayRock, false);
+
+
+			return;
 			CollectionDumper.DumpCollection(user.sprite.Collection);
 			StartCoroutine(Destrot());
 
@@ -271,7 +493,7 @@ namespace BotsMod
 
 			BotsModule.Log("" + idk);
 
-			return;
+			
 			foreach (var clip in user.gameActor.spriteAnimator.Library.clips)
 			{
 
@@ -360,7 +582,7 @@ namespace BotsMod
 			}
 
 			
-
+			/*
 
 			
 			if (victum == null)
@@ -391,7 +613,7 @@ namespace BotsMod
 				beam.AdjustPlayerBeamTint(Color.green, 10000);
 				user.StartCoroutine(this.HandleFireShortBeam(currentProjectile, user, 10));
 
-			}
+			}*/
 			
 			dfLabel nameLabel = GameUIRoot.Instance.notificationController.NameLabel;
 			GameUIRoot.Instance.notificationController.DoCustomNotification(StringTableManager.PostprocessString(nameLabel.ForceGetLocalizedValue("#SUPERDUPERAUTOAIM_WARNING_TITLE")), StringTableManager.PostprocessString(nameLabel.ForceGetLocalizedValue("#SUPERDUPERAUTOAIM_WARNING_BODY")), null, -1, UINotificationController.NotificationColor.SILVER, false, false);
@@ -488,19 +710,19 @@ namespace BotsMod
 			
 
 			//GameObject gameObject = SpawnManager.SpawnProjectile(sourceProjectile.gameObject, user.sprite.WorldCenter, Quaternion.Euler(0f, 0f, (user.CurrentGun == null) ? 0f : user.CurrentGun.CurrentAngle), true);
-			Projectile component = gameObject.GetComponent<Projectile>();
+			Projectile component8 = gameObject.GetComponent<Projectile>();
 
-			bool flag9999 = component != null;
+			bool flag9999 = component8 != null;
 			if (flag9999)
 			{
-				component.Owner = user;
-				component.sprite.spriteId = 291;
-				component.baseData.speed = 0.5f;
+				component8.Owner = user;
+				component8.sprite.spriteId = 291;
+				component8.baseData.speed = 0.5f;
 				
-				component.Shooter = user.specRigidbody;
+				component8.Shooter = user.specRigidbody;
 				//component.DefaultTintColor = new Color(0f, 0.45882352941f, 0.02745098039f);
-				component.HasDefaultTint = true;
-				component.baseData.damage = 0;
+				component8.HasDefaultTint = true;
+				component8.baseData.damage = 0;
 
 			}
 
@@ -573,20 +795,12 @@ namespace BotsMod
 			//Start();
 		}
 
-
+		Vector2 pos1;
+		Vector2 pos2;
 
 		public float rotationSpeed = 10;
 
-		public override void Update()
-		{
-			//y = Input.GetAxis("Mouse X");
-			//x = Input.GetAxis("Mouse Y");
-			//Debug.Log(x + ":" + y);
-			//rotateValue = new Vector3(x, y * -1, 0);
-			//transform.eulerAngles = transform.eulerAngles - rotateValue;
-			
-
-		}
+		
 
 
 		int lastClip;
@@ -597,5 +811,69 @@ namespace BotsMod
 
 		public GameObject healVFX;
 		tk2dTileMap component;
+	}
+	public class DoDamage : PickupObject
+	{
+
+		private void Start()
+		{
+			BotsModule.Log("start");
+			this.PickupObjectId = idToCopy;
+			this.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
+
+			BotsModule.Log("damaged");
+			GameManager.Instance.PrimaryPlayer.healthHaver.ApplyDamage(5f, Vector2.zero, ":P");
+		}
+
+		public override void Pickup(PlayerController player)
+		{
+
+
+
+		}
+
+		public int idToCopy;
+	}
+
+	public class FunnySpin : MonoBehaviour
+	{
+		private void Start()
+		{
+			if (this.gameObject.GetComponent<PlayerOrbital>() != null)
+			{
+
+			}
+		}
+		public IEnumerator GetOrbitals()
+		{
+			foreach (var obj in UnityEngine.Object.FindObjectsOfType<FunnySpin>())
+			{
+				if (obj.gameObject.GetComponent<PlayerOrbital>() != null)
+				{
+					StartCoroutine(MoveOrbital(obj.gameObject.GetComponent<PlayerOrbital>()));
+					yield return new WaitForSeconds(0.3f);
+				}
+
+			}
+			yield break;
+		}
+
+		public IEnumerator MoveOrbital(PlayerOrbital orbital)
+		{
+			
+			while (this.gameObject != null)
+			{
+				orbital.orbitRadius += 1;
+				yield return new WaitForSeconds(1);
+				orbital.orbitRadius -= 1;
+				yield return new WaitForSeconds(1);
+				orbital.orbitRadius -= 1;
+				yield return new WaitForSeconds(1);
+				orbital.orbitRadius += 1;
+				yield return new WaitForSeconds(1);
+			}
+
+			yield break;
+		}
 	}
 }

@@ -67,7 +67,6 @@ namespace BotsMod
 
 		public override void Pickup(PlayerController player)
 		{
-			
 			player.PostProcessProjectile += PostProcessProjectile;
 			base.Pickup(player);
 		}
@@ -103,6 +102,8 @@ namespace BotsMod
 					{
 						num += projectiles[i].GetEstimatedShotsPerSecond(gun.reloadTime);
 					}
+
+					num /= projectiles.Count;
 				}
 				else if (gun.DefaultModule != null)
 				{
@@ -112,10 +113,17 @@ namespace BotsMod
 				{
 					arg = 3.5f / num;
 				}
+
 			}
 
-			BotsModule.Log("dum dum rng: " + 10 * arg);
-			if (UnityEngine.Random.Range(0, 10* arg) < 4 )
+			float num2 = this.chanceOfActivating;
+			if (this.chanceOfActivating < 1f)
+			{
+				num2 = this.chanceOfActivating * effectChanceScalar;
+			}
+			var rng = UnityEngine.Random.value;
+			//BotsModule.Log("dum dum rng: " + num2);
+			if (rng < num2)
 			{
 				
 				bullet.OnDestruction += Bullet_OnDestruction;
@@ -124,6 +132,9 @@ namespace BotsMod
 			}
 			
 		}
+
+		float chanceOfActivating = 0.3f;
+
 		//5/10 = rr(0, 10) < 4
 		private void Bullet_OnDestruction(Projectile obj)
 		{

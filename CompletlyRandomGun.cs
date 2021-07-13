@@ -115,8 +115,8 @@ namespace BotsMod
 					BotsModule.Log("g6");
 					var minX = Mathf.RoundToInt(uvs[0].x * width);
 					var minY = Mathf.RoundToInt(uvs[0].y * height);
-					var maxX = Mathf.RoundToInt(uvs[3].x * width);
-					var maxY = Mathf.RoundToInt(uvs[3].y * height);
+					var X = Mathf.RoundToInt(uvs[3].x * width);
+					var Y = Mathf.RoundToInt(uvs[3].y * height);
 
 					var w = width - minX;
 					var h = height - minY;
@@ -308,34 +308,34 @@ namespace BotsMod
 				rngLongDescSize,
 		};
 
-			var maxStats = JarvisGetMaxGunStatsAndMakeThemAnArray();
+			var Stats = JarvisGetGunStatsAndMakeThemAnArray();
 			var minStats = JarvisGetMinGunStatsAndMakeThemAnArray();
 
 			for (int i = 0; i < rngStats.Length; i++)
 			{
-				rngStats[i] = UnityEngine.Random.Range(minStats[i], maxStats[i]);
+				rngStats[i] = UnityEngine.Random.Range(minStats[i], Stats[i]);
 			}
 
 			return rngStats;
 		}
 
-		private static float[] JarvisGetMaxGunStatsAndMakeThemAnArray()
+		private static float[] JarvisGetGunStatsAndMakeThemAnArray()
 		{
 			List<float> list = new List<float>();
 
-			float maxRange = 0;
-			float maxDmg = 0;
-			float maxFirerate = 0;
-			float maxSpread = 0;
-			float maxMagSize = 0;
-			float maxReload = 0;
-			float maxSpeed = 0;
-			float maxForce = 0;
-			float maxAmmo = 0;
-			float maxAmmoCost = 0;
-			float maxNameSize = 0;
-			float maxDescSize = 0;
-			float maxLongDescSize = 0;
+			float Range = 0;
+			float Dmg = 0;
+			float Firerate = 0;
+			float Spread = 0;
+			float MagSize = 0;
+			float Reload = 0;
+			float Speed = 0;
+			float Force = 0;
+			float Ammo = 0;
+			float AmmoCost = 0;
+			float NameSize = 0;
+			float DescSize = 0;
+			float LongDescSize = 0;
 
 
 			for (int i = 0; i < PickupObjectDatabase.Instance.Objects.Count; i++)
@@ -357,70 +357,76 @@ namespace BotsMod
 									{
 										
 
-										if (maxRange < gun.DefaultModule.projectiles[0].baseData.range)
+										if (Range < gun.DefaultModule.projectiles[0].baseData.range)
 										{
-											maxRange = gun.DefaultModule.projectiles[0].baseData.range;
+											Range = gun.DefaultModule.projectiles[0].baseData.range;
 										}
 
-										if (maxDmg < gun.DefaultModule.projectiles[0].baseData.damage)
+										if (Dmg < gun.DefaultModule.projectiles[0].baseData.damage)
 										{
-											maxDmg = gun.DefaultModule.projectiles[0].baseData.damage;
+											Dmg = gun.DefaultModule.projectiles[0].baseData.damage;
 										}
 
-										if (maxFirerate < gun.DefaultModule.cooldownTime)
+										if (Firerate < gun.DefaultModule.cooldownTime)
 										{
-											maxFirerate = gun.DefaultModule.cooldownTime;
+											Firerate = gun.DefaultModule.cooldownTime;
 										}
 
-										if (maxSpread < gun.DefaultModule.angleVariance)
+										if (Spread < gun.DefaultModule.angleVariance)
 										{
-											maxSpread = gun.DefaultModule.angleVariance;
+											Spread = gun.DefaultModule.angleVariance;
 										}
 
-										if (maxMagSize < gun.DefaultModule.numberOfShotsInClip)
+										if (MagSize < gun.DefaultModule.numberOfShotsInClip)
 										{
-											maxMagSize = gun.DefaultModule.numberOfShotsInClip;
+											MagSize = gun.DefaultModule.numberOfShotsInClip;
 										}
 
-										if (maxReload < gun.reloadTime)
+										if (Reload < gun.reloadTime)
 										{
-											maxReload = gun.reloadTime;
+											Reload = gun.reloadTime;
 										}
 
-										if (maxSpeed < gun.DefaultModule.projectiles[0].baseData.speed)
+										if (Speed < gun.DefaultModule.projectiles[0].baseData.speed)
 										{
-											maxSpeed = gun.DefaultModule.projectiles[0].baseData.speed;
+											Speed = gun.DefaultModule.projectiles[0].baseData.speed;
 										}
 
-										if (maxForce < gun.DefaultModule.projectiles[0].baseData.force)
+										if (Force < gun.DefaultModule.projectiles[0].baseData.force)
 										{
-											maxForce = gun.DefaultModule.projectiles[0].baseData.force;
+											Force = gun.DefaultModule.projectiles[0].baseData.force;
 										}
 
-										if (maxAmmo < gun.GetBaseMaxAmmo())
+										if (Ammo < gun.GetBaseMaxAmmo())
 										{
-											maxAmmo = gun.GetBaseMaxAmmo();
+											Ammo = gun.GetBaseMaxAmmo();
 										}
 
-										if (maxAmmoCost < gun.DefaultModule.ammoCost)
+										if (AmmoCost < gun.DefaultModule.ammoCost)
 										{
-											maxAmmoCost = gun.DefaultModule.ammoCost;
+											AmmoCost = gun.DefaultModule.ammoCost;
 										}
 
-										if (maxNameSize < gun.encounterTrackable.journalData.PrimaryDisplayName.Length)
+										if (NameSize < gun.encounterTrackable.journalData.PrimaryDisplayName.Length)
 										{
-											maxNameSize = gun.encounterTrackable.journalData.PrimaryDisplayName.Length;
+											NameSize = gun.encounterTrackable.journalData.PrimaryDisplayName.Length;
 										}
 
-										if (maxLongDescSize < gun.encounterTrackable.journalData.AmmonomiconFullEntry.Length)
+										if (LongDescSize < gun.encounterTrackable.journalData.AmmonomiconFullEntry.Length)
 										{
-											maxLongDescSize = gun.encounterTrackable.journalData.AmmonomiconFullEntry.Length;
+											LongDescSize = gun.encounterTrackable.journalData.AmmonomiconFullEntry.Length;
 										}
 
-										if (maxDescSize < gun.encounterTrackable.journalData.NotificationPanelDescription.Length)
+										if (DescSize < gun.encounterTrackable.journalData.NotificationPanelDescription.Length)
 										{
-											maxDescSize = gun.encounterTrackable.journalData.NotificationPanelDescription.Length;
+											DescSize = gun.encounterTrackable.journalData.NotificationPanelDescription.Length;
 										}
+
+
+
+
+
+
 									}
 								}
 							}
@@ -431,38 +437,38 @@ namespace BotsMod
 				}
 			}
 
-			float[] maxStats = new float[13] 
+			float[] Stats = new float[13] 
 			{
-				maxRange,
-				maxDmg,
-				maxFirerate,
-				maxSpread,
-				maxMagSize,
-				maxReload,
-				maxSpeed,
-				maxForce,
-				maxAmmo,
-				maxAmmoCost,
-				maxNameSize,
-				maxDescSize,
-				maxLongDescSize,
+				Range,
+				Dmg,
+				Firerate,
+				Spread,
+				MagSize,
+				Reload,
+				Speed,
+				Force,
+				Ammo,
+				AmmoCost,
+				NameSize,
+				DescSize,
+				LongDescSize,
 			};
 
-			BotsModule.Log("MaxRange: " + maxStats[0]);
-			BotsModule.Log("MaxDmg: " + maxStats[1]);
-			BotsModule.Log("MaxFirerate: " + maxStats[2]);
-			BotsModule.Log("MaxSpread: " + maxStats[3]);
-			BotsModule.Log("MaxMagSize: " + maxStats[4]);
-			BotsModule.Log("MaxReload: " + maxStats[5]);
-			BotsModule.Log("MaxSpeed: " + maxStats[6]);
-			BotsModule.Log("MaxForce: " + maxStats[7]);
-			BotsModule.Log("MaxAmmo: " + maxStats[8]);
-			BotsModule.Log("MaxAmmoCost: " + maxStats[9]);
-			BotsModule.Log("MaxNameSize: " + maxStats[10]);
-			BotsModule.Log("MaxDescSize: " + maxStats[11]);
-			BotsModule.Log("MaxLongDescSize: " + maxStats[12]);
+			BotsModule.Log("Range: " + Stats[0]);
+			BotsModule.Log("Dmg: " + Stats[1]);
+			BotsModule.Log("Firerate: " + Stats[2]);
+			BotsModule.Log("Spread: " + Stats[3]);
+			BotsModule.Log("MagSize: " + Stats[4]);
+			BotsModule.Log("Reload: " + Stats[5]);
+			BotsModule.Log("Speed: " + Stats[6]);
+			BotsModule.Log("Force: " + Stats[7]);
+			BotsModule.Log("Ammo: " + Stats[8]);
+			BotsModule.Log("AmmoCost: " + Stats[9]);
+			BotsModule.Log("NameSize: " + Stats[10]);
+			BotsModule.Log("DescSize: " + Stats[11]);
+			BotsModule.Log("LongDescSize: " + Stats[12]);
 
-			return maxStats;
+			return Stats;
 		}
 
 		private static float[] JarvisGetMinGunStatsAndMakeThemAnArray()

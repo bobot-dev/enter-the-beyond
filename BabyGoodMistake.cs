@@ -57,8 +57,9 @@ namespace BotsMod
 
 			//Add all of the needed animations (most of the animations need to have specific names to be recognized, like idle_right or attack_left)
 			//prefab.AddAnimation("idle_right", "ItemAPI/Resources/BigSlime/Idle", fps: 5, AnimationType.Idle, DirectionType.TwoWayHorizontal);
-			prefab.AddAnimation("idle_right", "BotsMod/sprites/ministake/idle_right", fps: 5, AnimationType.Idle, DirectionType.TwoWayHorizontal);
+			prefab.AddAnimation("idle_right", "BotsMod/sprites/ministake/idle_right", fps: 5, AnimationType.Idle, DirectionType.TwoWayVertical);
 			prefab.AddAnimation("idle_left", "BotsMod/sprites/ministake/idle_right", fps: 5, AnimationType.Idle, DirectionType.TwoWayHorizontal);
+
 
 			//Add the behavior here, this too can be a custom class that extends AttackBehaviorBase or something like that
 

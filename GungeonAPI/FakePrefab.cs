@@ -6,6 +6,9 @@ using System.Text;
 using UnityEngine;
 namespace GungeonAPI
 {
+    /// <summary>
+    /// aAGGGGGGGGGdghjjjg-jrgj-
+    /// </summary>
     public class FakePrefab : Component
     {
         internal static HashSet<GameObject> ExistingFakePrefabs = new HashSet<GameObject>();

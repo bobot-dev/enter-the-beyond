@@ -52,7 +52,6 @@ namespace BotsMod
 			gun.DefaultModule.customAmmoType = other.DefaultModule.customAmmoType;
 
 
-
 			//gun.DefaultModule.usesOptionalFinalProjectile = true;
 			//gun.DefaultModule.numberOfFinalProjectiles = 1;
 
@@ -70,8 +69,8 @@ namespace BotsMod
 			Gun gun5 = PickupObjectDatabase.GetById(37) as Gun;
 			gun.finalMuzzleFlashEffects = gun5.muzzleFlashEffects;
 
-			gun.DefaultModule.cooldownTime = 0.1f;
-			gun.DefaultModule.numberOfShotsInClip = 14;
+			gun.DefaultModule.cooldownTime = 0.15f;
+			gun.DefaultModule.numberOfShotsInClip = 10;
 			gun.quality = PickupObject.ItemQuality.SPECIAL;
 			Guid.NewGuid().ToString();
 			gun.gunClass = GunClass.SHITTY;
@@ -83,14 +82,14 @@ namespace BotsMod
 			UnityEngine.Object.DontDestroyOnLoad(projectile);
 			gun.DefaultModule.projectiles[0] = projectile;
 
-			gun.shellsToLaunchOnReload = 14;
+			gun.shellsToLaunchOnReload = gun.DefaultModule.numberOfShotsInClip;
 			gun.shellCasing = gun3.shellCasing;
 
 			gun.shellsToLaunchOnFire = 0;
 
 			projectile.transform.parent = gun.barrelOffset;
 			projectile.hitEffects = gun4.DefaultModule.projectiles[0].hitEffects;
-			projectile.baseData.damage = 3f;
+			projectile.baseData.damage = 4f;
 			projectile.baseData.speed = 16f;
 			projectile.baseData.force = 10f;
 			projectile.baseData.range = 16f;
@@ -147,7 +146,7 @@ namespace BotsMod
 
 			//projectile.OverrideMotionModule = new LostProjectile(ItemAPI.ResourceExtractor.GetTextureFromResource("ExampleMod/Resources/Other/squaregrad.png"));
 
-			projectile.OnHitEnemy += ApplyDecay;
+			//projectile.OnHitEnemy += ApplyDecay;
 		}
 
 		protected void Update()
@@ -184,6 +183,8 @@ namespace BotsMod
 
 		public override void OnReloadPressed(PlayerController player, Gun gun, bool bSOMETHING)
 		{
+
+			 
 			bool flag = gun.IsReloading && this.HasReloaded;
 			if (flag)
 			{

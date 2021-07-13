@@ -11,13 +11,13 @@ using System.Reflection;
 
 namespace BotsMod
 {
-    public class TestPassive : BulletStatusEffectItem
+    public class TestPassive : PassiveItem
     {
         //Call this method from the Start() method of your ETGModule extension
         public static void Init()
         {
 
-            string itemName = "happyiness";
+            string itemName = "Test Passive";
             string resourceName = "BotsMod/sprites/wip";
             GameObject obj = new GameObject();
             //var item = BotsModule.WarCrime2;//obj.AddComponent<PirmalShotgrub>().GetComponent<PickupObject>();
@@ -25,17 +25,73 @@ namespace BotsMod
             ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
             string shortDesc = "testing item";
             string longDesc = "this item is purly for testing";
-            ItemBuilder.SetupItem(item, shortDesc, longDesc, "");
+            ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
             item.quality = ItemQuality.EXCLUDED;
 
             //ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.MovementSpeed, 5f, StatModifier.ModifyMethod.MULTIPLICATIVE);
             //ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.RangeMultiplier, 1f, StatModifier.ModifyMethod.ADDITIVE);
 
+            var rotator = new GameObject("shitty_test_model");
+            rotator.transform.parent = obj.transform;
+
+            rotator.SetActive(true);
+
+            GameObject.DontDestroyOnLoad(rotator);
+
+            var spriteRotator = rotator.AddComponent<SimpleSpriteRotator>();
+            spriteRotator.angularVelocity = 8;
+            spriteRotator.acceleration = 8;
+            spriteRotator.RandomStartingAngle = true;
+            spriteRotator.RotateParent = true;
+
+            //var model = Tools.BotsAssetBundle.LoadAsset<GameObject>("TestModel");
+            //var model = UnityEngine.Object.Instantiate(Tools.BotsAssetBundle.LoadAsset<GameObject>("TestModel"), GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, new Quaternion());
+            //model.transform.parent = rotator.transform;
+
+            //model.SetActive(true);
+
+            //GameObject.DontDestroyOnLoad(model);
+
         }
+
+        public override DebrisObject Drop(PlayerController user)
+        {
+            
+            foreach(var item in PickupObjectDatabase.Instance.Objects)
+            {
+                if (item != null && item.encounterTrackable != null)
+                {
+                    ETGModConsole.Log($"{item.EncounterNameOrDisplayName}: {item.encounterTrackable.EncounterGuid}");
+                }
+                
+            }
+
+            if (base.transform.childCount > 0)
+            {
+                SimpleSpriteRotator[] componentsInChildren = base.GetComponentsInChildren<SimpleSpriteRotator>(true);
+                if (componentsInChildren.Length > 0)
+                {
+                    componentsInChildren[0].gameObject.SetActive(true);
+                }
+            }
+            return base.Drop(user);
+        }
+
         private ImprovedAfterImage zoomy;
         public override void Pickup(PlayerController player)
         {
 
+
+
+
+            PickupObject byId = PickupObjectDatabase.GetById(60);
+            LootEngine.TryGivePrefabToPlayer(byId.gameObject, player, true);
+            player.PostProcessBeam += this.PostProcessProjectileHelixBeam;
+            player.PostProcessProjectile += this.PostProcessProjectileHelix;
+            player.OnIsRolling += Player_OnIsRolling;
+
+            base.Pickup(player);
+            return;
             WindowRect = new Rect(500f, 0f, 450f, 900f);
 
            
@@ -55,7 +111,73 @@ namespace BotsMod
 
             player.healthHaver.ApplyDamage(10000, Vector2.zero, "happiness");
 
-            base.Pickup(player);
+           
+        }
+
+        private void Player_OnIsRolling(PlayerController obj)
+        {
+            if (obj.CurrentRollState == PlayerController.DodgeRollState.PreRollDelay)
+            {
+                this.DisableEffect(obj);
+                this.EnableVFX(obj, new Color32(255, 0, 0, 255));
+
+            }
+
+            if (obj.CurrentRollState == PlayerController.DodgeRollState.InAir)
+            {
+                this.DisableEffect(obj);
+                this.EnableVFX(obj, new Color32(0, 255, 0, 255));
+            }
+
+            if (obj.CurrentRollState == PlayerController.DodgeRollState.OnGround)
+            {
+                this.DisableEffect(obj);
+                this.EnableVFX(obj, new Color32(255, 170, 0, 255));
+            }
+
+            if (obj.CurrentRollState == PlayerController.DodgeRollState.AdditionalDelay)
+            {
+                this.DisableEffect(obj);
+                this.EnableVFX(obj, new Color32(0, 255, 229, 255));
+            }
+
+            if (obj.CurrentRollState == PlayerController.DodgeRollState.None)
+            {
+                this.DisableEffect(obj);
+                //this.EnableVFX(obj, new Color32(221, 255, 0, 255));
+            }
+
+            if (obj.CurrentRollState == PlayerController.DodgeRollState.Blink)
+            {
+                this.DisableEffect(obj);
+                this.EnableVFX(obj, new Color32(149, 0, 255, 255));
+            }
+            
+        }
+
+        public void EnableVFX(PlayerController target, Color color)
+        {
+
+            Material outlineMaterial = SpriteOutlineManager.GetOutlineMaterial(target.sprite);
+            if (outlineMaterial != null)
+            {
+                outlineMaterial.SetColor("_OverrideColor", color);
+            }
+
+            
+        }
+
+        // Token: 0x060072CA RID: 29386 RVA: 0x002E3174 File Offset: 0x002E1374
+        public void DisableVFX(PlayerController target)
+        {
+
+            Material outlineMaterial = SpriteOutlineManager.GetOutlineMaterial(target.sprite);
+            if (outlineMaterial != null)
+            {
+                outlineMaterial.SetColor("_OverrideColor", new Color(0f, 0f, 0f));
+            }
+
+            
         }
 
         private static Rect WindowRect;
@@ -65,9 +187,56 @@ namespace BotsMod
         private Shader m_glintShader;
         protected override void Update()
         {
+            base.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unpixelated"));
+            base.sprite.renderer.enabled = false;
+            SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
+        }
+        private bool UpOrDown;
 
+        private void PostProcessProjectileHelix(Projectile obj, float effectChanceScalar)
+        {
+            if (obj is InstantDamageOneEnemyProjectile)
+            {
+                return;
+            }
+            if (obj is InstantlyDamageAllProjectile)
+            {
+                return;
+            }
+            else if (this.UpOrDown)
+            {
+                obj.OverrideMotionModule = new BotsProjectileMotionModule();
+            }
+            else
+            {
+                obj.OverrideMotionModule = new BotsProjectileMotionModule
+                {
+                    ForceInvert = true
+                };
+            }
+            this.UpOrDown = !this.UpOrDown;
+            
         }
 
+        private void PostProcessProjectileHelixBeam(BeamController beam)
+        {
+            if (beam.Owner is AIActor)
+            {
+                return;
+            }
+
+            else if (this.UpOrDown)
+            {
+                beam.projectile.OverrideMotionModule = new BotsProjectileMotionModule();
+            }
+            else
+            {
+                BotsProjectileMotionModule helixProjectileMotionModule = new BotsProjectileMotionModule();
+                helixProjectileMotionModule.ForceInvert = true;
+                beam.projectile.OverrideMotionModule = helixProjectileMotionModule;
+            }
+            this.UpOrDown = !this.UpOrDown;
+        }
 
 
 
@@ -89,6 +258,7 @@ namespace BotsMod
 
         private void ProcessGunShader(Gun g)
         {
+            
             MeshRenderer component = g.GetComponent<MeshRenderer>();
             if (!component)
             {

@@ -70,6 +70,7 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" />
     <Reference Include="UnityEngine.Base.mm">
       <HintPath>..\CustomItems\CustomItems\bin\Debug\UnityEngine.Base.mm.dll</HintPath>
     </Reference>
@@ -109,10 +110,34 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Beyond\RoomPrefabs.cs" />
     <Compile Include="BotsPingPongAroundBehavior.cs" />
     <Compile Include="AmmonomiconAPI\Ammonomicon.cs" />
     <Compile Include="AmmonomiconAPI\AmmonomiconHooks.cs" />
     <Compile Include="AmmonomiconAPI\Tools.cs" />
+    <Compile Include="Character Api\CharacterBuilding\CustomCharacterController.cs" />
+    <Compile Include="Character Api\Tools\Class1.cs" />
+    <Compile Include="Character Api\Tools\Enums.cs" />
+    <Compile Include="BotsProjectileMotionModule.cs" />
+    <Compile Include="Class2.cs" />
+    <Compile Include="CustomHealth\SoulHeartController.cs" />
+    <Compile Include="NoitaGun\SpellPickupObject.cs" />
+    <Compile Include="NoitaGun\Spells\SpellInit.cs" />
+    <Compile Include="NoitaGun\Spells\SparkBolt.cs" />
+    <Compile Include="NoitaGun\StaticSpellReferences.cs" />
+    <Compile Include="NoitaGun\GUIhandler.cs" />
+    <Compile Include="NoitaGun\UITExtMeshControllers\BooleanPicker.cs" />
+    <Compile Include="NoitaGun\UITExtMeshControllers\ColorPicker.cs" />
+    <Compile Include="NoitaGun\UITExtMeshControllers\FloatPicker.cs" />
+    <Compile Include="NoitaGun\UITExtMeshControllers\UIBodyPartPicker.cs" />
+    <Compile Include="NoitaGun\UITExtMeshControllers\UITextMesh.cs" />
+    <Compile Include="NoitaGun\Wand.cs" />
+    <Compile Include="NPCs\NpcInitShit.cs" />
+    <Compile Include="OtherwordlyFury.cs" />
+    <Compile Include="StuffForOthers\Class1.cs" />
+    <Compile Include="TestGun.cs" />
+    <Compile Include="OtherworldlyConnections.cs" />
+    <Compile Include="SpinDownDice.cs" />
     <Compile Include="CompletlyRandomGun.cs" />
     <Compile Include="Roomba.cs" />
     <Compile Include="DiscordGameSDK\DiscordController.cs" />
@@ -129,26 +154,25 @@
     <Compile Include="Beyond\BullShitNeededForCustomPasts.cs" />
     <Compile Include="Beyond\LostPastController.cs" />
     <Compile Include="Beyond\LostsPast.cs" />
-    <Compile Include="CCM\AltSkinSwapper\Class1.cs" />
-    <Compile Include="CCM\AltSkinSwapper\InitGameObjects.cs" />
-    <Compile Include="CCM\AltSkinSwapper\LostCharacterCostumeSwapper.cs" />
-    <Compile Include="CCM\CharacterBuilding\CharacterBuilder.cs" />
-    <Compile Include="CCM\CharacterBuilding\CustomCharacter.cs" />
-    <Compile Include="CCM\CharacterBuilding\FoyerCharacterHandler.cs" />
-    <Compile Include="CCM\CharacterBuilding\Loader.cs" />
-    <Compile Include="CCM\CharacterBuilding\SpriteHandler.cs" />
-    <Compile Include="CCM\CharacterBuilding\StringHandler.cs" />
-    <Compile Include="CCM\CharacterSwitcher.cs" />
-    <Compile Include="CCM\CustomPlayableCharacters.cs" />
-    <Compile Include="CCM\CollectionDumper.cs" />
-    <Compile Include="CCM\Tools\Hooks.cs" />
-    <Compile Include="CCM\Tools\TextureStitcher.cs" />
-    <Compile Include="CCM\Tools\Tools.cs" />
-    <Compile Include="CCM\Tools\ZipExtensions.cs" />
+    <Compile Include="Character Api\AltSkinSwapper\Class1.cs" />
+    <Compile Include="Character Api\AltSkinSwapper\InitGameObjects.cs" />
+    <Compile Include="Character Api\AltSkinSwapper\LostCharacterCostumeSwapper.cs" />
+    <Compile Include="Character Api\CharacterBuilding\CharacterBuilder.cs" />
+    <Compile Include="Character Api\CharacterBuilding\CustomCharacter.cs" />
+    <Compile Include="Character Api\CharacterBuilding\FoyerCharacterHandler.cs" />
+    <Compile Include="Character Api\CharacterBuilding\Loader.cs" />
+    <Compile Include="Character Api\CharacterBuilding\SpriteHandler.cs" />
+    <Compile Include="Character Api\CharacterBuilding\StringHandler.cs" />
+    <Compile Include="Character Api\CharacterSwitcher.cs" />
+    <Compile Include="Character Api\CustomPlayableCharacters.cs" />
+    <Compile Include="Character Api\CollectionDumper.cs" />
+    <Compile Include="Character Api\Tools\Hooks.cs" />
+    <Compile Include="Character Api\Tools\TextureStitcher.cs" />
+    <Compile Include="Character Api\Tools\Tools.cs" />
+    <Compile Include="Character Api\Tools\ZipExtensions.cs" />
     <Compile Include="BotsCompanionFollowPlayerBehavior.cs" />
     <Compile Include="Chests\ChestInitStuff.cs" />
     <Compile Include="Class1.cs" />
-    <Compile Include="Class2.cs" />
     <Compile Include="Debuff\NotReallyADebuff.cs" />
     <Compile Include="LightningRounds.cs" />
     <Compile Include="Enemies\Behaviors\RockFallBehavior.cs" />
@@ -234,6 +258,13 @@
     <Compile Include="ItemAPI\Tools.cs" />
     <Compile Include="ToolsAndStuff\BotsItemIds.cs" />
     <Compile Include="Beyond\SpAPIAbandonedUsSoIMustMakeFloorFrameWork.cs" />
+    <Compile Include="ToolsAndStuff\BeyondPrefabs.cs" />
+    <Compile Include="ToolsAndStuff\AtlasEditing.cs" />
+    <Compile Include="ToolsAndStuff\Class1.cs" />
+    <Compile Include="ToolsAndStuff\RandomComps.cs" />
+    <Compile Include="ToolsAndStuff\SpecialOrbital.cs" />
+    <Compile Include="ToolsAndStuff\CustomReloadText.cs" />
+    <Compile Include="ToolsAndStuff\ExpandObjectDatabase.cs" />
     <Compile Include="ToolsAndStuff\LootTables.cs" />
     <Compile Include="ToolsAndStuff\thingistolefromapache.cs" />
     <Compile Include="ToolsAndStuff\CustomEnums.cs" />
@@ -269,6 +300,11 @@
     <EmbeddedResource Include="rooms\Beyond\LostPastEntrace.room" />
     <EmbeddedResource Include="rooms\Beyond\LostPastBossRoom2.room" />
     <EmbeddedResource Include="rooms\Beyond\LostUnlockRoom.room" />
+    <EmbeddedResource Include="rooms\Beyond\Beyond_Entrance.room" />
+    <EmbeddedResource Include="rooms\npctest.room" />
+    <EmbeddedResource Include="rooms\robotflytestroom.room" />
+    <EmbeddedResource Include="rooms\customnpctest.room" />
+    <EmbeddedResource Include="rooms\npctestroomthatisntfucked.room" />
     <None Include="rooms\Swordtress\SwordtressEntrance.room" />
     <None Include="rooms\Swordtress\SwordtressExit.room" />
   </ItemGroup>
@@ -448,7 +484,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="sprites\PastBoss\" />
-    <Folder Include="StuffIOnlyUnderstandCozRoR2Modders\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="sprites\NotificationSprites\crosshair_beyond.png" />
@@ -461,6 +496,61 @@
     <EmbeddedResource Include="sprites\NotificationSprites\notification_box_beyond_007.png" />
     <EmbeddedResource Include="sprites\NotificationSprites\notification_box_beyond_008.png" />
     <EmbeddedResource Include="sprites\NotificationSprites\object_box_beyond_001.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\altskinsprites_001.png" />
+    <EmbeddedResource Include="sprites\altskinsprites_002.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\chest\chest_beyond_appear_001.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_appear_002.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_appear_003.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_appear_004.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_appear_005.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_break_001.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_break_002.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_break_003.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_break_004.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_idle_001.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_open_001.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_open_002.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_open_003.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_open_004.png" />
+    <EmbeddedResource Include="sprites\chest\chest_beyond_open_005.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\beam\beam_end_001.png" />
+    <EmbeddedResource Include="sprites\beam\beam_end_002.png" />
+    <EmbeddedResource Include="sprites\beam\beam_end_003.png" />
+    <EmbeddedResource Include="sprites\beam\beam_end_004.png" />
+    <EmbeddedResource Include="sprites\beam\beam_middle_001.png" />
+    <EmbeddedResource Include="sprites\beam\beam_middle_002.png" />
+    <EmbeddedResource Include="sprites\beam\beam_middle_003.png" />
+    <EmbeddedResource Include="sprites\beam\beam_middle_004.png" />
+    <EmbeddedResource Include="sprites\beam\beam_middle_005.png" />
+    <EmbeddedResource Include="sprites\beam\beam_middle_006.png" />
+    <EmbeddedResource Include="sprites\beam\beam_middle_007.png" />
+    <EmbeddedResource Include="sprites\beam\beam_middle_008.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\otherworldlyfuryorbital.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\otherworldlyconnections.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\flags\trans.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\Npcs\Test\test_npc_idle_001.png" />
+    <EmbeddedResource Include="sprites\Npcs\Test\test_npc_idle_002.png" />
+    <EmbeddedResource Include="sprites\Npcs\Test\test_npc_idle_003.png" />
+    <EmbeddedResource Include="sprites\Npcs\Test\test_npc_idle_004.png" />
+    <EmbeddedResource Include="sprites\Npcs\Test\test_npc_talk_001.png" />
+    <EmbeddedResource Include="sprites\Npcs\Test\test_npc_talk_002.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

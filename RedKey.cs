@@ -1,6 +1,7 @@
 ﻿using Dungeonator;
 using GungeonAPI;
 using ItemAPI;
+using MultiplayerBasicExample;
 using Pathfinding;
 using System;
 using System.Collections.Generic;
@@ -40,8 +41,32 @@ namespace BotsMod
 
 		protected override void DoEffect(PlayerController user)
 		{
+			var room = user.CurrentRoom;
+			List<RoomHandler> RoomSequence = new List<RoomHandler>();
+			for (int i = 1; i < room.injectionFrameData.Count; i++)
+			{
+				RoomSequence.Add(room.injectionFrameData[i]);
+				BotsModule.Log(room.GetRoomName());
+			}
 
-			var room = RoomFactory.CreateRoomFromTexture(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/cursething.png"));
+
+	
+
+			GameObject effect = (PickupObjectDatabase.GetById(353) as RagePassiveItem).OverheadVFX;
+
+
+			for (int i = 1; i < RoomSequence.Count; i++)
+			{
+				var exist = room.GetExitConnectedToRoom(RoomSequence[i]);
+				GameObject gameObject = SpawnManager.SpawnVFX(effect, false);
+				tk2dBaseSprite component = gameObject.GetComponent<tk2dBaseSprite>();
+
+				Vector3 a = new Vector3(exist.GetExitOrigin(0).x, exist.GetExitOrigin(0).y, 0);
+				component.PlaceAtPositionByAnchor(a, tk2dBaseSprite.Anchor.MiddleCenter);
+			}
+
+			return;
+			/*var room = RoomFactory.CreateRoomFromTexture(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/cursething.png"));
 			RoomFactory.AddExit(room, new Vector2(room.Width / 2, room.Height), DungeonData.Direction.NORTH);
 			RoomFactory.AddExit(room, new Vector2(room.Width / 2, 0), DungeonData.Direction.SOUTH);
 			RoomFactory.AddExit(room, new Vector2(room.Width, room.Height / 2), DungeonData.Direction.EAST);
@@ -49,7 +74,7 @@ namespace BotsMod
 			room.usesCustomAmbientLight = true;
 			room.customAmbientLight = Color.red;
 
-			room.UseCustomMusic = true;
+			room.UseCustomMusic = true;*/
 
 			//room.music
 
@@ -58,17 +83,17 @@ namespace BotsMod
 			//room.overriddenTilesets = GlobalDungeonData.ValidTilesets.
 
 
-			RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room, null, DungeonData.LightGenerationStyle.FORCE_COLOR);
+			//RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room, null, DungeonData.LightGenerationStyle.FORCE_COLOR);
 			
 			
 
 			//creepyRoom.OverrideTilemap = 
 
-			Pathfinder.Instance.InitializeRegion(GameManager.Instance.Dungeon.data, creepyRoom.area.basePosition, creepyRoom.area.dimensions);
+			//Pathfinder.Instance.InitializeRegion(GameManager.Instance.Dungeon.data, creepyRoom.area.basePosition, creepyRoom.area.dimensions);
 
 
 
-			user.WarpToPoint((creepyRoom.area.basePosition + new IntVector2(12, 4)).ToVector2(), false, false);
+			//user.WarpToPoint((creepyRoom.area.basePosition + new IntVector2(12, 4)).ToVector2(), false, false);
 
 			/*
 			if (user.CurrentRoom != null)

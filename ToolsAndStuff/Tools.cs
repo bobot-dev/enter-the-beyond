@@ -1,4 +1,5 @@
 ﻿using Dungeonator;
+using FerryMansOar;
 using Gungeon;
 using ItemAPI;
 using Pathfinding;
@@ -17,6 +18,7 @@ namespace BotsMod
 	{
 		public static GameObject Mines_Cave_In;
 		public static AssetBundle AHHH;
+		public static AssetBundle BotsAssetBundle;
 		public static List<int> BeyondItems = new List<int>();
 
 
@@ -30,6 +32,7 @@ namespace BotsMod
 			AssetBundle assetBundle2 = ResourceManager.LoadAssetBundle("shared_auto_002");
 			shared_auto_001 = assetBundle3;
 			shared_auto_002 = assetBundle2;
+			brave = ResourceManager.LoadAssetBundle("brave_resources_001");
 
 			Mines_Cave_In = assetBundle2.LoadAsset<GameObject>("Mines_Cave_In");
 
@@ -91,6 +94,531 @@ namespace BotsMod
 			Tools.DefaultPoopulonGoop = EnemyDatabase.GetOrLoadByGuid("116d09c26e624bca8cca09fc69c714b3").GetComponent<GoopDoer>().goopDefinition;
 		}
 
+		public static void UpdateLink(DebrisObject targetPos, tk2dTiledSprite m_extantLink, DebrisObject landedPoint)
+		{
+
+			Vector2 unitCenter = landedPoint.sprite.WorldCenter;
+			Vector2 unitCenter2 = targetPos.sprite.WorldCenter;
+			m_extantLink.transform.position = unitCenter;
+			Vector2 vector = unitCenter2 - unitCenter;
+			float num = BraveMathCollege.Atan2Degrees(vector.normalized);
+			int num2 = Mathf.RoundToInt(vector.magnitude / 0.0625f);
+			m_extantLink.dimensions = new Vector2((float)num2, m_extantLink.dimensions.y);
+			m_extantLink.transform.rotation = Quaternion.Euler(0f, 0f, num);
+			m_extantLink.UpdateZDepth();
+
+
+		}
+
+		public static BasicBeamController GenerateBeamPrefab(this Projectile projectile, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> beamAnimationPaths = null, int beamFPS = -1, List<string> endVFXAnimationPaths = null, int beamEndFPS = -1, Vector2? endVFXColliderDimensions = null, Vector2? endVFXColliderOffsets = null, List<string> muzzleVFXAnimationPaths = null, int beamMuzzleFPS = -1, Vector2? muzzleVFXColliderDimensions = null, Vector2? muzzleVFXColliderOffsets = null)
+		{
+			try
+			{
+				float convertedColliderX = colliderDimensions.x / 16f;
+				float convertedColliderY = colliderDimensions.y / 16f;
+				float convertedOffsetX = colliderOffsets.x / 16f;
+				float convertedOffsetY = colliderOffsets.y / 16f;
+
+				int spriteID = SpriteBuilder.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
+				tk2dTiledSprite tiledSprite = projectile.gameObject.GetOrAddComponent<tk2dTiledSprite>();
+
+
+
+				tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
+				tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
+				def.colliderVertices = new Vector3[]{
+					new Vector3(convertedOffsetX, convertedOffsetY, 0f),
+					new Vector3(convertedColliderX, convertedColliderY, 0f)
+				};
+
+				def.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+
+				//tiledSprite.anchor = tk2dBaseSprite.Anchor.MiddleCenter;
+				tk2dSpriteAnimator animator = projectile.gameObject.GetOrAddComponent<tk2dSpriteAnimator>();
+				tk2dSpriteAnimation animation = projectile.gameObject.GetOrAddComponent<tk2dSpriteAnimation>();
+				animation.clips = new tk2dSpriteAnimationClip[0];
+				animator.Library = animation;
+				UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSprite>());
+				BasicBeamController beamController = projectile.gameObject.GetOrAddComponent<BasicBeamController>();
+
+				if (beamAnimationPaths != null)
+				{
+					tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = "beam_idle", frames = new tk2dSpriteAnimationFrame[0], fps = beamFPS };
+					List<string> spritePaths = beamAnimationPaths;
+
+					List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+					foreach (string path in spritePaths)
+					{
+						tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
+						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+						tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
+						frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+						frameDef.colliderVertices = def.colliderVertices;
+						frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
+					}
+					clip.frames = frames.ToArray();
+					animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+					beamController.beamAnimation = "beam_idle";
+				}
+				if (endVFXAnimationPaths != null && endVFXColliderDimensions != null && endVFXColliderOffsets != null)
+				{
+					tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = "beam_end", frames = new tk2dSpriteAnimationFrame[0], fps = beamEndFPS };
+					List<string> spritePaths = endVFXAnimationPaths;
+
+					List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+					foreach (string path in spritePaths)
+					{
+						tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
+						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+						tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
+						frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+						Vector2 actualDimensions = (Vector2)endVFXColliderDimensions;
+						Vector2 actualOffsets = (Vector2)endVFXColliderOffsets;
+						frameDef.colliderVertices = new Vector3[]{
+							new Vector3(actualOffsets.x / 16, actualOffsets.y / 16, 0f),
+							new Vector3(actualDimensions.x / 16, actualDimensions.y / 16, 0f)
+						};
+						frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
+					}
+					clip.frames = frames.ToArray();
+					animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+					beamController.impactAnimation = "beam_end";
+				}
+				if (muzzleVFXAnimationPaths != null && muzzleVFXColliderDimensions != null && muzzleVFXColliderOffsets != null)
+				{
+					tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = "beam_start", frames = new tk2dSpriteAnimationFrame[0], fps = beamMuzzleFPS };
+					List<string> spritePaths = muzzleVFXAnimationPaths;
+
+					List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+					foreach (string path in spritePaths)
+					{
+						tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
+						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+						tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
+						frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+						Vector2 actualDimensions = (Vector2)muzzleVFXColliderDimensions;
+						Vector2 actualOffsets = (Vector2)muzzleVFXColliderOffsets;
+						frameDef.colliderVertices = new Vector3[]{
+							new Vector3(actualOffsets.x / 16, actualOffsets.y / 16, 0f),
+							new Vector3(actualDimensions.x / 16, actualDimensions.y / 16, 0f)
+						};
+						frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
+					}
+					clip.frames = frames.ToArray();
+					animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+					beamController.beamStartAnimation = "beam_start";
+				}
+				return beamController;
+			}
+			catch (Exception e)
+			{
+				ETGModConsole.Log(e.ToString());
+				return null;
+			}
+		}
+
+		/*
+		public static void RerollShops(PlayerController user)
+		{
+			foreach (BaseShopController baseShopController in StaticReferenceManager.AllShops)
+			{
+				Console.WriteLine(string.Format("Searching shop <{0}>: {1} {2}", baseShopController.GetType().Name, baseShopController.baseShopType, baseShopController));
+				List<ShopItemController> list = ReflectGetField<List<ShopItemController>>(typeof(BaseShopController), "m_itemControllers", baseShopController);
+				for (int i = 0; i < list.Count; i++)
+				{
+					ShopItemController shopItemController = list[i];
+					bool flag = shopItemController == null;
+					if (!flag)
+					{
+						PickupObject item = shopItemController.item;
+						bool flag2 = !this.ItemIsRerollable(item, null, data);
+						if (!flag2)
+						{
+							GameObject gameObject = null;
+							bool flag3 = item is PassiveItem;
+							if (flag3)
+							{
+								gameObject = GameManager.Instance.RewardManager.ItemsLootTable.SelectByWeightWithoutDuplicates(data.ItemsToAvoidPickingForPassives, false);
+								bool flag4 = gameObject != null;
+								if (flag4)
+								{
+									data.ItemsToAvoidPickingForPassives.Add(gameObject);
+								}
+							}
+							else
+							{
+								bool flag5 = item is PlayerItem;
+								if (flag5)
+								{
+									gameObject = GameManager.Instance.RewardManager.ItemsLootTable.SelectByWeightWithoutDuplicates(data.ItemsToAvoidPickingForActives, false);
+									bool flag6 = gameObject != null;
+									if (flag6)
+									{
+										data.ItemsToAvoidPickingForActives.Add(gameObject);
+									}
+								}
+								else
+								{
+									bool flag7 = item is Gun;
+									if (flag7)
+									{
+										gameObject = GameManager.Instance.RewardManager.GunsLootTable.SelectByWeightWithoutDuplicates(data.ItemsToAvoidPickingForGuns, false);
+										bool flag8 = gameObject != null;
+										if (flag8)
+										{
+											data.ItemsToAvoidPickingForGuns.Add(gameObject);
+										}
+									}
+								}
+							}
+							bool flag9 = gameObject == null;
+							if (flag9)
+							{
+								Console.WriteLine("Couldn't add an item! Giving junk instead.");
+								PickupObject pickupObject = Game.Items.Get("gungeon:junk");
+								bool flag10 = pickupObject == null;
+								if (flag10)
+								{
+									Console.WriteLine("Cannot get 'gungeon:junk' item! Not changing shop!");
+								}
+								else
+								{
+									gameObject = pickupObject.gameObject;
+								}
+							}
+							bool flag11 = gameObject != null;
+							if (flag11)
+							{
+								PickupObject component = gameObject.GetComponent<PickupObject>();
+								Console.WriteLine(string.Format("Attempting to change shop contents: {0}={1} to {2}={3}", new object[]
+								{
+									item.PickupObjectId,
+									item.name,
+									component.PickupObjectId,
+									component.name
+								}));
+								ShopItemController x = ReplaceShopItem(baseShopController, shopItemController, gameObject);
+								bool flag12 = true;
+								bool flag13 = flag12 && x != null;
+								if (flag13)
+								{
+									LootEngine.DoDefaultItemPoof(base.sprite.WorldCenter, false, false);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		public static ShopItemController ReplaceShopItem(BaseShopController shopController, ShopItemController oldShopItemController, GameObject itemToAdd)
+		{
+			PickupObject component = itemToAdd.GetComponent<PickupObject>();
+			List<ShopItemController> list = ReflectGetField<List<ShopItemController>>(typeof(BaseShopController), "m_itemControllers", shopController);
+			List<GameObject> list2 = ReflectGetField<List<GameObject>>(typeof(BaseShopController), "m_shopItems", shopController);
+			for (int i = 0; i < list2.Count; i++)
+			{
+				GameObject gameObject = list2[i];
+				bool flag = gameObject == null;
+				if (!flag)
+				{
+					PickupObject component2 = gameObject.GetComponent<PickupObject>();
+					bool flag2 = component2 == null;
+					if (!flag2)
+					{
+						bool flag3 = component2 != oldShopItemController.item;
+						if (!flag3)
+						{
+							Transform parent = oldShopItemController.gameObject.transform.parent;
+							bool flag4 = parent == null;
+							if (!flag4)
+							{
+								list2[i] = itemToAdd;
+								InitializeInternal(oldShopItemController, component);
+								return oldShopItemController;
+							}
+							Console.WriteLine("null transform");
+						}
+					}
+				}
+			}
+			Console.WriteLine("Did not replace shop item! Could not find old item in the shop's List<GameObject> shop items.");
+			return null;
+		}
+
+		public static T ReflectGetField<T>(Type classType, string fieldName, object o = null)
+		{
+			FieldInfo field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | ((o != null) ? BindingFlags.Instance : BindingFlags.Static));
+			return (T)((object)field.GetValue(o));
+		}
+
+		public static void InitializeInternal(ShopItemController sic, PickupObject i)
+		{
+			BaseShopController baseShopController = ReflectGetField<BaseShopController>(typeof(ShopItemController), "m_baseParentShop", sic);
+			ShopController shopController = ReflectGetField<ShopController>(typeof(ShopItemController), "m_parentShop", sic);
+			sic.item = i;
+			bool flag = i is SpecialKeyItem && (i as SpecialKeyItem).keyType == SpecialKeyItem.SpecialKeyType.RESOURCEFUL_RAT_LAIR;
+			if (flag)
+			{
+				sic.IsResourcefulRatKey = true;
+			}
+			bool flag2 = sic.item && sic.item.encounterTrackable;
+			if (flag2)
+			{
+				GameStatsManager.Instance.SingleIncrementDifferentiator(sic.item.encounterTrackable);
+			}
+			sic.CurrentPrice = sic.item.PurchasePrice;
+			bool flag3 = baseShopController != null && baseShopController.baseShopType == BaseShopController.AdditionalShopType.KEY;
+			if (flag3)
+			{
+				sic.CurrentPrice = 1;
+				bool flag4 = sic.item.quality == PickupObject.ItemQuality.A;
+				if (flag4)
+				{
+					sic.CurrentPrice = 2;
+				}
+				bool flag5 = sic.item.quality == PickupObject.ItemQuality.S;
+				if (flag5)
+				{
+					sic.CurrentPrice = 3;
+				}
+			}
+			bool flag6 = baseShopController != null && baseShopController.baseShopType == BaseShopController.AdditionalShopType.NONE && (sic.item is BankMaskItem || sic.item is BankBagItem || sic.item is PaydayDrillItem);
+			if (flag6)
+			{
+				EncounterTrackable encounterTrackable = sic.item.encounterTrackable;
+				bool flag7 = encounterTrackable && !encounterTrackable.PrerequisitesMet();
+				if (flag7)
+				{
+					bool flag8 = sic.item is BankMaskItem;
+					if (flag8)
+					{
+						sic.SetsFlagOnSteal = true;
+						sic.FlagToSetOnSteal = GungeonFlags.ITEMSPECIFIC_STOLE_BANKMASK;
+					}
+					else
+					{
+						bool flag9 = sic.item is BankBagItem;
+						if (flag9)
+						{
+							sic.SetsFlagOnSteal = true;
+							sic.FlagToSetOnSteal = GungeonFlags.ITEMSPECIFIC_STOLE_BANKBAG;
+						}
+						else
+						{
+							bool flag10 = sic.item is PaydayDrillItem;
+							if (flag10)
+							{
+								sic.SetsFlagOnSteal = true;
+								sic.FlagToSetOnSteal = GungeonFlags.ITEMSPECIFIC_STOLE_DRILL;
+							}
+						}
+					}
+					sic.OverridePrice = new int?(9999);
+				}
+			}
+			sic.gameObject.GetOrAddComponent<tk2dSprite>();
+			tk2dSprite tk2dSprite = i.GetComponent<tk2dSprite>();
+			bool flag11 = tk2dSprite == null;
+			if (flag11)
+			{
+				tk2dSprite = i.GetComponentInChildren<tk2dSprite>();
+			}
+			sic.sprite.SetSprite(tk2dSprite.Collection, tk2dSprite.spriteId);
+			sic.sprite.IsPerpendicular = true;
+			bool useOmnidirectionalItemFacing = sic.UseOmnidirectionalItemFacing;
+			if (useOmnidirectionalItemFacing)
+			{
+				sic.sprite.IsPerpendicular = false;
+			}
+			sic.sprite.HeightOffGround = 1f;
+			bool flag12 = shopController != null;
+			if (flag12)
+			{
+				bool flag13 = shopController is MetaShopController;
+				if (flag13)
+				{
+					sic.UseOmnidirectionalItemFacing = true;
+					sic.sprite.IsPerpendicular = false;
+				}
+				sic.sprite.HeightOffGround += shopController.ItemHeightOffGroundModifier;
+			}
+			else
+			{
+				bool flag14 = baseShopController.baseShopType == BaseShopController.AdditionalShopType.BLACKSMITH;
+				if (flag14)
+				{
+					sic.UseOmnidirectionalItemFacing = true;
+				}
+				else
+				{
+					bool flag15 = baseShopController.baseShopType == BaseShopController.AdditionalShopType.TRUCK || baseShopController.baseShopType == BaseShopController.AdditionalShopType.GOOP || baseShopController.baseShopType == BaseShopController.AdditionalShopType.CURSE || baseShopController.baseShopType == BaseShopController.AdditionalShopType.BLANK || baseShopController.baseShopType == BaseShopController.AdditionalShopType.KEY || baseShopController.baseShopType == BaseShopController.AdditionalShopType.RESRAT_SHORTCUT;
+					if (flag15)
+					{
+						sic.UseOmnidirectionalItemFacing = true;
+					}
+				}
+			}
+			sic.sprite.PlaceAtPositionByAnchor(sic.transform.parent.position, tk2dBaseSprite.Anchor.MiddleCenter);
+			sic.sprite.transform.position = sic.sprite.transform.position.Quantize(0.0625f);
+			DepthLookupManager.ProcessRenderer(sic.sprite.renderer);
+			tk2dSprite componentInParent = sic.transform.parent.gameObject.GetComponentInParent<tk2dSprite>();
+			bool flag16 = componentInParent != null;
+			if (flag16)
+			{
+				componentInParent.AttachRenderer(sic.sprite);
+			}
+			SpriteOutlineManager.AddOutlineToSprite(sic.sprite, Color.black, 0.1f, 0.05f, SpriteOutlineManager.OutlineType.NORMAL);
+			GameObject gameObject = null;
+			bool flag17 = shopController != null && shopController.shopItemShadowPrefab != null;
+			if (flag17)
+			{
+				gameObject = shopController.shopItemShadowPrefab;
+			}
+			bool flag18 = baseShopController != null && baseShopController.shopItemShadowPrefab != null;
+			if (flag18)
+			{
+				gameObject = baseShopController.shopItemShadowPrefab;
+			}
+			bool flag19 = gameObject != null;
+			if (flag19)
+			{
+				GameObject gameObject2 = ReflectionHelpers.ReflectGetField<GameObject>(typeof(ShopItemController), "m_shadowObject", sic);
+				bool flag20 = !gameObject2;
+				if (flag20)
+				{
+					gameObject2 = UnityEngine.Object.Instantiate<GameObject>(gameObject);
+					ReflectionHelpers.ReflectSetField<GameObject>(typeof(ShopItemController), "m_shadowObject", gameObject2, sic);
+				}
+				tk2dBaseSprite component = gameObject2.GetComponent<tk2dBaseSprite>();
+				component.PlaceAtPositionByAnchor(sic.sprite.WorldBottomCenter, tk2dBaseSprite.Anchor.MiddleCenter);
+				component.transform.position = component.transform.position.Quantize(0.0625f);
+				sic.sprite.AttachRenderer(component);
+				component.transform.parent = sic.sprite.transform;
+				component.HeightOffGround = -0.5f;
+				bool flag21 = shopController is MetaShopController;
+				if (flag21)
+				{
+					component.HeightOffGround = -0.0625f;
+				}
+			}
+			sic.sprite.UpdateZDepth();
+			SpeculativeRigidbody orAddComponent = sic.gameObject.GetOrAddComponent<SpeculativeRigidbody>();
+			orAddComponent.PixelColliders = new List<PixelCollider>();
+			PixelCollider pixelCollider = new PixelCollider
+			{
+				ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Circle,
+				CollisionLayer = CollisionLayer.HighObstacle,
+				ManualDiameter = 14
+			};
+			Vector2 vector = sic.sprite.WorldCenter - sic.transform.position.XY();
+			pixelCollider.ManualOffsetX = PhysicsEngine.UnitToPixel(vector.x) - 7;
+			pixelCollider.ManualOffsetY = PhysicsEngine.UnitToPixel(vector.y) - 7;
+			orAddComponent.PixelColliders.Add(pixelCollider);
+			orAddComponent.Initialize();
+			orAddComponent.OnPreRigidbodyCollision = null;
+			sic.RegenerateCache();
+			bool flag22 = !GameManager.Instance.IsFoyer && sic.item is Gun && GameManager.Instance.PrimaryPlayer.CharacterUsesRandomGuns;
+			if (flag22)
+			{
+				sic.ForceOutOfStock();
+			}
+		}*/
+
+		public static void SetTextAnchor(this RectTransform r, TextAnchor anchor)
+		{
+			r.anchorMin = AnchorMap[anchor];
+			r.anchorMax = AnchorMap[anchor];
+			r.pivot = AnchorMap[anchor];
+		}
+
+		public static readonly Dictionary<TextAnchor, Vector2> AnchorMap = new Dictionary<TextAnchor, Vector2>
+		{
+			{
+				TextAnchor.LowerLeft,
+				new Vector2(0f, 0f)
+			},
+			{
+				TextAnchor.LowerCenter,
+				new Vector2(0.5f, 0f)
+			},
+			{
+				TextAnchor.LowerRight,
+				new Vector2(1f, 0f)
+			},
+			{
+				TextAnchor.MiddleLeft,
+				new Vector2(0f, 0.5f)
+			},
+			{
+				TextAnchor.MiddleCenter,
+				new Vector2(0.5f, 0.5f)
+			},
+			{
+				TextAnchor.MiddleRight,
+				new Vector2(1f, 0.5f)
+			},
+			{
+				TextAnchor.UpperLeft,
+				new Vector2(0f, 1f)
+			},
+			{
+				TextAnchor.UpperCenter,
+				new Vector2(0.5f, 1f)
+			},
+			{
+				TextAnchor.UpperRight,
+				new Vector2(1f, 1f)
+			}
+		};
+
+		public static void LogPropertiesAndFields<T>(T obj, string header = "")
+		{
+			BotsModule.Log(header);
+			BotsModule.Log("=======================");
+			bool flag = obj == null;
+			if (flag)
+			{
+				BotsModule.Log("LogPropertiesAndFields: Null object");
+			}
+			else
+			{
+				Type type = obj.GetType();
+				BotsModule.Log(string.Format("Type: {0}", type));
+				PropertyInfo[] properties = type.GetProperties();
+				BotsModule.Log(string.Format("{0} Properties: ", typeof(T)));
+				foreach (PropertyInfo propertyInfo in properties)
+				{
+					try
+					{
+						object value = propertyInfo.GetValue(obj, null);
+						string text = value.ToString();
+						bool flag2 = ((obj != null) ? obj.GetType().GetGenericTypeDefinition() : null) == typeof(List<>);
+						bool flag3 = flag2;
+						if (flag3)
+						{
+							List<object> list = value as List<object>;
+							text = string.Format("List[{0}]", list.Count);
+							foreach (object obj2 in list)
+							{
+								text = text + "\n\t\t" + obj2.ToString();
+							}
+						}
+						BotsModule.Log("\t" + propertyInfo.Name + ": " + text);
+					}
+					catch
+					{
+					}
+				}
+				BotsModule.Log(string.Format("{0} Fields: ", typeof(T)));
+				FieldInfo[] fields = type.GetFields();
+				foreach (FieldInfo fieldInfo in fields)
+				{
+					BotsModule.Log(string.Format("\t{0}: {1}", fieldInfo.Name, fieldInfo.GetValue(obj)));
+				}
+			}
+		}
+
 
 		public static Texture2D SpriteToTexture(tk2dSprite sourceSprite)
 		{
@@ -135,12 +663,12 @@ namespace BotsMod
 			return obj;
 		}
 
-		public static void AddItemToSynergy(this PickupObject obj, string nameKey)
+		public static void AddItemToSynergy(this PickupObject obj, string nameKey, bool clearMandatory = false)
 		{
-			AddItemToSynergy(nameKey, obj.PickupObjectId);
+			AddItemToSynergy(nameKey, obj.PickupObjectId, clearMandatory);
 		}
 
-		public static void AddItemToSynergy(string nameKey, int id)
+		public static void AddItemToSynergy(string nameKey, int id, bool clearMandatory = false)
 		{
 			foreach (AdvancedSynergyEntry entry in GameManager.Instance.SynergyManager.synergies)
 			{
@@ -153,6 +681,14 @@ namespace BotsMod
 						{
 							if (entry.OptionalGunIDs != null)
 							{
+								if (entry.MandatoryGunIDs != null && clearMandatory)
+								{
+									foreach (var mId in entry.MandatoryGunIDs)
+									{
+										entry.OptionalItemIDs.Add(mId);
+									}
+									entry.MandatoryItemIDs.Clear();
+								}
 								entry.OptionalGunIDs.Add(id);
 							}
 							else
@@ -164,6 +700,15 @@ namespace BotsMod
 						{
 							if (entry.OptionalItemIDs != null)
 							{
+								if (entry.MandatoryItemIDs != null && clearMandatory)
+								{
+									foreach(var mId in entry.MandatoryItemIDs)
+									{
+										entry.OptionalItemIDs.Add(mId);
+									}
+									entry.MandatoryItemIDs.Clear();
+								}
+								
 								entry.OptionalItemIDs.Add(id);
 							}
 							else
@@ -174,6 +719,32 @@ namespace BotsMod
 					}
 				}
 			}
+		}
+
+		public static void AddItemToPool(this GenericLootTable lootTable, PickupObject po, float weight = 1)
+		{
+			lootTable.defaultItemDrops.Add(new WeightedGameObject()
+			{
+				pickupId = po.PickupObjectId,
+				weight = weight,
+				rawGameObject = po.gameObject,
+				forceDuplicatesPossible = false,
+				additionalPrerequisites = new DungeonPrerequisite[0]
+			});
+		}
+
+		public static void AddItemToPool(this GenericLootTable lootTable, int poID, float weight = 1)
+		{
+
+			var po = PickupObjectDatabase.GetById(poID);
+			lootTable.defaultItemDrops.Add(new WeightedGameObject()
+			{
+				pickupId = po.PickupObjectId,
+				weight = weight,
+				rawGameObject = po.gameObject,
+				forceDuplicatesPossible = false,
+				additionalPrerequisites = new DungeonPrerequisite[0]
+			});
 		}
 
 		/// <summary>
@@ -189,7 +760,7 @@ namespace BotsMod
 		/// <param name="startColor">Color at the start of the trail</param>
 		/// <param name="endColor">Color at the end of the trail</param>
 		/// <returns></returns>
-		public static void AddTrailToObject(GameObject obj, Color color, Texture texture, float time, float minVertexDistance, float startWidth, float endWidth, Color startColor, Color endColor)
+		public static void AddTrailToObject(this GameObject obj, Color color, Texture texture, float time, float minVertexDistance, float startWidth, float endWidth, Color startColor, Color endColor)
 		{
 			var tr = obj.AddComponent<TrailRenderer>();
 			tr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
@@ -1441,6 +2012,7 @@ namespace BotsMod
 		///SpApi code
 		///
 
+
 		public static void AddEnemyToDatabase(GameObject EnemyPrefab, string EnemyGUID, bool isInBossTab = false, bool IsNormalEnemy = true, bool AddToMTGSpawnPool = true)
 		{
 			EnemyDatabaseEntry item = new EnemyDatabaseEntry
@@ -1477,6 +2049,7 @@ namespace BotsMod
 
 		public static AssetBundle shared_auto_002;
 		public static AssetBundle shared_auto_001;
+		public static AssetBundle brave;
 
 		public static DungeonFlowNode GenerateFlowNode(DungeonFlow flow, PrototypeDungeonRoom.RoomCategory category, PrototypeDungeonRoom overrideRoom = null, GenericRoomTable overrideRoomTable = null, bool loopTargetIsOneWay = false, bool isWarpWing = false,
 		   bool handlesOwnWarping = true, float weight = 1f, DungeonFlowNode.NodePriority priority = DungeonFlowNode.NodePriority.MANDATORY, string guid = "")
@@ -1527,8 +2100,78 @@ namespace BotsMod
 			return Tools.shared_auto_001.LoadAsset<GenericLootTable>(assetName);
 		}
 
+
+
+
 		///scary apache code
 		///
+
+		public static DungeonFlow LoadOfficialFlow(string target)
+		{
+			string flowName = target;
+			if (flowName.Contains("/")) { flowName = target.Substring(target.LastIndexOf("/") + 1); }
+			AssetBundle m_assetBundle_orig = ResourceManager.LoadAssetBundle("flows_base_001");
+			DebugTime.RecordStartTime();
+			DungeonFlow result = m_assetBundle_orig.LoadAsset<DungeonFlow>(flowName);
+			DebugTime.Log("AssetBundle.LoadAsset<DungeonFlow>({0})", new object[] { flowName });
+			if (result == null)
+			{
+				Debug.Log("ERROR: Requested DungeonFlow not found!\nCheck that you provided correct DungeonFlow name and that it actually exists!");
+				m_assetBundle_orig = null;
+				return null;
+			}
+			else
+			{
+				m_assetBundle_orig = null;
+				return result;
+			}
+		}
+
+
+		public static DungeonFlowNode GenerateDefaultNode(this DungeonFlow targetflow, PrototypeDungeonRoom.RoomCategory roomType, PrototypeDungeonRoom overrideRoom = null, GenericRoomTable overrideTable = null, bool oneWayLoopTarget = false, bool isWarpWingNode = false, string nodeGUID = null, DungeonFlowNode.NodePriority priority = DungeonFlowNode.NodePriority.MANDATORY, float percentChance = 1, bool handlesOwnWarping = true)
+		{
+
+			if (string.IsNullOrEmpty(nodeGUID)) { nodeGUID = Guid.NewGuid().ToString(); }
+
+			DungeonFlowNode m_CachedNode = new DungeonFlowNode(targetflow)
+			{
+				isSubchainStandin = false,
+				nodeType = DungeonFlowNode.ControlNodeType.ROOM,
+				roomCategory = roomType,
+				percentChance = percentChance,
+				priority = priority,
+				overrideExactRoom = overrideRoom,
+				overrideRoomTable = overrideTable,
+				capSubchain = false,
+				subchainIdentifier = string.Empty,
+				limitedCopiesOfSubchain = false,
+				maxCopiesOfSubchain = 1,
+				subchainIdentifiers = new List<string>(0),
+				receivesCaps = false,
+				isWarpWingEntrance = isWarpWingNode,
+				handlesOwnWarping = handlesOwnWarping,
+				forcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
+				loopForcedDoorType = DungeonFlowNode.ForcedDoorType.NONE,
+				nodeExpands = false,
+				initialChainPrototype = "n",
+				chainRules = new List<ChainRule>(0),
+				minChainLength = 3,
+				maxChainLength = 8,
+				minChildrenToBuild = 1,
+				maxChildrenToBuild = 1,
+				canBuildDuplicateChildren = false,
+				guidAsString = nodeGUID,
+				parentNodeGuid = string.Empty,
+				childNodeGuids = new List<string>(0),
+				loopTargetNodeGuid = string.Empty,
+				loopTargetIsOneWay = oneWayLoopTarget,
+				flow = targetflow
+			};
+
+			return m_CachedNode;
+		}
+
+
 		public static Dungeon GetOrLoadByName_Orig(string name)
 		{
 			AssetBundle assetBundle = ResourceManager.LoadAssetBundle("dungeons/" + name.ToLower());
@@ -2236,6 +2879,8 @@ namespace BotsMod
 			}
 			return orAddComponent;
 		}
+
+
 
 		public static void GenerateHealthHaver(GameObject target, float maxHealth = 25f, bool disableAnimator = true, bool explodesOnDeath = true, OnDeathBehavior.DeathType explosionDeathType = OnDeathBehavior.DeathType.Death, bool flashesOnDamage = true, bool exploderSpawnsItem = false, bool isCorruptedObject = true, bool isRatNPC = false, bool skipAnimatorCheck = false, bool buildLists = false)
 		{

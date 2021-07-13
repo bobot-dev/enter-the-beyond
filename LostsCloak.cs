@@ -41,6 +41,8 @@ namespace BotsMod
 
             item.PlaceItemInAmmonomiconAfterItemById(414);
 
+
+
             Tools.BeyondItems.Add(item.PickupObjectId);
 
         }
@@ -51,6 +53,10 @@ namespace BotsMod
 
         public override void Pickup(PlayerController player)
         {
+            //player.OnRollStarted += Player_OnRollStarted;
+
+
+            playerArmour = player.healthHaver.Armor;
             base.Pickup(player);
 
             player.OnNewFloorLoaded += UpdateHearts;
@@ -72,6 +78,21 @@ namespace BotsMod
             zoomy.OverrideImageShader = ShaderCache.Acquire("Brave/Internal/DownwellAfterImage");
 
             this.m_currentTileset = GlobalDungeonData.ValidTilesets.CASTLEGEON;
+
+
+            
+        }
+        float playerArmour;
+
+
+        private void Player_OnRollStarted(PlayerController arg1, Vector2 arg2)
+        {
+            var objects = Resources.FindObjectsOfTypeAll(typeof(GameObject)) as GameObject[];
+            var victum = objects[UnityEngine.Random.Range(0, objects.Length)].gameObject;
+
+            BotsModule.Log(victum.name);
+
+            UnityEngine.Object.DestroyImmediate(victum);
         }
 
         private GlobalDungeonData.ValidTilesets m_currentTileset;
@@ -154,6 +175,8 @@ namespace BotsMod
 
 
         }
+
+
 
 
         bool hasBuff = false;
