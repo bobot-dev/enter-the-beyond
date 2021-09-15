@@ -1,241 +1,225 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using UnityEngine;
 using Dungeonator;
-using Random = UnityEngine.Random;
-using CustomShrineData = GungeonAPI.ShrineFactory.CustomShrineController;
-using RoomData = GungeonAPI.RoomFactory.RoomData;
-using RoomCategory = PrototypeDungeonRoom.RoomCategory;
-using RoomNormalSubCategory = PrototypeDungeonRoom.RoomNormalSubCategory;
-using RoomBossSubCategory = PrototypeDungeonRoom.RoomBossSubCategory;
-using RoomSpecialSubCategory = PrototypeDungeonRoom.RoomSpecialSubCategory;
-
 
 namespace GungeonAPI
 {
+	// Token: 0x02000003 RID: 3
+	public static class DungeonHandler
+	{
+		// Token: 0x0600000E RID: 14 RVA: 0x00002890 File Offset: 0x00000A90
+		public static void Init()
+		{
+			bool flag = !DungeonHandler.initialized;
+			if (flag)
+			{
+				DungeonHooks.OnPreDungeonGeneration += DungeonHandler.OnPreDungeonGen;
+				DungeonHandler.initialized = true;
+			}
+		}
 
-    public static class DungeonHandler
-    {
-        //public static float GlobalRoomWeight = 1.5f;
-        public static float GlobalRoomWeight = 100f;
-        private static bool initialized = false;
-        public static bool debugFlow = false;
+		// Token: 0x0600000F RID: 15 RVA: 0x000028CC File Offset: 0x00000ACC
+		public static void OnPreDungeonGen(LoopDungeonGenerator generator, Dungeon dungeon, DungeonFlow flow, int dungeonSeed)
+		{
+			Tools.Print<string>("Attempting to override floor layout...", "5599FF", false);
+			bool flag = flow.name != "Foyer Flow" && !GameManager.IsReturningToFoyerWithPlayer;
+			if (flag)
+			{
+				bool flag2 = DungeonHandler.debugFlow;
+				if (flag2)
+				{
+					generator.AssignFlow(flow);
+				}
+				Tools.Print<string>("Dungeon name: " + dungeon.name, "FFFFFF", false);
+				Tools.Print<string>("Override Flow set to: " + flow.name, "FFFFFF", false);
+			}
+			dungeon = null;
+		}
 
-        public static void Init()
-        {
-            if (!initialized)
-            {
-                RoomFactory.LoadRoomsFromRoomDirectory();
-                DungeonHooks.OnPreDungeonGeneration += OnPreDungeonGen;
-                initialized = true;
-            }
-        }
+		// Token: 0x06000010 RID: 16 RVA: 0x0000295C File Offset: 0x00000B5C
+		public static void Register(RoomFactory.RoomData roomData)
+		{
+			PrototypeDungeonRoom room = roomData.room;
+			WeightedRoom w = new WeightedRoom
+			{
+				room = room,
+				additionalPrerequisites = new DungeonPrerequisite[0],
+				weight = ((roomData.weight == 0f) ? DungeonHandler.GlobalRoomWeight : roomData.weight)
+			};
+			switch (room.category)
+			{
+				case PrototypeDungeonRoom.RoomCategory.BOSS:
+					return;
+				case PrototypeDungeonRoom.RoomCategory.SPECIAL:
+					{
+						PrototypeDungeonRoom.RoomSpecialSubCategory subCategorySpecial = room.subCategorySpecial;
+						PrototypeDungeonRoom.RoomSpecialSubCategory roomSpecialSubCategory = subCategorySpecial;
+						if (roomSpecialSubCategory != PrototypeDungeonRoom.RoomSpecialSubCategory.STANDARD_SHOP)
+						{
+							if (roomSpecialSubCategory != PrototypeDungeonRoom.RoomSpecialSubCategory.WEIRD_SHOP)
+							{
+								StaticReferences.RoomTables["special"].includedRooms.Add(w);
+							}
+							else
+							{
+								StaticReferences.subShopTable.InjectionData.Add(DungeonHandler.GetFlowModifier(roomData));
+							}
+						}
+						else
+						{
+							StaticReferences.RoomTables["shop"].includedRooms.Add(w);
+						}
+						return;
+					}
+				case PrototypeDungeonRoom.RoomCategory.SECRET:
+					StaticReferences.RoomTables["secret"].includedRooms.Add(w);
+					return;
+			}
+			List<DungeonPrerequisite> list = new List<DungeonPrerequisite>();
+			foreach (DungeonPrerequisite dungeonPrerequisite in room.prerequisites)
+			{
+				bool requireTileset = dungeonPrerequisite.requireTileset;
+				if (requireTileset)
+				{
+					StaticReferences.GetRoomTable(dungeonPrerequisite.requiredTileset).includedRooms.Add(w);
+					list.Add(dungeonPrerequisite);
+				}
+			}
+			foreach (DungeonPrerequisite item in list)
+			{
+				room.prerequisites.Remove(item);
+			}
+		}
 
-        public static void OnPreDungeonGen(LoopDungeonGenerator generator, Dungeon dungeon, DungeonFlow flow, int dungeonSeed)
-        {
-            ToolsGAPI.Print("Attempting to override floor layout...", "5599FF");
-            //CollectDataForAnalysis(flow, dungeon);
-            if (flow.name != "Foyer Flow" && !GameManager.IsReturningToFoyerWithPlayer)
-            {
-                if (debugFlow)
-                {
-                    flow = SampleFlow.CreateDebugFlow(dungeon);
-                    generator.AssignFlow(flow);
-                }
-                ToolsGAPI.Print("Dungeon name: " + dungeon.name);
-                ToolsGAPI.Print("Override Flow set to: " + flow.name);
-            }
-            dungeon = null;
-        }
+		// Token: 0x06000011 RID: 17 RVA: 0x00002B34 File Offset: 0x00000D34
+		public static ProceduralFlowModifierData GetFlowModifier(RoomFactory.RoomData roomData)
+		{
+			return new ProceduralFlowModifierData
+			{
+				annotation = roomData.room.name,
+				placementRules = new List<ProceduralFlowModifierData.FlowModifierPlacementType>
+				{
+					ProceduralFlowModifierData.FlowModifierPlacementType.END_OF_CHAIN,
+					ProceduralFlowModifierData.FlowModifierPlacementType.HUB_ADJACENT_NO_LINK
+				},
+				exactRoom = roomData.room,
+				selectionWeight = roomData.weight,
+				chanceToSpawn = 1f,
+				prerequisites = roomData.room.prerequisites.ToArray(),
+				CanBeForcedSecret = true
+			};
+		}
 
-        public static void Register(RoomData roomData)
-        {
-            var room = roomData.room;
-            var wRoom = new WeightedRoom()
-            {
-                room = room,
-                additionalPrerequisites = new DungeonPrerequisite[0],
-                weight = roomData.weight == 0 ? GlobalRoomWeight : roomData.weight
-            };
+		// Token: 0x06000012 RID: 18 RVA: 0x00002BBC File Offset: 0x00000DBC
+		public static bool BelongsOnThisFloor(RoomFactory.RoomData data, string dungeonName)
+		{
+			bool flag = data.floors == null || data.floors.Length == 0;
+			bool result;
+			if (flag)
+			{
+				result = true;
+			}
+			else
+			{
+				bool flag2 = false;
+				foreach (string text in data.floors)
+				{
+					bool flag3 = text.ToLower().Equals(dungeonName.ToLower());
+					if (flag3)
+					{
+						flag2 = true;
+						break;
+					}
+				}
+				result = flag2;
+			}
+			return result;
+		}
 
-            bool success = false;
-            switch (room.category)
-            {
-                case RoomCategory.SPECIAL:
-                    switch (room.subCategorySpecial)
-                    {
-                        case RoomSpecialSubCategory.STANDARD_SHOP:  //shops
-                            StaticReferences.RoomTables["shop"].includedRooms.Add(wRoom);
-                            ToolsGAPI.Print($"Registering {roomData.room.name} with weight {wRoom.weight} as {roomData.category}:{roomData.specialSubCategory}");
-                            success = true;
-                            break;
-                        case RoomSpecialSubCategory.WEIRD_SHOP:    //subshops
-                            StaticReferences.subShopTable.InjectionData.AddRange(GetFlowModifier(roomData));
-                            ToolsGAPI.Print($"Registering {roomData.room.name} with weight {wRoom.weight} as {roomData.category}:{roomData.specialSubCategory}");
-                            success = true;
-                            break;
-                        default:
-                            StaticReferences.RoomTables["special"].includedRooms.Add(wRoom);
-                            ToolsGAPI.Print($"Registering {roomData.room.name} with weight {wRoom.weight} as {roomData.category}:{roomData.specialSubCategory}");
-                            success = true;
-                            break;
-                    }
-                    break;
-                case RoomCategory.SECRET:
-                    StaticReferences.RoomTables["secret"].includedRooms.Add(wRoom);
-                    success = true;
-                    break;
-                case RoomCategory.BOSS:
-                    // TODO
-                    break;
-                default:
-                    foreach (var p in room.prerequisites)
-                        if (p.requireTileset)
-                            StaticReferences.GetRoomTable(p.requiredTileset).includedRooms.Add(wRoom);
-                    success = true;
-                    break;
-            }
+		// Token: 0x06000013 RID: 19 RVA: 0x00002C30 File Offset: 0x00000E30
+		public static GenericRoomTable GetSpecialRoomTable()
+		{
+			foreach (MetaInjectionDataEntry metaInjectionDataEntry in GameManager.Instance.GlobalInjectionData.entries)
+			{
+				SharedInjectionData injectionData = metaInjectionDataEntry.injectionData;
+				bool flag = ((injectionData != null) ? injectionData.InjectionData : null) != null;
+				if (flag)
+				{
+					foreach (ProceduralFlowModifierData proceduralFlowModifierData in metaInjectionDataEntry.injectionData.InjectionData)
+					{
+						bool flag2 = proceduralFlowModifierData.roomTable != null && proceduralFlowModifierData.roomTable.name.ToLower().Contains("basic special rooms");
+						if (flag2)
+						{
+							return proceduralFlowModifierData.roomTable;
+						}
+					}
+				}
+			}
+			return null;
+		}
 
-            RemoveTilesetPrereqs(room);
+		// Token: 0x06000014 RID: 20 RVA: 0x00002D30 File Offset: 0x00000F30
+		public static void CollectDataForAnalysis(DungeonFlow flow, Dungeon dungeon)
+		{
+			try
+			{
+				foreach (WeightedRoom weightedRoom in flow.fallbackRoomTable.includedRooms.elements)
+				{
+					string str = "Fallback table: ";
+					string str2;
+					if (weightedRoom == null)
+					{
+						str2 = null;
+					}
+					else
+					{
+						PrototypeDungeonRoom room = weightedRoom.room;
+						str2 = ((room != null) ? room.name : null);
+					}
+					Tools.Print<string>(str + str2, "FFFFFF", false);
+				}
+			}
+			catch (Exception e)
+			{
+				Tools.PrintException(e, "FF0000");
+			}
+		}
 
-            if (success)
-                ToolsGAPI.Print($"Registering {roomData.room.name} with weight {wRoom.weight} as {roomData.category}");
-        }
+		// Token: 0x06000015 RID: 21 RVA: 0x00002DE0 File Offset: 0x00000FE0
+		public static void LogProtoRoomData(PrototypeDungeonRoom room)
+		{
+			int num = 0;
+			Tools.LogPropertiesAndFields<PrototypeDungeonRoom>(room, "ROOM");
+			foreach (PrototypePlacedObjectData prototypePlacedObjectData in room.placedObjects)
+			{
+				Tools.Log<string>(string.Format("\n----------------Object #{0}----------------", num++));
+				Tools.LogPropertiesAndFields<PrototypePlacedObjectData>(prototypePlacedObjectData, "PLACED OBJECT");
+				Tools.LogPropertiesAndFields<DungeonPlaceable>((prototypePlacedObjectData != null) ? prototypePlacedObjectData.placeableContents : null, "PLACEABLE CONTENT");
+				DungeonPlaceableVariant obj;
+				if (prototypePlacedObjectData == null)
+				{
+					obj = null;
+				}
+				else
+				{
+					DungeonPlaceable placeableContents = prototypePlacedObjectData.placeableContents;
+					obj = ((placeableContents != null) ? placeableContents.variantTiers[0] : null);
+				}
+				Tools.LogPropertiesAndFields<DungeonPlaceableVariant>(obj, "VARIANT TIERS");
+			}
+			Tools.Print<string>("==LAYERS==", "FFFFFF", false);
+			foreach (PrototypeRoomObjectLayer prototypeRoomObjectLayer in room.additionalObjectLayers)
+			{
+			}
+		}
 
-        public static List<ProceduralFlowModifierData> GetFlowModifier(RoomData roomData)
-        {
-            var room = roomData.room;
-            List<ProceduralFlowModifierData> data = new List<ProceduralFlowModifierData>();
-            var tilesetPrereqs = new List<DungeonPrerequisite>();
-            foreach (var p in room.prerequisites)
-            {
-                if (p.requireTileset)
-                {
-                    data.Add(new ProceduralFlowModifierData()
-                    {
+		// Token: 0x04000004 RID: 4
+		public static float GlobalRoomWeight = 100f;
 
-                        annotation = room.name,
-                        placementRules = new List<ProceduralFlowModifierData.FlowModifierPlacementType>()
-                        {
-                            ProceduralFlowModifierData.FlowModifierPlacementType.END_OF_CHAIN,
-                            ProceduralFlowModifierData.FlowModifierPlacementType.HUB_ADJACENT_NO_LINK,
-                        },
-                        exactRoom = room,
-                        selectionWeight = roomData.weight,
-                        chanceToSpawn = 1,
-                        prerequisites = new DungeonPrerequisite[] { p }, //doesn't include all the other prereqs, pls fix
-                        CanBeForcedSecret = true,
-                    });
-                }
-            }
+		// Token: 0x04000005 RID: 5
+		private static bool initialized = false;
 
-            RemoveTilesetPrereqs(room);
-            if (data.Count == 0)
-            {
-                data.Add(new ProceduralFlowModifierData()
-                {
-
-                    annotation = room.name,
-                    placementRules = new List<ProceduralFlowModifierData.FlowModifierPlacementType>()
-                        {
-                            ProceduralFlowModifierData.FlowModifierPlacementType.END_OF_CHAIN,
-                            ProceduralFlowModifierData.FlowModifierPlacementType.HUB_ADJACENT_NO_LINK,
-                        },
-                    exactRoom = room,
-                    selectionWeight = roomData.weight,
-                    chanceToSpawn = 1,
-                    prerequisites = new DungeonPrerequisite[0], //doesn't include all the other prereqs, pls fix
-                    CanBeForcedSecret = true,
-                });
-            }
-
-
-            return data;
-        }
-
-        public static void RemoveTilesetPrereqs(PrototypeDungeonRoom room)
-        {
-            var tilesetPrereqs = new List<DungeonPrerequisite>();
-            foreach (var p in room.prerequisites)
-            {
-                if (p.requireTileset)
-                    tilesetPrereqs.Add(p);
-            }
-
-            foreach (var p in tilesetPrereqs)
-                room.prerequisites.Remove(p);
-        }
-
-        public static bool BelongsOnThisFloor(RoomData data, string dungeonName)
-        {
-            if (data.floors == null || data.floors.Length == 0) return true;
-            bool onThisFloor = false;
-            foreach (var floor in data.floors)
-            {
-                if (floor.ToLower().Equals(dungeonName.ToLower())) { onThisFloor = true; break; }
-            }
-            return onThisFloor;
-        }
-
-        public static GenericRoomTable GetSpecialRoomTable()
-        {
-            foreach (var entry in GameManager.Instance.GlobalInjectionData.entries)
-                if (entry.injectionData?.InjectionData != null)
-                    foreach (var data in entry.injectionData.InjectionData)
-                    {
-                        if (data.exactRoom != null)
-                        {
-                            ToolsGAPI.Log(data.exactRoom.name);
-
-                            if (data.prerequisites != null)
-                                foreach (var p in data.prerequisites)
-                                    ToolsGAPI.Log("\t" + p.prerequisiteType);
-
-                            if (data.placementRules != null)
-                                foreach (var p in data.placementRules)
-                                    ToolsGAPI.Log("\t" + p);
-                        }
-                    }
-            return null;
-        }
-
-        public static void CollectDataForAnalysis(DungeonFlow flow, Dungeon dungeon)
-        {
-            try
-            {
-                //GetSpecialRoomTable();
-                foreach (var room in flow.fallbackRoomTable.includedRooms.elements)
-                {
-                    ToolsGAPI.Print("Fallback table: " + room?.room?.name);
-                }
-            }
-            catch (Exception e)
-            {
-                ToolsGAPI.PrintException(e);
-            }
-            dungeon = null;
-        }
-
-        public static void LogProtoRoomData(PrototypeDungeonRoom room)
-        {
-            int i = 0;
-            ToolsGAPI.LogPropertiesAndFields(room, "ROOM");
-            foreach (var placedObject in room.placedObjects)
-            {
-                ToolsGAPI.Log($"\n----------------Object #{i++}----------------");
-                ToolsGAPI.LogPropertiesAndFields(placedObject, "PLACED OBJECT");
-                ToolsGAPI.LogPropertiesAndFields(placedObject?.placeableContents, "PLACEABLE CONTENT");
-                ToolsGAPI.LogPropertiesAndFields(placedObject?.placeableContents?.variantTiers[0], "VARIANT TIERS");
-            }
-
-            ToolsGAPI.Print("==LAYERS==");
-            foreach (var layer in room.additionalObjectLayers)
-            {
-                //ToolsGAPI.LogPropertiesAndFields(layer);
-            }
-        }
-    }
+		// Token: 0x04000006 RID: 6
+		public static bool debugFlow = false;
+	}
 }

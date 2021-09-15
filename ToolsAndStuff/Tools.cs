@@ -5,6 +5,7 @@ using ItemAPI;
 using Pathfinding;
 //using Pathfinding;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,24 +18,29 @@ namespace BotsMod
 	public static class Tools //1
 	{
 		public static GameObject Mines_Cave_In;
+		public static GameObject Foyer_ElevatorChamber;
 		public static AssetBundle AHHH;
 		public static AssetBundle BotsAssetBundle;
 		public static List<int> BeyondItems = new List<int>();
 
 
 
-		// Token: 0x06000172 RID: 370 RVA: 0x00013060 File Offset: 0x00011260
+		
 		public static void Init()
 		{
 
 
 			AssetBundle assetBundle3 = ResourceManager.LoadAssetBundle("shared_auto_001");
 			AssetBundle assetBundle2 = ResourceManager.LoadAssetBundle("shared_auto_002");
+
+			ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<Texture2D>("nebula_reducednoise");
+
 			shared_auto_001 = assetBundle3;
 			shared_auto_002 = assetBundle2;
 			brave = ResourceManager.LoadAssetBundle("brave_resources_001");
 
 			Mines_Cave_In = assetBundle2.LoadAsset<GameObject>("Mines_Cave_In");
+			Foyer_ElevatorChamber = assetBundle2.LoadAsset<GameObject>("Foyer_ElevatorChamber");
 
 			AssetBundle assetBundle = ResourceManager.LoadAssetBundle("shared_auto_001");
 			string text = "assets/data/goops/water goop.asset";
@@ -94,6 +100,26 @@ namespace BotsMod
 			Tools.DefaultPoopulonGoop = EnemyDatabase.GetOrLoadByGuid("116d09c26e624bca8cca09fc69c714b3").GetComponent<GoopDoer>().goopDefinition;
 		}
 
+		public static Projectile SetupProjectile(int id)
+        {
+			Projectile proj = UnityEngine.Object.Instantiate<Projectile>((PickupObjectDatabase.GetById(id) as Gun).DefaultModule.projectiles[0]);
+			proj.gameObject.SetActive(false);
+			ItemAPI.FakePrefab.MarkAsFakePrefab(proj.gameObject);
+			UnityEngine.Object.DontDestroyOnLoad(proj);
+
+			return proj;
+		}
+
+		public static Projectile SetupProjectile(Projectile projToCopy)
+		{
+			Projectile proj = UnityEngine.Object.Instantiate<Projectile>(projToCopy);
+			proj.gameObject.SetActive(false);
+			ItemAPI.FakePrefab.MarkAsFakePrefab(proj.gameObject);
+			UnityEngine.Object.DontDestroyOnLoad(proj);
+
+			return proj;
+		}
+
 		public static void UpdateLink(DebrisObject targetPos, tk2dTiledSprite m_extantLink, DebrisObject landedPoint)
 		{
 
@@ -109,11 +135,507 @@ namespace BotsMod
 
 
 		}
+		public static List<FuckYouThisIsAnAwfulIdea> coinUIControllersList = new List<FuckYouThisIsAnAwfulIdea>();
+		public static List<FuckYouThisIsAnAwfulIdea> coinUIControllers(this GameUIRoot hi)
+		{
+			Debug.Log(hi);
+			return coinUIControllersList;
+		}
 
-		public static BasicBeamController GenerateBeamPrefab(this Projectile projectile, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> beamAnimationPaths = null, int beamFPS = -1, List<string> endVFXAnimationPaths = null, int beamEndFPS = -1, Vector2? endVFXColliderDimensions = null, Vector2? endVFXColliderOffsets = null, List<string> muzzleVFXAnimationPaths = null, int beamMuzzleFPS = -1, Vector2? muzzleVFXColliderDimensions = null, Vector2? muzzleVFXColliderOffsets = null)
+		public static void coinUIControllersAdd(this GameUIRoot hi, FuckYouThisIsAnAwfulIdea help)
+		{
+			Debug.Log(hi);
+			coinUIControllersList.Add(help);
+		}
+
+
+
+		public static class ReflectionHelpers
+		{
+
+			public static IList CreateDynamicList(Type type)
+			{
+				bool flag = type == null;
+				if (flag) { throw new ArgumentNullException("type", "Argument cannot be null."); }
+				ConstructorInfo[] constructors = typeof(List<>).MakeGenericType(new Type[] { type }).GetConstructors();
+				foreach (ConstructorInfo constructorInfo in constructors)
+				{
+					ParameterInfo[] parameters = constructorInfo.GetParameters();
+					bool flag2 = parameters.Length != 0;
+					if (!flag2) { return (IList)constructorInfo.Invoke(null, null); }
+				}
+				throw new ApplicationException("Could not create a new list with type <" + type.ToString() + ">.");
+			}
+
+			public static IDictionary CreateDynamicDictionary(Type typeKey, Type typeValue)
+			{
+				bool flag = typeKey == null;
+				if (flag)
+				{
+					throw new ArgumentNullException("type_key", "Argument cannot be null.");
+				}
+				bool flag2 = typeValue == null;
+				if (flag2) { throw new ArgumentNullException("type_value", "Argument cannot be null."); }
+				ConstructorInfo[] constructors = typeof(Dictionary<,>).MakeGenericType(new Type[] { typeKey, typeValue }).GetConstructors();
+				foreach (ConstructorInfo constructorInfo in constructors)
+				{
+					ParameterInfo[] parameters = constructorInfo.GetParameters();
+					bool flag3 = parameters.Length != 0;
+					if (!flag3) { return (IDictionary)constructorInfo.Invoke(null, null); }
+				}
+				throw new ApplicationException(string.Concat(new string[] {
+				"Could not create a new dictionary with types <",
+				typeKey.ToString(),
+				",",
+				typeValue.ToString(),
+				">."
+			}));
+			}
+
+			public static T ReflectGetField<T>(Type classType, string fieldName, object o = null)
+			{
+				FieldInfo field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | ((o != null) ? BindingFlags.Instance : BindingFlags.Static));
+				return (T)field.GetValue(o);
+			}
+
+			public static void ReflectSetField<T>(Type classType, string fieldName, T value, object o = null)
+			{
+				FieldInfo field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | ((o != null) ? BindingFlags.Instance : BindingFlags.Static));
+				field.SetValue(o, value);
+			}
+
+			public static T ReflectGetProperty<T>(Type classType, string propName, object o = null, object[] indexes = null)
+			{
+				PropertyInfo property = classType.GetProperty(propName, BindingFlags.Public | BindingFlags.NonPublic | ((o != null) ? BindingFlags.Instance : BindingFlags.Static));
+				return (T)property.GetValue(o, indexes);
+			}
+
+			public static void ReflectSetProperty<T>(Type classType, string propName, T value, object o = null, object[] indexes = null)
+			{
+				PropertyInfo property = classType.GetProperty(propName, BindingFlags.Public | BindingFlags.NonPublic | ((o != null) ? BindingFlags.Instance : BindingFlags.Static));
+				property.SetValue(o, value, indexes);
+			}
+
+			public static MethodInfo ReflectGetMethod(Type classType, string methodName, Type[] methodArgumentTypes = null, Type[] genericMethodTypes = null, bool? isStatic = null)
+			{
+				MethodInfo[] array = ReflectTryGetMethods(classType, methodName, methodArgumentTypes, genericMethodTypes, isStatic);
+				bool flag = array.Count() == 0;
+				if (flag) { throw new MissingMethodException("Cannot reflect method, not found based on input parameters."); }
+				bool flag2 = array.Count() > 1;
+				if (flag2) { throw new InvalidOperationException("Cannot reflect method, more than one method matched based on input parameters."); }
+				return array[0];
+			}
+
+			public static MethodInfo ReflectTryGetMethod(Type classType, string methodName, Type[] methodArgumentTypes = null, Type[] genericMethodTypes = null, bool? isStatic = null)
+			{
+				MethodInfo[] array = ReflectTryGetMethods(classType, methodName, methodArgumentTypes, genericMethodTypes, isStatic);
+				bool flag = array.Count() == 0;
+				MethodInfo result;
+				if (flag)
+				{
+					result = null;
+				}
+				else
+				{
+					bool flag2 = array.Count() > 1;
+					if (flag2) { result = null; } else { result = array[0]; }
+				}
+				return result;
+			}
+
+			public static MethodInfo[] ReflectTryGetMethods(Type classType, string methodName, Type[] methodArgumentTypes = null, Type[] genericMethodTypes = null, bool? isStatic = null)
+			{
+				BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic;
+				bool flag = isStatic == null || isStatic.Value;
+				if (flag) { bindingFlags |= BindingFlags.Static; }
+				bool flag2 = isStatic == null || !isStatic.Value;
+				if (flag2) { bindingFlags |= BindingFlags.Instance; }
+				MethodInfo[] methods = classType.GetMethods(bindingFlags);
+				List<MethodInfo> list = new List<MethodInfo>();
+				for (int i = 0; i < methods.Length; i++)
+				{
+					// foreach (MethodInfo methodInfo in methods) {
+					bool flag3 = methods[i].Name != methodName;
+					if (!flag3)
+					{
+						bool isGenericMethodDefinition = methods[i].IsGenericMethodDefinition;
+						if (isGenericMethodDefinition)
+						{
+							bool flag4 = genericMethodTypes == null || genericMethodTypes.Length == 0;
+							if (flag4) { goto IL_14D; }
+							Type[] genericArguments = methods[i].GetGenericArguments();
+							bool flag5 = genericArguments.Length != genericMethodTypes.Length;
+							if (flag5) { goto IL_14D; }
+							methods[i] = methods[i].MakeGenericMethod(genericMethodTypes);
+						}
+						else
+						{
+							bool flag6 = genericMethodTypes != null && genericMethodTypes.Length != 0;
+							if (flag6) { goto IL_14D; }
+						}
+						ParameterInfo[] parameters = methods[i].GetParameters();
+						bool flag7 = methodArgumentTypes != null;
+						if (!flag7) { goto IL_141; }
+						bool flag8 = parameters.Length != methodArgumentTypes.Length;
+						if (!flag8)
+						{
+							for (int j = 0; j < parameters.Length; j++)
+							{
+								ParameterInfo parameterInfo = parameters[j];
+								bool flag9 = parameterInfo.ParameterType != methodArgumentTypes[j];
+								if (flag9) { goto IL_14A; }
+							}
+							goto IL_141;
+						}
+					IL_14A:
+						goto IL_14D;
+					IL_141:
+						list.Add(methods[i]);
+					}
+				IL_14D:;
+				}
+				return list.ToArray();
+			}
+
+			public static object InvokeRefs<T0>(MethodInfo methodInfo, object o, T0 p0)
+			{
+				object[] parameters = new object[] { p0 };
+				return methodInfo.Invoke(o, parameters);
+			}
+
+			public static object InvokeRefs<T0>(MethodInfo methodInfo, object o, ref T0 p0)
+			{
+				object[] array = new object[] { p0 };
+				object result = methodInfo.Invoke(o, array);
+				p0 = (T0)array[0];
+				return result;
+			}
+
+			public static object InvokeRefs<T0, T1>(MethodInfo methodInfo, object o, T0 p0, T1 p1)
+			{
+				object[] parameters = new object[] { p0, p1 };
+				return methodInfo.Invoke(o, parameters);
+			}
+
+			public static object InvokeRefs<T0, T1>(MethodInfo methodInfo, object o, ref T0 p0, T1 p1)
+			{
+				object[] array = new object[] { p0, p1 };
+				object result = methodInfo.Invoke(o, array);
+				p0 = (T0)array[0];
+				return result;
+			}
+
+			public static object InvokeRefs<T0, T1>(MethodInfo methodInfo, object o, T0 p0, ref T1 p1)
+			{
+				object[] array = new object[] { p0, p1 };
+				object result = methodInfo.Invoke(o, array);
+				p1 = (T1)array[1];
+				return result;
+			}
+
+			public static object InvokeRefs<T0, T1>(MethodInfo methodInfo, object o, ref T0 p0, ref T1 p1)
+			{
+				object[] array = new object[] { p0, p1 };
+				object result = methodInfo.Invoke(o, array);
+				p0 = (T0)array[0];
+				p1 = (T1)array[1];
+				return result;
+			}
+
+			public static object InvokeRefs<T0, T1, T2>(MethodInfo methodInfo, object o, T0 p0, T1 p1, T2 p2)
+			{
+				object[] parameters = new object[] { p0, p1, p2 };
+				return methodInfo.Invoke(o, parameters);
+			}
+
+			public static object InvokeRefs<T0, T1, T2>(MethodInfo methodInfo, object o, ref T0 p0, T1 p1, T2 p2)
+			{
+				object[] array = new object[] { p0, p1, p2 };
+				object result = methodInfo.Invoke(o, array);
+				p0 = (T0)array[0];
+				return result;
+			}
+
+			public static object InvokeRefs<T0, T1, T2>(MethodInfo methodInfo, object o, T0 p0, ref T1 p1, T2 p2)
+			{
+				object[] array = new object[] { p0, p1, p2 };
+				object result = methodInfo.Invoke(o, array);
+				p1 = (T1)array[1];
+				return result;
+			}
+
+			public static object InvokeRefs<T0, T1, T2>(MethodInfo methodInfo, object o, T0 p0, T1 p1, ref T2 p2)
+			{
+				object[] array = new object[] { p0, p1, p2 };
+				object result = methodInfo.Invoke(o, array);
+				p2 = (T2)array[2];
+				return result;
+			}
+
+			public static object InvokeRefs<T0, T1, T2>(MethodInfo methodInfo, object o, ref T0 p0, ref T1 p1, T2 p2)
+			{
+				object[] array = new object[] { p0, p1, p2 };
+				object result = methodInfo.Invoke(o, array);
+				p0 = (T0)array[0];
+				p1 = (T1)array[1];
+				return result;
+			}
+
+			public static object InvokeRefs<T0, T1, T2>(MethodInfo methodInfo, object o, ref T0 p0, T1 p1, ref T2 p2)
+			{
+				object[] array = new object[] { p0, p1, p2 };
+				object result = methodInfo.Invoke(o, array);
+				p0 = (T0)array[0];
+				p2 = (T2)array[2];
+				return result;
+			}
+
+			public static object InvokeRefs<T0, T1, T2>(MethodInfo methodInfo, object o, T0 p0, ref T1 p1, ref T2 p2)
+			{
+				object[] array = new object[] { p0, p1, p2 };
+				object result = methodInfo.Invoke(o, array);
+				p1 = (T1)array[1];
+				p2 = (T2)array[2];
+				return result;
+			}
+
+			public static object InvokeRefs<T0, T1, T2>(MethodInfo methodInfo, object o, ref T0 p0, ref T1 p1, ref T2 p2)
+			{
+				object[] array = new object[] { p0, p1, p2 };
+				object result = methodInfo.Invoke(o, array);
+				p0 = (T0)array[0];
+				p1 = (T1)array[1];
+				p2 = (T2)array[2];
+				return result;
+			}
+		}
+
+
+		public static DungeonPlaceable GenerateDungeonPlacable(GameObject ObjectPrefab = null, bool spawnsEnemy = false, bool useExternalPrefab = false, bool spawnsItem = false, string EnemyGUID = "479556d05c7c44f3b6abb3b2067fc778", int itemID = 307, Vector2? CustomOffset = null, bool itemHasDebrisObject = true, float spawnChance = 1f)
+		{
+			AssetBundle m_assetBundle = ResourceManager.LoadAssetBundle("shared_auto_001");
+			AssetBundle m_assetBundle2 = ResourceManager.LoadAssetBundle("shared_auto_002");
+			AssetBundle m_resourceBundle = ResourceManager.LoadAssetBundle("brave_resources_001");
+
+			// Used with custom DungeonPlacable        
+			GameObject ChestBrownTwoItems = m_assetBundle.LoadAsset<GameObject>("Chest_Wood_Two_Items");
+			GameObject Chest_Silver = m_assetBundle.LoadAsset<GameObject>("chest_silver");
+			GameObject Chest_Green = m_assetBundle.LoadAsset<GameObject>("chest_green");
+			GameObject Chest_Synergy = m_assetBundle.LoadAsset<GameObject>("chest_synergy");
+			GameObject Chest_Red = m_assetBundle.LoadAsset<GameObject>("chest_red");
+			GameObject Chest_Black = m_assetBundle.LoadAsset<GameObject>("Chest_Black");
+			GameObject Chest_Rainbow = m_assetBundle.LoadAsset<GameObject>("Chest_Rainbow");
+			// GameObject Chest_Rat = m_assetBundle.LoadAsset<GameObject>("Chest_Rat");
+
+			m_assetBundle = null;
+			m_assetBundle2 = null;
+			m_resourceBundle = null;
+
+			DungeonPlaceableVariant BlueChestVariant = new DungeonPlaceableVariant();
+			BlueChestVariant.percentChance = 0.35f;
+			BlueChestVariant.unitOffset = new Vector2(1, 0.8f);
+			BlueChestVariant.enemyPlaceableGuid = string.Empty;
+			BlueChestVariant.pickupObjectPlaceableId = -1;
+			BlueChestVariant.forceBlackPhantom = false;
+			BlueChestVariant.addDebrisObject = false;
+			BlueChestVariant.prerequisites = null;
+			BlueChestVariant.materialRequirements = null;
+			BlueChestVariant.nonDatabasePlaceable = Chest_Silver;
+
+			DungeonPlaceableVariant BrownChestVariant = new DungeonPlaceableVariant();
+			BrownChestVariant.percentChance = 0.28f;
+			BrownChestVariant.unitOffset = new Vector2(1, 0.8f);
+			BrownChestVariant.enemyPlaceableGuid = string.Empty;
+			BrownChestVariant.pickupObjectPlaceableId = -1;
+			BrownChestVariant.forceBlackPhantom = false;
+			BrownChestVariant.addDebrisObject = false;
+			BrownChestVariant.prerequisites = null;
+			BrownChestVariant.materialRequirements = null;
+			BrownChestVariant.nonDatabasePlaceable = ChestBrownTwoItems;
+
+			DungeonPlaceableVariant GreenChestVariant = new DungeonPlaceableVariant();
+			GreenChestVariant.percentChance = 0.25f;
+			GreenChestVariant.unitOffset = new Vector2(1, 0.8f);
+			GreenChestVariant.enemyPlaceableGuid = string.Empty;
+			GreenChestVariant.pickupObjectPlaceableId = -1;
+			GreenChestVariant.forceBlackPhantom = false;
+			GreenChestVariant.addDebrisObject = false;
+			GreenChestVariant.prerequisites = null;
+			GreenChestVariant.materialRequirements = null;
+			GreenChestVariant.nonDatabasePlaceable = Chest_Green;
+
+			DungeonPlaceableVariant SynergyChestVariant = new DungeonPlaceableVariant();
+			SynergyChestVariant.percentChance = 0.2f;
+			SynergyChestVariant.unitOffset = new Vector2(1, 0.8f);
+			SynergyChestVariant.enemyPlaceableGuid = string.Empty;
+			SynergyChestVariant.pickupObjectPlaceableId = -1;
+			SynergyChestVariant.forceBlackPhantom = false;
+			SynergyChestVariant.addDebrisObject = false;
+			SynergyChestVariant.prerequisites = null;
+			SynergyChestVariant.materialRequirements = null;
+			SynergyChestVariant.nonDatabasePlaceable = Chest_Synergy;
+
+			DungeonPlaceableVariant RedChestVariant = new DungeonPlaceableVariant();
+			RedChestVariant.percentChance = 0.15f;
+			RedChestVariant.unitOffset = new Vector2(0.5f, 0.5f);
+			RedChestVariant.enemyPlaceableGuid = string.Empty;
+			RedChestVariant.pickupObjectPlaceableId = -1;
+			RedChestVariant.forceBlackPhantom = false;
+			RedChestVariant.addDebrisObject = false;
+			RedChestVariant.prerequisites = null;
+			RedChestVariant.materialRequirements = null;
+			RedChestVariant.nonDatabasePlaceable = Chest_Red;
+
+			DungeonPlaceableVariant BlackChestVariant = new DungeonPlaceableVariant();
+			BlackChestVariant.percentChance = 0.1f;
+			BlackChestVariant.unitOffset = new Vector2(0.5f, 0.5f);
+			BlackChestVariant.enemyPlaceableGuid = string.Empty;
+			BlackChestVariant.pickupObjectPlaceableId = -1;
+			BlackChestVariant.forceBlackPhantom = false;
+			BlackChestVariant.addDebrisObject = false;
+			BlackChestVariant.prerequisites = null;
+			BlackChestVariant.materialRequirements = null;
+			BlackChestVariant.nonDatabasePlaceable = Chest_Black;
+
+			DungeonPlaceableVariant RainbowChestVariant = new DungeonPlaceableVariant();
+			RainbowChestVariant.percentChance = 0.005f;
+			RainbowChestVariant.unitOffset = new Vector2(0.5f, 0.5f);
+			RainbowChestVariant.enemyPlaceableGuid = string.Empty;
+			RainbowChestVariant.pickupObjectPlaceableId = -1;
+			RainbowChestVariant.forceBlackPhantom = false;
+			RainbowChestVariant.addDebrisObject = false;
+			RainbowChestVariant.prerequisites = null;
+			RainbowChestVariant.materialRequirements = null;
+			RainbowChestVariant.nonDatabasePlaceable = Chest_Rainbow;
+
+			DungeonPlaceableVariant ItemVariant = new DungeonPlaceableVariant();
+			ItemVariant.percentChance = spawnChance;
+			if (CustomOffset.HasValue)
+			{
+				ItemVariant.unitOffset = CustomOffset.Value;
+			}
+			else
+			{
+				ItemVariant.unitOffset = Vector2.zero;
+			}
+			// ItemVariant.unitOffset = new Vector2(0.5f, 0.8f);
+			ItemVariant.enemyPlaceableGuid = string.Empty;
+			ItemVariant.pickupObjectPlaceableId = itemID;
+			ItemVariant.forceBlackPhantom = false;
+			if (itemHasDebrisObject)
+			{
+				ItemVariant.addDebrisObject = true;
+			}
+			else
+			{
+				ItemVariant.addDebrisObject = false;
+			}
+			RainbowChestVariant.prerequisites = null;
+			RainbowChestVariant.materialRequirements = null;
+
+			List<DungeonPlaceableVariant> ChestTiers = new List<DungeonPlaceableVariant>();
+			ChestTiers.Add(BrownChestVariant);
+			ChestTiers.Add(BlueChestVariant);
+			ChestTiers.Add(GreenChestVariant);
+			ChestTiers.Add(SynergyChestVariant);
+			ChestTiers.Add(RedChestVariant);
+			ChestTiers.Add(BlackChestVariant);
+			ChestTiers.Add(RainbowChestVariant);
+
+			DungeonPlaceableVariant EnemyVariant = new DungeonPlaceableVariant();
+			EnemyVariant.percentChance = spawnChance;
+			EnemyVariant.unitOffset = Vector2.zero;
+			EnemyVariant.enemyPlaceableGuid = EnemyGUID;
+			EnemyVariant.pickupObjectPlaceableId = -1;
+			EnemyVariant.forceBlackPhantom = false;
+			EnemyVariant.addDebrisObject = false;
+			EnemyVariant.prerequisites = null;
+			EnemyVariant.materialRequirements = null;
+
+			List<DungeonPlaceableVariant> EnemyTiers = new List<DungeonPlaceableVariant>();
+			EnemyTiers.Add(EnemyVariant);
+
+			List<DungeonPlaceableVariant> ItemTiers = new List<DungeonPlaceableVariant>();
+			ItemTiers.Add(ItemVariant);
+
+			DungeonPlaceable m_cachedCustomPlacable = ScriptableObject.CreateInstance<DungeonPlaceable>();
+			m_cachedCustomPlacable.name = "CustomChestPlacable";
+			if (spawnsEnemy | useExternalPrefab)
+			{
+				m_cachedCustomPlacable.width = 2;
+				m_cachedCustomPlacable.height = 2;
+			}
+			else if (spawnsItem)
+			{
+				m_cachedCustomPlacable.width = 1;
+				m_cachedCustomPlacable.height = 1;
+			}
+			else
+			{
+				m_cachedCustomPlacable.width = 4;
+				m_cachedCustomPlacable.height = 1;
+			}
+			m_cachedCustomPlacable.roomSequential = false;
+			m_cachedCustomPlacable.respectsEncounterableDifferentiator = true;
+			m_cachedCustomPlacable.UsePrefabTransformOffset = false;
+			m_cachedCustomPlacable.isPassable = true;
+			if (spawnsItem)
+			{
+				m_cachedCustomPlacable.MarkSpawnedItemsAsRatIgnored = true;
+			}
+			else
+			{
+				m_cachedCustomPlacable.MarkSpawnedItemsAsRatIgnored = false;
+			}
+
+			m_cachedCustomPlacable.DebugThisPlaceable = false;
+			if (useExternalPrefab && ObjectPrefab != null)
+			{
+				DungeonPlaceableVariant ExternalObjectVariant = new DungeonPlaceableVariant();
+				ExternalObjectVariant.percentChance = spawnChance;
+				if (CustomOffset.HasValue)
+				{
+					ExternalObjectVariant.unitOffset = CustomOffset.Value;
+				}
+				else
+				{
+					ExternalObjectVariant.unitOffset = Vector2.zero;
+				}
+				ExternalObjectVariant.enemyPlaceableGuid = string.Empty;
+				ExternalObjectVariant.pickupObjectPlaceableId = -1;
+				ExternalObjectVariant.forceBlackPhantom = false;
+				ExternalObjectVariant.addDebrisObject = false;
+				ExternalObjectVariant.nonDatabasePlaceable = ObjectPrefab;
+				List<DungeonPlaceableVariant> ExternalObjectTiers = new List<DungeonPlaceableVariant>();
+				ExternalObjectTiers.Add(ExternalObjectVariant);
+				m_cachedCustomPlacable.variantTiers = ExternalObjectTiers;
+			}
+			else if (spawnsEnemy)
+			{
+				m_cachedCustomPlacable.variantTiers = EnemyTiers;
+			}
+			else if (spawnsItem)
+			{
+				m_cachedCustomPlacable.variantTiers = ItemTiers;
+			}
+			else
+			{
+				m_cachedCustomPlacable.variantTiers = ChestTiers;
+			}
+			return m_cachedCustomPlacable;
+		}
+
+
+		public static BasicBeamController GenerateBeamPrefab(this Projectile projectile, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> beamAnimationPaths = null, int beamFPS = -1, List<string> impactVFXAnimationPaths = null, int beamImpactFPS = -1, Vector2? impactVFXColliderDimensions = null, Vector2? impactVFXColliderOffsets = null, List<string> endVFXAnimationPaths = null, int beamEndFPS = -1, Vector2? endVFXColliderDimensions = null, Vector2? endVFXColliderOffsets = null, List<string> muzzleVFXAnimationPaths = null, int beamMuzzleFPS = -1, Vector2? muzzleVFXColliderDimensions = null, Vector2? muzzleVFXColliderOffsets = null, bool glows = false)
 		{
 			try
 			{
+				BotsModule.Log("beam 0");
+				if (projectile.specRigidbody != null)
+                {
+					projectile.specRigidbody.CollideWithOthers = false;
+				}
+				
 				float convertedColliderX = colliderDimensions.x / 16f;
 				float convertedColliderY = colliderDimensions.y / 16f;
 				float convertedOffsetX = colliderOffsets.x / 16f;
@@ -122,7 +644,7 @@ namespace BotsMod
 				int spriteID = SpriteBuilder.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
 				tk2dTiledSprite tiledSprite = projectile.gameObject.GetOrAddComponent<tk2dTiledSprite>();
 
-
+				BotsModule.Log("beam 1");
 
 				tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
 				tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
@@ -141,6 +663,7 @@ namespace BotsMod
 				UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSprite>());
 				BasicBeamController beamController = projectile.gameObject.GetOrAddComponent<BasicBeamController>();
 
+				//BotsModule.Log("---------------- Sets up the animation for the main part of the beam");
 				if (beamAnimationPaths != null)
 				{
 					tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = "beam_idle", frames = new tk2dSpriteAnimationFrame[0], fps = beamFPS };
@@ -160,53 +683,42 @@ namespace BotsMod
 					animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
 					beamController.beamAnimation = "beam_idle";
 				}
+				//BotsModule.Log("------------- Sets up the animation for the part of the beam that touches the wall");
 				if (endVFXAnimationPaths != null && endVFXColliderDimensions != null && endVFXColliderOffsets != null)
 				{
-					tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = "beam_end", frames = new tk2dSpriteAnimationFrame[0], fps = beamEndFPS };
-					List<string> spritePaths = endVFXAnimationPaths;
-
-					List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
-					foreach (string path in spritePaths)
-					{
-						tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
-						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
-						tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
-						frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
-						Vector2 actualDimensions = (Vector2)endVFXColliderDimensions;
-						Vector2 actualOffsets = (Vector2)endVFXColliderOffsets;
-						frameDef.colliderVertices = new Vector3[]{
-							new Vector3(actualOffsets.x / 16, actualOffsets.y / 16, 0f),
-							new Vector3(actualDimensions.x / 16, actualDimensions.y / 16, 0f)
-						};
-						frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
-					}
-					clip.frames = frames.ToArray();
-					animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
-					beamController.impactAnimation = "beam_end";
+					SetupBeamPart(animation, endVFXAnimationPaths, "beam_end", beamEndFPS, (Vector2)endVFXColliderDimensions, (Vector2)endVFXColliderOffsets);
+					beamController.beamEndAnimation = "beam_end";
 				}
+				else
+				{
+					SetupBeamPart(animation, beamAnimationPaths, "beam_end", beamFPS, null, null, def.colliderVertices);
+					beamController.beamEndAnimation = "beam_end";
+				}
+
+				//BotsModule.Log("---------------Sets up the animaton for the VFX that plays over top of the end of the beam where it hits stuff");
+				if (impactVFXAnimationPaths != null && impactVFXColliderDimensions != null && impactVFXColliderOffsets != null)
+				{
+					SetupBeamPart(animation, impactVFXAnimationPaths, "beam_impact", beamImpactFPS, (Vector2)impactVFXColliderDimensions, (Vector2)impactVFXColliderOffsets);
+					beamController.impactAnimation = "beam_impact";
+				}
+
+				//BotsModule.Log("--------------Sets up the animation for the very start of the beam");
 				if (muzzleVFXAnimationPaths != null && muzzleVFXColliderDimensions != null && muzzleVFXColliderOffsets != null)
 				{
-					tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = "beam_start", frames = new tk2dSpriteAnimationFrame[0], fps = beamMuzzleFPS };
-					List<string> spritePaths = muzzleVFXAnimationPaths;
-
-					List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
-					foreach (string path in spritePaths)
-					{
-						tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
-						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
-						tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
-						frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
-						Vector2 actualDimensions = (Vector2)muzzleVFXColliderDimensions;
-						Vector2 actualOffsets = (Vector2)muzzleVFXColliderOffsets;
-						frameDef.colliderVertices = new Vector3[]{
-							new Vector3(actualOffsets.x / 16, actualOffsets.y / 16, 0f),
-							new Vector3(actualDimensions.x / 16, actualDimensions.y / 16, 0f)
-						};
-						frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
-					}
-					clip.frames = frames.ToArray();
-					animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+					SetupBeamPart(animation, muzzleVFXAnimationPaths, "beam_start", beamMuzzleFPS, (Vector2)muzzleVFXColliderDimensions, (Vector2)muzzleVFXColliderOffsets);
 					beamController.beamStartAnimation = "beam_start";
+				}
+				else
+				{
+					SetupBeamPart(animation, beamAnimationPaths, "beam_start", beamFPS, null, null, def.colliderVertices);
+					beamController.beamStartAnimation = "beam_start";
+				}
+
+				if (glows)
+				{
+					EmmisiveBeams emission = projectile.gameObject.GetOrAddComponent<EmmisiveBeams>();
+					//emission
+
 				}
 				return beamController;
 			}
@@ -215,6 +727,44 @@ namespace BotsMod
 				ETGModConsole.Log(e.ToString());
 				return null;
 			}
+		}
+
+		private static void SetupBeamPart(tk2dSpriteAnimation beamAnimation, List<string> animSpritePaths, string animationName, int fps, Vector2? colliderDimensions = null, Vector2? colliderOffsets = null, Vector3[] overrideVertices = null)
+		{
+			tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = animationName, frames = new tk2dSpriteAnimationFrame[0], fps = fps };
+			List<string> spritePaths = animSpritePaths;
+
+			List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+			foreach (string path in spritePaths)
+			{
+				tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
+				int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+				tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
+				frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleCenter);
+				if (overrideVertices != null)
+				{
+					frameDef.colliderVertices = overrideVertices;
+				}
+				else
+				{
+					if (colliderDimensions == null || colliderOffsets == null)
+					{
+						ETGModConsole.Log("<size=100><color=#ff0000ff>BEAM ERROR: colliderDimensions or colliderOffsets was null with no override vertices!</color></size>", false);
+					}
+					else
+					{
+						Vector2 actualDimensions = (Vector2)colliderDimensions;
+						Vector2 actualOffsets = (Vector2)colliderDimensions;
+						frameDef.colliderVertices = new Vector3[]{
+							new Vector3(actualOffsets.x / 16, actualOffsets.y / 16, 0f),
+							new Vector3(actualDimensions.x / 16, actualDimensions.y / 16, 0f)
+						};
+					}
+				}
+				frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
+			}
+			clip.frames = frames.ToArray();
+			beamAnimation.clips = beamAnimation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
 		}
 
 		/*
@@ -525,12 +1075,6 @@ namespace BotsMod
 			}
 		}*/
 
-		public static void SetTextAnchor(this RectTransform r, TextAnchor anchor)
-		{
-			r.anchorMin = AnchorMap[anchor];
-			r.anchorMax = AnchorMap[anchor];
-			r.pivot = AnchorMap[anchor];
-		}
 
 		public static readonly Dictionary<TextAnchor, Vector2> AnchorMap = new Dictionary<TextAnchor, Vector2>
 		{
@@ -1174,7 +1718,7 @@ namespace BotsMod
 			EncounterDatabase.Instance.Entries.Add(encounterDatabaseEntry);
 		}
 
-		// Token: 0x06000173 RID: 371 RVA: 0x00013268 File Offset: 0x00011468
+		
 		public static GameActorEffect CopyEffectFrom(this GameActorEffect self, GameActorEffect other)
 		{
 			bool flag = self == null || other == null;
@@ -1220,10 +1764,10 @@ namespace BotsMod
 			return result;
 		}
 
-		// Token: 0x06000174 RID: 372 RVA: 0x000133F0 File Offset: 0x000115F0
+		
 
 
-		// Token: 0x06000175 RID: 373 RVA: 0x00013490 File Offset: 0x00011690
+		
 		public static bool PlayerHasCompletionItem(this PlayerController player)
 		{
 			bool result = false;
@@ -1242,7 +1786,7 @@ namespace BotsMod
 			return result;
 		}
 
-		// Token: 0x06000176 RID: 374 RVA: 0x00013518 File Offset: 0x00011718
+		
 		public static bool PlayerHasActiveSynergy(this PlayerController player, string synergyNameToCheck)
 		{
 			foreach (int num in player.ActiveExtraSynergies)
@@ -1257,7 +1801,7 @@ namespace BotsMod
 			return false;
 		}
 
-		// Token: 0x06000177 RID: 375 RVA: 0x00013598 File Offset: 0x00011798
+		
 		public static tk2dSpriteDefinition CopyDefinitionFrom(this tk2dSpriteDefinition other)
 		{
 			return new tk2dSpriteDefinition
@@ -1296,19 +1840,19 @@ namespace BotsMod
 			};
 		}
 
-		// Token: 0x06000178 RID: 376 RVA: 0x00013730 File Offset: 0x00011930
+		
 		public static Gun GetGunById(this PickupObjectDatabase database, int id)
 		{
 			return PickupObjectDatabase.GetById(id) as Gun;
 		}
 
-		// Token: 0x06000179 RID: 377 RVA: 0x00013750 File Offset: 0x00011950
+		
 		public static Gun GetGunById(int id)
 		{
 			return Tools.GetGunById((PickupObjectDatabase)null, id);
 		}
 
-		// Token: 0x0600017A RID: 378 RVA: 0x0001376C File Offset: 0x0001196C
+		
 		public static ExplosionData CopyExplosionData(this ExplosionData other)
 		{
 			return new ExplosionData
@@ -1361,7 +1905,7 @@ namespace BotsMod
 			};
 		}
 
-		// Token: 0x0600017B RID: 379 RVA: 0x000139AC File Offset: 0x00011BAC
+		
 		public static void SetProjectileSpriteRight(this Projectile proj, string name, int pixelWidth, int pixelHeight, bool lightened = true, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.LowerLeft, bool anchorChangesCollider = true, int? overrideColliderPixelWidth = null,
 	 int? overrideColliderPixelHeight = null, int? overrideColliderOffsetX = null, int? overrideColliderOffsetY = null, Projectile overrideProjectileToCopyFrom = null)
 		{
@@ -1472,7 +2016,7 @@ namespace BotsMod
 		}
 
 
-		// Token: 0x0600017C RID: 380 RVA: 0x00013BFC File Offset: 0x00011DFC
+		
 		public static StatModifier SetupStatModifier(PlayerStats.StatType statType, float modificationAmount, StatModifier.ModifyMethod modifyMethod = StatModifier.ModifyMethod.ADDITIVE, bool breaksOnDamage = false)
 		{
 			return new StatModifier
@@ -1484,7 +2028,7 @@ namespace BotsMod
 			};
 		}
 
-		// Token: 0x0600017D RID: 381 RVA: 0x00013C30 File Offset: 0x00011E30
+		
 		public static GameActorCharmEffect CopyCharmFrom(this GameActorCharmEffect self, GameActorCharmEffect other)
 		{
 			bool flag = self == null;
@@ -1495,7 +2039,7 @@ namespace BotsMod
 			return (GameActorCharmEffect)self.CopyEffectFrom(other);
 		}
 
-		// Token: 0x0600017E RID: 382 RVA: 0x00013C60 File Offset: 0x00011E60
+		
 		public static GameActorFireEffect CopyFireFrom(this GameActorFireEffect self, GameActorFireEffect other)
 		{
 			bool flag = self == null;
@@ -1531,7 +2075,7 @@ namespace BotsMod
 			return result;
 		}
 
-		// Token: 0x0600017F RID: 383 RVA: 0x00013D64 File Offset: 0x00011F64
+		
 		public static GameActorHealthEffect CopyPoisonFrom(this GameActorHealthEffect self, GameActorHealthEffect other)
 		{
 			bool flag = self == null;
@@ -1555,7 +2099,7 @@ namespace BotsMod
 			return result;
 		}
 
-		// Token: 0x06000180 RID: 384 RVA: 0x00013DB8 File Offset: 0x00011FB8
+		
 		public static GameActorSpeedEffect CopySpeedFrom(this GameActorSpeedEffect self, GameActorSpeedEffect other)
 		{
 			bool flag = self == null;
@@ -1580,7 +2124,7 @@ namespace BotsMod
 			return result;
 		}
 
-		// Token: 0x06000181 RID: 385 RVA: 0x00013E18 File Offset: 0x00012018
+		
 		public static GameActorFreezeEffect CopyFreezeFrom(this GameActorFreezeEffect self, GameActorFreezeEffect other)
 		{
 			bool flag = self == null;
@@ -1620,7 +2164,7 @@ namespace BotsMod
 			return result;
 		}
 
-		// Token: 0x06000182 RID: 386 RVA: 0x00013F48 File Offset: 0x00012148
+		
 		public static GameActorBleedEffect CopyBleedFrom(this GameActorBleedEffect self, GameActorBleedEffect other)
 		{
 			bool flag = self == null;
@@ -1646,7 +2190,7 @@ namespace BotsMod
 			return result;
 		}
 
-		// Token: 0x06000183 RID: 387 RVA: 0x00013FB4 File Offset: 0x000121B4
+		
 		public static GameActorCheeseEffect CopyCheeseFrom(this GameActorCheeseEffect self, GameActorCheeseEffect other)
 		{
 			bool flag = self == null;
@@ -1687,10 +2231,10 @@ namespace BotsMod
 			return result;
 		}
 
-		// Token: 0x06000184 RID: 388 RVA: 0x000140F0 File Offset: 0x000122F0
+		
 	
 
-		// Token: 0x0600018A RID: 394 RVA: 0x00014158 File Offset: 0x00012358
+		
 		public static void SetupUnlockOnFlag(this PickupObject self, GungeonFlags flag, bool requiredFlagValue)
 		{
 			EncounterTrackable encounterTrackable = self.encounterTrackable;
@@ -1748,7 +2292,7 @@ namespace BotsMod
 			}
 		}
 
-		// Token: 0x0600018B RID: 395 RVA: 0x00014290 File Offset: 0x00012490
+		
 		public static void SetupUnlockOnStat(this PickupObject self, TrackedStats stat, DungeonPrerequisite.PrerequisiteOperation operation, int comparisonValue)
 		{
 			EncounterTrackable encounterTrackable = self.encounterTrackable;
@@ -1810,7 +2354,40 @@ namespace BotsMod
 			}
 		}
 
-		// Token: 0x0600018C RID: 396 RVA: 0x000143E8 File Offset: 0x000125E8
+		public static List<AIBeamShooter2> ExtremeLaziness(GameObject prefab, Transform parent, int amountOfBeams, List<string> names)
+        {
+			var beamList = new List<AIBeamShooter2>();
+			for(int i = 0; i < amountOfBeams; i++)
+            {
+				/*AIBeamShooter2 aIBeamShooter = prefab.GetOrAddComponent<AIBeamShooter2>();
+				AIActor actor = EnemyDatabase.GetOrLoadByGuid("21dd14e5ca2a4a388adab5b11b69a1e1");
+				AIBeamShooter aIBeamShooter2 = actor.GetComponent<AIBeamShooter>();
+				aIBeamShooter.beamTransform = parent;
+				aIBeamShooter.beamModule = aIBeamShooter2.beamModule;
+				aIBeamShooter.beamProjectile = aIBeamShooter2.beamProjectile;
+				aIBeamShooter.name = names[i];
+				aIBeamShooter.PreventBeamContinuation = true;*/
+
+
+				AIBeamShooter2 bholsterbeam1 = prefab.AddComponent<AIBeamShooter2>();
+				AIActor actor2 = EnemyDatabase.GetOrLoadByGuid("4b992de5b4274168a8878ef9bf7ea36b");
+				BeholsterController beholsterbeam = actor2.GetComponent<BeholsterController>();
+				bholsterbeam1.beamTransform = parent;
+				bholsterbeam1.beamModule = beholsterbeam.beamModule;
+				bholsterbeam1.sprite.HeightOffGround = -20;
+				//bholsterbeam1.beamProjectile = beholsterbeam.beamModule.GetCurrentProjectile();
+				bholsterbeam1.beamProjectile = beholsterbeam.projectile;
+
+				beamList.Add(bholsterbeam1);
+
+				BotsModule.Log(names[i]);
+			}
+			
+
+			return beamList;
+        }
+
+		
 		public static Tools.ChestType GetChestType(this Chest chest)
 		{
 			bool flag = chest.ChestIdentifier == Chest.SpecialChestIdentifier.SECRET_RAINBOW;
@@ -1898,7 +2475,7 @@ namespace BotsMod
 			return result;
 		}
 
-		// Token: 0x0600018D RID: 397 RVA: 0x000144F5 File Offset: 0x000126F5
+		
 		public static void PlaceItemInAmmonomiconAfterItemById(this PickupObject item, int id)
 		{
 			item.ForcedPositionInAmmonomicon = PickupObjectDatabase.GetById(id).ForcedPositionInAmmonomicon;
@@ -2050,6 +2627,13 @@ namespace BotsMod
 		public static AssetBundle shared_auto_002;
 		public static AssetBundle shared_auto_001;
 		public static AssetBundle brave;
+
+		public static void AddComplex(this StringDBTable stringdb, string key, string value)
+		{
+			StringTableManager.StringCollection stringCollection = new StringTableManager.ComplexStringCollection();
+			stringCollection.AddString(value, 1f);
+			stringdb[key] = stringCollection;
+		}
 
 		public static DungeonFlowNode GenerateFlowNode(DungeonFlow flow, PrototypeDungeonRoom.RoomCategory category, PrototypeDungeonRoom overrideRoom = null, GenericRoomTable overrideRoomTable = null, bool loopTargetIsOneWay = false, bool isWarpWing = false,
 		   bool handlesOwnWarping = true, float weight = 1f, DungeonFlowNode.NodePriority priority = DungeonFlowNode.NodePriority.MANDATORY, string guid = "")
@@ -3111,7 +3695,7 @@ namespace BotsMod
 			return material;
 		}
 
-		// Token: 0x06000170 RID: 368 RVA: 0x0001ABE8 File Offset: 0x00018DE8
+		
 		public static tk2dSpriteDefinition Copy(this tk2dSpriteDefinition orig)
 		{
 			tk2dSpriteDefinition tk2dSpriteDefinition = new tk2dSpriteDefinition();
@@ -3160,7 +3744,7 @@ namespace BotsMod
 		{
 			if (sourceCollection == null)
 			{
-				return null;
+				//return null;
 			}
 			tk2dSpriteCollectionData tk2dSpriteCollectionData = UnityEngine.Object.Instantiate<tk2dSpriteCollectionData>(sourceCollection);
 			tk2dSpriteDefinition[] array = new tk2dSpriteDefinition[tk2dSpriteCollectionData.spriteDefinitions.Length];

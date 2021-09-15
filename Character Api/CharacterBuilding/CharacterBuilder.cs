@@ -73,7 +73,7 @@ namespace CustomCharacters
 
 
             gameObject.SetActive(false);
-            GungeonAPI.FakePrefab.MarkAsFakePrefab(gameObject);
+            FakePrefab.MarkAsFakePrefab(gameObject);
         }
 
         public static void CustomizeCharacter(PlayerController player, CustomCharacterData data, bool paradoxUsesSprites)

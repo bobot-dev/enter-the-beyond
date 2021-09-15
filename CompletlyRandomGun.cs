@@ -49,7 +49,7 @@ namespace BotsMod
 
 			var rngStats = OkJarvisNowRandomizeThem();
 
-			BotsModule.Log("Range: " + rngStats[0]);
+			/*BotsModule.Log("Range: " + rngStats[0]);
 			BotsModule.Log("Dmg: " + rngStats[1]);
 			BotsModule.Log("Firerate: " + rngStats[2]);
 			BotsModule.Log("Spread: " + rngStats[3]);
@@ -61,7 +61,7 @@ namespace BotsMod
 			BotsModule.Log("AmmoCost: " + rngStats[9]);
 			BotsModule.Log("NameSize: " + rngStats[10]);
 			BotsModule.Log("DescSize: " + rngStats[11]);
-			BotsModule.Log("LongDescSize: " + rngStats[12]);
+			BotsModule.Log("LongDescSize: " + rngStats[12]);*/
 
 
 			Gun gun2 = PickupObjectDatabase.GetById(GetRandomGunThatsNotABeam()) as Gun;
@@ -101,7 +101,7 @@ namespace BotsMod
 
 					var texture = (Texture2D)material.mainTexture.GetReadable();
 
-					BotsModule.Log("g5");
+					
 					material.mainTexture.GetReadable();
 					var width = texture.width;
 					var height = texture.height;
@@ -112,7 +112,7 @@ namespace BotsMod
 						ItemAPI.Tools.PrintError($"Failed to edit {defName} in {collectionName}: Invalid UV's");
 						continue;
 					}
-					BotsModule.Log("g6");
+
 					var minX = Mathf.RoundToInt(uvs[0].x * width);
 					var minY = Mathf.RoundToInt(uvs[0].y * height);
 					var X = Mathf.RoundToInt(uvs[3].x * width);
@@ -139,7 +139,7 @@ namespace BotsMod
 						output = output.Rotated().Flipped();
 					}
 					output.name = def.name;
-					BotsModule.Log(output.name, BotsModule.TEXT_COLOR);
+					//BotsModule.Log(output.name, BotsModule.TEXT_COLOR);
 					for (int y = minY; y < (minY); y++)
 					{
 						for (int x = minX; x < (minX); x++)
@@ -156,20 +156,19 @@ namespace BotsMod
 
 					def.material.SetTexture("_MainTex", output);
 
-					BotsModule.Log("g7");
 				}
 			}
 
-			BotsModule.Log("g8");
+
 			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()_-+=|';:,.<>/?[]{}`~";
 			var name = new string (Enumerable.Repeat(chars, (int)rngStats[10]).Select(s => s[UnityEngine.Random.Range(0, s.Length)]).ToArray());
 			var desc = new string (Enumerable.Repeat(chars, (int)rngStats[11]).Select(s => s[UnityEngine.Random.Range(0, s.Length)]).ToArray());
 			var longDesc = new string (Enumerable.Repeat(chars, (int)rngStats[12]).Select(s => s[UnityEngine.Random.Range(0, s.Length)]).ToArray());
-			BotsModule.Log("g9");
+
 			gun.SetName(name);
 			gun.SetShortDescription(desc);
 			gun.SetLongDescription(longDesc);
-			BotsModule.Log("g10");
+
 			Gun other = PickupObjectDatabase.GetById(GetRandomGunThatsNotABeam()) as Gun;
 			if (module == null) 
 			{
@@ -179,7 +178,7 @@ namespace BotsMod
 
 			gun.SetBaseMaxAmmo((int)rngStats[8]);
 			gun.InfiniteAmmo = false;
-			BotsModule.Log("g11");
+
 			gun.DefaultModule.ammoCost = (int)rngStats[9];
 
 			gun.DefaultModule.shootStyle = (ProjectileModule.ShootStyle)UnityEngine.Random.Range(0, 5);
@@ -187,14 +186,13 @@ namespace BotsMod
 
 			gun.DefaultModule.ammoType = (GameUIAmmoType.AmmoType)UnityEngine.Random.Range(0, 14);
 			gun.DefaultModule.customAmmoType = other.DefaultModule.customAmmoType;
-			BotsModule.Log("g12");
 
 			gun.finalMuzzleFlashEffects = gun5.muzzleFlashEffects;
 
 			gun.DefaultModule.cooldownTime = rngStats[2];
 			gun.DefaultModule.numberOfShotsInClip = (int)rngStats[4];
 			gun.quality = PickupObject.ItemQuality.SPECIAL;
-			BotsModule.Log("g13");
+
 			gun.gunClass = GunClass.SHITTY;
 			gun.CanBeDropped = true;
 			gun.PreventStartingOwnerFromDropping = true;
@@ -203,7 +201,7 @@ namespace BotsMod
 			ItemAPI.FakePrefab.MarkAsFakePrefab(projectile.gameObject);
 			UnityEngine.Object.DontDestroyOnLoad(projectile);
 			gun.DefaultModule.projectiles[0] = projectile;
-			BotsModule.Log("g14");
+
 			gun.shellsToLaunchOnReload = 14;
 			gun.shellCasing = gun3.shellCasing;
 
@@ -225,7 +223,7 @@ namespace BotsMod
 			gun.reloadAnimation = (PickupObjectDatabase.GetById(GetRandomGunThatsNotABeam()) as Gun).reloadAnimation;
 			gun.emptyReloadAnimation = (PickupObjectDatabase.GetById(GetRandomGunThatsNotABeam()) as Gun).emptyReloadAnimation;
 
-			BotsModule.Log(gun.emptyAnimation);
+			/*BotsModule.Log(gun.emptyAnimation);
 			BotsModule.Log(gun.idleAnimation);
 			BotsModule.Log(gun.introAnimation);
 			BotsModule.Log(gun.shootAnimation);
@@ -238,7 +236,7 @@ namespace BotsMod
 
 			BotsModule.Log("name: " + name);
 			BotsModule.Log("desc: " + desc);
-			BotsModule.Log("longDesc: " + longDesc);
+			BotsModule.Log("longDesc: " + longDesc);*/
 		}
 
 		private static int GetRandomGunThatsNotABeam()
@@ -454,7 +452,7 @@ namespace BotsMod
 				LongDescSize,
 			};
 
-			BotsModule.Log("Range: " + Stats[0]);
+			/*BotsModule.Log("Range: " + Stats[0]);
 			BotsModule.Log("Dmg: " + Stats[1]);
 			BotsModule.Log("Firerate: " + Stats[2]);
 			BotsModule.Log("Spread: " + Stats[3]);
@@ -466,7 +464,7 @@ namespace BotsMod
 			BotsModule.Log("AmmoCost: " + Stats[9]);
 			BotsModule.Log("NameSize: " + Stats[10]);
 			BotsModule.Log("DescSize: " + Stats[11]);
-			BotsModule.Log("LongDescSize: " + Stats[12]);
+			BotsModule.Log("LongDescSize: " + Stats[12]);*/
 
 			return Stats;
 		}
@@ -600,7 +598,7 @@ namespace BotsMod
 				minDescSize,
 				minLongDescSize,
 			};
-			BotsModule.Log("MinRange: " + minStats[0]);
+			/*BotsModule.Log("MinRange: " + minStats[0]);
 			BotsModule.Log("MinDmg: " + minStats[1]);
 			BotsModule.Log("MinFirerate: " + minStats[2]);
 			BotsModule.Log("MinSpread: " + minStats[3]);
@@ -612,7 +610,7 @@ namespace BotsMod
 			BotsModule.Log("MinAmmoCost: " + minStats[9]);
 			BotsModule.Log("MinNameSize: " + minStats[10]);
 			BotsModule.Log("MinDescSize: " + minStats[11]);
-			BotsModule.Log("MinLongDescSize: " + minStats[12]);
+			BotsModule.Log("MinLongDescSize: " + minStats[12]);*/
 			return minStats;
 		}
 

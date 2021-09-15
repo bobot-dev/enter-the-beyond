@@ -69,10 +69,14 @@ namespace BotsMod
             {
                 return;
             }
-            if (collision.OtherRigidbody)
+
+
+            if (collision.OtherRigidbody && collision.OtherRigidbody.projectile)
             {
                 return;
+
             }
+
             if (collision.CollidedX || collision.CollidedY)
             {
                 Vector2 vector = collision.MyRigidbody.Velocity;
@@ -105,7 +109,7 @@ namespace BotsMod
 
 
                 BotsModule.Log("AHHHH");
-                AkSoundEngine.PostEvent("Play_Fuck", this.m_aiActor.gameObject);
+                //AkSoundEngine.PostEvent("Play_Fuck", this.m_aiActor.gameObject);
             }
         }
 

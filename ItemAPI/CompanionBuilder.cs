@@ -118,18 +118,19 @@ namespace ItemAPI
         }
 
         public enum AnimationType { Move, Idle, Fidget, Flight, Hit, Talk, Other }
-        public static tk2dSpriteAnimationClip AddAnimation(this GameObject obj, string name, string spriteDirectory, int fps, AnimationType type, DirectionType directionType = DirectionType.None, FlipType flipType = FlipType.None)
+        public static tk2dSpriteAnimationClip AddAnimation(this GameObject obj, string name, string spriteDirectory, int fps,
+           AnimationType type, DirectionType directionType = DirectionType.None, FlipType flipType = FlipType.None)
         {
             AIAnimator aiAnimator = obj.GetOrAddComponent<AIAnimator>();
             DirectionalAnimation animation = aiAnimator.GetDirectionalAnimation(name, directionType, type);
-            if(animation == null)
+            if (animation == null)
             {
                 animation = new DirectionalAnimation()
                 {
                     AnimNames = new string[0],
                     Flipped = new FlipType[0],
                     Type = directionType,
-                    Prefix = string.Empty
+                    Prefix = name
                 };
             }
 
@@ -209,10 +210,17 @@ namespace ItemAPI
                     aiAnimator.IdleFidgetAnimations.Add(animation);
                     break;
                 default:
+
+                    if (aiAnimator.OtherAnimations == null)
+                    {
+                        aiAnimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>();
+                    }
+
                     aiAnimator.OtherAnimations.Add(new AIAnimator.NamedDirectionalAnimation()
                     {
                         anim = animation,
-                        name = name
+                        name = name,
+
                     });
                     break;
             }

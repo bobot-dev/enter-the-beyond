@@ -18,7 +18,7 @@ namespace GungeonAPI
 
             if (xIndex >= xCapacity || yIndex >= yCapacity)
             {
-                ToolsGAPI.PrintError("Not enough room left on the Facecard Atlas for this facecard!");
+                Tools.PrintError("Not enough room left on the Facecard Atlas for this facecard!");
                 return Rect.zero;
             }
 

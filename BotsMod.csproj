@@ -108,9 +108,21 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\CustomItems\CustomItems\bin\Debug\UnityEngine.UI.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UIModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Enter the Gungeon\EtG_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Beyond\RoomPrefabs.cs" />
+    <Compile Include="Audio\AudioResourceLoader.cs" />
+    <Compile Include="Audio\ResourceLoaderSoundbanks.cs" />
+    <Compile Include="Floors\BeyondDungeon.cs" />
+    <Compile Include="Floors\LostPastDungeon.cs" />
+    <Compile Include="Floors\ToolsForFloors\BeyondPrefabs.cs" />
+    <Compile Include="Floors\ToolsForFloors\FloorHooks.cs" />
+    <Compile Include="Floors\ToolsForFloors\ModRoomPrefabs.cs" />
+    <Compile Include="Floors\ToolsForFloors\BeyondDungeonFlows.cs" />
+    <Compile Include="Floors\ToolsForFloors\FlowHelpers.cs" />
     <Compile Include="BotsPingPongAroundBehavior.cs" />
     <Compile Include="AmmonomiconAPI\Ammonomicon.cs" />
     <Compile Include="AmmonomiconAPI\AmmonomiconHooks.cs" />
@@ -120,18 +132,70 @@
     <Compile Include="Character Api\Tools\Enums.cs" />
     <Compile Include="BotsProjectileMotionModule.cs" />
     <Compile Include="Class2.cs" />
+    <Compile Include="Enemies\Overseer\BulletScripts.cs" />
+    <Compile Include="TheMessanger.cs" />
+    <Compile Include="Debuff\CustomGameActorFireEffect.cs" />
+    <Compile Include="Enemies\Behaviors\AIBeamShooter2.cs" />
+    <Compile Include="Enemies\Behaviors\AddBeamsBehavior.cs" />
+    <Compile Include="Enemies\Behaviors\DashButGoodBehavior.cs" />
+    <Compile Include="Enemies\Behaviors\TeleportToMiddleBehavior.cs" />
+    <Compile Include="Enemies\Behaviors\FireLotsOfLasersBehaviour.cs" />
+    <Compile Include="Enemies\Behaviors\CustomBeholsterLaserBehavior.cs" />
+    <Compile Include="Enemies\Behaviors\SPIIIIINBehavior.cs" />
+    <Compile Include="Enemies\Behaviors\EnemyBlankBehavior.cs" />
+    <Compile Include="Enemies\Behaviors\MirrorImageBehaviorButBetter.cs" />
+    <Compile Include="Enemies\Beyond\BeyondScout.cs" />
+    <Compile Include="Enemies\Overseer\OverseerDebrisObjects.cs" />
+    <Compile Include="GungeonAPI\DungeonHandler.cs" />
+    <Compile Include="GungeonAPI\DungeonHooks.cs" />
+    <Compile Include="GungeonAPI\GungeonAPI.cs" />
+    <Compile Include="GungeonAPI\HitboxMonitor.cs" />
+    <Compile Include="GungeonAPI\NPCBuilder.cs" />
+    <Compile Include="GungeonAPI\OfficialFlows.cs" />
+    <Compile Include="GungeonAPI\ResourceExtractor.cs" />
+    <Compile Include="GungeonAPI\RoomBuilder.cs" />
+    <Compile Include="GungeonAPI\RoomFactory.cs" />
+    <Compile Include="GungeonAPI\SampleFlow.cs" />
+    <Compile Include="GungeonAPI\ShrineFactory.cs" />
+    <Compile Include="GungeonAPI\ShrineFakePrefab.cs" />
+    <Compile Include="GungeonAPI\ShrineFakePrefabHooks.cs" />
+    <Compile Include="GungeonAPI\SimpleInteractable.cs" />
+    <Compile Include="GungeonAPI\SimpleShrine.cs" />
+    <Compile Include="GungeonAPI\StaticReferences.cs" />
+    <Compile Include="GungeonAPI\TextureStitcher.cs" />
+    <Compile Include="GungeonAPI\Tools.cs" />
+    <Compile Include="Guns\Ultrakill Gun\Comps.cs" />
+    <Compile Include="Guns\Ultrakill Gun\HellsShotgun.cs" />
+    <Compile Include="Guns\Ultrakill Gun\ProjBoostModifer.cs" />
+    <Compile Include="Guns\Ultrakill Gun\FuckYouThisIsAnAwfulIdea.cs" />
+    <Compile Include="Guns\NoitaGun\Spells\Arrow.cs" />
+    <Compile Include="Guns\NoitaGun\UITExtMeshControllers\ColorPicker.cs" />
+    <Compile Include="Guns\Ultrakill Gun\CoinGunModifier.cs" />
+    <Compile Include="Guns\Ultrakill Gun\Coin.cs" />
+    <Compile Include="Guns\Ultrakill Gun\HellsRevolver2.cs" />
+    <Compile Include="Guns\Ultrakill Gun\HellsRevolver.cs" />
+    <Compile Include="NPCs\ItsDaFuckinShopApi.cs" />
+    <Compile Include="NPCs\DevilDealShopHelper.cs" />
+    <Compile Include="RandomCustomGameObjects\CustomSparkDoer.cs" />
+    <Compile Include="RandomCustomGameObjects\CustomFire.cs" />
+    <Compile Include="Synergies\AdvancedTransformGunSynergyProcessor.cs" />
+    <Compile Include="Synergies\SynergyFormInitialiser.cs" />
+    <Compile Include="Synergies\AdvancedDualWieldSynergyProcessor.cs" />
+    <Compile Include="ToolsAndStuff\AssetBundleLoader.cs" />
+    <Compile Include="ToolsAndStuff\CatogreyTeller.cs" />
+    <Compile Include="ToolsAndStuff\CustomGunFormeData.cs" />
+    <Compile Include="ToolsAndStuff\GUI.cs" />
+    <Compile Include="TrailBullets.cs" />
     <Compile Include="CustomHealth\SoulHeartController.cs" />
-    <Compile Include="NoitaGun\SpellPickupObject.cs" />
-    <Compile Include="NoitaGun\Spells\SpellInit.cs" />
-    <Compile Include="NoitaGun\Spells\SparkBolt.cs" />
-    <Compile Include="NoitaGun\StaticSpellReferences.cs" />
-    <Compile Include="NoitaGun\GUIhandler.cs" />
-    <Compile Include="NoitaGun\UITExtMeshControllers\BooleanPicker.cs" />
-    <Compile Include="NoitaGun\UITExtMeshControllers\ColorPicker.cs" />
-    <Compile Include="NoitaGun\UITExtMeshControllers\FloatPicker.cs" />
-    <Compile Include="NoitaGun\UITExtMeshControllers\UIBodyPartPicker.cs" />
-    <Compile Include="NoitaGun\UITExtMeshControllers\UITextMesh.cs" />
-    <Compile Include="NoitaGun\Wand.cs" />
+    <Compile Include="Guns\NoitaGun\EnchantedEnemies.cs" />
+    <Compile Include="Guns\NoitaGun\Spells\SpellPickupObject.cs" />
+    <Compile Include="Guns\NoitaGun\Spells\SpellInit.cs" />
+    <Compile Include="Guns\NoitaGun\Spells\SparkBolt.cs" />
+    <Compile Include="Guns\NoitaGun\StaticSpellReferences.cs" />
+    <Compile Include="Guns\NoitaGun\GUIhandler.cs" />
+    <Compile Include="Guns\NoitaGun\UITExtMeshControllers\UIBodyPartPicker.cs" />
+    <Compile Include="Guns\NoitaGun\UITExtMeshControllers\UITextMesh.cs" />
+    <Compile Include="Guns\NoitaGun\Wand.cs" />
     <Compile Include="NPCs\NpcInitShit.cs" />
     <Compile Include="OtherwordlyFury.cs" />
     <Compile Include="StuffForOthers\Class1.cs" />
@@ -148,12 +212,9 @@
     <Compile Include="DiscordGameSDK\LobbyManager.cs" />
     <Compile Include="DiscordGameSDK\StorageManager.cs" />
     <Compile Include="DiscordGameSDK\StoreManager.cs" />
-    <Compile Include="Audio\AudioResourceLoader.cs" />
-    <Compile Include="Audio\ResourceLoaderSoundbanks.cs" />
-    <Compile Include="Beyond\BotChamberGunProcessor.cs" />
-    <Compile Include="Beyond\BullShitNeededForCustomPasts.cs" />
-    <Compile Include="Beyond\LostPastController.cs" />
-    <Compile Include="Beyond\LostsPast.cs" />
+    <Compile Include="Floors\BotChamberGunProcessor.cs" />
+    <Compile Include="Floors\BullShitNeededForCustomPasts.cs" />
+    <Compile Include="Floors\LostPastController.cs" />
     <Compile Include="Character Api\AltSkinSwapper\Class1.cs" />
     <Compile Include="Character Api\AltSkinSwapper\InitGameObjects.cs" />
     <Compile Include="Character Api\AltSkinSwapper\LostCharacterCostumeSwapper.cs" />
@@ -195,11 +256,11 @@
     <Compile Include="BabyGoodMistake.cs" />
     <Compile Include="BlessedOrb.cs" />
     <Compile Include="bob.cs" />
-    <Compile Include="Enemies\LostPastBoss\Decoy\OverseerDecoy.cs" />
-    <Compile Include="Enemies\LostPastBoss\ShiledShader2.cs" />
-    <Compile Include="Enemies\LostPastBoss\ShiledShader1.cs" />
-    <Compile Include="Enemies\LostPastBoss\OverseerShield.cs" />
-    <Compile Include="Enemies\LostPastBoss\OverseerGlow.cs" />
+    <Compile Include="Enemies\Overseer\Decoy\OverseerDecoy.cs" />
+    <Compile Include="Enemies\Overseer\ShiledShader2.cs" />
+    <Compile Include="Enemies\Overseer\ShiledShader1.cs" />
+    <Compile Include="Enemies\Overseer\OverseerShield.cs" />
+    <Compile Include="Enemies\Overseer\OverseerGlow.cs" />
     <Compile Include="PrimalShotgrubChallengeModifier.cs" />
     <Compile Include="BeyondMasteryToken.cs" />
     <Compile Include="LostsCloak.cs" />
@@ -227,8 +288,8 @@
     <Compile Include="Synergies\InitSynergies.cs" />
     <Compile Include="TestPassive.cs" />
     <Compile Include="CosmicSludge.cs" />
-    <Compile Include="Enemies\LostPastBoss\LostPastBoss.cs" />
-    <Compile Include="Enemies\LostPastBoss\LostPastBossIntro.cs" />
+    <Compile Include="Enemies\Overseer\LostPastBoss.cs" />
+    <Compile Include="Enemies\Overseer\LostPastBossIntro.cs" />
     <Compile Include="Enemies\PirmalShotgrub.cs" />
     <Compile Include="Enemies\PrimalShotGrubAttack1.cs" />
     <Compile Include="EnemyAPI\BossBuilder.cs" />
@@ -236,20 +297,6 @@
     <Compile Include="EnemyAPI\EnemyTools.cs" />
     <Compile Include="EnemyAPI\Hooks.cs" />
     <Compile Include="EnemyAPI\OverrideBehavior.cs" />
-    <Compile Include="GungeonAPI\GungeonAPI.cs" />
-    <Compile Include="GungeonAPI\DungeonHandler.cs" />
-    <Compile Include="GungeonAPI\DungeonHooks.cs" />
-    <Compile Include="GungeonAPI\FakePrefab.cs" />
-    <Compile Include="GungeonAPI\FakePrefabHooks.cs" />
-    <Compile Include="GungeonAPI\HitboxMonitor.cs" />
-    <Compile Include="GungeonAPI\OfficialFlows.cs" />
-    <Compile Include="GungeonAPI\ResourceExtractor.cs" />
-    <Compile Include="GungeonAPI\RoomFactory.cs" />
-    <Compile Include="GungeonAPI\SampleFlow.cs" />
-    <Compile Include="GungeonAPI\ShrineFactory.cs" />
-    <Compile Include="GungeonAPI\SimpleInteractable.cs" />
-    <Compile Include="GungeonAPI\StaticReferences.cs" />
-    <Compile Include="GungeonAPI\TextureStitcher.cs" />
     <Compile Include="ItemAPI\CompanionBuilder.cs" />
     <Compile Include="ItemAPI\CustomSynergies.cs" />
     <Compile Include="ItemAPI\FakePrefab\FakePrefab.cs" />
@@ -257,22 +304,19 @@
     <Compile Include="ItemAPI\ItemBuilder.cs" />
     <Compile Include="ItemAPI\Tools.cs" />
     <Compile Include="ToolsAndStuff\BotsItemIds.cs" />
-    <Compile Include="Beyond\SpAPIAbandonedUsSoIMustMakeFloorFrameWork.cs" />
-    <Compile Include="ToolsAndStuff\BeyondPrefabs.cs" />
     <Compile Include="ToolsAndStuff\AtlasEditing.cs" />
     <Compile Include="ToolsAndStuff\Class1.cs" />
     <Compile Include="ToolsAndStuff\RandomComps.cs" />
     <Compile Include="ToolsAndStuff\SpecialOrbital.cs" />
     <Compile Include="ToolsAndStuff\CustomReloadText.cs" />
     <Compile Include="ToolsAndStuff\ExpandObjectDatabase.cs" />
-    <Compile Include="ToolsAndStuff\LootTables.cs" />
+    <Compile Include="ToolsAndStuff\LootTableTools.cs" />
     <Compile Include="ToolsAndStuff\thingistolefromapache.cs" />
     <Compile Include="ToolsAndStuff\CustomEnums.cs" />
     <Compile Include="ToolsAndStuff\Rooms.cs" />
     <Compile Include="ToolsAndStuff\Debuffs.cs" />
     <Compile Include="ToolsAndStuff\ImprovedAfterImage.cs" />
     <Compile Include="ToolsAndStuff\CustomValidTilesets.cs" />
-    <Compile Include="Beyond\TheBeyond.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ItemAPI\ResourceExtractor.cs" />
@@ -288,11 +332,10 @@
     <Compile Include="ToolsAndStuff\VFXLibrary.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Audio\Bot_SFX.bnk" />
-    <EmbeddedResource Include="Audio\EX_SFX.bnk" />
     <EmbeddedResource Include="Marks\Sprites\leveler.ase" />
     <EmbeddedResource Include="Marks\Sprites\point1.aseprite" />
     <EmbeddedResource Include="JSONShit\PlayMakerFSM #11743.json" />
+    <EmbeddedResource Include="rooms\Beyond\Beyond_Exit.room" />
     <None Include="packages.config" />
     <EmbeddedResource Include="rooms\bad.room" />
     <EmbeddedResource Include="rooms\breachHangout.room" />
@@ -305,8 +348,16 @@
     <EmbeddedResource Include="rooms\robotflytestroom.room" />
     <EmbeddedResource Include="rooms\customnpctest.room" />
     <EmbeddedResource Include="rooms\npctestroomthatisntfucked.room" />
+    <EmbeddedResource Include="rooms\breachRoom.room" />
+    <EmbeddedResource Include="rooms\Beyond\Beyond_Entrance2.room" />
+    <EmbeddedResource Include="rooms\Beyond\tempbossroombeyond2.room" />
+    <EmbeddedResource Include="rooms\Past\LostPastBossRoom.room" />
+    <EmbeddedResource Include="rooms\Past\LostPastRoom1.room" />
+    <EmbeddedResource Include="rooms\Beyond\Beyond_Shop.room" />
+    <EmbeddedResource Include="rooms\Beyond\overseerbossroombutround.room" />
     <None Include="rooms\Swordtress\SwordtressEntrance.room" />
     <None Include="rooms\Swordtress\SwordtressExit.room" />
+    <EmbeddedResource Include="rooms\Beyond\tempbossroombeyond.room" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="sprites\blessed_orb.png" />
@@ -431,8 +482,6 @@
     <EmbeddedResource Include="sprites\OverseerIcon.png" />
     <EmbeddedResource Include="sprites\overseer_floor\Shield\OverseerShield.png" />
     <EmbeddedResource Include="sprites\overseer_floor\ammonomicon_enemy_overseer_001.png" />
-    <EmbeddedResource Include="sprites\lostfriend.png" />
-    <EmbeddedResource Include="sprites\lostfriend_peting.png" />
     <EmbeddedResource Include="sprites\ENV_Tileset_Canyon.png" />
     <EmbeddedResource Include="sprites\ENV_Tileset_Rat.png" />
     <EmbeddedResource Include="sprites\ENV_Tileset_Beyond.png" />
@@ -479,7 +528,6 @@
     <EmbeddedResource Include="sprites\lost\guide_idle_front_004.png" />
     <EmbeddedResource Include="sprites\marker.png" />
     <EmbeddedResource Include="sprites\cursething.png" />
-    <EmbeddedResource Include="sprites\overseer_floor\Overseer_Bosscard_001.png" />
     <EmbeddedResource Include="sprites\overseer_floor\Overseer.png" />
   </ItemGroup>
   <ItemGroup>
@@ -551,6 +599,164 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\SpellMiniMapIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\TestBreachRoomTexture.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite_001.png" />
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite_002.png" />
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite_003.png" />
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite_004.png" />
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite_005.png" />
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite_006.png" />
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite_007.png" />
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite_008.png" />
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite_009.png" />
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite_010.png" />
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite_011.png" />
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSprite_012.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\Spells\ShittySpellTempSpriteArrow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\TestHeart.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\TempCoinSprite-export.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\overseer_floor\blank\overseerf_blank_001.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\blank\overseerf_blank_002.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\blank\overseerf_blank_003.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\blank\overseerf_blank_004.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\blank\overseerf_blank_005.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_001.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_002.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_003.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_004.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_005.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_006.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_007.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_008.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_009.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_010.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_011.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_012.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_013.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_014.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_015.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_016.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\death\overseerf_death_017.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\idle\overseerf_idle_001.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\idle\overseerf_idle_002.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\idle\overseerf_idle_003.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\idle\overseerf_idle_004.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_001.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_002.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_003.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_004.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_005.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_006.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_007.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_008.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_009.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_010.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_011.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_012.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_013.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_014.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_015.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_016.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\intro\overseerf_intro_017.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\overseer_floor\beam\overseerf_beam_001.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\beam\overseerf_beam_002.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\beam\overseerf_beam_003.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\beam\overseerf_beam_004.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\TelBeam\overseerf_beamtell2_001.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\TelBeam\overseerf_beamtell2_002.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\TelBeam\overseerf_beamtell2_003.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\TelBeam\overseerf_beamtell2_004.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\TelBeam\overseerf_beamtell2_005.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\TelBeam\overseerf_beamtell2_006.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\TelBeam\overseerf_beamtell2_007.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\TelBeam\overseerf_beamtell2_008.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\TelBeam\overseerf_beamtell2_009.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\TelBeam\overseerf_beamtell2_010.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\TelBeam\overseerf_beamtell2_011.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\TelBeam\overseerf_beamtell2_012.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\overseer_floor\gaurd\overseerf_gaurd_001.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\gaurd\overseerf_gaurd_002.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\gaurd\overseerf_gaurd_003.png" />
+    <EmbeddedResource Include="sprites\overseer_floor\gaurd\overseerf_gaurd_004.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\tempScout.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\elevator_bottom_floor_beyond.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\overseer_floor\overseerf_Bosscard_001.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sprites\SpinDownDice.png" />
+    <EmbeddedResource Include="sprites\fire_purple_effect_ver1_sheet_11x4.png" />
+    <EmbeddedResource Include="sprites\Npcs\beyond_merch_carpet_001.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_001.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_002.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_003.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_004.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_005.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_006.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_007.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_008.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_009.png" />
+    <EmbeddedResource Include="sprites\Npcs\mapiconshop.png" />
+    <EmbeddedResource Include="sprites\beam\OtherWorldlyFury\otherworldly_fury_beam_impact_001.png" />
+    <EmbeddedResource Include="sprites\beam\OtherWorldlyFury\otherworldly_fury_beam_impact_002.png" />
+    <EmbeddedResource Include="sprites\beam\OtherWorldlyFury\otherworldly_fury_beam_impact_003.png" />
+    <EmbeddedResource Include="sprites\beam\OtherWorldlyFury\otherworldly_fury_beam_impact_004.png" />
+    <EmbeddedResource Include="sprites\beam\OtherWorldlyFury\otherworldly_fury_beam_middle_001.png" />
+    <EmbeddedResource Include="sprites\beam\OtherWorldlyFury\otherworldly_fury_beam_middle_002.png" />
+    <EmbeddedResource Include="sprites\beam\OtherWorldlyFury\otherworldly_fury_beam_middle_003.png" />
+    <EmbeddedResource Include="sprites\otherworldly_fury.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_talk_001.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_talk_002.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_talk_003.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_talk_004.png" />
+    <EmbeddedResource Include="sprites\Npcs\Beyond\shopkeep_talk_005.png" />
+    <EmbeddedResource Include="sprites\LostFriend\idle\lostfriend1.png" />
+    <EmbeddedResource Include="sprites\LostFriend\idle\lostfriend2.png" />
+    <EmbeddedResource Include="sprites\LostFriend\idle\lostfriend3.png" />
+    <EmbeddedResource Include="sprites\LostFriend\idle\lostfriend4.png" />
+    <EmbeddedResource Include="sprites\LostFriend\pet\lostfriend_peting1.png" />
+    <EmbeddedResource Include="sprites\LostFriend\pet\lostfriend_peting2.png" />
+    <EmbeddedResource Include="sprites\LostFriend\pet\lostfriend_peting3.png" />
+    <EmbeddedResource Include="sprites\LostFriend\pet\lostfriend_peting4.png" />
+    <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_flare_001.png" />
+    <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_flare_002.png" />
+    <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_impact_001.png" />
+    <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_impact_002.png" />
+    <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_impact_003.png" />
+    <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_impact_004.png" />
+    <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_middle_001.png" />
+    <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_middle_002.png" />
+    <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_muzzleflash_001.png" />
+    <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_muzzleflash_002.png" />
+    <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_muzzleflash_003.png" />
+    <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_muzzleflash_004.png" />
+    <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_muzzleflash_005.png" />
+    <Content Include="sprites\overseerf_Bosscard_001.png" />
+    <EmbeddedResource Include="sprites\water_standard_base_001.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

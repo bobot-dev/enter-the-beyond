@@ -205,7 +205,8 @@ namespace CustomCharacters
                 copyDefinitions[i] = orig.spriteDefinitions[i].Copy();
             }
             copyCollection.spriteDefinitions = copyDefinitions;
-
+            //ToolsGAPI.ExportTexture(TextureStitcher.GetReadable(copyCollection.textures[0]), "SpriteDump/balls", TextureStitcher.GetReadable(copyCollection.textures[0]).name + UnityEngine.Random.Range(1, 10000));
+            
             if (data.playerSheet != null)
             {
                 ToolsGAPI.Print("        Using sprite sheet replacement.", "FFBB00");
@@ -235,7 +236,7 @@ namespace CustomCharacters
             }
             else if (data.sprites != null)
             {
-                
+
                 ToolsGAPI.Print("        Using individual sprite replacement.", "FFBB00");
                 bool notSlinger = data.baseCharacter != PlayableCharacters.Gunslinger;
 
@@ -277,12 +278,13 @@ namespace CustomCharacters
                     }
                 }
                 page.Apply();
+                ToolsGAPI.ExportTexture(TextureStitcher.GetReadable(page.Texture), "SpriteDump/balls", TextureStitcher.GetReadable(copyCollection.textures[0]).name + UnityEngine.Random.Range(1, 10000));
             }
             else
             {
                 ToolsGAPI.Print("        Not replacing sprites.", "FFFF00");
             }
-
+            
             player.spriteAnimator.Library = GameObject.Instantiate(player.spriteAnimator.Library);
             GameObject.DontDestroyOnLoad(player.spriteAnimator.Library);
 
@@ -294,7 +296,7 @@ namespace CustomCharacters
                 }
             }
 
-            
+
 
             copyCollection.name = player.OverrideDisplayName;
 
@@ -417,6 +419,7 @@ namespace CustomCharacters
 
 
             data.AlternateCostumeLibrary = player.AlternateCostumeLibrary;
+            BotsModule.LostAltSkinAnimator = player.AlternateCostumeLibrary;
 
             copyCollection.name = player.OverrideDisplayName + "_alt";
 

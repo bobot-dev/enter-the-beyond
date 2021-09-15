@@ -23,26 +23,20 @@ namespace BotsMod
             //var item = BotsModule.WarCrime2;//obj.AddComponent<PirmalShotgrub>().GetComponent<PickupObject>();
             var item = obj.AddComponent<TestPassive>();
             ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
+
+            //ItemBuilder.AddAnimatedSpriteToObject(itemName, new List<string> { "BotsMod/sprites/Spells/ShittySpellTempSprite_001", "BotsMod/sprites/Spells/ShittySpellTempSprite_002", "BotsMod/sprites/Spells/ShittySpellTempSprite_003", "BotsMod/sprites/Spells/ShittySpellTempSprite_004", "BotsMod/sprites/Spells/ShittySpellTempSprite_005", "BotsMod/sprites/Spells/ShittySpellTempSprite_006", "BotsMod/sprites/Spells/ShittySpellTempSprite_007", "BotsMod/sprites/Spells/ShittySpellTempSprite_008", "BotsMod/sprites/Spells/ShittySpellTempSprite_009", "BotsMod/sprites/Spells/ShittySpellTempSprite_010", "BotsMod/sprites/Spells/ShittySpellTempSprite_011", "BotsMod/sprites/Spells/ShittySpellTempSprite_012", }, obj);
+
+
+
             string shortDesc = "testing item";
             string longDesc = "this item is purly for testing";
             ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
             item.quality = ItemQuality.EXCLUDED;
 
+            ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.Curse, 1f, StatModifier.ModifyMethod.ADDITIVE);
+
             //ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.MovementSpeed, 5f, StatModifier.ModifyMethod.MULTIPLICATIVE);
             //ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.RangeMultiplier, 1f, StatModifier.ModifyMethod.ADDITIVE);
-
-            var rotator = new GameObject("shitty_test_model");
-            rotator.transform.parent = obj.transform;
-
-            rotator.SetActive(true);
-
-            GameObject.DontDestroyOnLoad(rotator);
-
-            var spriteRotator = rotator.AddComponent<SimpleSpriteRotator>();
-            spriteRotator.angularVelocity = 8;
-            spriteRotator.acceleration = 8;
-            spriteRotator.RandomStartingAngle = true;
-            spriteRotator.RotateParent = true;
 
             //var model = Tools.BotsAssetBundle.LoadAsset<GameObject>("TestModel");
             //var model = UnityEngine.Object.Instantiate(Tools.BotsAssetBundle.LoadAsset<GameObject>("TestModel"), GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, new Quaternion());
@@ -54,41 +48,24 @@ namespace BotsMod
 
         }
 
-        public override DebrisObject Drop(PlayerController user)
-        {
-            
-            foreach(var item in PickupObjectDatabase.Instance.Objects)
-            {
-                if (item != null && item.encounterTrackable != null)
-                {
-                    ETGModConsole.Log($"{item.EncounterNameOrDisplayName}: {item.encounterTrackable.EncounterGuid}");
-                }
-                
-            }
-
-            if (base.transform.childCount > 0)
-            {
-                SimpleSpriteRotator[] componentsInChildren = base.GetComponentsInChildren<SimpleSpriteRotator>(true);
-                if (componentsInChildren.Length > 0)
-                {
-                    componentsInChildren[0].gameObject.SetActive(true);
-                }
-            }
-            return base.Drop(user);
-        }
 
         private ImprovedAfterImage zoomy;
         public override void Pickup(PlayerController player)
         {
-
+            if (player.CurrentGun)
+            {
+                this.ProcessGunShader(player.CurrentGun);
+            }
 
 
 
             PickupObject byId = PickupObjectDatabase.GetById(60);
             LootEngine.TryGivePrefabToPlayer(byId.gameObject, player, true);
-            player.PostProcessBeam += this.PostProcessProjectileHelixBeam;
+            //player.PostProcessBeam += this.PostProcessProjectileHelixBeam;
             player.PostProcessProjectile += this.PostProcessProjectileHelix;
-            player.OnIsRolling += Player_OnIsRolling;
+            //player.OnIsRolling += Player_OnIsRolling;
+            //player.OnDodgedProjectile += Player_OnDodgedProjectile;
+            
 
             base.Pickup(player);
             return;
@@ -112,6 +89,43 @@ namespace BotsMod
             player.healthHaver.ApplyDamage(10000, Vector2.zero, "happiness");
 
            
+        }
+
+        private void ProcessGunShader(Gun g)
+        {
+            MeshRenderer component = g.GetComponent<MeshRenderer>();
+            if (!component)
+            {
+                return;
+            }
+            Material[] sharedMaterials = component.sharedMaterials;
+            for (int i = 0; i < sharedMaterials.Length; i++)
+            {
+                if (sharedMaterials[i].shader == ShaderCache.Acquire("Brave/PlayerShaderEevee"))
+                {
+                    return;
+                }
+            }
+            Array.Resize<Material>(ref sharedMaterials, sharedMaterials.Length + 1);
+            Material material = new Material(ShaderCache.Acquire("Brave/PlayerShaderEevee"));
+            material.SetTexture("_EeveeTex", ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<Texture2D>("nebula_reducednoise"));
+            material.SetTexture("_MainTex", sharedMaterials[0].GetTexture("_MainTex"));
+            sharedMaterials[sharedMaterials.Length - 1] = material;
+            component.sharedMaterials = sharedMaterials;
+        }
+
+        private void Player_OnDodgedProjectile(Projectile obj)
+        {
+            if (obj.Owner is PlayerController)
+            {
+                obj.baseData.speed *= 3;
+                obj.OnDestruction += Obj_OnDestruction;
+            }
+        }
+
+        private void Obj_OnDestruction(Projectile obj)
+        {
+            Exploder.DoDefaultExplosion(obj.sprite.WorldCenter, Vector2.zero);
         }
 
         private void Player_OnIsRolling(PlayerController obj)
@@ -185,16 +199,28 @@ namespace BotsMod
         private static Vector2 ScrollPos;
 
         private Shader m_glintShader;
-        protected override void Update()
-        {
-            base.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unpixelated"));
-            base.sprite.renderer.enabled = false;
-            SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, true);
-        }
+
         private bool UpOrDown;
+
+        public void OnHit(Projectile projectile, SpeculativeRigidbody target, bool fatal)
+        {
+            if (target.aiActor != null)
+            {
+                target.aiActor.SetOverrideOutlineColor(new Color(255, 0, 140));
+            } 
+            else if(target.gameObject != null && target.gameObject.GetComponentInChildren<AIActor>() != null) 
+            {
+                target.gameObject.GetComponentInChildren<AIActor>().SetOverrideOutlineColor(new Color(255, 0, 140));
+            }
+           
+        }
 
         private void PostProcessProjectileHelix(Projectile obj, float effectChanceScalar)
         {
+
+            obj.gameObject.AddComponent<ProjBoostModifer>();
+
+            /*obj.OnHitEnemy += OnHit;
             if (obj is InstantDamageOneEnemyProjectile)
             {
                 return;
@@ -214,7 +240,7 @@ namespace BotsMod
                     ForceInvert = true
                 };
             }
-            this.UpOrDown = !this.UpOrDown;
+            this.UpOrDown = !this.UpOrDown;*/
             
         }
 
@@ -256,28 +282,6 @@ namespace BotsMod
         }
 
 
-        private void ProcessGunShader(Gun g)
-        {
-            
-            MeshRenderer component = g.GetComponent<MeshRenderer>();
-            if (!component)
-            {
-                return;
-            }
-            Material[] sharedMaterials = component.sharedMaterials;
-            for (int i = 0; i < sharedMaterials.Length; i++)
-            {
-                if (sharedMaterials[i].shader == this.m_glintShader)
-                {
-                    return;
-                }
-            }
-            Array.Resize<Material>(ref sharedMaterials, sharedMaterials.Length + 1);
-            Material material = new Material(this.m_glintShader);
-            material.SetTexture("_MainTex", sharedMaterials[0].GetTexture("_MainTex"));
-            sharedMaterials[sharedMaterials.Length - 1] = material;
-            component.sharedMaterials = sharedMaterials;
-        }
     }
 
         

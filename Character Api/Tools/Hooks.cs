@@ -181,7 +181,7 @@ namespace CustomCharacters
 			orig(self);
 		}
 
-		public static void OnSelectedCharacterCallbackHook(FoyerCharacterSelectFlag self, PlayerController newCharacter)
+		public static void OnSelectedCharacterCallbackHook(Action<FoyerCharacterSelectFlag, PlayerController> orig, FoyerCharacterSelectFlag self, PlayerController newCharacter)
 		{
 			FieldInfo _isAlternateCostume = typeof(FoyerCharacterSelectFlag).GetField("m_isAlternateCostume", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -208,9 +208,10 @@ namespace CustomCharacters
 				{
 					GameStatsManager.Instance.RegisterStatChange(TrackedStats.META_CURRENCY, -7f);
 				}
+				
 				if (self.GetComponent<CustomCharacterFoyerController>() != null && self.GetComponent<CustomCharacterFoyerController>().metaCost > 0)
 				{
-					BotsModule.Log(self.GetComponent<CustomCharacterFoyerController>().metaCost.ToString());
+					BotsModule.Log("character cost " + self.GetComponent<CustomCharacterFoyerController>().metaCost.ToString());
 					GameStatsManager.Instance.RegisterStatChange(TrackedStats.META_CURRENCY, (self.GetComponent<CustomCharacterFoyerController>().metaCost) * -1);
 				}
 			}
@@ -230,7 +231,7 @@ namespace CustomCharacters
 
 		private static void OnEnableHook(Action<CharacterSelectIdleDoer> orig, CharacterSelectIdleDoer self)
 		{
-			if (self.sprite.renderer.material != new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material))
+			if (self.GetComponent<CustomCharacterFoyerController>() != null && self.sprite.renderer.material != new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material))
 			{
 				var character = self.GetComponent<CustomCharacterFoyerController>();
 
@@ -337,6 +338,7 @@ namespace CustomCharacters
 					}
 				}
 			}
+			BotsModule.Log(result.NumMetas.ToString());
 			return result;
 		}
 

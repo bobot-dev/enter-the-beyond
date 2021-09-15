@@ -6,6 +6,8 @@ using System.Reflection;
 using UnityEngine;
 
 using ItemAPI;
+using static DirectionalAnimation;
+
 namespace ItemAPI
 {
     public static class SpriteBuilder
@@ -69,14 +71,21 @@ namespace ItemAPI
         /// Adds a sprite (from a resource) to a collection
         /// </summary>
         /// <returns>The spriteID of the defintion in the collection</returns>
-        public static int AddSpriteToCollection(string resourcePath, tk2dSpriteCollectionData collection)
+        public static int AddSpriteToCollection(string resourcePath, tk2dSpriteCollectionData collection, string name = "")
         {
             string extension = !resourcePath.EndsWith(".png") ? ".png" : "";
             resourcePath += extension;
             var texture = ResourceExtractor.GetTextureFromResource(resourcePath); //Get Texture
 
             var definition = ConstructDefinition(texture); //Generate definition
-            definition.name = texture.name; //naming the definition is actually extremely important 
+            if (string.IsNullOrEmpty(name))
+            {
+                definition.name = texture.name; //naming the definition is actually extremely important 
+            } else
+            {
+                definition.name = name; //naming the definition is actually extremely important 
+            }
+           
 
             return AddSpriteToCollection(definition, collection);
         }
@@ -108,8 +117,52 @@ namespace ItemAPI
             return AddSpriteToCollection(spriteDefinition, ammonomiconCollection);
         }
 
+
+
+        public static tk2dSpriteAnimationClip AddAnimation(tk2dSpriteAnimator animator, string name, string spriteDirectory, int fps, BossBuilder.AnimationType type, DirectionType directionType = DirectionType.None, FlipType flipType = FlipType.None)
+        {
+            var obj = animator.gameObject;
+            AIAnimator aiAnimator = obj.GetOrAddComponent<AIAnimator>();
+            DirectionalAnimation animation = aiAnimator.GetDirectionalAnimation(name, directionType, type);
+            if (animation == null)
+            {
+                animation = new DirectionalAnimation()
+                {
+                    AnimNames = new string[0],
+                    Flipped = new FlipType[0],
+                    Type = directionType,
+                    Prefix = string.Empty
+                };
+            }
+
+            animation.AnimNames = animation.AnimNames.Concat(new string[] { name }).ToArray();
+            animation.Flipped = animation.Flipped.Concat(new FlipType[] { flipType }).ToArray();
+            aiAnimator.AssignDirectionalAnimation(name, animation, type);
+            return BuildAnimation(aiAnimator, name, spriteDirectory, fps);
+        }
+
+        public static tk2dSpriteAnimationClip BuildAnimation(AIAnimator aiAnimator, string name, string spriteDirectory, int fps)
+        {
+            tk2dSpriteCollectionData collection = aiAnimator.GetComponent<tk2dSpriteCollectionData>();
+            if (!collection)
+                collection = SpriteBuilder.ConstructCollection(aiAnimator.gameObject, $"{aiAnimator.name}_collection");
+
+            string[] resources = ResourceExtractor.GetResourceNames();
+            List<int> indices = new List<int>();
+            for (int i = 0; i < resources.Length; i++)
+            {
+                if (resources[i].StartsWith(spriteDirectory.Replace('/', '.'), StringComparison.OrdinalIgnoreCase))
+                {
+                    indices.Add(SpriteBuilder.AddSpriteToCollection(resources[i], collection));
+                }
+            }
+            tk2dSpriteAnimationClip clip = SpriteBuilder.AddAnimation(aiAnimator.spriteAnimator, collection, indices, name, tk2dSpriteAnimationClip.WrapMode.Loop);
+            clip.fps = fps;
+            return clip;
+        }
+
         public static tk2dSpriteAnimationClip AddAnimation(tk2dSpriteAnimator animator, tk2dSpriteCollectionData collection, List<int> spriteIDs,
-            string clipName, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop)
+            string clipName, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, float fps = 15)
         {
             if (animator.Library == null)
             {
@@ -136,7 +189,7 @@ namespace ItemAPI
             var clip = new tk2dSpriteAnimationClip()
             {
                 name = clipName,
-                fps = 15,
+                fps = fps,
                 wrapMode = wrapMode,
             };
             Array.Resize(ref animator.Library.clips, animator.Library.clips.Length + 1);

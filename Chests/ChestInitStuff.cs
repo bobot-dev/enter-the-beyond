@@ -619,7 +619,7 @@ namespace BotsMod
         {
 
            
-            // Token: 0x060009FF RID: 2559 RVA: 0x00086088 File Offset: 0x00084288
+            
             protected override IEnumerator Top()
             {
                 if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
@@ -635,14 +635,14 @@ namespace BotsMod
             // Token: 0x0200028E RID: 654
             public class BigBullet : Bullet
             {
-                // Token: 0x06000A00 RID: 2560 RVA: 0x0000645C File Offset: 0x0000465C
+                
                 public BigBullet(bool isBlackPhantom) : base("bigbullet", false, false, false)
                 {
                     base.ForceBlackBullet = true;
                     this.m_isBlackPhantom = isBlackPhantom;
                 }
 
-                // Token: 0x06000A01 RID: 2561 RVA: 0x000860F8 File Offset: 0x000842F8
+                
                 protected override IEnumerator Top()
                 {
                     yield return this.Wait(80);
@@ -650,7 +650,7 @@ namespace BotsMod
                     yield break;
                 }
 
-                // Token: 0x06000A02 RID: 2562 RVA: 0x00086114 File Offset: 0x00084314
+                
                 public override void OnBulletDestruction(Bullet.DestroyType destroyType, SpeculativeRigidbody hitRigidbody, bool preventSpawningProjectiles)
                 {
                     if (preventSpawningProjectiles)

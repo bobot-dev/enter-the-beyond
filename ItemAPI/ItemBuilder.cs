@@ -70,6 +70,33 @@ namespace ItemAPI
         }
 
         /// <summary>
+        /// Adds a tk2dSpriteAnimator component to an object and adds that sprite to the 
+        /// </summary>
+        public static GameObject AddAnimatedSpriteToObject(string name, List<string> resourcePaths, GameObject obj = null, float fps = 15)
+        {
+
+            GameObject spriteObject = SpriteBuilder.SpriteFromResource(resourcePaths[0], obj);
+
+            tk2dSpriteAnimator spriteAnimator = obj.AddComponent<tk2dSpriteAnimator>();
+
+            var idList = new List<int>();
+
+            foreach (string sprite in resourcePaths)
+            {
+                idList.Add(SpriteBuilder.AddSpriteToCollection(sprite, spriteObject.GetComponent<tk2dSprite>().Collection));
+            }
+
+            spriteAnimator.playAutomatically = true;
+            SpriteBuilder.AddAnimation(spriteAnimator, spriteObject.GetComponent<tk2dSprite>().Collection, idList, name + "_idle", tk2dSpriteAnimationClip.WrapMode.Loop, fps);
+
+
+
+            spriteObject.name = name;
+            return spriteObject;
+        }
+
+
+        /// <summary>
         /// Finishes the item setup, adds it to the item databases, adds an encounter trackable 
         /// blah, blah, blah
         /// </summary>
@@ -77,6 +104,16 @@ namespace ItemAPI
         {
             try
             {
+                if(item == null)
+                {
+                    ETGModConsole.Log($"(SetupItem) \"item\" has nulled");
+                }
+
+                if (item.name == null)
+                {
+                    ETGModConsole.Log($"(SetupItem) \"item.name\" has nulled");
+                }
+
                 item.encounterTrackable = null;
 
                 ETGMod.Databases.Items.SetupItem(item, item.name);

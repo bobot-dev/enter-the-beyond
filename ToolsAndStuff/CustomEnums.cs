@@ -28,6 +28,22 @@ namespace BotsMod
 
 		}
 
+		public enum CustomSackKnightPhase
+		{
+			
+			PEASANT,
+
+			SQUIRE,
+			HEDGE_KNIGHT,
+			KNIGHT,
+			KNIGHT_LIEUTENANT,
+			KNIGHT_COMMANDER,
+			HOLY_KNIGHT,
+			ANGELIC_KNIGHT,
+			MECHAJUNKAN,
+			BOB_FROM_HR
+		}
+
 		public enum CustomShopCurrencyType
 		{
 			COINS,

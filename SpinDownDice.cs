@@ -14,7 +14,7 @@ namespace BotsMod
 		{
 			//The name of the item
 			string itemName = "Spin Down Dice";
-			string resourceName = "BotsMod/sprites/wip";
+			string resourceName = "BotsMod/sprites/SpinDownDice";
 			GameObject obj = new GameObject();
 			var item = obj.AddComponent<SpinDownDice>();
 
@@ -25,7 +25,7 @@ namespace BotsMod
 			ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
 			ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.None, 0);
 			item.consumable = false;
-			item.quality = ItemQuality.SPECIAL;
+			item.quality = ItemQuality.S;
 
 			Tools.BeyondItems.Add(item.PickupObjectId);
 

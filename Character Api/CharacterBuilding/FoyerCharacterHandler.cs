@@ -119,10 +119,10 @@ namespace CustomCharacters
             var customCharacter = CharacterBuilder.storedCharacters[characterPath.ToLower()];
 
             
-            if (!CheckUnlocked(customCharacter.First))
-            {
-                return null;
-            }
+            //if (!CheckUnlocked(customCharacter.First))
+            //{
+            //    return null;
+            //}
 
 
             if (customCharacter.First.characterID >= foyerPositions.Length)
@@ -203,6 +203,7 @@ namespace CustomCharacters
 
             selectCharacter.renderer.material = new Material(selectCharacter.renderer.material);
 
+
             BotsMod.BotsModule.Log($"{selectCharacter.spriteAnimator.gameObject}");
             
             selectCharacter.sprite.ForceBuild();
@@ -224,7 +225,7 @@ namespace CustomCharacters
         {
             //Create new card instance
             selectCharacter.ClearOverheadElement();
-            selectCharacter.OverheadElement = GungeonAPI.FakePrefab.Clone(selectCharacter.OverheadElement);
+            selectCharacter.OverheadElement = FakePrefab.Clone(selectCharacter.OverheadElement);
             selectCharacter.OverheadElement.SetActive(true);
 
 
@@ -289,7 +290,7 @@ namespace CustomCharacters
             try
             {
 
-                var spriteObject = GungeonAPI.FakePrefab.Clone(infoPanel.itemsPanel.GetComponentInChildren<dfSprite>().gameObject);
+                var spriteObject = FakePrefab.Clone(infoPanel.itemsPanel.GetComponentInChildren<dfSprite>().gameObject);
 
                 //spriteObject.SetActive(false);
                 var posList = new List<Vector3>();
@@ -309,7 +310,7 @@ namespace CustomCharacters
                 for (int i = 0; i < data.loadoutSpriteNames.Count; i++)
                 {
 
-                    var sprite = GungeonAPI.FakePrefab.Clone(spriteObject).GetComponent<dfSprite>();
+                    var sprite = FakePrefab.Clone(spriteObject).GetComponent<dfSprite>();
                     sprite.gameObject.SetActive(true);
 
                     sprite.SpriteName = data.loadoutSpriteNames[i];
@@ -427,12 +428,7 @@ namespace CustomCharacters
 
 
 				}
-
-
-                infoPanel.scaledSprites = new tk2dSprite[]
-                {
-                     facecard.sprite as tk2dSprite
-                };
+                
             }
             selectCharacter.OverheadElement.SetActive(false);
         }

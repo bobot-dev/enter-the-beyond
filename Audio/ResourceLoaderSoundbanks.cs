@@ -36,7 +36,7 @@ namespace BotsMod
 						if (flag6) { text2 = text2.Substring(1); }
 						text2 = prefix + ":" + text2;
                        
-                           ETGModConsole.Log(string.Format("{0}: Soundbank found, attempting to autoload: name='{1}' resource='{2}'", typeof(ResourceLoaderSoundbanks), text2, text));
+                           Debug.Log(string.Format("{0}: Soundbank found, attempting to autoload: name='{1}' resource='{2}'", typeof(ResourceLoaderSoundbanks), text2, text));
                         				
 						using (Stream manifestResourceStream = assembly.GetManifestResourceStream(text)) {
 							LoadSoundbankFromStream(manifestResourceStream, text2);
@@ -49,26 +49,28 @@ namespace BotsMod
         public void AutoloadFromModZIPOrModFolder(string path)
         {
             int FilesLoaded = 0;
-            if (File.Exists(path + ".zip"))
+            if (File.Exists(path))
             {
                 Debug.Log("Zip Found");
-                ZipFile ModZIP = ZipFile.Read(path + ".zip");
-                if (ModZIP != null && ModZIP.Entries.Count > 0)
+                using (ZipFile ModZIP = ZipFile.Read(path))
                 {
-                    foreach (ZipEntry entry in ModZIP.Entries)
+                    if (ModZIP != null && ModZIP.Entries.Count > 0)
                     {
-                        if (entry.FileName.EndsWith(".bnk"))
+                        foreach (ZipEntry entry in ModZIP.Entries)
                         {
-                            using (MemoryStream ms = new MemoryStream())
+                            if (entry.FileName.EndsWith(".bnk"))
                             {
-                                entry.Extract(ms);
-                                ms.Seek(0, SeekOrigin.Begin);
-                                LoadSoundbankFromStream(ms, entry.FileName.ToLower().Replace(".bnk", string.Empty));
-                                FilesLoaded++;
+                                using (MemoryStream ms = new MemoryStream())
+                                {
+                                    entry.Extract(ms);
+                                    ms.Seek(0, SeekOrigin.Begin);
+                                    LoadSoundbankFromStream(ms, entry.FileName.ToLower().Replace(".bnk", string.Empty));
+                                    FilesLoaded++;
+                                }
                             }
                         }
+                        if (FilesLoaded > 0) { return; }
                     }
-                    if (FilesLoaded > 0) { return; }
                 }
             }
             // Zip file wasn't found. Try to load from Mod folder instead.
@@ -86,7 +88,7 @@ namespace BotsMod
             if (!Directory.Exists(path))
             {
 
-                ETGModConsole.Log(string.Format("{0}: No autoload directory in path, not autoloading anything. Path='{1}'.", typeof(ResourceLoaderSoundbanks), path));
+                Debug.Log(string.Format("{0}: No autoload directory in path, not autoloading anything. Path='{1}'.", typeof(ResourceLoaderSoundbanks), path));
 
             }
             else
@@ -103,7 +105,7 @@ namespace BotsMod
                     bool flag5 = text2.IndexOf(Path.DirectorySeparatorChar) == 0;
                     if (flag5) { text2 = text2.Substring(1); }
                     text2 = prefix + ":" + text2;
-                    ETGModConsole.Log(string.Format("{0}: Soundbank found, attempting to autoload: name='{1}' file='{2}'", typeof(ResourceLoaderSoundbanks), text2, text));
+                    Debug.Log(string.Format("{0}: Soundbank found, attempting to autoload: name='{1}' file='{2}'", typeof(ResourceLoaderSoundbanks), text2, text));
 
                     using (FileStream fileStream = File.OpenRead(text)) { LoadSoundbankFromStream(fileStream, text2); }
                 }
@@ -120,7 +122,7 @@ namespace BotsMod
                 uint num;
                 AKRESULT akresult = AkSoundEngine.LoadAndDecodeBankFromMemory(intPtr, (uint)array.Length, false, name, false, out num);
 
-                ETGModConsole.Log(string.Format("Result of soundbank load: {0}.", akresult));
+                Debug.Log(string.Format("Result of soundbank load: {0}.", akresult));
 
             }
             finally

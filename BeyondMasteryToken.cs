@@ -28,12 +28,12 @@ namespace BotsMod
 
             //EncounterDatabase.GetEntry(item.encounterTrackable.EncounterGuid).usesPurpleNotifications = true;
 
-            //ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.Health, 1f, StatModifier.ModifyMethod.ADDITIVE);
+            ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.Health, 1f, StatModifier.ModifyMethod.ADDITIVE);
 
 
             BotsItemIds.BeyondMasteryToken = item.PickupObjectId;
 
-            item.ItemRespectsHeartMagnificence = true;
+            //item.ItemRespectsHeartMagnificence = true;
 
             item.minimapIcon = BotsModule.WarCrime;
 
@@ -42,7 +42,7 @@ namespace BotsMod
             item.PlaceItemInAmmonomiconAfterItemById(467);
 
 
-            Tools.BeyondItems.Add(item.PickupObjectId);
+            //Tools.BeyondItems.Add(item.PickupObjectId);
             //item.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/RainbowChestShader");
             //item.sprite.usesOverrideMaterial = true;
 

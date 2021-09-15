@@ -289,7 +289,7 @@ namespace BotsMod
 		}
 
 
-		// Token: 0x060001B4 RID: 436 RVA: 0x00010334 File Offset: 0x0000E534
+		
 		private void CreateNewCompanion(PlayerController player)
 		{
 

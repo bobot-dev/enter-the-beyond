@@ -27,18 +27,13 @@ namespace BotsMod
 
 			item.PlaceItemInAmmonomiconAfterItemById(298);
 
-			Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
-			material.SetTexture("_MainTexture", item.sprite.renderer.material.GetTexture("_MainTex"));
-			material.SetColor("_EmissiveColor", new Color32(136, 0, 215, 255));
-			material.SetFloat("_EmissiveColorPower", 40.55f);
-			material.SetFloat("_EmissivePower", 70);
-			item.sprite.renderer.material = material;
+			
 		}
 
 		protected override void Update()
 		{
 			PlayerController player = GameManager.Instance.PrimaryPlayer;
-			if (player && this.extantLink == null)
+			if (player && this.extantLink == null && LinkVFXPrefab != null)
 			{
 				tk2dTiledSprite component = SpawnManager.SpawnVFX(this.LinkVFXPrefab, false).GetComponent<tk2dTiledSprite>();
 				this.extantLink = component;
@@ -179,17 +174,8 @@ namespace BotsMod
 			//SpeculativeRigidbody specRigidbody = target.specRigidbody;
 			//SpeculativeRigidbody speculativeRigidbody = specRigidbody;
 			Material material = m_extantLink.GetComponent<Renderer>().material;
-			//material.SetColor("_EmissiveColor", lightningColour);
-			//material.SetFloat("_EmissiveColorPower", 4.9f);
-			//material.SetFloat("_EmissivePower", 4.9f);
-			//material.SetFloat("_VertexColor", 4.9f);
-
-			//material.SetFloat("_BlackBullet", 0.9f);
-			//material.SetFloat("_Cutoff", 1f);
-			//material.SetFloat("_EmissiveColorPower", 10f);
-
-			//material.SetFloat("_EmissiveColorPower", 4.9f);
-
+			material.SetFloat("_BlackBullet", 0.995f);
+			material.SetFloat("_EmissiveColorPower", 4.9f);
 
 			Vector2 unitCenter = landedPoint;
 			Vector2 unitCenter2 = target.specRigidbody.HitboxPixelCollider.UnitCenter;

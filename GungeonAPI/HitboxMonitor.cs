@@ -14,10 +14,10 @@ namespace GungeonAPI
         public static void DisplayHitbox(SpeculativeRigidbody speculativeRigidbody)
         {
             PixelCollider collider = speculativeRigidbody.HitboxPixelCollider;
-            ToolsGAPI.Log("Collider Found...");
+            Tools.Log("Collider Found...");
             if (!speculativeRigidbody.gameObject.GetComponent<HitBoxDisplay>())
                 speculativeRigidbody.gameObject.AddComponent<HitBoxDisplay>();
-            ToolsGAPI.Log("Displaying...");
+            Tools.Log("Displaying...");
             LogHitboxInfo(collider);
         }
 
@@ -76,8 +76,8 @@ namespace GungeonAPI
 
         private static void LogHitboxInfo(PixelCollider collider)
         {
-            ToolsGAPI.Print($"Dimensions: ({collider.Dimensions.x},{collider.Dimensions.y})");
-            ToolsGAPI.Print($"Offset: ({collider.Offset.x},{collider.Offset.y})");
+            Tools.Print($"Dimensions: ({collider.Dimensions.x},{collider.Dimensions.y})");
+            Tools.Print($"Offset: ({collider.Offset.x},{collider.Offset.y})");
         }
     }
 }

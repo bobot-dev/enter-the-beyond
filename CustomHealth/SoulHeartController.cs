@@ -1,5 +1,6 @@
 ﻿using Dungeonator;
 using GungeonAPI;
+using ItemAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace BotsMod
 		public static void Init()
 		{
 			var atlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;
-			atlas.AddNewItemToAtlas(ResourceExtractor.GetTextureFromResource("BotsMod/sprites/UI/heart_full_purple_001.png"), fullSoulHeartName);
+			atlas.AddNewItemToAtlas(GungeonAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/UI/heart_full_purple_001.png"), fullSoulHeartName);
 		}
 
 		public static void OnSoulHeartLost(PlayerController player)

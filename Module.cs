@@ -51,7 +51,6 @@ namespace BotsMod
         public static GameObject Shop;
         public static GameObject NPC;
 
-
         public static string ZipFilePath;
         public static string FilePath;
 
@@ -61,14 +60,19 @@ namespace BotsMod
 
         public static Gun ChamberGun;
 
+        public static ETGModuleMetadata metadata;
 
+        private int FontSize = 34;
+
+
+        public static UnityEngine.UI.Text CatogreyText;
 
         public override void Start()
         {
 
             try
             {
-
+                metadata = this.Metadata;
                 characterFilePath = this.Metadata.Directory + "/characters";
                 //gungeon api
                 GungeonAP.Init();
@@ -93,7 +97,7 @@ namespace BotsMod
 
                 CustomCharacters.Hooks.Init();
 
-                GungeonAPI.FakePrefabHooks.Init();
+                FakePrefabHooks.Init();
                 ToolsGAPI.Init();
                 
                 CharacterSwitcher.Init();
@@ -111,7 +115,6 @@ namespace BotsMod
             try
             {
 
-
                 ZipFilePath = this.Metadata.Archive;
                 FilePath = this.Metadata.Directory;
 
@@ -128,9 +131,11 @@ namespace BotsMod
                 //GungeonAP.Init();
 
                 GameManager.Instance.gameObject.AddComponent<DiscordController>();
-
-                
-
+                /*
+                var array = Tools.ReflectionHelpers.ReflectGetField<Type[]>(typeof(GameManager), "BraveLevelLoadedListeners", GameManager.Instance).ToList();
+                array.Add(typeof(FuckYouThisIsAnAwfulIdea));
+                Tools.ReflectionHelpers.ReflectSetField(typeof(GameManager), "BraveLevelLoadedListeners", array.ToArray(), GameManager.Instance);
+                */
                 //enemy api
                 EnemyBuilder.Init();
                 BossBuilder.Init();
@@ -146,17 +151,19 @@ namespace BotsMod
                 Tools.Init();
                 Hooks.Init();
                 Rooms.Init();
-                BeyondPrefabs.Init();
-                RoomPrefabs.Init();
+                //BeyondPrefabs.Init();
+                //RoomPrefabs.Init();
+                CustomFire.Init();
 
 
-                NpcInitShit.Init();
 
                 Tools.AHHH = this.LoadAssetBundleFromLiterallyAnywhere("customglitchshader");
 
                 Tools.BotsAssetBundle = this.LoadAssetBundleFromLiterallyAnywhere("botsassetbundle");
 
                 SoulHeartController.Init();
+
+                FloorHooks.Init();
 
                 //StuffIStoleFromApacheForChallengeMode.Init();
 
@@ -180,14 +187,20 @@ namespace BotsMod
                 PirmalShotgrub.Init();
                 BeyondKin.Init();
                 LostPastBoss.Init();
-                OverseerDecoy.Init();
+                //OverseerDecoy.Init();
                 TestActive.Init();
-                SpecialDungeon.Init();
-                SpecialDungeon2CozFuckYou.Init();
+                //SpecialDungeon.Init();
+                //SpecialDungeon2CozFuckYou.Init();
                 RichPresenceItem.Register();
+
+                BeyondScout.Init();
 
                 TestGun.Add();
 
+                Coin.Init();
+                HellsRevolver2.Add();
+                HellsRevolver.Add();
+                HellsShotgun.Add();
 
                 CompletlyRandomGun.Add();
 
@@ -198,6 +211,8 @@ namespace BotsMod
                 PortalThing.Init();
                 NoTimeToExplain.Add();
 
+                TheMessanger.Add();
+
                 LostsCloak.Init();
 
                 //LootTables.Init();
@@ -206,9 +221,12 @@ namespace BotsMod
 
                 LostSidearm.Add();
 
-                Wand.Add();
+                TrailBullets.Init();
 
                 SpellInit.Init();
+                Wand.Add();
+               
+                EnchantedEnemies.Init();
 
                 TestPassive.Init();
 
@@ -220,10 +238,71 @@ namespace BotsMod
 
                 SpinDownDice.Init();
 
-                OtherworldlyConnections.Init();
+                //OtherworldlyConnections.Init();
                 OtherwordlyFury.Init();
 
+
+                NpcInitShit.Init();
                 //GameManager.Instance.PrimaryPlayer.star
+
+                var stupidlist = Tools.ReflectionHelpers.ReflectGetField<Type[]>(typeof(GameManager), "BraveLevelLoadedListeners", GameManager.Instance).ToList();
+                stupidlist.Add(typeof(FuckYouThisIsAnAwfulIdea));
+                Tools.ReflectionHelpers.ReflectSetField<Type[]>(typeof(GameManager), "BraveLevelLoadedListeners", stupidlist.ToArray(), GameManager.Instance);
+                Log("reflections done");
+
+                //var coinPannel = FakePrefab.Clone(Tools.shared_auto_001.LoadAsset<GameObject>("BlankPanel"));
+                var coinPannel = FakePrefab.Clone(GameUIRoot.Instance.blankControllers[0].gameObject);
+                coinPannel.transform.parent = AmmonomiconAPI.Tools.LoadAssetFromAnywhere<GameObject>("UI Root").transform;
+                Log("objs sorta done");
+                var coinSpritePrefab = FakePrefab.Clone(coinPannel.GetComponent<GameUIBlankController>().blankSpritePrefab.gameObject).GetComponent<dfSprite>();
+                coinSpritePrefab.gameObject.GetOrAddComponent<Transform>();
+
+
+                
+
+                coinSpritePrefab.SpriteName = "heart_shield_full_001";
+                Log("objs done");
+
+                Log("done");
+                UnityEngine.Object.Destroy(coinPannel.GetComponent<GameUIBlankController>());
+                Log("done done");
+                GameUIRoot.Instance.coinUIControllersAdd(coinPannel.AddComponent<FuckYouThisIsAnAwfulIdea>());
+
+
+                coinPannel.GetComponent<FuckYouThisIsAnAwfulIdea>().IsRightAligned = false;
+                coinPannel.GetComponent<FuckYouThisIsAnAwfulIdea>().extantCoins = new List<dfSprite>();
+                coinPannel.GetComponent<FuckYouThisIsAnAwfulIdea>().CoinSpritePrefab = coinSpritePrefab;
+
+                FakePrefab.MarkAsFakePrefab(coinSpritePrefab.gameObject);
+                FakePrefab.MarkAsFakePrefab(coinPannel);
+                UnityEngine.Object.DontDestroyOnLoad(coinSpritePrefab.gameObject);
+                UnityEngine.Object.DontDestroyOnLoad(coinPannel);
+                coinSpritePrefab.gameObject.SetActive(true);
+                coinPannel.SetActive(true);
+
+                Log("done done done");
+
+                BeyondPrefabs.InitCustomPrefabs();
+                ModRoomPrefabs.InitCustomRooms();
+                BeyondDungeonFlows.InitDungeonFlows();
+                BeyondDungeon.InitCustomDungeon();
+                LostPastDungeon.InitCustomDungeon();
+                Hook hook = new Hook(
+                   typeof(GameManager).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance),
+                   typeof(BotsModule).GetMethod("GameManager_Awake", BindingFlags.NonPublic | BindingFlags.Instance),
+                   typeof(GameManager)
+               );
+                
+
+                metadata = this.Metadata;
+
+
+
+                GUI.Init();
+
+                CatogreyText = GUI.CreateText(null, new Vector2(15f, 265), "", TextAnchor.MiddleLeft, font_size: FontSize);
+
+                ETGModMainBehaviour.Instance.gameObject.AddComponent<CatogreyTeller>();
 
                 InitSynergies.Init();
 
@@ -231,16 +310,9 @@ namespace BotsMod
                 Loader.BuildCharacter("Shade", false, true, true, false, new Color32(0, 0, 0, 0), 0, 0, 0, false, "");
                 Loader.BuildCharacter("The Blind", false, true, true, false, new Color32(0, 0, 0, 0), 0, 0, 0, false, "");
 
-                var roomData = RoomFactory.BuildFromResource("BotsMod/rooms/npctestroomthatisntfucked.room");
-
-                var protoroom = roomData.room;
-
-                var req = new DungeonPrerequisite[0];
-
-                DungeonHandler.Register(roomData);
-
-                ShrineFactory.RegisterShrineRoom(shop.gameObject, protoroom, "bot:test_npc_shop_shrine", new Vector2(1, 1));
                 //ShrineFactory.RegisterShrineRoom(NPC, protoroom, "bot:test_npc_shrine", new Vector2(1, 1));
+
+                //CollectionDumper.DumpCollection();
 
 
                 //Ammonomicon.Init();
@@ -264,15 +336,7 @@ namespace BotsMod
 
                 }*/
 
-
-                var bulletGun = (PickupObjectDatabase.GetById(503) as Gun);
-                var shotgunGun = (PickupObjectDatabase.GetById(512) as Gun);
-                var anotherGun = (PickupObjectDatabase.GetById(169) as Gun);
-
-                var moreBullet = bulletGun.DefaultModule.projectiles[0].gameObject.GetComponent<SpawnProjModifier>();
-                var moreBulletShotgun = shotgunGun.DefaultModule.projectiles[0].gameObject.GetComponent<SpawnProjModifier>();
-
-                moreBullet.projectileToSpawnInFlight = bulletGun.DefaultModule.projectiles[0];
+                
 
 
                 AlphabetSoupSynergyProcessor alphabetSoupSynergyProcessor = PickupObjectDatabase.GetById(340).gameObject.GetComponent<AlphabetSoupSynergyProcessor>();
@@ -312,8 +376,45 @@ namespace BotsMod
                     {
                         "Play_Fuck"
                     }
-                };*/
+                };
+                Log("sc 0");
+                if (Tools.Foyer_ElevatorChamber == null)
+                {
+                    Log("fuck!!!!!!!!");
+                    Log("fuck!!!!!!!!");
+                }
 
+                ShortcutElevatorController shortcutElevatorController = (Resources.FindObjectsOfTypeAll(typeof(ShortcutElevatorController)) as ShortcutElevatorController[])[0];
+
+                var shortCutController = Tools.Foyer_ElevatorChamber.GetComponent<ShortcutElevatorController>();
+                Log("sc 0.5");
+                if (shortCutController == null)
+                {
+                    Log("fuck2!!!!!!!!");
+                }
+                Log("sc 0.6");
+                List<ShortcutDefinition> shortCuts = new List<ShortcutDefinition>();
+                Log("sc 0.7");
+                for (int i = 0; i < shortCutController.definedShortcuts.Length; i++)
+                {
+                    shortCuts.Add(shortCutController.definedShortcuts[i]);
+                }
+
+                
+                Log("sc 1");
+                SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/elevator_bottom_floor_beyond.png", shortCutController.elevatorFloorSprite.Collection, "elevator_bottom_floor_beyond");
+                shortCuts.Add(new ShortcutDefinition
+                {
+                    elevatorFloorSpriteName = "elevator_bottom_floor_beyond",
+                    IsBossRush = false,
+                    IsSuperBossRush = false,
+                    requiredFlag = GungeonFlags.NONE,
+                    sherpaTextKey = "test",
+                    targetLevelName = BeyondDungeon.BeyondDefinition.dungeonSceneName,
+                });
+                Log("sc 2");
+                shortCutController.definedShortcuts = shortCuts.ToArray();
+                Log("sc 3");*/
                 var funnylist = new List<AlphabetSoupEntry> { TransRights };
                // var funnylist = alphabetSoupSynergyProcessor.Entries.ToList();
                 //funnylist.Add(iShouldntHaveBeenGivenThisPower6);
@@ -380,6 +481,17 @@ namespace BotsMod
                     handler.enabled = true;
 
                 });
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("checkLootTable", delegate (string[] args)
+                {
+                    Log($"Number of items in loot table: {StaticSpellReferences.spellLootTable.defaultItemDrops.elements.Count}");
+                    foreach (var item in StaticSpellReferences.spellLootTable.defaultItemDrops.elements)
+                    {
+                        Log($"[{item.pickupId}]: {item.rawGameObject.name}");
+                    }
+
+                });
+
+
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("addSpellSlots", delegate (string[] args)
                 {
@@ -396,12 +508,68 @@ namespace BotsMod
 
                 });
 
-                ETGModConsole.Commands.GetGroup("bot").AddUnit("npc", delegate (string[] args)
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("addCoinToUi", delegate (string[] args)
+                {
+                    //foreach (var dumbfuck in GameUIRoot.Instance.coinUIControllers())
+                    //{
+                    //    Log("a");
+                    //}
+
+                    //GameUIRoot.Instance.coinUIControllers()[0].AddCoin();\
+                    //UnityEngine.JsonUtility.ToJson();
+                });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("dumpPlayerSprites", delegate (string[] args)
+                {
+                    CollectionDumper.DumpCollection(GameManager.Instance.PrimaryPlayer.sprite.Collection);
+                });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("masterRound", delegate (string[] args)
+                {
+                    Log(GameManager.Instance.PrimaryPlayer.MasteryTokensCollectedThisRun.ToString());
+                });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("setPerks", delegate (string[] args)
                 {
 
-                    DungeonPlaceableUtility.InstantiateDungeonPlaceable(shop.gameObject, GameManager.Instance.PrimaryPlayer.CurrentRoom, new IntVector2((int)GameManager.Instance.PrimaryPlayer.gameObject.transform.position.x, (int)GameManager.Instance.PrimaryPlayer.gameObject.transform.position.y), false);
+                    GameManager.Instance.PrimaryPlayer.CurrentGun.GetComponent<TheMessanger>().firstPerk = TheMessanger.FirstSlotPerks.MovingTarget;
+                    GameManager.Instance.PrimaryPlayer.CurrentGun.GetComponent<TheMessanger>().secondPerk = TheMessanger.SecondSlotPerks.Desperado;
+                });
+
+                ETGModConsole.Commands.AddUnit("exportPlayerTexture", delegate (string[] args)
+                {
+                    File.WriteAllBytes(ETGMod.ResourcesDirectory + GameManager.Instance.PrimaryPlayer.characterIdentity.ToString() + "spritesheet.png", ((Texture2D)GameManager.Instance.PrimaryPlayer.sprite.renderer.material.GetTexture("_MainTex")).EncodeToPNG());
+                });
+
+                ETGModConsole.Commands.AddUnit("getAllInteractablesInRoom", delegate (string[] args)
+                {
+                    foreach(var obj in GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRoomInteractables())
+                    {
+                        Log(obj.ToString());
+                        Log(obj.GetDistanceToPoint(GameManager.Instance.PrimaryPlayer.sprite.WorldCenter).ToString());
+                    }
+                });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("npc", delegate (string[] args)
+                {
+                    Log("0");
+                    if (GameManager.Instance.PrimaryPlayer.CurrentRoom == null)
+                    {
+                        Log("shop did a null");
+                    }
+
+                    var shopObj = DungeonPlaceableUtility.InstantiateDungeonPlaceable(shop.gameObject, GameManager.Instance.PrimaryPlayer.CurrentRoom, (GameManager.Instance.PrimaryPlayer.CurrentRoom.area.UnitCenter - GameManager.Instance.PrimaryPlayer.CurrentRoom.area.basePosition.ToVector2()).ToIntVector2(), false).transform.Find("Bot:Test_Npc").gameObject;
+                    GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(shopObj.GetComponent<TalkDoerLite>());
+
+
+                    //
+                    File.WriteAllText("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Enter the Gungeon\\Resources\\EnterTheBeyond/fuckingdie.txt", UnityEngine.JsonUtility.ToJson(shopObj.GetComponent<PlayMakerFSM>(), true));
+
+                    
+                    Log("2");
                     return;
-                    var room = RoomFactory.BuildFromResource("BotsMod/rooms/customnpctest.room").room;
+                    var room = RoomFactory.BuildFromResource("BotsMod/rooms/customnpctest.room");
 
 
                     RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room, null, DungeonData.LightGenerationStyle.STANDARD);
@@ -497,6 +665,58 @@ namespace BotsMod
                 });
 
 
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("burn", delegate (string[] args)
+                {
+
+                    LightningRounds.ApplyActionToNearbyEnemiesWithALimit(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter, 10, 30, GameManager.Instance.PrimaryPlayer.CurrentRoom.GetActiveEnemies(Dungeonator.RoomHandler.ActiveEnemyType.All), delegate (AIActor enemy, float dist)
+                    {
+
+                        if (enemy && enemy.healthHaver)
+                        {
+                            //-2510877616333010786
+                            //-4066334418742256460
+                            enemy.ApplyEffect(new CustomGameActorFireEffect
+                            {
+                                AffectsEnemies = true,
+                                AffectsPlayers = false,
+                                AppliesDeathTint = true,
+                                AppliesOutlineTint = false,
+                                AppliesTint = false,
+                                PlaysVFXOnActor = false,
+                                DamagePerSecondToEnemies = 10,
+                                DeathTintColor = new Color32(128, 0, 128, 255),
+                                TintColor = new Color(1, 0, 1, 1),
+                                duration = 10,
+                                effectIdentifier = "BeyondFire",
+                                flameBuffer = new Vector2(0.0625f, 0.3f),
+                                flameFpsVariation = 15,
+                                flameMoveChance = 1,
+
+                            }) ;
+
+                        }
+
+
+                    });
+                });
+
+
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("breachRoom", delegate (string[] args)
+                {
+                    var orLoadByName_Orig5 = SpecialDungeon.GetOrLoadByNameOrig("Base_ResourcefulRat");
+                    var room = RoomFactory.BuildFromResource("BotsMod/rooms/breachRoom.room");
+                    room.overriddenTilesets = GlobalDungeonData.ValidTilesets.HELLGEON;
+                    RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room, null, DungeonData.LightGenerationStyle.FORCE_COLOR);
+
+                    
+
+                    Pathfinder.Instance.InitializeRegion(GameManager.Instance.Dungeon.data, creepyRoom.area.basePosition, creepyRoom.area.dimensions);
+                    GameManager.Instance.PrimaryPlayer.WarpToPoint((creepyRoom.area.basePosition + new IntVector2(3, 4)).ToVector2(), false, false);
+
+                    //UnityEngine.Object.Instantiate(SpriteBuilder.SpriteFromResource("BotsMod/sprites/TestBreachRoomTexture"), new Vector3(creepyRoom.area.basePosition.x, creepyRoom.area.basePosition.y), Quaternion.identity);
+                });
+
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("beyond", delegate (string[] args)
                 {
@@ -591,6 +811,7 @@ namespace BotsMod
                 });
 
 
+                
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("findshops", delegate (string[] args)
                 {
                     foreach (var shop in UnityEngine.Object.FindObjectsOfType<BaseShopController>())
@@ -630,7 +851,7 @@ namespace BotsMod
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("flytest", delegate (string[] args)
                 {
-                    var room = RoomFactory.BuildFromResource("BotsMod/rooms/robotflytestroom.room").room;
+                    var room = RoomFactory.BuildFromResource("BotsMod/rooms/robotflytestroom.room");
                     RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room, null, DungeonData.LightGenerationStyle.FORCE_COLOR);
 
                     Pathfinder.Instance.InitializeRegion(GameManager.Instance.Dungeon.data, creepyRoom.area.basePosition, creepyRoom.area.dimensions);
@@ -683,6 +904,40 @@ namespace BotsMod
                     }
                 });
 
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("KillPillarsAreDumb", delegate (string[] args)
+                {
+
+                    foreach (var comp in EnemyDatabase.GetOrLoadByGuid("3f11bbbc439c4086a180eb0fb9990cb4").GetComponent<AIActorDummy>().realPrefab.GetComponentsInChildren<Component>())
+                    {
+                        Log($"=========[{comp.name}: {comp.GetType()}]=========");
+
+
+                        /*PropertyInfo[] properties = comp.GetType().GetProperties();
+
+                        foreach (PropertyInfo propertyInfo in properties)
+                        {
+                            string text = propertyInfo.DeclaringType.FullName + "::" + propertyInfo.Name;
+                            if (propertyInfo.MemberType != MemberTypes.Method && propertyInfo.GetIndexParameters().Length == 0 && propertyInfo.CanRead)
+                            {
+
+                                try
+                                {
+                                    object value = ReflectionHelper.GetValue(propertyInfo, comp);
+                                    Log(propertyInfo.Name + ": " + value.ToStringIfNoString());
+                                }
+                                catch (Exception message)
+                                {
+                                    Debug.LogWarning("KillPillarsAreDumb: THIS LITTLE SHIT BROKE IT > " + text);
+                                    Debug.LogWarning(message);
+                                }
+                            }
+                        }*/
+                    }
+
+                    
+
+                });
+
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("shop", delegate (string[] args)
                 {
@@ -705,7 +960,7 @@ namespace BotsMod
                     devilLootTable.AddItemToPool(336);
                     devilLootTable.AddItemToPool(285);
 
-                    var room = RoomFactory.BuildFromResource("BotsMod/rooms/npctest.room").room;
+                    var room = RoomFactory.BuildFromResource("BotsMod/rooms/npctest.room");
 
 
                     RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room, null, DungeonData.LightGenerationStyle.FORCE_COLOR);
@@ -993,6 +1248,35 @@ namespace BotsMod
 
                 });
 
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("ihateunity", delegate (string[] args)
+                {
+                    int i = 0;
+                    foreach(var comp in GameManager.Instance.PrimaryPlayer.gameObject.GetComponentsInChildren<MonoBehaviour>())
+                    {
+                        Log(comp.GetType().ToString());
+                        try
+                        {
+                            var path = "C:\\Users\\noaht\\Documents\\unity\\stop crashing pls\\Assets\\fuck\\" + i + comp.GetType().ToString() + ".txt";
+
+                            if (!File.Exists(path))
+                            {
+                                var f = File.Create(path);
+                                f.Close();
+                            }
+                            File.WriteAllText(path, UnityEngine.JsonUtility.ToJson(comp));
+                            i++;
+                        }
+                        catch(Exception e)
+                        {
+                            Log(e.ToString());
+                        }
+                        
+                        
+                        
+                    }
+
+                });
+
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("findgun", delegate (string[] args)
                 {
@@ -1041,66 +1325,113 @@ namespace BotsMod
                     try
                     {
 
-                        var sprite = SpriteBuilder.SpriteFromResource("BotsMod/sprites/altskinsprites_001").GetComponent<tk2dSprite>();
-                        var altSprite = SpriteBuilder.SpriteFromResource("BotsMod/sprites/altskinsprites_002").GetComponent<tk2dSprite>();
+                        var baseSwapper = FakePrefab.Clone(ResourceManager.LoadAssetBundle("foyer_002").LoadAsset<GameObject>("costume_guide"));
+                        var altSwapper = FakePrefab.Clone(ResourceManager.LoadAssetBundle("foyer_002").LoadAsset<GameObject>("costume_guide_alt"));
 
-                        GameObject baseSwapper;
-                        GameObject altSwapper;
+                        var sprite = baseSwapper.GetComponent<tk2dSprite>();
+                        var altSprite = altSwapper.GetComponent<tk2dSprite>();
 
-                        foreach (var dumbpeiceofshit in UnityEngine.Object.FindObjectsOfType<tk2dSprite>())
+                        Log("objects set up");
+
+                        sprite.SetSprite(sprite.Collection, sprite.spriteId);
+                        altSprite.SetSprite(altSprite.Collection, altSprite.spriteId);
+
+                        baseSwapper.transform.parent = altSwapper.transform;
+
+                        altSwapper.name = "costume_lost_alt";
+
+                        baseSwapper.name = "costume_lost";
+
+                        Log("renamed");
+                        var characterCostumeSwapper = baseSwapper.GetComponent<CharacterCostumeSwapper>();
+                        Log("variables set0");
+                        characterCostumeSwapper.TargetCharacter = (PlayableCharacters)CustomPlayableCharacters.Custom;
+                        Log("variables set1");
+                        characterCostumeSwapper.AlternateCostumeSprite = altSprite;
+                        Log("variables set2");
+                        characterCostumeSwapper.CostumeSprite = sprite;
+                        Log("variables set3");
+                        characterCostumeSwapper.HasCustomTrigger = false;
+                        characterCostumeSwapper.CustomTriggerIsFlag = false;
+                        characterCostumeSwapper.TriggerFlag = GungeonFlags.NONE;
+                        characterCostumeSwapper.CustomTriggerIsSpecialReserve = false;
+                        Log("variables set4");
+                        characterCostumeSwapper.TargetLibrary = LostAltSkinAnimator;
+                        Log("variables set5");
+
+
+
+                        //GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(UnityEngine.Object.Instantiate(altSwapper, new Vector3(16.4f, 25.1f, 25.6f), Quaternion.identity).GetComponent<IPlayerInteractable>());
+                       // GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(UnityEngine.Object.Instantiate(baseSwapper, new Vector3(16.4f, 25.1f, 25.6f), Quaternion.identity).GetComponent<IPlayerInteractable>());
+
+                        var baseObj = UnityEngine.Object.Instantiate(baseSwapper, GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, Quaternion.identity);
+                        var altObj = UnityEngine.Object.Instantiate(altSprite, GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, Quaternion.identity);
+
+                        baseObj.gameObject.SetActive(true);
+                        altObj.gameObject.SetActive(true);
+
+                        if (!Dungeonator.RoomHandler.unassignedInteractableObjects.Contains(baseObj.GetComponent<IPlayerInteractable>()))
+                            Dungeonator.RoomHandler.unassignedInteractableObjects.Add(baseObj.GetComponent<IPlayerInteractable>());
+
+                        if (!Dungeonator.RoomHandler.unassignedInteractableObjects.Contains(altObj.GetComponent<IPlayerInteractable>()))
+                            Dungeonator.RoomHandler.unassignedInteractableObjects.Add(altObj.GetComponent<IPlayerInteractable>());
+
+
+                        Log("finished!");
+                        /*foreach (var dumbpeiceofshit in UnityEngine.Object.FindObjectsOfType<tk2dSprite>())
                         {
                             if (dumbpeiceofshit.gameObject.name.Contains("costume"))
                             {
-                                if (dumbpeiceofshit.gameObject.name == "costume_guide_alt")
+                                /*if (dumbpeiceofshit.gameObject.name == "costume_guide_alt")
                                 {
-                                    //altSwapper = GungeonAPI.FakePrefab.Clone(dumbpeiceofshit.gameObject);
+                                    //altSwapper = FakePrefab.Clone(dumbpeiceofshit.gameObject);
                                     altSwapper = dumbpeiceofshit.gameObject;
 
                                     dumbpeiceofshit.SetSprite(altSprite.Collection, altSprite.spriteId);
 
 
-                                    altSwapper.name = "costume_lost_alt";
+                                    
 
                                     altSwapper.transform.position = GameManager.Instance.PrimaryPlayer.sprite.WorldCenter;
 
                                     BotsModule.Log($"{altSwapper.name}: {altSwapper.transform.position}");
                                     BotsModule.Log($"{dumbpeiceofshit.gameObject.name}: {dumbpeiceofshit.Collection.spriteDefinitions[dumbpeiceofshit.gameObject.GetComponent<tk2dSprite>().spriteId].name}");
-                                }
+                                }*/
 
 
-                                if (dumbpeiceofshit.gameObject.name == "costume_guide")
-                                {
-                                    //baseSwapper = GungeonAPI.FakePrefab.Clone(dumbpeiceofshit.gameObject);
-                                    baseSwapper = dumbpeiceofshit.gameObject;
+                        /*if (dumbpeiceofshit.gameObject.name == "costume_guide")
+                        {
+                            //baseSwapper = FakePrefab.Clone(dumbpeiceofshit.gameObject);
+                            baseSwapper = dumbpeiceofshit.gameObject;
 
 
-                                    dumbpeiceofshit.SetSprite(sprite.Collection, sprite.spriteId);
+                            dumbpeiceofshit.SetSprite(sprite.Collection, sprite.spriteId);
 
-                                    baseSwapper.name = "costume_lost";
-                                    var characterCostumeSwapper = baseSwapper.GetComponent<CharacterCostumeSwapper>();
-                                    characterCostumeSwapper.TargetCharacter = (PlayableCharacters)CustomPlayableCharacters.Custom;
-                                    //characterCostumeSwapper.AlternateCostumeSprite = altSwapper.GetComponent<tk2dSprite>();
-                                    //characterCostumeSwapper.CostumeSprite = baseSwapper.GetComponent<tk2dSprite>();
-                                    characterCostumeSwapper.TargetLibrary = GameManager.Instance.PrimaryPlayer.AlternateCostumeLibrary;
-
-
-                                    baseSwapper.transform.position = GameManager.Instance.PrimaryPlayer.sprite.WorldCenter;
-
-                                    //GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(UnityEngine.Object.Instantiate(swapper, new Vector3(16.4f, 25.1f, 25.6f), Quaternion.identity).GetComponent<IPlayerInteractable>());
+                            baseSwapper.name = "costume_lost";
+                            var characterCostumeSwapper = baseSwapper.GetComponent<CharacterCostumeSwapper>();
+                            characterCostumeSwapper.TargetCharacter = (PlayableCharacters)CustomPlayableCharacters.Custom;
+                            //characterCostumeSwapper.AlternateCostumeSprite = altSwapper.GetComponent<tk2dSprite>();
+                            //characterCostumeSwapper.CostumeSprite = baseSwapper.GetComponent<tk2dSprite>();
+                            characterCostumeSwapper.TargetLibrary = GameManager.Instance.PrimaryPlayer.AlternateCostumeLibrary;
 
 
+                            baseSwapper.transform.position = GameManager.Instance.PrimaryPlayer.sprite.WorldCenter;
 
-                                    //GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(swapper.GetComponent<IPlayerInteractable>());
-
-                                    BotsModule.Log($"{baseSwapper.name}: {baseSwapper.transform.position}");
-                                    BotsModule.Log($"{dumbpeiceofshit.gameObject.name}: {dumbpeiceofshit.Collection.spriteDefinitions[dumbpeiceofshit.gameObject.GetComponent<tk2dSprite>().spriteId].name}");
-                                }
+                            //GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(UnityEngine.Object.Instantiate(swapper, new Vector3(16.4f, 25.1f, 25.6f), Quaternion.identity).GetComponent<IPlayerInteractable>());
 
 
-                                BotsModule.Log($"{dumbpeiceofshit.gameObject.name}: {dumbpeiceofshit.gameObject.transform.position}");
-                                BotsModule.Log($"{dumbpeiceofshit.gameObject.name}: {dumbpeiceofshit.Collection.spriteDefinitions[dumbpeiceofshit.gameObject.GetComponent<tk2dSprite>().spriteId].name}");
-                            }
+
+                            //GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(swapper.GetComponent<IPlayerInteractable>());
+
+                            BotsModule.Log($"{baseSwapper.name}: {baseSwapper.transform.position}");
+                            BotsModule.Log($"{dumbpeiceofshit.gameObject.name}: {dumbpeiceofshit.Collection.spriteDefinitions[dumbpeiceofshit.gameObject.GetComponent<tk2dSprite>().spriteId].name}");
                         }
+
+
+                        //BotsModule.Log($"{dumbpeiceofshit.gameObject.name}: {dumbpeiceofshit.gameObject.transform.position}");
+                        //BotsModule.Log($"{dumbpeiceofshit.gameObject.name}: {dumbpeiceofshit.Collection.spriteDefinitions[dumbpeiceofshit.gameObject.GetComponent<tk2dSprite>().spriteId].name}");
+                    }
+                }*/
                     }
                     catch (Exception e)
                     {
@@ -1110,7 +1441,39 @@ namespace BotsMod
                 });
 
 
+                //$"<color={color}>{text}</color>"
 
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("listitemchance", delegate (string[] args)
+                {
+                    for (int i = 0; i < PickupObjectDatabase.Instance.Objects.Count; i++)
+                    {
+                        if (PickupObjectDatabase.Instance.Objects[i] != null)
+                        {
+                            //GetItemForPlayer
+                            var player = GameManager.Instance.PrimaryPlayer;
+                            if (PickupObjectDatabase.Instance.Objects[i] is Gun)
+                            {
+                                var gunClass = (PickupObjectDatabase.Instance.Objects[i] as Gun).gunClass;
+                                int num4 = (!(player == null)) ? player.inventory.ContainsGunOfClass(gunClass, true) : 0;
+                                float modifierForClass = LootDataGlobalSettings.Instance.GetModifierForClass(gunClass);
+                                ETGModConsole.Log($"Name: <color={"#03fc0b"}>{PickupObjectDatabase.Instance.Objects[i].EncounterNameOrDisplayName}</color>, Id: <color={"#03fc0b"}>{PickupObjectDatabase.Instance.Objects[i].PickupObjectId}</color>, Chance: <color={"#03fc0b"}>{RewardManager.GetMultiplierForItem(PickupObjectDatabase.Instance.Objects[i], player, false)}/{Mathf.Pow(modifierForClass, (float)num4)}</color>, Class: <color={"#03fc0b"}>{gunClass}</color>");
+
+                            } else
+                            {
+
+                                ETGModConsole.Log($"Name: <color={"#03fc0b"}>{PickupObjectDatabase.Instance.Objects[i].EncounterNameOrDisplayName}</color>, Id: <color={"#03fc0b"}>{PickupObjectDatabase.Instance.Objects[i].PickupObjectId}</color>, Chance: <color={"#03fc0b"}>{RewardManager.GetMultiplierForItem(PickupObjectDatabase.Instance.Objects[i], player, false)}</color>");
+                            }
+
+
+                            
+                            
+                        }
+                    }
+
+                    
+
+                });
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("crime", delegate (string[] args)
                 {
@@ -1185,6 +1548,12 @@ namespace BotsMod
 
                     Log(GameManager.PlayerPrefabForNewGame.GetComponent<PlayerController>().characterIdentity.ToString());
                 });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("docool", delegate (string[] args)
+                {
+                    GameManager.Instance.Dungeon.roomMaterialDefinitions[GameManager.Instance.PrimaryPlayer.CurrentRoom.RoomVisualSubtype] = BeyondPrefabs.shared_auto_002.LoadAsset<DungeonMaterial>("Boss_Cathedral_StainedGlass_Lights");
+                });
+                
 
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("asset_bundle_objects", delegate (string[] args)
@@ -1265,6 +1634,16 @@ namespace BotsMod
                     ETGModConsole.Log("CustomDungeonFlags.BOT_LOST_UNLOCKED's new value: " + SaveAPIManager.GetCharacterSpecificFlag(CustomCharacterSpecificGungeonFlags.EXAMPLE_CHARACTER_SPECIFIC_FLAG).ToString());
                 });
 
+                ETGModConsole.Commands.AddGroup("floor", args =>
+                {
+                });
+                ETGModConsole.Commands.GetGroup("floor").AddUnit("load", this.LoadFloor);
+
+                ETGModConsole.Commands.AddGroup("past", args =>
+                {
+                });
+                ETGModConsole.Commands.GetGroup("past").AddUnit("load", this.LoadPast);
+
                 ModLogo = GungeonAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/title_words_beyond_001.png");
                 try
                 {
@@ -1295,6 +1674,7 @@ namespace BotsMod
             }
         }
         public static Texture2D ModLogo;
+        public static tk2dSpriteAnimation LostAltSkinAnimator;
         public static Hook MainMenuFoyerUpdateHook;
         dfAtlas df;
 
@@ -1308,6 +1688,24 @@ namespace BotsMod
         }
 
         public static List<GameUIAmmoType> addedAmmoTypes = new List<GameUIAmmoType>();
+
+        private void GameManager_Awake(Action<GameManager> orig, GameManager self)
+        {
+            orig(self);
+            BeyondDungeon.InitCustomDungeon();
+            LostPastDungeon.InitCustomDungeon();
+        }
+
+
+        private void LoadFloor(string[] obj)
+        {
+            GameManager.Instance.LoadCustomLevel(BeyondDungeon.BeyondDefinition.dungeonSceneName);
+        }
+
+        private void LoadPast(string[] obj)
+        {
+            GameManager.Instance.LoadCustomLevel(LostPastDungeon.LostPastDefinition.dungeonSceneName);
+        }
 
         public void DelayedStart()
         {

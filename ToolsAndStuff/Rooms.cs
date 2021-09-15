@@ -11,7 +11,7 @@ namespace BotsMod
     {
         public static void Init()
         {
-            SecretLostUnlockRoom = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/LostUnlockRoom.room").room;
+            SecretLostUnlockRoom = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/LostUnlockRoom.room");
             SecretLostUnlockRoom.roomEvents = new List<RoomEventDefinition>() {
                 new RoomEventDefinition(RoomEventTriggerCondition.NPC_TRIGGER_A, RoomEventTriggerAction.SEAL_ROOM),
                 new RoomEventDefinition(RoomEventTriggerCondition.NPC_TRIGGER_C, RoomEventTriggerAction.UNSEAL_ROOM),

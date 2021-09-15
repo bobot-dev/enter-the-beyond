@@ -67,6 +67,7 @@ namespace BotsMod
 			//gun.DefaultModule.finalProjectile.ChanceToTransmogrify = 0;
 
 			Gun gun5 = PickupObjectDatabase.GetById(37) as Gun;
+			
 			gun.finalMuzzleFlashEffects = gun5.muzzleFlashEffects;
 
 			gun.DefaultModule.cooldownTime = 0.15f;
@@ -77,9 +78,11 @@ namespace BotsMod
 			gun.CanBeDropped = true;
 			gun.PreventStartingOwnerFromDropping = true;
 			Projectile projectile = UnityEngine.Object.Instantiate<Projectile>(other.DefaultModule.projectiles[0]);
+			
 			projectile.gameObject.SetActive(false);
 			ItemAPI.FakePrefab.MarkAsFakePrefab(projectile.gameObject);
 			UnityEngine.Object.DontDestroyOnLoad(projectile);
+
 			gun.DefaultModule.projectiles[0] = projectile;
 
 			gun.shellsToLaunchOnReload = gun.DefaultModule.numberOfShotsInClip;
@@ -98,14 +101,12 @@ namespace BotsMod
 
 
 
-
 			ETGMod.Databases.Items.Add(gun, null, "ANY");
-
 
 			lostSidearm = gun;
 			BotsItemIds.LostSidearm = gun.PickupObjectId;
 
-			Tools.BeyondItems.Add(gun.PickupObjectId);
+			//Tools.BeyondItems.Add(gun.PickupObjectId);
 		}
 
 		static TrailRenderer tr;

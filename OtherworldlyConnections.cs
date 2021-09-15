@@ -87,7 +87,7 @@ namespace BotsMod
                 devilLootTable.AddItemToPool(336);
                 devilLootTable.AddItemToPool(285);
 
-                var room = RoomFactory.BuildFromResource("BotsMod/rooms/npctest.room").room;
+                var room = RoomFactory.BuildFromResource("BotsMod/rooms/npctest.room");
 
 
                 RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room, null, DungeonData.LightGenerationStyle.FORCE_COLOR);

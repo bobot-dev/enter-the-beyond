@@ -1,118 +1,46 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace GungeonAPI
 {
-    public class SimpleInteractable : BraveBehaviour, IPlayerInteractable
-    {
-        public Action<PlayerController, GameObject> OnAccept, OnDecline;
+	// Token: 0x0200000C RID: 12
+	public abstract class SimpleInteractable : BraveBehaviour
+	{
+		// Token: 0x0400002E RID: 46
+		public Action<PlayerController, GameObject> OnAccept;
+
+		// Token: 0x0400002F RID: 47
+		public Action<PlayerController, GameObject> OnDecline;
+
+		// Token: 0x04000030 RID: 48
+		public List<string> conversation;
+        public List<string> conversation2;
+
+        // Token: 0x04000031 RID: 49
         public Func<PlayerController, GameObject, bool> CanUse;
-        public Transform talkPoint;
-        public string text, acceptText, declineText;
+
+		// Token: 0x04000032 RID: 50
+		public Transform talkPoint;
+
+		// Token: 0x04000033 RID: 51
+		public string text;
+
+		// Token: 0x04000034 RID: 52
+		public string acceptText;
+        public string acceptText2;
+
+        // Token: 0x04000035 RID: 53
+        public string declineText;
+        public string declineText2;
+
+        // Token: 0x04000036 RID: 54
         public bool isToggle;
-        private bool m_isToggled, m_canUse = true;
 
-        void Start()
-        {
-            talkPoint = transform.Find("talkpoint");
-            m_isToggled = false;
-        }
+		// Token: 0x04000037 RID: 55
+		protected bool m_isToggled;
 
-        public void Interact(PlayerController interactor)
-        {
-            if (TextBoxManager.HasTextBox(this.talkPoint))
-                return;
-
-            ToolsGAPI.Print("Can use: " + (CanUse == null));
-            m_canUse = CanUse != null ? CanUse.Invoke(interactor, this.gameObject) : m_canUse;
-            StartCoroutine(this.HandleConversation(interactor));
-        }
-
-        private IEnumerator HandleConversation(PlayerController interactor)
-        {
-            // Show text and lock player in place
-            TextBoxManager.ShowStoneTablet(this.talkPoint.position, this.talkPoint, -1f, text, true, false);
-            int selectedResponse = -1;
-            interactor.SetInputOverride("shrineConversation");
-            yield return null;
-
-            // Wait for player response
-            if (!m_canUse)
-            {
-                GameUIRoot.Instance.DisplayPlayerConversationOptions(interactor, null, declineText, string.Empty);
-            }
-            else if (isToggle)
-            {
-                if (m_isToggled)
-                    GameUIRoot.Instance.DisplayPlayerConversationOptions(interactor, null, declineText, string.Empty);
-                else
-                    GameUIRoot.Instance.DisplayPlayerConversationOptions(interactor, null, acceptText, string.Empty);
-            }
-            else
-            {
-                GameUIRoot.Instance.DisplayPlayerConversationOptions(interactor, null, acceptText, declineText);
-            }
-
-
-            while (!GameUIRoot.Instance.GetPlayerConversationResponse(out selectedResponse))
-            {
-                yield return null;
-            }
-
-            // Free player and run OnAccept/OnDecline actions
-            interactor.ClearInputOverride("shrineConversation");
-            TextBoxManager.ClearTextBox(this.talkPoint);
-            if (!m_canUse)
-                yield break;
-
-            if (selectedResponse == 0 && isToggle)
-            {
-                (m_isToggled ? OnDecline : OnAccept)?.Invoke(interactor, this.gameObject);
-                m_isToggled = !m_isToggled;
-                yield break;
-            }
-
-            if (selectedResponse == 0)
-                OnAccept?.Invoke(interactor, this.gameObject);
-            else
-                OnDecline?.Invoke(interactor, this.gameObject);
-            yield break;
-        }
-
-        public void OnEnteredRange(PlayerController interactor)
-        {
-            SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.white, 1f);
-            base.sprite.UpdateZDepth();
-        }
-
-        public void OnExitRange(PlayerController interactor)
-        {
-            SpriteOutlineManager.RemoveOutlineFromSprite(base.sprite, false);
-        }
-
-        public string GetAnimationState(PlayerController interactor, out bool shouldBeFlipped)
-        {
-            shouldBeFlipped = false;
-            return string.Empty;
-        }
-
-        public float GetDistanceToPoint(Vector2 point)
-        {
-            if (base.sprite == null)
-            {
-                return 100f;
-            }
-            Vector3 v = BraveMathCollege.ClosestPointOnRectangle(point, base.specRigidbody.UnitBottomLeft, base.specRigidbody.UnitDimensions);
-            return Vector2.Distance(point, v) / 1.5f;
-        }
-
-        public float GetOverrideMaxDistance()
-        {
-            return -1f;
-        }
-    }
+		// Token: 0x04000038 RID: 56
+		protected bool m_canUse = true;
+	}
 }

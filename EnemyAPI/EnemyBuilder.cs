@@ -316,7 +316,7 @@ namespace ItemAPI
                 }
                 aibulletBank.RegenerateCache();
             }
-            if (!targetObject.GetComponent<AIShooter>())
+            if (!targetObject.GetComponent<AIShooter>() && sourceShooter != null)
             {
                 AIShooter aishooter = targetObject.AddComponent<AIShooter>();
                 aishooter.volley = sourceShooter.volley;

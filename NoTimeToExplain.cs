@@ -17,7 +17,7 @@ namespace BotsMod
 
 
 
-		// Token: 0x060000A0 RID: 160 RVA: 0x000063DC File Offset: 0x000045DC
+		
 		public static void Add()
 		{
 			Gun gun = ETGMod.Databases.Items.NewGun("No Time to Explain", "syntest");
@@ -150,7 +150,7 @@ namespace BotsMod
 		}
 
 
-		// Token: 0x060000A1 RID: 161 RVA: 0x00006510 File Offset: 0x00004710
+		
 		protected void Update()
 		{
 
@@ -169,7 +169,7 @@ namespace BotsMod
 		}
 
 
-		// Token: 0x060000A3 RID: 163 RVA: 0x00006629 File Offset: 0x00004829
+		
 		public override void OnPostFired(PlayerController player, Gun gun)
 		{
 			gun.PreventNormalFireAudio = true;
@@ -185,7 +185,7 @@ namespace BotsMod
 			base.OnDropped();
 		}
 
-		// Token: 0x060000A4 RID: 164 RVA: 0x00006644 File Offset: 0x00004844
+		
 		public override void OnReloadPressed(PlayerController player, Gun gun, bool bSOMETHING)
 		{
 			if (gun.IsReloading && this.HasReloaded)

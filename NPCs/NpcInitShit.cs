@@ -1,9 +1,11 @@
 ﻿using Dungeonator;
+using HutongGames.PlayMaker;
 using ItemAPI;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 
@@ -19,35 +21,58 @@ namespace BotsMod.NPCs
             {
                 List<string> testNpcIdleSprites = new List<string>
                 {
-                    "test_npc_idle_001.png",
-                    "test_npc_idle_002.png",
-                    "test_npc_idle_003.png",
-                    "test_npc_idle_004.png"
+                    "shopkeep_001.png",
+                    "shopkeep_002.png",
+                    "shopkeep_003.png",
+                    "shopkeep_004.png",
+                    "shopkeep_005.png",
+                    "shopkeep_006.png",
+                    "shopkeep_007.png",
+                    "shopkeep_008.png",
+                    "shopkeep_009.png",
                 };
 
                 List<string> testNpcTalkSprites = new List<string>
                 {
-                    "test_npc_talk_001.png",
-                    "test_npc_talk_002.png",
+                    "shopkeep_talk_001.png",
+                    "shopkeep_talk_002.png",
+                    "shopkeep_talk_003.png",
+                    "shopkeep_talk_004.png",
+                    "shopkeep_talk_005.png",
                 };
 
                 BotsModule.Log("anim lists done");
 
-                var npcObj = SpriteBuilder.SpriteFromResource("BotsMod/sprites/Npcs/Test/test_npc_idle_001.png", new GameObject("Bot:Test_Npc"));
+                var SpeechPoint = new GameObject("SpeechPoint");
+                SpeechPoint.transform.position = new Vector3(0.8125f, 2.1875f, -1.31f);
+
+
+
+                var npcObj = SpriteBuilder.SpriteFromResource("BotsMod/sprites/Npcs/Beyond/shopkeep_001.png", new GameObject("Bot:Test_Npc"));
+
+                npcObj.layer = 22;
 
                 var collection = npcObj.GetComponent<tk2dSprite>().Collection;
+                SpeechPoint.transform.parent = npcObj.transform;
+
+                FakePrefab.MarkAsFakePrefab(SpeechPoint);
+                UnityEngine.Object.DontDestroyOnLoad(SpeechPoint);
+                SpeechPoint.SetActive(true);
+
+                //-2729308948368026681
+                //-2729308948368026681
 
                 var idleIdsList = new List<int>();
                 var talkIdsList = new List<int>();
 
                 foreach (string sprite in testNpcIdleSprites)
                 {
-                    idleIdsList.Add(SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/Npcs/Test/" + sprite, collection));
+                    idleIdsList.Add(SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/Npcs/Beyond/" + sprite, collection));
                 }
 
                 foreach (string sprite in testNpcTalkSprites)
                 {
-                    talkIdsList.Add(SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/Npcs/Test/" + sprite, collection));
+                    talkIdsList.Add(SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/Npcs/Beyond/" + sprite, collection));
                 }
 
 
@@ -55,19 +80,14 @@ namespace BotsMod.NPCs
 
                 tk2dSpriteAnimator spriteAnimator = npcObj.AddComponent<tk2dSpriteAnimator>();
 
-                SpriteBuilder.AddAnimation(spriteAnimator, collection, idleIdsList, "test_npc_idle", tk2dSpriteAnimationClip.WrapMode.Loop);
-                SpriteBuilder.AddAnimation(spriteAnimator, collection, talkIdsList, "test_npc_talk", tk2dSpriteAnimationClip.WrapMode.Loop);
+                SpriteBuilder.AddAnimation(spriteAnimator, collection, idleIdsList, "beyond_npc_idle", tk2dSpriteAnimationClip.WrapMode.Loop, 6);
+                SpriteBuilder.AddAnimation(spriteAnimator, collection, talkIdsList, "beyond_npc_talk", tk2dSpriteAnimationClip.WrapMode.LoopSection, 8).loopStart = 3;
 
                 SpeculativeRigidbody rigidbody = Tools.GenerateOrAddToRigidBody(npcObj, CollisionLayer.BulletBlocker, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
 
                 BotsModule.Log("rigidbody done");
 
-                var talkPoint = new GameObject("TalkPoint").GetComponent<Transform>();
-
-                talkPoint.localPosition = new Vector3(0.6875f, 2.0625f, 0);
-                talkPoint.parent = npcObj.transform;
-
-                UnityEngine.Object.DontDestroyOnLoad(talkPoint);
+               
 
                 BotsModule.Log("talkPoint done");
 
@@ -83,7 +103,7 @@ namespace BotsMod.NPCs
                 talkDoer.overrideInteractionRadius = -1;
                 talkDoer.PreventInteraction = false;
                 talkDoer.AllowPlayerToPassEventually = true;
-                talkDoer.speakPoint = talkPoint;
+                talkDoer.speakPoint = SpeechPoint.transform;
                 talkDoer.SpeaksGleepGlorpenese = false;
                 talkDoer.audioCharacterSpeechTag = "oldman";
                 talkDoer.playerApproachRadius = 5;
@@ -100,7 +120,7 @@ namespace BotsMod.NPCs
 
                 BotsModule.Log("TalkDoerLite done");
 
-                /*UltraFortunesFavor dreamLuck = npcObj.AddComponent<UltraFortunesFavor>();
+                UltraFortunesFavor dreamLuck = npcObj.AddComponent<UltraFortunesFavor>();
 
                 dreamLuck.goopRadius = 2;
                 dreamLuck.beamRadius = 2;
@@ -109,7 +129,7 @@ namespace BotsMod.NPCs
 
                 dreamLuck.vfxOffset = 0.625f;
                 dreamLuck.sparkOctantVFX = Tools.shared_auto_001.LoadAsset<GameObject>("FortuneFavor_VFX_Spark");
-                */
+                
                 BotsModule.Log("UltraFortunesFavor done");
 
 
@@ -117,212 +137,122 @@ namespace BotsMod.NPCs
                 aIAnimator.IdleAnimation = new DirectionalAnimation
                 {
                     Type = DirectionalAnimation.DirectionType.Single,
-                    Prefix = "test_npc_idle",
+                    Prefix = "beyond_npc_idle",
                     AnimNames = new string[]
                     {
-                                ""
+                        ""
                     },
                     Flipped = new DirectionalAnimation.FlipType[]
                     {
-                                DirectionalAnimation.FlipType.None
+                        DirectionalAnimation.FlipType.None
                     }
-
+                    
                 };
 
-                aIAnimator.OtherAnimations.Add(new AIAnimator.NamedDirectionalAnimation
+                aIAnimator.TalkAnimation = new DirectionalAnimation
                 {
-                    name = "talk",
-                    anim = new DirectionalAnimation
+                    Type = DirectionalAnimation.DirectionType.Single,
+                    Prefix = "beyond_npc_talk",
+                    AnimNames = new string[]
                     {
-                        Type = DirectionalAnimation.DirectionType.Single,
-                        Prefix = "test_npc_talk",
-                        AnimNames = new string[]
-                        {
-                                    ""
-                        },
-                        Flipped = new DirectionalAnimation.FlipType[]
-                        {
-                                    DirectionalAnimation.FlipType.None
-                        }
+                        ""
+                    },
+                    Flipped = new DirectionalAnimation.FlipType[]
+                    {
+                        DirectionalAnimation.FlipType.None
                     }
-                });
+                };
+
+                //PlayMakerFSM iHaveNoFuckingClueWhatThisIs = npcObj.AddComponent<PlayMakerFSM>();
+
+
+                var basenpc = ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<GameObject>("Merchant_Key").transform.Find("NPC_Key").gameObject;
+                if (basenpc == null)
+                {
+                    BotsModule.Log("fuck shit fuck fuck shit");
+                }
 
                 PlayMakerFSM iHaveNoFuckingClueWhatThisIs = npcObj.AddComponent<PlayMakerFSM>();
-                /*iHaveNoFuckingClueWhatThisIs.Fsm.Name = "Main";
-                iHaveNoFuckingClueWhatThisIs.Fsm.StartState = "Idle";
-                iHaveNoFuckingClueWhatThisIs.Fsm.DataVersion = 1;
-                iHaveNoFuckingClueWhatThisIs.Fsm.States = new FsmState[]
-                {
-                    new FsmState(iHaveNoFuckingClueWhatThisIs.Fsm)
-                    {
-                        Name = "Idle",
-                        Description = "",
-                        ColorIndex = 1,
-                        IsBreakpoint = false,
-                        IsSequence = false,
-                        HideUnused = false,
-                        Transitions = new FsmTransition[]
-                        {
-                            new FsmTransition
-                            {
-                                FsmEvent = new FsmEvent("playerInteract")
-                                {
-                                    IsGlobal = true,
-                                    IsSystemEvent = false,
-                                },
-                                ToState = "Bool Tests",
-                                LinkStyle = FsmTransition.CustomLinkStyle.Default,
-                                LinkConstraint = FsmTransition.CustomLinkConstraint.None,
-                                ColorIndex = 0,
 
-                            },
-
-                        },
+                UnityEngine.JsonUtility.FromJsonOverwrite(UnityEngine.JsonUtility.ToJson(basenpc.GetComponent<PlayMakerFSM>()), iHaveNoFuckingClueWhatThisIs);
 
 
-                    }
-                };*/
+                FieldInfo fsmStringParams = typeof(ActionData).GetField("fsmStringParams", BindingFlags.NonPublic | BindingFlags.Instance);
 
-                UnityEngine.JsonUtility.FromJsonOverwrite(File.ReadAllText(ETGMod.ResourcesDirectory + "/EnterTheBeyond/fuckingdie.txt"), iHaveNoFuckingClueWhatThisIs);
-                //iHaveNoFuckingClueWhatThisIs.Fsm.Init(iHaveNoFuckingClueWhatThisIs);
-                //   iHaveNoFuckingClueWhatThisIs
-                GungeonAPI.FakePrefab.MarkAsFakePrefab(npcObj);
+                (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[1].ActionData) as List<FsmString>)[0].Value = "#BEYOND_RUNBASEDMULTILINE_GENERIC";
+                (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[1].ActionData) as List<FsmString>)[1].Value = "#BEYOND_RUNBASEDMULTILINE_STOPPER";
+
+                (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[4].ActionData) as List<FsmString>)[0].Value = "#BEYOND_SHOP_PURCHASED";
+
+                (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[5].ActionData) as List<FsmString>)[0].Value = "#BEYOND_PURCHASE_FAILED";
+
+                (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[7].ActionData) as List<FsmString>)[0].Value = "#BEYOND_INTRO";
+
+                (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[8].ActionData) as List<FsmString>)[0].Value = "#BEYOND_TAKEPLAYERDAMAGE";
+
+                (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[9].ActionData) as List<FsmString>)[0].Value = "#SUBSHOP_GENERIC_CAUGHT_STEALING";
+
+                (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[10].ActionData) as List<FsmString>)[0].Value = "#SHOP_GENERIC_NO_SALE_LABEL";
+
+                (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[12].ActionData) as List<FsmString>)[0].Value = "#COOP_REBUKE";
+
+
+                ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_RUNBASEDMULTILINE_GENERIC", "You are not one of us free of the masters control...");
+                ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_RUNBASEDMULTILINE_GENERIC", "more words");
+                ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_RUNBASEDMULTILINE_GENERIC", "even more words");
+                ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_RUNBASEDMULTILINE_GENERIC", "to many words");
+
+                ETGMod.Databases.Strings.Core.Set("#BEYOND_RUNBASEDMULTILINE_STOPPER", "Enough talk");
+
+                ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_SHOP_PURCHASED", "Yes yes good good");
+                ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_SHOP_PURCHASED", "Enjoy this one");
+
+                ETGMod.Databases.Strings.Core.Set("#BEYOND_PURCHASE_FAILED", "To weak come back when you're in better condition");
+
+                ETGMod.Databases.Strings.Core.Set("#BEYOND_INTRO", "Welcome...");
+
+                ETGMod.Databases.Strings.Core.Set("#BEYOND_TAKEPLAYERDAMAGE", "The master's fury will not be kind to you!");
+
+
+
+                npcObj.name = "Bot:Test_Npc";
+                
+                FakePrefab.MarkAsFakePrefab(npcObj);
                 UnityEngine.Object.DontDestroyOnLoad(npcObj);
-                npcObj.SetActive(true);
+                npcObj.SetActive(true);                
 
-                BotsModule.Log("npc set up now moving to shop but just like the loot table");
-
-                ETGMod.Databases.Strings.Core.Set("#TEST_NPC_CRY", "*cry*");
-                ETGMod.Databases.Strings.Core.Set("#TEST_NPC_BAD", "bad lol");
-                ETGMod.Databases.Strings.Core.Set("#TEST_NPC_FUCK_YOU_RESPONCE", "FUCK YOU >:(");
-                ETGMod.Databases.Strings.Core.Set("#TEST_NPC_YES", "yes...");
-                ETGMod.Databases.Strings.Core.Set("#TEST_NPC_GET_GOOD", "get good kid");
-
-
-
-                ETGMod.Databases.Strings.Core.Set("#TESTNPC_IDFK", "Hello there mode begin 1 has triggered... i have no fucking clue what that means.");
-                ETGMod.Databases.Strings.Core.Set("#TESTNPC_IDFK2", "Hello there mode begin 2 has triggered... i have no fucking clue what that means.");
-
-                ETGMod.Databases.Strings.Core.Set("#TESTNPC_CAUGHT_STEALING", "THIS TEXT SHOULD NEVER BE DISPLAYED AS STEALING FROM THIS SHOP SHOULD NOT WORK!!");
-                ETGMod.Databases.Strings.Core.Set("#TESTNPC_OUCH", "Ouch");
-
-                ETGMod.Databases.Strings.Core.Set("#TESTNPC_SELL_SOUL", "Good choice indeed...");
-                ETGMod.Databases.Strings.Core.Set("#TESTNPC_FAIL_TO_SELL_SOUL", "Nope!");
-
-                ETGMod.Databases.Strings.Core.Set("#TESTNPC_TELL_CULTIST_TO_FUCK_OFF", "You're not old enough to sell your soul.");
-
-                ETGMod.Databases.Strings.Core.Set("#TESTNPC_Greet", "Welcome, please sell me your soul.");
-
-                var devilLootTable = ScriptableObject.CreateInstance<GenericLootTable>();
-                devilLootTable.defaultItemDrops = new WeightedGameObjectCollection()
+                var devilLootTable = LootTableAPI.LootTableTools.CreateLootTable();
+                foreach(var item in Tools.BeyondItems)
                 {
-                    elements = new List<WeightedGameObject>()
-                    {
-                        new WeightedGameObject()
-                        {
-                          additionalPrerequisites = new DungeonPrerequisite[0],
-                          forceDuplicatesPossible = true,
-                          pickupId = 60,
-                          rawGameObject = null,
-                          weight = 1
-                        },
-                        new WeightedGameObject()
-                        {
-                          additionalPrerequisites = new DungeonPrerequisite[0],
-                          forceDuplicatesPossible = true,
-                          pickupId = 125,
-                          rawGameObject = null,
-                          weight = 1
-                        },
-                        new WeightedGameObject()
-                        {
-                          additionalPrerequisites = new DungeonPrerequisite[0],
-                          forceDuplicatesPossible = true,
-                          pickupId = 434,
-                          rawGameObject = null,
-                          weight = 1
-                        },
-                        new WeightedGameObject()
-                        {
-                          additionalPrerequisites = new DungeonPrerequisite[0],
-                          forceDuplicatesPossible = true,
-                          pickupId = 271,
-                          rawGameObject = null,
-                          weight = 1
-                        },
-                        new WeightedGameObject()
-                        {
-                          additionalPrerequisites = new DungeonPrerequisite[0],
-                          forceDuplicatesPossible = true,
-                          pickupId = 571,
-                          rawGameObject = null,
-                          weight = 1
-                        },
-                        new WeightedGameObject()
-                        {
-                          additionalPrerequisites = new DungeonPrerequisite[0],
-                          forceDuplicatesPossible = true,
-                          pickupId = 33,
-                          rawGameObject = null,
-                          weight = 1
-                        },
-                        new WeightedGameObject()
-                        {
-                          additionalPrerequisites = new DungeonPrerequisite[0],
-                          forceDuplicatesPossible = true,
-                          pickupId = 17,
-                          rawGameObject = null,
-                          weight = 1
-                        },
-                        new WeightedGameObject()
-                        {
-                          additionalPrerequisites = new DungeonPrerequisite[0],
-                          forceDuplicatesPossible = true,
-                          pickupId = 347,
-                          rawGameObject = null,
-                          weight = 1
-                        },
-                        new WeightedGameObject()
-                        {
-                          additionalPrerequisites = new DungeonPrerequisite[0],
-                          forceDuplicatesPossible = true,
-                          pickupId = 90,
-                          rawGameObject = null,
-                          weight = 1                       
-                        },
-                        new WeightedGameObject()
-                        {
-                          additionalPrerequisites = new DungeonPrerequisite[0],
-                          forceDuplicatesPossible = true,
-                          pickupId = 336,
-                          rawGameObject = null,
-                          weight = 1
-                        },
-                        new WeightedGameObject()
-                        {
-                          additionalPrerequisites = new DungeonPrerequisite[0],
-                          forceDuplicatesPossible = true,
-                          pickupId = 285,
-                          rawGameObject = null,
-                          weight = 1
-                        },
-                    }
-                };
-                devilLootTable.includedLootTables = new List<GenericLootTable>();
-                devilLootTable.tablePrerequisites = new DungeonPrerequisite[0];
-
-
-                //var devilLootTable = UnityEngine.Object.Instantiate(Tools.shared_auto_001.LoadAsset<GenericLootTable>("Shop_Key_Items_01"));
+                    devilLootTable.AddItemToPool(item);
+                }
+                
                
 
+                //var devilLootTable = UnityEngine.Object.Instantiate(Tools.shared_auto_001.LoadAsset<GenericLootTable>("Shop_Key_Items_01"));
 
+                var ItemPoint1 = new GameObject("ItemPoint1");
+                ItemPoint1.transform.position = new Vector3(1.125f, 2.125f, 1);
+                FakePrefab.MarkAsFakePrefab(ItemPoint1);
+                UnityEngine.Object.DontDestroyOnLoad(ItemPoint1);
+                ItemPoint1.SetActive(true);
+                var ItemPoint2 = new GameObject("ItemPoint2");
+                ItemPoint2.transform.position = new Vector3(2.625f, 1f, 1);
+                FakePrefab.MarkAsFakePrefab(ItemPoint2);
+                UnityEngine.Object.DontDestroyOnLoad(ItemPoint2);
+                ItemPoint2.SetActive(true);
+                var ItemPoint3 = new GameObject("ItemPoint3");
+                ItemPoint3.transform.position = new Vector3(4.125f, 2.125f, 1);
+                FakePrefab.MarkAsFakePrefab(ItemPoint3);
+                UnityEngine.Object.DontDestroyOnLoad(ItemPoint3);
+                ItemPoint3.SetActive(true);
                 //var npc = UnityEngine.Object.Instantiate(npcObj, GameManager.Instance.PrimaryPlayer.gameObject.transform.position, Quaternion.identity);
                 //GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(npc.GetComponent<TalkDoerLite>());
 
                 BotsModule.Log("npc set up now moving to shop");
 
                 var shopObj = new GameObject("Test_Npc_Shop").AddComponent<BaseShopController>();
-                GungeonAPI.FakePrefab.MarkAsFakePrefab(shopObj.gameObject);
+                FakePrefab.MarkAsFakePrefab(shopObj.gameObject);
                 UnityEngine.Object.DontDestroyOnLoad(shopObj.gameObject);
 
                 shopObj.gameObject.SetActive(false);
@@ -331,12 +261,12 @@ namespace BotsMod.NPCs
                 shopObj.placeableWidth = 5;
                 shopObj.difficulty = 0;
                 shopObj.isPassable = true;
-                shopObj.baseShopType = BaseShopController.AdditionalShopType.NONE;
+                shopObj.baseShopType = (BaseShopController.AdditionalShopType)CustomEnums.CustomAdditionalShopType.DEVIL_DEAL;
                 shopObj.FoyerMetaShopForcedTiers = false;
                 shopObj.IsBeetleMerchant = false;
                 shopObj.ExampleBlueprintPrefab = null;
                 shopObj.shopItems = devilLootTable;
-                shopObj.spawnPositions = Tools.shared_auto_001.LoadAsset<GameObject>("Merchant_Key").GetComponent<BaseShopController>().spawnPositions;
+                shopObj.spawnPositions = new Transform[] { ItemPoint1.transform, ItemPoint2.transform, ItemPoint3.transform };
 
                 foreach (var pos in shopObj.spawnPositions) 
                 {
@@ -351,11 +281,26 @@ namespace BotsMod.NPCs
                 shopObj.shopkeepFSM = npcObj.GetComponent<PlayMakerFSM>();
                 shopObj.shopItemShadowPrefab = Tools.shared_auto_001.LoadAsset<GameObject>("Merchant_Key").GetComponent<BaseShopController>().shopItemShadowPrefab;
                 shopObj.cat = null;
-                shopObj.OptionalMinimapIcon = null;
+                shopObj.OptionalMinimapIcon = SpriteBuilder.SpriteFromResource("BotsMod/sprites/Npcs/mapiconshop");
                 shopObj.ShopCostModifier = 1;
                 shopObj.FlagToSetOnEncounter = GungeonFlags.NONE;
 
+                shopObj.gameObject.AddComponent<DevilDealShopHelper>();
+
+
+                
+
                 npcObj.transform.parent = shopObj.gameObject.transform;
+                npcObj.transform.position = new Vector3(1.9375f, 3.4375f, 5.9375f);
+
+                var carpetObj = SpriteBuilder.SpriteFromResource("BotsMod/sprites/Npcs/beyond_merch_carpet_001.png", new GameObject("Bot:Test_Npc_Carpet"));
+                carpetObj.GetComponent<tk2dSprite>().SortingOrder = 2;
+                FakePrefab.MarkAsFakePrefab(carpetObj);
+                UnityEngine.Object.DontDestroyOnLoad(carpetObj);
+                carpetObj.SetActive(true);
+
+                carpetObj.transform.parent = shopObj.gameObject.transform;
+                carpetObj.layer = 20;
 
 
                 BotsModule.shop = shopObj;
@@ -363,6 +308,7 @@ namespace BotsMod.NPCs
                 //DungeonPlaceableUtility.InstantiateDungeonPlaceable(shopObj.gameObject, GameManager.Instance.PrimaryPlayer.CurrentRoom, new IntVector2((int)GameManager.Instance.PrimaryPlayer.gameObject.transform.position.x, (int)GameManager.Instance.PrimaryPlayer.gameObject.transform.position.y), false);
                 //UnityEngine.Object.Instantiate(shopObj, , Quaternion.identity).GetComponent<BaseShopController>().ConfigureOnPlacement();
                 //shopObj.baseShopType = (BaseShopController.AdditionalShopType)CustomEnums.CustomAdditionalShopType.DEVIL_DEAL;
+                BotsModule.Log("all done :D");
             }
             catch (Exception message)
             {

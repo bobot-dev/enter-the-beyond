@@ -52,6 +52,8 @@ namespace BotsMod
 			//prefab = CompanionBuilder.BuildPrefab("mistake", guid, "BotsMod/sprites/Pets/mistake/Idle_front/mistake_pet_idle_001", new IntVector2(1, 0), new IntVector2(9, 9));
 			prefab = CompanionBuilder.BuildPrefab("roomba", guid, "BotsMod/sprites/Roomba/roomba_idle_N_001", new IntVector2(1, 0), new IntVector2(9, 9));
 
+			//prefab.AddComponent<HitEffectHandler>();
+
 			//Add a companion component to the prefab (could be a custom class)
 			var companion = prefab.AddComponent<RoombaBehaviors>();
 			companion.aiActor.MovementSpeed = 6f;
@@ -222,7 +224,7 @@ namespace BotsMod
 
 		}
 
-		// Token: 0x060001B4 RID: 436 RVA: 0x00010334 File Offset: 0x0000E534
+		
 
 	}
 

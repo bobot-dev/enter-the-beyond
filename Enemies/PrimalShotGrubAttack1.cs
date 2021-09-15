@@ -49,7 +49,7 @@ namespace LostItems
 
 			public class BurstingBullet : Bullet
 			{
-				// Token: 0x060006C0 RID: 1728 RVA: 0x0001F513 File Offset: 0x0001D713
+				
 				public BurstingBullet(bool isBlackPhantom) : base("bigBullet", false, false, false)
 				{
 					//this.deltaAngle = deltaAngle;

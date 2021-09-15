@@ -1,6 +1,7 @@
 ﻿using BotsMod;
 using Gungeon;
 using GungeonAPI;
+using ItemAPI;
 using System;
 using UnityEngine;
 
@@ -73,7 +74,7 @@ public class ZenithGun : GunBehaviour
             pierceProjModifier.penetration = int.MaxValue;
         }
         projectile.IgnoreTileCollisionsFor(10f);
-        projectile.OverrideMotionModule = new ZenithProjectile(ResourceExtractor.GetTextureFromResource("ExampleMod/Resources/Other/squaregrad.png"));
+        projectile.OverrideMotionModule = new ZenithProjectile(GungeonAPI.ResourceExtractor.GetTextureFromResource("ExampleMod/Resources/Other/squaregrad.png"));
 
         var rot = projectile.Owner.FacingDirection + 180f;
         projectile.transform.eulerAngles = new Vector3(0f, 0f, rot);

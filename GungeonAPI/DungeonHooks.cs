@@ -1,182 +1,89 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Diagnostics;
 using System.Reflection;
-using UnityEngine;
 using Dungeonator;
 using MonoMod.RuntimeDetour;
 
 
 namespace GungeonAPI
 {
-    public static class DungeonHooks
-    {
-        public static event Action<LoopDungeonGenerator, Dungeon, DungeonFlow, int> OnPreDungeonGeneration;
-        public static event Action OnPostDungeonGeneration, OnFoyerAwake;
-        private static GameManager targetInstance;
-        public static FieldInfo m_assignedFlow =
-            typeof(LoopDungeonGenerator).GetField("m_assignedFlow", BindingFlags.Instance | BindingFlags.NonPublic);
+	// Token: 0x02000004 RID: 4
+	public static class DungeonHooks
+	{
+		// Token: 0x14000001 RID: 1
+		// (add) Token: 0x06000017 RID: 23 RVA: 0x00002F10 File Offset: 0x00001110
+		// (remove) Token: 0x06000018 RID: 24 RVA: 0x00002F44 File Offset: 0x00001144
+		//[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public static event Action<LoopDungeonGenerator, Dungeon, DungeonFlow, int> OnPreDungeonGeneration;
 
-        private static Hook preDungeonGenHook = new Hook(
-           typeof(LoopDungeonGenerator).GetConstructor(new Type[] { typeof(Dungeon), typeof(int) }),
-           typeof(DungeonHooks).GetMethod("LoopGenConstructor")
-        );
+		// Token: 0x14000002 RID: 2
+		// (add) Token: 0x06000019 RID: 25 RVA: 0x00002F78 File Offset: 0x00001178
+		// (remove) Token: 0x0600001A RID: 26 RVA: 0x00002FAC File Offset: 0x000011AC
+		//[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public static event Action OnPostDungeonGeneration;
 
-        private static Hook foyerAwakeHook = new Hook(
-            typeof(MainMenuFoyerController).GetMethod("Awake", BindingFlags.NonPublic | BindingFlags.Instance),
-            typeof(DungeonHooks).GetMethod("FoyerAwake") //this no longer exists
-        );
+		// Token: 0x14000003 RID: 3
+		// (add) Token: 0x0600001B RID: 27 RVA: 0x00002FE0 File Offset: 0x000011E0
+		// (remove) Token: 0x0600001C RID: 28 RVA: 0x00003014 File Offset: 0x00001214
+		//[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public static event Action OnFoyerAwake;
 
-        //private static Hook roomEventsHook = new Hook(
-        //    typeof(RoomHandler).GetMethod("ProcessRoomEvents", BindingFlags.Instance | BindingFlags.NonPublic),
-        //    typeof(DungeonHooks).GetMethod("ProcessRoomEvents")
-        //);
+		// Token: 0x0600001D RID: 29 RVA: 0x00003047 File Offset: 0x00001247
+		public static void FoyerAwake(Action<MainMenuFoyerController> orig, MainMenuFoyerController self)
+		{
+			orig(self);
+			Action onFoyerAwake = DungeonHooks.OnFoyerAwake;
+			if (onFoyerAwake != null)
+			{
+				onFoyerAwake();
+			}
+		}
 
-        //private static Hook flowHook = new Hook(
-        //    typeof(DungeonFlow).GetMethod("NewGetNodeChildrenToBuild", BindingFlags.Instance | BindingFlags.Public),
-        //    typeof(DungeonHooks).GetMethod("NewGetNodeChildrenToBuild")
-        //);
+		// Token: 0x0600001E RID: 30 RVA: 0x00003064 File Offset: 0x00001264
+		public static void LoopGenConstructor(Action<LoopDungeonGenerator, Dungeon, int> orig, LoopDungeonGenerator self, Dungeon dungeon, int dungeonSeed)
+		{
+			Tools.Print<string>("-Loop Gen Called-", "5599FF", false);
+			orig(self, dungeon, dungeonSeed);
+			bool flag = GameManager.Instance != null && GameManager.Instance != DungeonHooks.targetInstance;
+			if (flag)
+			{
+				DungeonHooks.targetInstance = GameManager.Instance;
+				DungeonHooks.targetInstance.OnNewLevelFullyLoaded += DungeonHooks.OnLevelLoad;
+			}
+			DungeonFlow arg = (DungeonFlow)DungeonHooks.m_assignedFlow.GetValue(self);
+			Action<LoopDungeonGenerator, Dungeon, DungeonFlow, int> onPreDungeonGeneration = DungeonHooks.OnPreDungeonGeneration;
+			if (onPreDungeonGeneration != null)
+			{
+				onPreDungeonGeneration(self, dungeon, arg, dungeonSeed);
+			}
+			dungeon = null;
+		}
 
-        //private static Hook acquirePrototypeRoomHook = new Hook(
-        //    typeof(LoopFlowBuilder).GetMethod("AcquirePrototypeRoom", BindingFlags.Instance | BindingFlags.NonPublic),
-        //    typeof(DungeonHooks).GetMethod("AcquirePrototypeRoom")
-        //);
+		// Token: 0x0600001F RID: 31 RVA: 0x000030FC File Offset: 0x000012FC
+		public static void OnLevelLoad()
+		{
+			Tools.Print<string>("-Post Gen Called-", "5599FF", false);
+			Action onPostDungeonGeneration = DungeonHooks.OnPostDungeonGeneration;
+			if (onPostDungeonGeneration != null)
+			{
+				onPostDungeonGeneration();
+			}
+		}
 
-        //private static Hook processSingleNodeInjectionHook = new Hook(
-        //    typeof(LoopFlowBuilder).GetMethod("ProcessSingleNodeInjection", BindingFlags.Instance | BindingFlags.NonPublic),
-        //    typeof(DungeonHooks).GetMethod("ProcessSingleNodeInjection")
-        //);
+		// Token: 0x0400000A RID: 10
+		private static GameManager targetInstance;
 
-        //private static Hook sanityCheckRoomsHook = new Hook(
-        //    typeof(LoopFlowBuilder).GetMethod("SanityCheckRooms", BindingFlags.Instance | BindingFlags.NonPublic),
-        //    typeof(DungeonHooks).GetMethod("SanityCheckRooms")
-        //);
+		// Token: 0x0400000B RID: 11
+		public static FieldInfo m_assignedFlow = typeof(LoopDungeonGenerator).GetField("m_assignedFlow", BindingFlags.Instance | BindingFlags.NonPublic);
 
-        //private static Hook roomTableHook = new Hook(
-        //    typeof(WeightedRoomCollection).GetMethod("SelectByWeight", BindingFlags.Instance | BindingFlags.Public),
-        //    typeof(DungeonHooks).GetMethod("SelectByWeight")
-        //);
+		// Token: 0x0400000C RID: 12
+		private static Hook preDungeonGenHook = new Hook(typeof(LoopDungeonGenerator).GetConstructor(new Type[]
+		{
+			typeof(Dungeon),
+			typeof(int)
+		}), typeof(DungeonHooks).GetMethod("LoopGenConstructor"));
 
-        public static void FoyerAwake(Action<MainMenuFoyerController> orig, MainMenuFoyerController self)
-        {
-            orig(self);
-            OnFoyerAwake?.Invoke();
-        }
-
-        public static void LoopGenConstructor(Action<LoopDungeonGenerator, Dungeon, int> orig, LoopDungeonGenerator self, Dungeon dungeon, int dungeonSeed)
-        {
-            ToolsGAPI.Print("-Loop Gen Called-", "5599FF");
-            orig(self, dungeon, dungeonSeed);
-
-            if (GameManager.Instance != null && GameManager.Instance != targetInstance)
-            {
-                targetInstance = GameManager.Instance;
-                targetInstance.OnNewLevelFullyLoaded += OnLevelLoad;
-            }
-
-            var flow = (DungeonFlow)m_assignedFlow.GetValue(self);
-            OnPreDungeonGeneration?.Invoke(self, dungeon, flow, dungeonSeed);
-            dungeon = null;
-        }
-
-        public static void OnLevelLoad()
-        {
-            ToolsGAPI.Print("-Post Gen Called-", "5599FF");
-            OnPostDungeonGeneration?.Invoke();
-        }
-
-        public static void ProcessRoomEvents(Action<RoomHandler, RoomEventTriggerCondition> orig, RoomHandler self, RoomEventTriggerCondition eventCondition)
-        {
-            orig(self, eventCondition);
-        }
-
-        public static List<WeightedRoomCollection> seenTables = new List<WeightedRoomCollection>();
-        public static WeightedRoom SelectByWeight(Func<WeightedRoomCollection, WeightedRoom> orig, WeightedRoomCollection self)
-        {
-            try
-            {
-                if (!seenTables.Contains(self))
-                {
-                    //ToolsGAPI.Log(self.name, "RoomTables/" + self.name + ".txt");
-                    foreach (var wroom in self.elements)
-                    {
-                        ToolsGAPI.Log(wroom.room.name, "RoomTables/" + seenTables.Count + ".txt");
-                    }
-                    seenTables.Add(self);
-                }
-            }catch(Exception e)
-            {
-                ToolsGAPI.PrintException(e);
-            }
-            return orig(self);
-        }
-
-        public static void AcquirePrototypeRoom(Action<LoopFlowBuilder, BuilderFlowNode> orig, LoopFlowBuilder self, BuilderFlowNode buildData)
-        {
-            orig(self, buildData);
-            if (buildData.assignedPrototypeRoom)
-                if (buildData.assignedPrototypeRoom.category != PrototypeDungeonRoom.RoomCategory.NORMAL)
-                    ToolsGAPI.LogPropertiesAndFields(buildData.assignedPrototypeRoom, "\n" + buildData.assignedPrototypeRoom.name);
-                else
-                    ToolsGAPI.Log("======================= NULL =======================\n");
-        }
-
-
-        public static void SanityCheckRooms(Action<LoopFlowBuilder, SemioticLayoutManager> orig, LoopFlowBuilder self, SemioticLayoutManager layout)
-        {
-            orig(self, layout);
-
-            FieldInfo m_allBuilderNodes = typeof(LoopFlowBuilder).GetField("allBuilderNodes", BindingFlags.Instance | BindingFlags.NonPublic);
-            var allBuilderNodes = (List<BuilderFlowNode>)m_allBuilderNodes.GetValue(self);
-            for (int j = 0; j < allBuilderNodes.Count; j++)
-            {
-                BuilderFlowNode builderFlowNode = allBuilderNodes[j];
-                if (builderFlowNode != null && builderFlowNode.assignedPrototypeRoom)
-                {
-                    string name = builderFlowNode.assignedPrototypeRoom.name.ToLower();
-                    if (name.Contains("shrine") || name.Contains("glass"))
-                    {
-                        ToolsGAPI.LogPropertiesAndFields(builderFlowNode, "Builder Flow Node");
-                        ToolsGAPI.LogPropertiesAndFields(builderFlowNode.assignedPrototypeRoom, "Proto Room");
-                        ToolsGAPI.LogPropertiesAndFields(builderFlowNode.assignedPrototypeRoom.requiredInjectionData, "InjectionData");
-                    }
-                }
-            }
-        }
-
-        public delegate TResult Func<in T1, in T2, in T3, in T4, in T5, in T6, out TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
-        public static bool ProcessSingleNodeInjection(Func<LoopFlowBuilder, ProceduralFlowModifierData, BuilderFlowNode, RuntimeInjectionFlags, FlowCompositeMetastructure, RuntimeInjectionMetadata, bool> orig,
-            LoopFlowBuilder self, ProceduralFlowModifierData pfmd, BuilderFlowNode root, RuntimeInjectionFlags flags, FlowCompositeMetastructure fcm, RuntimeInjectionMetadata rim = null)
-        {
-            //ToolsGAPI.LogPropertiesAndFields(pfmd);
-            //if (pfmd.exactRoom)
-            //    ToolsGAPI.Log("Exact Room: "+pfmd.exactRoom.name);
-            //if (pfmd.exactSecondaryRoom)
-            //    ToolsGAPI.Log("Exact Secondary Room: " + pfmd.exactSecondaryRoom.name);
-            //if (pfmd.roomTable)
-            //    ToolsGAPI.Log("Room Table: " + pfmd.roomTable.name);
-
-            return orig(self, pfmd, root, flags, fcm, rim);
-        }
-
-        public static List<BuilderFlowNode> NewGetNodeChildrenToBuild(Func<DungeonFlow, BuilderFlowNode, LoopFlowBuilder, List<BuilderFlowNode>> orig, DungeonFlow self, BuilderFlowNode parentBuilderNode, LoopFlowBuilder builder)
-        {
-            var list = orig(self, parentBuilderNode, builder);
-            try
-            {
-                foreach (var node in list)
-                {
-
-                }
-            }
-            catch (Exception e)
-            {
-                ToolsGAPI.PrintException(e);
-            }
-
-
-            return list;
-        }
-    }
+		// Token: 0x0400000D RID: 13
+		private static Hook foyerAwakeHook = new Hook(typeof(MainMenuFoyerController).GetMethod("Awake", BindingFlags.Instance | BindingFlags.NonPublic), typeof(DungeonHooks).GetMethod("FoyerAwake"));
+	}
 }

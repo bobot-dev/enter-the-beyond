@@ -72,94 +72,60 @@ namespace BotsMod
 			gun.gunClass = GunClass.BEAM;
 			gun.CanBeDropped = true;
 			gun.PreventStartingOwnerFromDropping = true;
-			Projectile projectile = UnityEngine.Object.Instantiate<Projectile>(other.DefaultModule.projectiles[0]);
-			
-			projectile.gameObject.SetActive(false);
-			ItemAPI.FakePrefab.MarkAsFakePrefab(projectile.gameObject);
-			UnityEngine.Object.DontDestroyOnLoad(projectile);
-			
+
+
 			List<string> BeamAnimPaths = new List<string>()
 			{
-				"BotsMod/sprites/beam/beam_middle_001",
-				"BotsMod/sprites/beam/beam_middle_002",
-				"BotsMod/sprites/beam/beam_middle_003",
-				"BotsMod/sprites/beam/beam_middle_004",
-				"BotsMod/sprites/beam/beam_middle_005",
-				"BotsMod/sprites/beam/beam_middle_006",
-				"BotsMod/sprites/beam/beam_middle_007",
-				"BotsMod/sprites/beam/beam_middle_008",
+				"BotsMod/sprites/beam/OtherWorldlyFury/otherworldly_fury_beam_middle_001",
+				"BotsMod/sprites/beam/OtherWorldlyFury/otherworldly_fury_beam_middle_002",
+				"BotsMod/sprites/beam/OtherWorldlyFury/otherworldly_fury_beam_middle_003",
 
 			};
 			List<string> ImpactAnimPaths = new List<string>()
 			{
-				"BotsMod/sprites/beam/beam_end_001",
-				"BotsMod/sprites/beam/beam_end_002",
-				"BotsMod/sprites/beam/beam_end_003",
-				"BotsMod/sprites/beam/beam_end_004",
+				"BotsMod/sprites/beam/OtherWorldlyFury/otherworldly_fury_beam_impact_001",
+				"BotsMod/sprites/beam/OtherWorldlyFury/otherworldly_fury_beam_impact_002",
+				"BotsMod/sprites/beam/OtherWorldlyFury/otherworldly_fury_beam_impact_003",
+				"BotsMod/sprites/beam/OtherWorldlyFury/otherworldly_fury_beam_impact_004",
 			};
 
 			Projectile projectile4 = UnityEngine.Object.Instantiate<Projectile>((PickupObjectDatabase.GetById(86) as Gun).DefaultModule.projectiles[0]);
-			BasicBeamController beamComp = projectile4.GenerateBeamPrefab("BotsMod/sprites/beam/beam_middle_001", new Vector2(16, 9), new Vector2(0, 0), BeamAnimPaths, 8, ImpactAnimPaths, 13, new Vector2(0, 0), new Vector2(0, 0));
+			//moonraker bloom material
+			BasicBeamController beamComp = projectile4.GenerateBeamPrefab("BotsMod/sprites/beam/OtherWorldlyFury/otherworldly_fury_beam_middle_001",
+				new Vector2(32, 5),
+				new Vector2(0, 2),
+				BeamAnimPaths, 8,
+				ImpactAnimPaths, 13,
+				new Vector2(0, 0),
+				new Vector2(0, 0),
+				glows: true
+				);
 			projectile4.gameObject.SetActive(false);
-			projectile4.baseData.damage *= 4;
-			projectile4.baseData.range *= 2;
-			projectile.baseData.speed *= 40;
-			ItemAPI.FakePrefab.MarkAsFakePrefab(projectile4.gameObject);
+			FakePrefab.MarkAsFakePrefab(projectile4.gameObject);
 			UnityEngine.Object.DontDestroyOnLoad(projectile4);
-			beamComp.interpolateStretchedBones = false;
-			beamComp.ContinueBeamArtToWall = true;
+			projectile4.baseData.damage = 10f;
+			projectile4.baseData.range = 100;
+			projectile4.baseData.speed = 200;
+
+			beamComp.ContinueBeamArtToWall = false;
 			beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
-
-			beamComp.endType = BasicBeamController.BeamEndType.Persist;
-
-
-			var funnyBeam = beamComp.gameObject.AddComponent<FireSubBeamSynergyProcessor>();
-
-			funnyBeam.BeamAngle = 45;
-			funnyBeam.FromProjectileDamageModifier = 3;
-			funnyBeam.Mode = FireSubBeamSynergyProcessor.SubBeamMode.FROM_BEAM;
-			funnyBeam.NumberBeams = 10;
-			funnyBeam.SubBeamProjectile = (PickupObjectDatabase.GetById(100) as Gun).DefaultModule.projectiles[0];
-			funnyBeam.SynergyToCheck = CustomSynergyType.BLESSED_CURSED_BULLETS;
+			beamComp.endType = BasicBeamController.BeamEndType.Vanish;
 
 
-			var funnyBeam2 = beamComp.gameObject.AddComponent<FireSubBeamSynergyProcessor>();
 
-			funnyBeam2.BeamAngle = 90;
-			funnyBeam2.FromProjectileDamageModifier = 3;
-			funnyBeam2.Mode = FireSubBeamSynergyProcessor.SubBeamMode.FROM_BEAM;
-			funnyBeam2.NumberBeams = 10;
-			funnyBeam2.SubBeamProjectile = (PickupObjectDatabase.GetById(60) as Gun).DefaultModule.projectiles[0];
-			funnyBeam2.SynergyToCheck = CustomSynergyType.BLESSED_CURSED_BULLETS;
 
-			var funnyBeam3 = beamComp.gameObject.AddComponent<FireSubBeamSynergyProcessor>();
+			beamComp.ProjectileAndBeamMotionModule = new HelixProjectileMotionModule();
+			beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
+			beamComp.homingRadius = 10;
+			beamComp.homingAngularVelocity = 1000;
 
-			funnyBeam3.BeamAngle = 315;
-			funnyBeam3.FromProjectileDamageModifier = 3;
-			funnyBeam3.Mode = FireSubBeamSynergyProcessor.SubBeamMode.FROM_BEAM;
-			funnyBeam3.NumberBeams = 10;
-			funnyBeam3.SubBeamProjectile = (PickupObjectDatabase.GetById(20) as Gun).DefaultModule.projectiles[0];
-			funnyBeam3.SynergyToCheck = CustomSynergyType.BLESSED_CURSED_BULLETS;
+			beamComp.gameObject.GetOrAddComponent<EmmisiveBeams>().EmissiveColorPower = 7;
+			beamComp.gameObject.GetOrAddComponent<EmmisiveBeams>().EmissivePower = 42;
+
+			
 
 
 			gun.DefaultModule.projectiles[0] = projectile4;
-
-			projectile.baseData.damage = 50;
-
-			var beam = projectile.gameObject.GetComponent<BasicBeamController>();
-
-			beam.boneType = BasicBeamController.BeamBoneType.Projectile;
-
-			beam.endType = BasicBeamController.BeamEndType.Persist;
-
-			beam.beamEndAnimation = "";
-
-			BotsModule.Log($"{projectile.gameObject.name}");
-			//GetComponentInChildren
-			foreach (var comp in projectile.gameObject.GetComponents<Component>())
-			{
-				BotsModule.Log($"=========[{comp.name}: {comp.GetType()}]=========");
-			}
 
 
 			ETGMod.Databases.Items.Add(gun, null, "ANY");

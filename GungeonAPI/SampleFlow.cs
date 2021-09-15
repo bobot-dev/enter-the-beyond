@@ -7,7 +7,6 @@ using UnityEngine;
 using Dungeonator;
 using Random = UnityEngine.Random;
 
-
 namespace GungeonAPI
 {
     public static class SampleFlow
@@ -23,7 +22,7 @@ namespace GungeonAPI
             flow.AddNodeToFlow(hub, flow.FirstNode);
             foreach (var room in RoomFactory.rooms.Values)
             {
-                ToolsGAPI.Log("Adding room to flow: " + room.room);
+                Tools.Log("Adding room to flow: " + room.room);
                 customRoom = new DungeonFlowNode(flow) { overrideExactRoom = room.room };
                 flow.AddNodeToFlow(customRoom, lastNode);
                 hub = new DungeonFlowNode(flow) { overrideExactRoom = RoomFactory.CreateEmptyRoom() };
@@ -45,7 +44,7 @@ namespace GungeonAPI
 
             //one room for each visual definition
             DungeonFlowNode lastNode = flow.FirstNode;
-            ToolsGAPI.Print(dungeon.roomMaterialDefinitions?.Length);
+            Tools.Print(dungeon.roomMaterialDefinitions?.Length);
             for (int i = 0; i < dungeon.roomMaterialDefinitions.Length; i++)
             {
                 if (dungeon.name == OfficialFlows.dungeonPrefabNames[3] && i == 5) continue;
@@ -85,7 +84,7 @@ namespace GungeonAPI
             var entrance = NodeFromAssetName(flow, "elevator entrance");
             flow.FirstNode = entrance;
             flow.AddNodeToFlow(entrance, null);
-            var maze = new DungeonFlowNode(flow) { overrideExactRoom = RoomFactory.BuildFromResource("resource/rooms/maze.room").room };
+            var maze = new DungeonFlowNode(flow) { overrideExactRoom = RoomFactory.BuildFromResource("resource/rooms/maze.room")};
             flow.AddNodeToFlow(maze, entrance);
             flow.AddNodeToFlow(NodeFromAssetName(flow, "exit_room_basic"), maze);
             dungeon = null;
@@ -116,7 +115,7 @@ namespace GungeonAPI
             var room = RoomFromAssetName(name);
             if (room == null)
             {
-                ToolsGAPI.Print("Error loading room " + name, "FF0000");
+                Tools.Print("Error loading room " + name, "FF0000");
             };
             node.overrideExactRoom = room;
             return node;
@@ -136,12 +135,12 @@ namespace GungeonAPI
 
         public static void ListNodes(this DungeonFlow flow)
         {
-            ToolsGAPI.Print(flow.name + " node:");
-            ToolsGAPI.Print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            Tools.Print(flow.name + " node:");
+            Tools.Print("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             foreach (var node in flow.AllNodes)
             {
                 if (node != null && node.overrideExactRoom)
-                    ToolsGAPI.Print(node.overrideExactRoom);
+                    Tools.Print(node.overrideExactRoom);
             }
         }
     }

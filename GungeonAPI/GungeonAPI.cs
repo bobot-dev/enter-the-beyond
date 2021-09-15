@@ -9,11 +9,11 @@ namespace GungeonAPI
     {
         public static void Init()
         {
-            ToolsGAPI.Init();
+            Tools.Init();
             StaticReferences.Init();
-            FakePrefabHooks.Init();
+            ShrineFakePrefabHooks.Init();
             ShrineFactory.Init();
-            DungeonHandler.Init();
+            //DungeonHandler.Init();
         }
     }
 }

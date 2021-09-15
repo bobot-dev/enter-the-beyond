@@ -99,7 +99,7 @@ namespace GungeonAPI
             var rooms = GetRoomsFromRoomTables(floor);
             foreach (var room in rooms)
             {
-                ToolsGAPI.Log(room.name, "roomnames.txt");
+                Tools.Log(room.name, "roomnames.txt");
                 if (room.name.ToLower().Equals(roomName))
                 {
                     return room;
@@ -112,7 +112,7 @@ namespace GungeonAPI
                 var overrideRoom = node.overrideExactRoom;
 
                 if(overrideRoom != null)
-                    ToolsGAPI.Log(overrideRoom.name, "roomnames.txt");
+                    Tools.Log(overrideRoom.name, "roomnames.txt");
                 if (overrideRoom != null && overrideRoom.name.ToLower().Equals(roomName))
                 {
                     return overrideRoom;

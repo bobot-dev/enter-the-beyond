@@ -12,5 +12,9 @@ namespace BotsMod
         public static int LostSidearm;
         public static int LostCloak;
         public static int Wand;
+        public static int SparkBolt;
+
+        public static int HellsRevolver;
+        public static int TheMarksman;
     }
 }

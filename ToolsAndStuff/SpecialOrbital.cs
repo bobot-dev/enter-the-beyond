@@ -8,7 +8,7 @@ using UnityEngine;
 using Dungeonator;
 using System.Collections;
 
-namespace BotsMod
+namespace Items
 {
 
     public class SpecialOrbital : MonoBehaviour, IPlayerOrbital
@@ -674,7 +674,7 @@ namespace BotsMod
         public FiringSequenceMode firingMode;
         public OrbitingMode orbitingMode;
         private Vector2 ownerCenterPos;
-        public tk2dSprite sprite;
+        private tk2dSprite sprite;
         private bool initialized;
         private bool isOnCooldown;
         private bool isReloading;

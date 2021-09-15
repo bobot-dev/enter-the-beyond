@@ -1,287 +1,391 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
 using Dungeonator;
+using ItemAPI;
+using UnityEngine;
 
 namespace GungeonAPI
 {
-    public class ShrineFactory
-    {
-        public string
-            name,
-            modID,
-            spritePath,
-            text, acceptText, declineText;
-        public Action<PlayerController, GameObject>
-            OnAccept,
-            OnDecline;
-        public Func<PlayerController, GameObject, bool> CanUse;
-        public Vector3 talkPointOffset;
-        public Vector3 offset = new Vector3(43.8f, 42.4f, 42.9f);
-        public IntVector2 colliderOffset, colliderSize;
-        public bool
-            isToggle,
-            usesCustomColliderOffsetAndSize;
-        public Type interactableComponent = null;
-        public bool isBreachShrine = false;
-        public PrototypeDungeonRoom room;
-        public Dictionary<string, int> roomStyles;
+	// Token: 0x0200000A RID: 10
+	public class ShrineFactory
+	{
+		// Token: 0x06000058 RID: 88 RVA: 0x00004D94 File Offset: 0x00002F94
+		public static void Init()
+		{
+			bool initialized = ShrineFactory.m_initialized;
+			if (!initialized)
+			{
+				DungeonHooks.OnFoyerAwake += ShrineFactory.PlaceBreachShrines;
+				DungeonHooks.OnPreDungeonGeneration += delegate (LoopDungeonGenerator generator, Dungeon dungeon, DungeonFlow flow, int dungeonSeed)
+				{
+					bool flag = flow.name != "Foyer Flow" && !GameManager.IsReturningToFoyerWithPlayer;
+					if (flag)
+					{
+						ShrineFactory.CleanupBreachShrines();
+					}
+				};
+				ShrineFactory.m_initialized = true;
+			}
+		}
 
-        public static Dictionary<string, GameObject> builtShrines = new Dictionary<string, GameObject>();
-        private static bool m_initialized, m_builtShrines;
+		// Token: 0x06000059 RID: 89 RVA: 0x00004DEC File Offset: 0x00002FEC
+		public GameObject Build()
+		{
+			GameObject result;
+			try
+			{
+				Texture2D textureFromResource = ResourceExtractor.GetTextureFromResource(this.spritePath);
+				GameObject gameObject = SpriteBuilder.SpriteFromResource(this.spritePath);
+				string text = (this.modID + ":" + this.name).ToLower().Replace(" ", "_");
+				gameObject.name = text;
+				tk2dSprite component = gameObject.GetComponent<tk2dSprite>();
+				component.IsPerpendicular = true;
+				component.PlaceAtPositionByAnchor(this.offset, tk2dBaseSprite.Anchor.LowerCenter);
+				Transform transform = new GameObject("talkpoint").transform;
+				transform.position = gameObject.transform.position + this.talkPointOffset;
+				transform.SetParent(gameObject.transform);
+				bool flag = !this.usesCustomColliderOffsetAndSize;
+				if (flag)
+				{
+					IntVector2 intVector = new IntVector2(textureFromResource.width, textureFromResource.height);
+					this.colliderOffset = new IntVector2(0, 0);
+					this.colliderSize = new IntVector2(intVector.x, intVector.y / 2);
+				}
+				SpeculativeRigidbody speculativeRigidbody = component.SetUpSpeculativeRigidbody(this.colliderOffset, this.colliderSize);
+				ShrineFactory.CustomShrineController customShrineController = gameObject.AddComponent<ShrineFactory.CustomShrineController>();
+				customShrineController.ID = text;
+				customShrineController.roomStyles = this.roomStyles;
+				customShrineController.isBreachShrine = true;
+				customShrineController.offset = this.offset;
+				customShrineController.pixelColliders = speculativeRigidbody.specRigidbody.PixelColliders;
+				customShrineController.factory = this;
+				customShrineController.OnAccept = this.OnAccept;
+				customShrineController.OnDecline = this.OnDecline;
+				customShrineController.CanUse = this.CanUse;
+				customShrineController.text = this.text;
+				customShrineController.acceptText = this.acceptText;
+				customShrineController.declineText = this.declineText;
+				bool flag2 = this.interactableComponent == null;
+				if (flag2)
+				{
+					SimpleShrine simpleShrine = gameObject.AddComponent<SimpleShrine>();
+					simpleShrine.isToggle = this.isToggle;
+					simpleShrine.OnAccept = this.OnAccept;
+					simpleShrine.OnDecline = this.OnDecline;
+					simpleShrine.CanUse = this.CanUse;
+					simpleShrine.text = this.text;
+					simpleShrine.acceptText = this.acceptText;
+					simpleShrine.declineText = this.declineText;
+					simpleShrine.talkPoint = transform;
+				}
+				else
+				{
+					gameObject.AddComponent(this.interactableComponent);
+				}
+				gameObject.name = text;
+				bool flag3 = !this.isBreachShrine;
+				if (flag3)
+				{
+					bool flag4 = !this.room;
+					if (flag4)
+					{
+						this.room = RoomFactory.CreateEmptyRoom(12, 12);
+					}
+					ShrineFactory.RegisterShrineRoom(gameObject, this.room, text, this.offset);
+				}
+				ShrineFactory.registeredShrines.Add(text, gameObject);
+				FakePrefab.MarkAsFakePrefab(gameObject);
+				Tools.Print<string>("Added shrine: " + text, "FFFFFF", false);
+				result = gameObject;
+			}
+			catch (Exception e)
+			{
+				Tools.PrintException(e, "FF0000");
+				result = null;
+			}
+			return result;
+		}
 
-        public static void Init()
-        {
-            if (m_initialized) return;
-            DungeonHooks.OnFoyerAwake += PlaceBreachShrines;
-            DungeonHooks.OnPreDungeonGeneration += (generator, dungeon, flow, dungeonSeed) =>
-            {
-                if (flow.name != "Foyer Flow" && !GameManager.IsReturningToFoyerWithPlayer)
-                {
-                    foreach (var cshrine in GameObject.FindObjectsOfType<CustomShrineController>())
-                    {
-                        if (!FakePrefab.IsFakePrefab(cshrine))
-                            GameObject.Destroy(cshrine.gameObject);
-                    }
-                    m_builtShrines = false;
-                }
-            };
-            m_initialized = true;
-        }
+		// Token: 0x0600005A RID: 90 RVA: 0x000050E4 File Offset: 0x000032E4
+		public static void RegisterShrineRoom(GameObject shrine, PrototypeDungeonRoom protoroom, string ID, Vector2 offset)
+		{
+			protoroom.category = PrototypeDungeonRoom.RoomCategory.NORMAL;
+			DungeonPrerequisite[] array = new DungeonPrerequisite[0];
+			Vector2 vector = new Vector2((float)(protoroom.Width / 2) + offset.x, (float)(protoroom.Height / 2) + offset.y);
+			protoroom.placedObjectPositions.Add(vector);
+			protoroom.placedObjects.Add(new PrototypePlacedObjectData
+			{
+				contentsBasePosition = vector,
+				fieldData = new List<PrototypePlacedObjectFieldData>(),
+				instancePrerequisites = array,
+				linkedTriggerAreaIDs = new List<int>(),
+				placeableContents = new DungeonPlaceable
+				{
+					width = 2,
+					height = 2,
+					respectsEncounterableDifferentiator = true,
+					variantTiers = new List<DungeonPlaceableVariant>
+					{
+						new DungeonPlaceableVariant
+						{
+							percentChance = 1f,
+							nonDatabasePlaceable = shrine,
+							prerequisites = array,
+							materialRequirements = new DungeonPlaceableRoomMaterialRequirement[0]
+						}
+					}
+				}
+			});
+			RoomFactory.RoomData roomData = new RoomFactory.RoomData
+			{
+				room = protoroom,
+				isSpecialRoom = true,
+				category = "SPECIAL",
+				specialSubCategory = "UNSPECIFIED_SPECIAL"
+			};
+			RoomFactory.rooms.Add(ID, roomData);
+			DungeonHandler.Register(roomData);
+		}
 
+		// Token: 0x0600005B RID: 91 RVA: 0x00005224 File Offset: 0x00003424
+		public static void PlaceBreachShrines()
+		{
+			ShrineFactory.CleanupBreachShrines();
+			Tools.Print<string>("Placing breach shrines: ", "FFFFFF", false);
+			foreach (GameObject gameObject in ShrineFactory.registeredShrines.Values)
+			{
+				try
+				{
+					ShrineFactory.CustomShrineController component = gameObject.GetComponent<ShrineFactory.CustomShrineController>();
+					bool flag = !component.isBreachShrine;
+					if (!flag)
+					{
+						Tools.Print<string>("    " + gameObject.name, "FFFFFF", false);
+						ShrineFactory.CustomShrineController component2 = UnityEngine.Object.Instantiate<GameObject>(gameObject).GetComponent<ShrineFactory.CustomShrineController>();
+						component2.Copy(component);
+						component2.gameObject.SetActive(true);
+						component2.sprite.PlaceAtPositionByAnchor(component2.offset, tk2dBaseSprite.Anchor.LowerCenter);
+						SpriteOutlineManager.AddOutlineToSprite(component2.sprite, Color.black);
+						IPlayerInteractable component3 = component2.GetComponent<IPlayerInteractable>();
+						bool flag2 = component3 is SimpleInteractable;
+						if (flag2)
+						{
+							((SimpleInteractable)component3).OnAccept = component2.OnAccept;
+							((SimpleInteractable)component3).OnDecline = component2.OnDecline;
+							((SimpleInteractable)component3).CanUse = component2.CanUse;
+						}
+						bool flag3 = !RoomHandler.unassignedInteractableObjects.Contains(component3);
+						if (flag3)
+						{
+							RoomHandler.unassignedInteractableObjects.Add(component3);
+						}
+					}
+				}
+				catch (Exception e)
+				{
+					Tools.PrintException(e, "FF0000");
+				}
+			}
+		}
 
-        ///maybe add some value proofing here (name != null, collider != IntVector2.Zero)
-        public GameObject Build()
-        {
-            try
-            {
-                //Get texture and create sprite
-                Texture2D tex = ResourceExtractor.GetTextureFromResource(spritePath);
-                var shrine = ItemAPI.SpriteBuilder.SpriteFromResource(spritePath, null);
+		// Token: 0x0600005C RID: 92 RVA: 0x000053C0 File Offset: 0x000035C0
+		private static void CleanupBreachShrines()
+		{
+			foreach (ShrineFactory.CustomShrineController customShrineController in UnityEngine.Object.FindObjectsOfType<ShrineFactory.CustomShrineController>())
+			{
+				bool flag = !FakePrefab.IsFakePrefab(customShrineController);
+				if (flag)
+				{
+					UnityEngine.Object.Destroy(customShrineController.gameObject);
+				}
+				else
+				{
+					customShrineController.gameObject.SetActive(false);
+				}
+			}
+		}
 
-                //Add (hopefully) unique ID to shrine for tracking
-                string ID = $"{modID}:{name}".ToLower().Replace(" ", "_");
-                shrine.name = ID;
+		// Token: 0x04000017 RID: 23
+		public string name;
 
-                //Position sprite 
-                var sprite = shrine.GetComponent<tk2dSprite>();
-                sprite.IsPerpendicular = true;
-                sprite.PlaceAtPositionByAnchor(offset, tk2dBaseSprite.Anchor.LowerCenter);
+		// Token: 0x04000018 RID: 24
+		public string modID;
 
-                //Add speech bubble origin
-                var talkPoint = new GameObject("talkpoint").transform;
-                talkPoint.position = shrine.transform.position + talkPointOffset;
-                talkPoint.SetParent(shrine.transform);
+		// Token: 0x04000019 RID: 25
+		public string spritePath;
 
-                //Set up collider
-                if (!usesCustomColliderOffsetAndSize)
-                {
-                    IntVector2 spriteDimensions = new IntVector2(tex.width, tex.height);
-                    colliderOffset = new IntVector2(0, 0);
-                    colliderSize = new IntVector2(spriteDimensions.x, spriteDimensions.y / 2);
-                }
-                var body = ItemAPI.SpriteBuilder.SetUpSpeculativeRigidbody(sprite, colliderOffset, colliderSize);
+		// Token: 0x0400001A RID: 26
+		public string shadowSpritePath;
 
-                var data = shrine.AddComponent<CustomShrineController>();
-                data.ID = ID;
-                data.roomStyles = roomStyles;
-                data.isBreachShrine = true;
-                data.offset = offset;
-                data.pixelColliders = body.specRigidbody.PixelColliders;
-                data.factory = this;
-                data.OnAccept = OnAccept;
-                data.OnDecline = OnDecline;
-                data.CanUse = CanUse;
+		// Token: 0x0400001B RID: 27
+		public string text;
 
-                IPlayerInteractable interactable;
-                //Register as interactable
-                if (interactableComponent != null)
-                    interactable = shrine.AddComponent(interactableComponent) as IPlayerInteractable;
-                else
-                {
-                    var simpInt = shrine.AddComponent<SimpleInteractable>();
-                    simpInt.isToggle = this.isToggle;
-                    simpInt.OnAccept = this.OnAccept;
-                    simpInt.OnDecline = this.OnDecline;
-                    simpInt.CanUse = CanUse;
-                    simpInt.text = this.text;
-                    simpInt.acceptText = this.acceptText;
-                    simpInt.declineText = this.declineText;
-                    simpInt.talkPoint = talkPoint;
-                    interactable = simpInt as IPlayerInteractable;
-                }
+		// Token: 0x0400001C RID: 28
+		public string acceptText;
 
+		// Token: 0x0400001D RID: 29
+		public string declineText;
 
-                var prefab = FakePrefab.Clone(shrine);
-                prefab.GetComponent<CustomShrineController>().Copy(data);
-                prefab.name = ID;
-                if (isBreachShrine)
-                {
-                    if (!RoomHandler.unassignedInteractableObjects.Contains(interactable))
-                        RoomHandler.unassignedInteractableObjects.Add(interactable);
-                }
-                else
-                {
-                    if (!room)
-                        room = RoomFactory.CreateEmptyRoom();
-                    RegisterShrineRoom(prefab, room, ID, offset);
-                }
+		// Token: 0x0400001E RID: 30
+		public Action<PlayerController, GameObject> OnAccept;
 
+		// Token: 0x0400001F RID: 31
+		public Action<PlayerController, GameObject> OnDecline;
 
-                builtShrines.Add(ID, prefab);
-                ToolsGAPI.Print("Added shrine: " + ID);
-                return shrine;
-            }
-            catch (Exception e)
-            {
-                ToolsGAPI.PrintException(e);
-                return null;
-            }
-        }
+		// Token: 0x04000020 RID: 32
+		public Func<PlayerController, GameObject, bool> CanUse;
 
-        public static void RegisterShrineRoom(GameObject shrine, PrototypeDungeonRoom protoroom, string ID, Vector2 offset)
-        {
+		// Token: 0x04000021 RID: 33
+		public Vector3 talkPointOffset;
 
-            protoroom.category = PrototypeDungeonRoom.RoomCategory.NORMAL;
+		// Token: 0x04000022 RID: 34
+		public Vector3 offset = new Vector3(43.8f, 42.4f, 42.9f);
 
-            DungeonPrerequisite[] emptyReqs = new DungeonPrerequisite[0];
-            Vector2 position = new Vector2(protoroom.Width / 2 + offset.x, protoroom.Height / 2 + offset.y);
-            protoroom.placedObjectPositions.Add(position);
+		// Token: 0x04000023 RID: 35
+		public IntVector2 colliderOffset;
 
-            var placeableContents = ScriptableObject.CreateInstance<DungeonPlaceable>();
-            placeableContents.width = 2;
-            placeableContents.height = 2;
-            placeableContents.respectsEncounterableDifferentiator = true;
-            placeableContents.variantTiers = new List<DungeonPlaceableVariant>()
-            {
-                new DungeonPlaceableVariant()
-                {
-                    percentChance = 1,
-                    nonDatabasePlaceable = shrine,
-                    prerequisites = emptyReqs,
-                    materialRequirements= new DungeonPlaceableRoomMaterialRequirement[0]
-                }
-            };
+		// Token: 0x04000024 RID: 36
+		public IntVector2 colliderSize;
 
-            protoroom.placedObjects.Add(new PrototypePlacedObjectData()
-            {
-                contentsBasePosition = position,
-                fieldData = new List<PrototypePlacedObjectFieldData>(),
-                instancePrerequisites = emptyReqs,
-                linkedTriggerAreaIDs = new List<int>(),
-                placeableContents = placeableContents
-            });
+		// Token: 0x04000025 RID: 37
+		public bool isToggle;
 
-            var data = new RoomFactory.RoomData()
-            {
-                room = protoroom,
-                isSpecialRoom = true,
-                category = "SPECIAL",
-                specialSubCategory = "UNSPECIFIED_SPECIAL"
-            };
-            RoomFactory.rooms.Add(ID, data);
-            DungeonHandler.Register(data);
-        }
+		// Token: 0x04000026 RID: 38
+		public bool usesCustomColliderOffsetAndSize;
 
-        private static void PlaceBreachShrines()
-        {
-            if (m_builtShrines) return;
-            ToolsGAPI.Print("Placing breach shrines: ");
-            foreach (var prefab in builtShrines.Values)
-            {
-                try
-                {
-                    var prefabShrineData = prefab.GetComponent<CustomShrineController>();
-                    if (!prefabShrineData.isBreachShrine) continue;
+		// Token: 0x04000027 RID: 39
+		public Type interactableComponent = null;
 
-                    ToolsGAPI.Print($"    {prefab.name}");
-                    var shrine = GameObject.Instantiate(prefab).GetComponent<CustomShrineController>();
-                    shrine.Copy(prefabShrineData);
-                    shrine.gameObject.SetActive(true);
-                    shrine.sprite.PlaceAtPositionByAnchor(shrine.offset, tk2dBaseSprite.Anchor.LowerCenter);
-                    var interactable = shrine.GetComponent<IPlayerInteractable>();
-                    if (interactable is SimpleInteractable)
-                    {
-                        ((SimpleInteractable)interactable).OnAccept = shrine.OnAccept;
-                        ((SimpleInteractable)interactable).OnDecline = shrine.OnDecline;
-                        ((SimpleInteractable)interactable).CanUse = shrine.CanUse;
-                    }
-                    if (!RoomHandler.unassignedInteractableObjects.Contains(interactable))
-                        RoomHandler.unassignedInteractableObjects.Add(interactable);
-                }
-                catch (Exception e)
-                {
-                    ToolsGAPI.PrintException(e);
-                }
-            }
-            m_builtShrines = true;
-        }
+		// Token: 0x04000028 RID: 40
+		public bool isBreachShrine = false;
 
-        public class CustomShrineController : DungeonPlaceableBehaviour
-        {
-            public string ID;
-            public bool isBreachShrine;
-            public Vector3 offset;
-            public List<PixelCollider> pixelColliders;
-            public Dictionary<string, int> roomStyles;
-            public ShrineFactory factory;
-            public Action<PlayerController, GameObject>
-                OnAccept,
-                OnDecline;
-            public Func<PlayerController, GameObject, bool> CanUse;
-            private RoomHandler m_parentRoom;
-            private GameObject m_instanceMinimapIcon;
-            public int numUses = 0;
+		// Token: 0x04000029 RID: 41
+		public PrototypeDungeonRoom room;
 
-            void Start()
-            {
-                string id = this.name.Replace("(Clone)", "");
+		// Token: 0x0400002A RID: 42
+		public Dictionary<string, int> roomStyles;
 
-                if (ShrineFactory.builtShrines.ContainsKey(id))
-                    Copy(ShrineFactory.builtShrines[id].GetComponent<CustomShrineController>());
-                else
-                    ToolsGAPI.PrintError($"Was this shrine registered correctly?: {id}");
+		// Token: 0x0400002B RID: 43
+		public static Dictionary<string, GameObject> registeredShrines = new Dictionary<string, GameObject>();
 
-                this.GetComponent<SimpleInteractable>().OnAccept = OnAccept;
-                this.GetComponent<SimpleInteractable>().OnDecline = OnDecline;
-                this.GetComponent<SimpleInteractable>().CanUse = CanUse;
-            }
+		// Token: 0x0400002C RID: 44
+		private static bool m_initialized;
 
-            public void Copy(CustomShrineController other)
-            {
-                this.ID = other.ID;
-                this.roomStyles = other.roomStyles;
-                this.isBreachShrine = other.isBreachShrine;
-                this.offset = other.offset;
-                this.pixelColliders = other.pixelColliders;
-                this.factory = other.factory;
-                this.OnAccept = other.OnAccept;
-                this.OnDecline = other.OnDecline;
-                this.CanUse = other.CanUse;
-            }
+		// Token: 0x02000021 RID: 33
+		public class CustomShrineController : DungeonPlaceableBehaviour
+		{
+			
+			private void Start()
+			{
+				string text = base.name.Replace("(Clone)", "");
+				bool flag = ShrineFactory.registeredShrines.ContainsKey(text);
+				if (flag)
+				{
+					this.Copy(ShrineFactory.registeredShrines[text].GetComponent<ShrineFactory.CustomShrineController>());
+				}
+				else
+				{
+					Tools.PrintError<string>("Was this shrine registered correctly?: " + text, "FF0000");
+				}
+				SimpleInteractable component = base.GetComponent<SimpleInteractable>();
+				bool flag2 = !component;
+				if (!flag2)
+				{
+					component.OnAccept = this.OnAccept;
+					component.OnDecline = this.OnDecline;
+					component.CanUse = this.CanUse;
+					component.text = this.text;
+					component.acceptText = this.acceptText;
+					component.declineText = this.declineText;
+					Tools.Print<string>("Started shrine: " + text, "FFFFFF", false);
+				}
+			}
 
-            public void ConfigureOnPlacement(RoomHandler room)
-            {
-                this.m_parentRoom = room;
-                this.RegisterMinimapIcon();
-            }
+			
+			public void Copy(ShrineFactory.CustomShrineController other)
+			{
+				this.ID = other.ID;
+				this.roomStyles = other.roomStyles;
+				this.isBreachShrine = other.isBreachShrine;
+				this.offset = other.offset;
+				this.pixelColliders = other.pixelColliders;
+				this.factory = other.factory;
+				this.OnAccept = other.OnAccept;
+				this.OnDecline = other.OnDecline;
+				this.CanUse = other.CanUse;
+				this.text = other.text;
+				this.acceptText = other.acceptText;
+				this.declineText = other.declineText;
+			}
 
-            public void RegisterMinimapIcon()
-            {
-                this.m_instanceMinimapIcon = Minimap.Instance.RegisterRoomIcon(this.m_parentRoom, (GameObject)BraveResources.Load("Global Prefabs/Minimap_Shrine_Icon", ".prefab"), false);
-            }
+			
+			public void ConfigureOnPlacement(RoomHandler room)
+			{
+				this.m_parentRoom = room;
+				this.RegisterMinimapIcon();
+			}
 
-            public void GetRidOfMinimapIcon()
-            {
-                if (this.m_instanceMinimapIcon != null)
-                {
-                    Minimap.Instance.DeregisterRoomIcon(this.m_parentRoom, this.m_instanceMinimapIcon);
-                    this.m_instanceMinimapIcon = null;
-                }
-            }
-        }
-    }
+			
+			public void RegisterMinimapIcon()
+			{
+				this.m_instanceMinimapIcon = Minimap.Instance.RegisterRoomIcon(this.m_parentRoom, (GameObject)BraveResources.Load("Global Prefabs/Minimap_Shrine_Icon", ".prefab"), false);
+			}
+
+			
+			public void GetRidOfMinimapIcon()
+			{
+				bool flag = this.m_instanceMinimapIcon != null;
+				if (flag)
+				{
+					Minimap.Instance.DeregisterRoomIcon(this.m_parentRoom, this.m_instanceMinimapIcon);
+					this.m_instanceMinimapIcon = null;
+				}
+			}
+
+			// Token: 0x04000098 RID: 152
+			public string ID;
+
+			// Token: 0x04000099 RID: 153
+			public bool isBreachShrine;
+
+			// Token: 0x0400009A RID: 154
+			public Vector3 offset;
+
+			// Token: 0x0400009B RID: 155
+			public List<PixelCollider> pixelColliders;
+
+			// Token: 0x0400009C RID: 156
+			public Dictionary<string, int> roomStyles;
+
+			// Token: 0x0400009D RID: 157
+			public ShrineFactory factory;
+
+			// Token: 0x0400009E RID: 158
+			public Action<PlayerController, GameObject> OnAccept;
+
+			// Token: 0x0400009F RID: 159
+			public Action<PlayerController, GameObject> OnDecline;
+
+			// Token: 0x040000A0 RID: 160
+			public Func<PlayerController, GameObject, bool> CanUse;
+
+			// Token: 0x040000A1 RID: 161
+			private RoomHandler m_parentRoom;
+
+			// Token: 0x040000A2 RID: 162
+			private GameObject m_instanceMinimapIcon;
+
+			// Token: 0x040000A3 RID: 163
+			public int numUses = 0;
+
+			// Token: 0x040000A4 RID: 164
+			public string text;
+
+			// Token: 0x040000A5 RID: 165
+			public string acceptText;
+
+			// Token: 0x040000A6 RID: 166
+			public string declineText;
+		}
+	}
 }
-

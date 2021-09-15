@@ -18,7 +18,7 @@ namespace BotsMod
 {
 	public class TestActive : PlayerItem
 	{
-
+		static dfAtlas fuckyou;
 		public static void Init()
 		{
 			//The name of the item
@@ -29,6 +29,7 @@ namespace BotsMod
 
 			//WandOfWonderItem
 			ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
+
 			string shortDesc = "testing item";
 			string longDesc = "this item is purly for testing [sprite \"ui_coin\"]";
 			ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
@@ -36,13 +37,15 @@ namespace BotsMod
 			item.consumable = false;
 			item.quality = ItemQuality.EXCLUDED;
 
+			fuckyou = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;
+			fuckyou.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/TestHeart.png"), "BrokenHeart");
 
 
 		}
 		private Dictionary<string, StringTableManager.StringCollection> leadMaidan;
 		public override void Pickup(PlayerController player)
 		{
-
+			
 			
 			dfLabel nameLabel = GameUIRoot.Instance.notificationController.NameLabel;
 
@@ -152,6 +155,8 @@ namespace BotsMod
 
 		private IEnumerator HandleDoTheStupidThingImDoingOutOfSpiteDirectedAtNilt (PlayerController user)//, AIActor enemy)
 		{
+
+
 			RoomHandler absoluteRoom = user.transform.position.GetAbsoluteRoom();
 			List<AIActor> activeEnemies = absoluteRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
 			victum = activeEnemies[0];
@@ -280,50 +285,158 @@ namespace BotsMod
 		Vector2 pos3 = Vector2.zero;
 		Vector2 pos4 = Vector2.zero;
 
-		/*public override void Update()
+		public override void Update()
 		{
 
-
-			PlayerController player = GameManager.Instance.PrimaryPlayer;
-			if (player && this.extantLink == null)
+			if (Event.current.isKey && Event.current.keyCode.ToString().ToLower() != "none")
 			{
-				tk2dTiledSprite component = SpawnManager.SpawnVFX(this.LinkVFXPrefab, false).GetComponent<tk2dTiledSprite>();
-				this.extantLink = component;
-			}
-			else if (player && this.extantLink != null)
-			{
-				if (this.extantLink.GetComponent<Renderer>().material.shader != ShaderCache.Acquire("Brave/Internal/HologramShader"))
+				for (int i = 0; i < Event.current.keyCode.ToString().Length; i++)
 				{
-					this.extantLink.GetComponent<Renderer>().material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
-				}
-				
+					var player = base.LastOwner;
+					GameObject gameObject = SpawnManager.SpawnProjectile((PickupObjectDatabase.GetById(86) as Gun).DefaultModule.projectiles[0].gameObject, player.sprite.WorldCenter, Quaternion.Euler(0f, 0f, (player.CurrentGun == null) ? 0f : player.CurrentGun.CurrentAngle), true);
+					Projectile component = gameObject.GetComponent<Projectile>();
 
-
-				foreach (var pickup in UnityEngine.Object.FindObjectsOfType<PickupObject>())
-				{
-
-					if (pain != null && suffering != null)
+					if (component != null)
 					{
-						Tools.UpdateLink(pain, this.extantLink, suffering);
+						component.Owner = player;
+						component.Shooter = player.specRigidbody;
+						component.baseData.speed /= 4;
+						component.sprite.SetSprite(this.GetLetterForWordPosition(Event.current.keyCode.ToString().ToUpper(), i));
 					}
 				}
 
 			}
-			else if (extantLink != null)// || actor == null)
-			{
-				SpawnManager.Despawn(extantLink.gameObject);
-				extantLink = null;
-			}
+
+
+
 
 			base.Update();
-		}*/
+		}
+
+
+		private string GetLetterForWordPosition(string word, int num = 0)
+		{
+			char c = word[num];
+			switch (c)
+			{
+				case 'A':
+					return "word_projectile_A_001";
+				case 'B':
+					return "word_projectile_B_001";
+				case 'C':
+					return "word_projectile_C_001";
+				case 'D':
+					return "word_projectile_D_001";
+				case 'E':
+					return "word_projectile_B_004";
+				case 'F':
+					return "word_projectile_F_001";
+				case 'G':
+					return "word_projectile_G_001";
+				case 'H':
+					return "word_projectile_H_001";
+				case 'I':
+					return "word_projectile_I_001";
+				case 'J':
+					return "word_projectile_J_001";
+				case 'K':
+					return "word_projectile_K_001";
+				case 'L':
+					return "word_projectile_B_003";
+				case 'M':
+					return "word_projectile_M_001";
+				case 'N':
+					return "word_projectile_N_001";
+				case 'O':
+					return "word_projectile_O_001";
+				case 'P':
+					return "word_projectile_P_001";
+				case 'Q':
+					return "word_projectile_Q_001";
+				case 'R':
+					return "word_projectile_R_001";
+				case 'S':
+					return "word_projectile_S_001";
+				case 'T':
+					return "word_projectile_B_005";
+				case 'U':
+					return "word_projectile_B_002";
+				case 'V':
+					return "word_projectile_V_001";
+				case 'W':
+					return "word_projectile_W_001";
+				case 'X':
+					return "word_projectile_X_001";
+				case 'Y':
+					return "word_projectile_Y_001";
+				case 'Z':
+					return "word_projectile_Z_001";
+				default:
+					if (c == '+')
+					{
+						return "word_projectile_+_001";
+					}
+					if (c != '1')
+					{
+						return "word_projectile_B_001";
+					}
+					return "word_projectile_1_001";
+				case 'a':
+					return "word_projectile_alpha_001";
+				case 'o':
+					return "word_projectile_omega_001";
+			}
+		}
 
 		DebrisObject pain;
 		DebrisObject suffering;
 
-
+		int i = 0;
 		protected override void DoEffect(PlayerController user)
 		{
+			Vector2 vector = user.specRigidbody.HitboxPixelCollider.UnitBottomLeft;
+			Vector2 vector2 = user.specRigidbody.HitboxPixelCollider.UnitTopRight;
+			//(!this.IsGreenFire) ? GlobalSparksDoer.SparksType.STRAIGHT_UP_FIRE : 
+			GlobalSparksDoer.DoRandomParticleBurst(6, vector, vector2, Vector3.zero, 0f, 0f, null, null, null, GlobalSparksDoer.SparksType.STRAIGHT_UP_GREEN_FIRE);
+
+			//3882816446524679410
+			//-6243670249480530921 - ParticleSystem #4263
+			//3838344109541889202 - ParticleSystemRenderer #18562
+			//-1724382749291533491 - PlayParticleSystemDuringBossIntro
+
+			GoopDefinition goop = new GoopDefinition
+			{
+
+				CanBeIgnited = true,
+				selfIgniteDelay = 1,
+				SelfIgnites = true,
+				damagesEnemies = false,
+				damagesPlayers = false,
+				goopTexture = ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/water_standard_base_001.png"),
+				usesLifespan = true,
+				playerStepsChangeLifetime = false,
+				playerStepsLifetime = 2.5f,
+				baseColor32 = new Color32(252, 3, 227, 255),
+				igniteColor32 = new Color32(224, 0, 146, 255),
+			};
+
+			Vector2 normalized = (user.unadjustedAimPoint.XY() - user.CenterPosition).normalized;
+			Vector2 normalized2 = BraveMathCollege.DegreesToVector(5);
+
+			DeadlyDeadlyGoopManager goopManagerForGoopType = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(goop);
+
+			goopManagerForGoopType.TimedAddGoopLine(user.CenterPosition + Vector2.right *3 , (user.CenterPosition + (normalized * 8 - normalized2)) , 1, 0.3f);
+			goopManagerForGoopType.TimedAddGoopLine(user.CenterPosition + Vector2.left * 3, (user.CenterPosition + (normalized * 8 + normalized2)) , 1, 0.3f);
+
+			return;
+			GameUIRoot.Instance.heartControllers[0].extantArmors[i].SpriteName = "BrokenHeart";
+			GameUIRoot.Instance.heartControllers[0].extantArmors[i].Atlas = fuckyou;
+
+			if (i < (GameUIRoot.Instance.heartControllers[0].extantArmors.Count - 1))
+            {
+				i++;
+            }
+			return;
 
 			user.CurrentRoom.ApplyActionToNearbyEnemies(user.CenterPosition, 100f, delegate (AIActor enemy, float dist)
 			{
@@ -346,7 +459,7 @@ namespace BotsMod
 
 			
 
-			var linkVFXPrefab = GungeonAPI.FakePrefab.Clone((PickupObjectDatabase.GetById(29) as Gun).DefaultModule.projectiles[0].GetComponent<ChainLightningModifier>().LinkVFXPrefab);
+			var linkVFXPrefab = FakePrefab.Clone((PickupObjectDatabase.GetById(29) as Gun).DefaultModule.projectiles[0].GetComponent<ChainLightningModifier>().LinkVFXPrefab);
 
 			tk2dTiledSprite component = SpawnManager.SpawnVFX(linkVFXPrefab, false).GetComponent<tk2dTiledSprite>();
 
