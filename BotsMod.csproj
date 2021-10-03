@@ -116,6 +116,15 @@
   <ItemGroup>
     <Compile Include="Audio\AudioResourceLoader.cs" />
     <Compile Include="Audio\ResourceLoaderSoundbanks.cs" />
+    <Compile Include="AltLostSidearm.cs" />
+    <Compile Include="Cybergrind\CgController.cs" />
+    <Compile Include="HellsGrasp.cs" />
+    <Compile Include="Enemies\Behaviors\DashAndShootBehavior.cs" />
+    <Compile Include="GlobalWarning.cs" />
+    <Compile Include="Guns\Ultrakill Gun\NailGun.cs" />
+    <Compile Include="NPCs\BreachShopTools.cs" />
+    <Compile Include="RandomCustomGameObjects\CustomLightning.cs" />
+    <Compile Include="ThrowableTest.cs" />
     <Compile Include="Floors\BeyondDungeon.cs" />
     <Compile Include="Floors\LostPastDungeon.cs" />
     <Compile Include="Floors\ToolsForFloors\BeyondPrefabs.cs" />
@@ -132,7 +141,7 @@
     <Compile Include="Character Api\Tools\Enums.cs" />
     <Compile Include="BotsProjectileMotionModule.cs" />
     <Compile Include="Class2.cs" />
-    <Compile Include="Enemies\Overseer\BulletScripts.cs" />
+    <Compile Include="Enemies\Overseer\OverseerBulletScripts.cs" />
     <Compile Include="TheMessanger.cs" />
     <Compile Include="Debuff\CustomGameActorFireEffect.cs" />
     <Compile Include="Enemies\Behaviors\AIBeamShooter2.cs" />
@@ -288,7 +297,7 @@
     <Compile Include="Synergies\InitSynergies.cs" />
     <Compile Include="TestPassive.cs" />
     <Compile Include="CosmicSludge.cs" />
-    <Compile Include="Enemies\Overseer\LostPastBoss.cs" />
+    <Compile Include="Enemies\Overseer\OverseerFloor.cs" />
     <Compile Include="Enemies\Overseer\LostPastBossIntro.cs" />
     <Compile Include="Enemies\PirmalShotgrub.cs" />
     <Compile Include="Enemies\PrimalShotGrubAttack1.cs" />
@@ -708,6 +717,15 @@
     <EmbeddedResource Include="sprites\overseer_floor\overseerf_Bosscard_001.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="sprites\robotmine\roboticmine_arm_001.png" />
+    <EmbeddedResource Include="sprites\robotmine\roboticmine_arm_002.png" />
+    <EmbeddedResource Include="sprites\robotmine\roboticmine_arm_003.png" />
+    <EmbeddedResource Include="sprites\robotmine\roboticmine_arm_004.png" />
+    <EmbeddedResource Include="sprites\robotmine\roboticmine_spawn_001.png" />
+    <EmbeddedResource Include="sprites\robotmine\roboticmine_spawn_002.png" />
+    <EmbeddedResource Include="sprites\robotmine\roboticmine_spawn_003.png" />
+    <EmbeddedResource Include="sprites\robotmine\roboticmine_spawn_004.png" />
+    <EmbeddedResource Include="sprites\robotmine\roboticmine_spawn_005.png" />
     <EmbeddedResource Include="sprites\SpinDownDice.png" />
     <EmbeddedResource Include="sprites\fire_purple_effect_ver1_sheet_11x4.png" />
     <EmbeddedResource Include="sprites\Npcs\beyond_merch_carpet_001.png" />
@@ -755,6 +773,34 @@
     <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_muzzleflash_003.png" />
     <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_muzzleflash_004.png" />
     <EmbeddedResource Include="sprites\beam\LostFriend\lost_friend_laser_muzzleflash_005.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_armed_001.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_armed_002.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_armed_003.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_armed_004.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_armed_005.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_armed_006.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_deploy_001.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_deploy_002.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_deploy_003.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_deploy_004.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_deploy_005.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_deploy_006.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_deploy_007.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_deploy_008.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_deploy_009.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_deploy_010.png" />
+    <EmbeddedResource Include="sprites\bomb\beyond_bomb_explode_001.png" />
+    <EmbeddedResource Include="sprites\globalwarming.png" />
+    <EmbeddedResource Include="sprites\Lightning\purple_lightning_beam_middle_001.png" />
+    <EmbeddedResource Include="sprites\Lightning\purple_lightning_beam_middle_002.png" />
+    <EmbeddedResource Include="sprites\Lightning\purple_lightning_beam_middle_003.png" />
+    <EmbeddedResource Include="sprites\Lightning\purple_lightning_beam_middle_004.png" />
+    <EmbeddedResource Include="sprites\Lightning\purple_lightning_beam_middle_005.png" />
+    <EmbeddedResource Include="sprites\Lightning\purple_lightning_beam_middle_006.png" />
+    <EmbeddedResource Include="sprites\Lightning\purple_lightning_beam_middle_007.png" />
+    <EmbeddedResource Include="sprites\Lightning\purple_lightning_beam_middle_008.png" />
+    <EmbeddedResource Include="sprites\Lightning\purple_lightning_beam_middle_009.png" />
+    <EmbeddedResource Include="sprites\Lightning\purple_lightning_beam_middle_010.png" />
     <Content Include="sprites\overseerf_Bosscard_001.png" />
     <EmbeddedResource Include="sprites\water_standard_base_001.png" />
   </ItemGroup>

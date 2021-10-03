@@ -26,8 +26,9 @@ namespace BotsMod
             item.quality = ItemQuality.B;
 
 			item.PlaceItemInAmmonomiconAfterItemById(298);
+			CustomLightning.Init();
 
-			
+
 		}
 
 		protected override void Update()
@@ -145,13 +146,15 @@ namespace BotsMod
 					limit *= 2;
 					range = 15;
 				}
+				List<AIActor> ignoreList = new List<AIActor>();
 				ApplyActionToNearbyEnemiesWithALimit(obj.specRigidbody.UnitCenter, range, limit, this.Owner.CurrentRoom.GetActiveEnemies(Dungeonator.RoomHandler.ActiveEnemyType.All), delegate (AIActor enemy, float dist)
 				{
 
 					if (enemy && enemy.healthHaver)
 					{
 
-						var linkVFXPrefab = FakePrefab.Clone(Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX);
+						var linkVFXPrefab = CustomLightning.lightningVFX;
+						//var linkVFXPrefab = FakePrefab.Clone(Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX);
 
 						tk2dTiledSprite component = SpawnManager.SpawnVFX(linkVFXPrefab, false).GetComponent<tk2dTiledSprite>();
 						this.extantLink = component;
@@ -159,7 +162,33 @@ namespace BotsMod
 						UpdateLink(enemy, component, obj.specRigidbody.UnitCenter);
 						enemy.gameObject.AddComponent<NotReallyADebuff>();
 						enemy.healthHaver.ApplyDamage(4, Vector2.zero, string.Empty, CoreDamageTypes.Electric, DamageCategory.Normal, false, null, false);
-						StartCoroutine(doTimerMagic(extantLink.gameObject));
+						ignoreList.Add(enemy);
+						StartCoroutine(doTimerMagic(component.gameObject));
+						if (enemy.specRigidbody)
+                        {
+							ApplyActionToNearbyEnemiesWithALimit(enemy.specRigidbody.UnitCenter, range / 2, limit / 2, this.Owner.CurrentRoom.GetActiveEnemies(Dungeonator.RoomHandler.ActiveEnemyType.All), delegate (AIActor enemy2, float dist2)
+							{
+
+								if (enemy2 && enemy2.healthHaver && !ignoreList.Contains(enemy2))
+								{
+									var linkVFXPrefab2 = CustomLightning.lightningVFX;
+									//var linkVFXPrefab = FakePrefab.Clone(Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX);
+
+									tk2dTiledSprite component2 = SpawnManager.SpawnVFX(linkVFXPrefab2, false).GetComponent<tk2dTiledSprite>();
+
+									UpdateLink(enemy2, component2, enemy.specRigidbody.UnitCenter);
+									enemy2.gameObject.AddComponent<NotReallyADebuff>();
+									enemy2.healthHaver.ApplyDamage(2, Vector2.zero, string.Empty, CoreDamageTypes.Electric, DamageCategory.Normal, false, null, false);
+									StartCoroutine(doTimerMagic(component2.gameObject));
+
+								}
+
+
+							});
+						}
+						
+
+						
 
 					}
 
@@ -173,9 +202,9 @@ namespace BotsMod
 		{
 			//SpeculativeRigidbody specRigidbody = target.specRigidbody;
 			//SpeculativeRigidbody speculativeRigidbody = specRigidbody;
-			Material material = m_extantLink.GetComponent<Renderer>().material;
-			material.SetFloat("_BlackBullet", 0.995f);
-			material.SetFloat("_EmissiveColorPower", 4.9f);
+			//Material material = m_extantLink.GetComponent<Renderer>().material;
+			//material.SetFloat("_BlackBullet", 0.995f);
+			//material.SetFloat("_EmissiveColorPower", 4.9f);
 
 			Vector2 unitCenter = landedPoint;
 			Vector2 unitCenter2 = target.specRigidbody.HitboxPixelCollider.UnitCenter;

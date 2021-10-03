@@ -46,9 +46,6 @@ namespace BotsMod
 
 				//ParticleSystem partSystem = Tools.BotsAssetBundle.LoadAsset<GameObject>("ParticleSystemObj").GetComponent<ParticleSystem>();
 
-
-				//var particleMagic = target.gameObject.AddComponent(partSystem);
-
 				target.healthHaver.OnPreDeath += delegate (Vector2 obj)
 				{
 					SpellReward(target.sprite.WorldCenter);

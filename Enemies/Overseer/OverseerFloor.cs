@@ -19,7 +19,7 @@ namespace BotsMod
 {
 
 
-	class LostPastBoss : AIActor
+	class OverseerFloor : AIActor
 	{
 		public static GameObject OverseerPrefab;
 		public static readonly string guid = "bot:Overseer";
@@ -76,7 +76,7 @@ namespace BotsMod
 		public static void Init()
 		{
 			
-			LostPastBoss.BuildPrefab();
+			OverseerFloor.BuildPrefab();
 
 			GameObject overseerShield = SpriteBuilder.SpriteFromResource("BotsMod/sprites/overseer_floor/Shield/OverseerShield", new GameObject("OverseerShield"));
 			overseerShield.SetActive(false);
@@ -212,7 +212,8 @@ namespace BotsMod
 				enemy.encounterTrackable.journalData.enemyPortraitSprite = ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod\\sprites\\overseer_floor\\ammonomicon_enemy_overseer_001.png");
 
 				BotsModule.Strings.Enemies.Set("#BOT_OVERSEER_SHORTDESC", "All Seeing Eye");
-				BotsModule.Strings.Enemies.Set("#BOT_OVERSEER_LONGDESC", "A powerful cult leader from another realm. \n\nThis fast and ruthless opponent is known to disorient all who challenge them.");
+				//This fast and ruthless  is known to disorient all who challenge them.
+				BotsModule.Strings.Enemies.Set("#BOT_OVERSEER_LONGDESC", "A powerful cult leader from another realm. \n\nVery little is know about this opponent.");
 				enemy.encounterTrackable.journalData.PrimaryDisplayName = "#THE_OVERSEER";
 				enemy.encounterTrackable.journalData.NotificationPanelDescription = "#BOT_OVERSEER_SHORTDESC";
 				enemy.encounterTrackable.journalData.AmmonomiconFullEntry = "#BOT_OVERSEER_LONGDESC";
@@ -408,7 +409,6 @@ namespace BotsMod
 				GameObject m_CachedGunAttachPoint = enemy.transform.Find("attach").gameObject;
 
 
-
 				bs.TargetBehaviors = new List<TargetBehaviorBase>
 				{
 					new TargetPlayerBehavior
@@ -440,145 +440,16 @@ namespace BotsMod
 				bs.AttackBehaviorGroup.AttackBehaviors = new List<AttackBehaviorGroup.AttackGroupItem>
 				{
 
-					/*new AttackBehaviorGroup.AttackGroupItem()
-					{
-						Probability = 0.8f,
-						Behavior = new CustomBeholsterLaserBehavior() {
-							//ShootPoint = m_CachedGunAttachPoint,
-							initialAimOffset = -15f,
-							InitialCooldown = 2f,
-							firingTime = 5f,
-							AttackCooldown = 2f,
-							RequiresLineOfSight = true,
-							//beamSelection = ShootBeamBehavior.BeamSelection.All,
-							FiresDirectlyTowardsPlayer = true,
-							UsesCustomAngle = false,
-
-							chargeTime = 1,
-							//UsesBaseSounds = false,
-							LaserFiringSound = "Play_ENM_deathray_shot_01",
-							StopLaserFiringSound = "Stop_ENM_deathray_loop_01",
-							ChargeAnimation = "beam_tell",
-							FireAnimation = "beam",
-							PostFireAnimation = "",
-							beamSelection = ShootBeamBehavior.BeamSelection.Random,
-							trackingType = CustomBeholsterLaserBehavior.TrackingType.Follow,
-							//initialAimType = CustomShootBeamBehavior.InitialAimType.Aim,
-
-							unitCatchUpSpeed = 3,
-							maxTurnRate = 16,
-							turnRateAcceleration = 24,
-							useDegreeCatchUp = enemy.transform,
-							minDegreesForCatchUp = 15,
-							degreeCatchUpSpeed = 180,
-							useUnitCatchUp = true,
-							minUnitForCatchUp = 2,
-							maxUnitForCatchUp = 30,
-							useUnitOvershoot = true,
-							minUnitForOvershoot = 1,
-							LockInPlaceWhileAttacking = true,
-							unitOvershootTime = 0.25f,
-							unitOvershootSpeed = 10,
-							ShootPoint = m_CachedGunAttachPoint.transform,
-							//BulletScript = new CustomBulletScriptSelector(typeof(Wailer.Wail))
-						},
-						NickName = "beam"
-					},
 
 					new AttackBehaviorGroup.AttackGroupItem()
-					{
-						Probability = 8f,
-						Behavior = new FireLotsOfLasersBehaviour() {
-							//ShootPoint = m_CachedGunAttachPoint,
-							initialAimOffset = -15f,
-							InitialCooldown = 2f,
-							firingTime = 10f,
-							AttackCooldown = 2f,
-							RequiresLineOfSight = true,
-							BulletScript =  new CustomBulletScriptSelector(typeof(SixBeamScript)),
-							chargeTime = 1,
-							//UsesBaseSounds = false,
-							LaserFiringSound = "Play_ENM_deathray_shot_01",
-							StopLaserFiringSound = "Stop_ENM_deathray_loop_01",
-							ChargeAnimation = "beam_tell",
-							FireAnimation = "beam",
-							PostFireAnimation = "",
-							beamSelection = ShootBeamBehavior.BeamSelection.All,
-							//initialAimType = CustomShootBeamBehavior.InitialAimType.Aim,
-							maxTurnRate = 32f,
-							turnRateAcceleration = 24,
-							turnRateMultiplier = 1.5f,
-							LockInPlaceWhileAttacking = true,
-							ShootPoint = m_CachedGunAttachPoint.transform,
-							//BulletScript = new CustomBulletScriptSelector(typeof(Wailer.Wail))
-							MinWallDistance = 5,
-						},
-						NickName = "6beams"
-					},
-
-					new AttackBehaviorGroup.AttackGroupItem()
-					{
-						Probability = 1,
-
-						Behavior = new TeleportToMiddleBehavior()
-						{
-
-							AttackableDuringAnimation = true,
-							AllowCrossRoomTeleportation = false,
-							teleportRequiresTransparency = false,
-							hasOutlinesDuringAnim = true,
-							ManuallyDefineRoom = false,
-							MaxHealthThreshold = 1f,
-							GoneTime = 1f,
-							OnlyTeleportIfPlayerUnreachable = false,
-							teleportInAnim = "",
-							teleportOutAnim = "",
-							AttackCooldown = 1f,
-							InitialCooldown = 0f,
-							RequiresLineOfSight = false,
-							roomMax = new Vector2(0,0),
-							roomMin = new Vector2(0,0),
-							
-							teleportOutBulletScript = new CustomBulletScriptSelector(typeof(OverseerTeleportStartScript)),
-							//teleportInBulletScript = new CustomBulletScriptSelector(typeof(OverseerBeam)),
-							//teleportInBulletScript = new CustomBulletScriptSelector(typeof(BEAM
-							GlobalCooldown = 0.5f,
-							Cooldown = 4f,
-							CooldownVariance = 1f,
-							InitialCooldownVariance = 0f,
-							goneAttackBehavior = null,
-							IsBlackPhantom = false,
-
-
-							GroupName = null,
-							GroupCooldown = 0,
-							MinRange = 0,
-							Range = 0,
-							MinHealthThreshold = 0,
-							MaxEnemiesInRoom = 1,
-							MaxUsages = 0,
-							AccumulateHealthThresholds = true,
-							//shadowInAnim = null,
-							//shadowOutAnim = null,
-							targetAreaStyle = null,
-							HealthThresholds = new float[0],
-							MinWallDistance = 0,
-							//resetCooldownOnDamage = null,
-							//shadowSupport = (TeleportBehavior.ShadowSupport)1,
-						},
-						NickName = "Beam Teleport"
-
-					},*/
-
-				new AttackBehaviorGroup.AttackGroupItem()
 					{
 						Probability = 1,
 
 						Behavior = new SequentialAttackBehaviorGroup()
 						{
-							
+
 							AttackBehaviors = new List<AttackBehaviorBase>
-                            {
+							{
 								new TeleportToMiddleBehavior()
 								{
 
@@ -593,7 +464,7 @@ namespace BotsMod
 									teleportInAnim = "",
 									teleportOutAnim = "",
 									AttackCooldown = 1f,
-									InitialCooldown = 0f,
+									InitialCooldown = 1f,
 									RequiresLineOfSight = false,
 									roomMax = new Vector2(0,0),
 									roomMin = new Vector2(0,0),
@@ -629,11 +500,12 @@ namespace BotsMod
 									//ShootPoint = m_CachedGunAttachPoint,
 									initialAimOffset = -15f,
 									InitialCooldown = 2f,
-									firingTime = 15f,
+									firingTime = 14f,
 									AttackCooldown = 2f,
 									RequiresLineOfSight = true,
-									BulletScript =  new CustomBulletScriptSelector(typeof(SixBeamScript)),
-									chargeTime = 5,
+									BulletScript =  new CustomBulletScriptSelector(typeof(SixBeamScript2)),
+									//BulletScript =  new CustomBulletScriptSelector(typeof(SixBeamScript)),
+									chargeTime = 2,
 									UsesBaseSounds = true,
 									LaserFiringSound = "Play_ENM_deathray_shot_01",
 									StopLaserFiringSound = "Stop_ENM_deathray_loop_01",
@@ -652,21 +524,406 @@ namespace BotsMod
 								},
 							},
 							OverrideCooldowns = new List<float>
-                            {
+							{
 								0
-                            },
+							},
 							RunInClass = false,
-							
+
 						},
 						NickName = "Beam Teleport Magic bs"
 
 					},
 
+					//secondBulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines2)),
+					new AttackBehaviorGroup.AttackGroupItem()
+					{
+						//Probability = 0.7f,
+						Probability = 1f,
+
+						Behavior = new SequentialAttackBehaviorGroup()
+						{
+							
+
+							AttackBehaviors = new List<AttackBehaviorBase>
+							{
+								#region dash1
+								new DashButGoodBehavior
+								{
+									dashDirection = DashButGoodBehavior.DashDirection.Random,
+									quantizeDirection = 0,
+									dashDistance = 8,
+									dashTime = 0.4f,
+									postDashSpeed = 0,
+									doubleDashChance = 0,
+									avoidTarget = true,
+									ShootPoint = m_CachedGunAttachPoint,
+									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),									
+									fireAtDashStart = true,
+									stopOnCollision = false,
+									warpDashAnimLength = false,
+									hideGun = false,
+									hideShadow = false,
+									toggleTrailRenderer = true,
+									enableShadowTrail = true,
+									Cooldown = 1,
+									CooldownVariance = 2,
+									GlobalCooldown = 0.5f,
+									InitialCooldown = 2,
+									InitialCooldownVariance = 0,
+									GroupCooldown = 0,
+									GroupName = "",
+									Range = 0,
+									MinRange = 0,
+									MinWallDistance = 0,
+									MaxEnemiesInRoom = 0,
+									MinHealthThreshold = 0,
+									MaxHealthThreshold = 1,
+									HealthThresholds = new float[0],
+									AccumulateHealthThresholds = true,
+									targetAreaStyle = null,
+									IsBlackPhantom = false,
+									resetCooldownOnDamage = null,
+									RequiresLineOfSight = false,
+									MaxUsages = 0,
+									AttackCooldown = 0,
+									doDodgeDustUp = false,
+									chargeAnim = "",
+									dashAnim = "idle",
+								},
+								#endregion
+								#region dash2
+
+
+								new DashButGoodBehavior
+								{
+									dashDirection = DashButGoodBehavior.DashDirection.Random,
+									quantizeDirection = 0,
+									dashDistance = 8,
+									dashTime = 0.4f,
+									postDashSpeed = 0,
+									doubleDashChance = 0,
+									avoidTarget = true,
+									ShootPoint = m_CachedGunAttachPoint,
+									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
+									fireAtDashStart = true,
+									stopOnCollision = false,
+									warpDashAnimLength = false,
+									hideGun = false,
+									hideShadow = false,
+									toggleTrailRenderer = true,
+									enableShadowTrail = true,
+									Cooldown = 1,
+									CooldownVariance = 2,
+									GlobalCooldown = 0.5f,
+									InitialCooldown = 2,
+									InitialCooldownVariance = 0,
+									GroupCooldown = 0,
+									GroupName = "",
+									Range = 0,
+									MinRange = 0,
+									MinWallDistance = 0,
+									MaxEnemiesInRoom = 0,
+									MinHealthThreshold = 0,
+									MaxHealthThreshold = 1,
+									HealthThresholds = new float[0],
+									AccumulateHealthThresholds = true,
+									targetAreaStyle = null,
+									IsBlackPhantom = false,
+									resetCooldownOnDamage = null,
+									RequiresLineOfSight = false,
+									MaxUsages = 0,
+									AttackCooldown = 0,
+									doDodgeDustUp = false,
+									chargeAnim = "",
+									dashAnim = "idle",
+								},
+								#endregion
+								#region dash1
+								new DashButGoodBehavior
+								{
+									dashDirection = DashButGoodBehavior.DashDirection.Random,
+									quantizeDirection = 0,
+									dashDistance = 8,
+									dashTime = 0.4f,
+									postDashSpeed = 0,
+									doubleDashChance = 0,
+									avoidTarget = true,
+									ShootPoint = m_CachedGunAttachPoint,
+									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
+									fireAtDashStart = true,
+									stopOnCollision = false,
+									warpDashAnimLength = false,
+									hideGun = false,
+									hideShadow = false,
+									toggleTrailRenderer = true,
+									enableShadowTrail = true,
+									Cooldown = 1,
+									CooldownVariance = 2,
+									GlobalCooldown = 0.5f,
+									InitialCooldown = 2,
+									InitialCooldownVariance = 0,
+									GroupCooldown = 0,
+									GroupName = "",
+									Range = 0,
+									MinRange = 0,
+									MinWallDistance = 0,
+									MaxEnemiesInRoom = 0,
+									MinHealthThreshold = 0,
+									MaxHealthThreshold = 1,
+									HealthThresholds = new float[0],
+									AccumulateHealthThresholds = true,
+									targetAreaStyle = null,
+									IsBlackPhantom = false,
+									resetCooldownOnDamage = null,
+									RequiresLineOfSight = false,
+									MaxUsages = 0,
+									AttackCooldown = 0,
+									doDodgeDustUp = false,
+									chargeAnim = "",
+									dashAnim = "idle",
+								},
+								#endregion
+								#region dash2
+
+
+								new DashButGoodBehavior
+								{
+									dashDirection = DashButGoodBehavior.DashDirection.Random,
+									quantizeDirection = 0,
+									dashDistance = 8,
+									dashTime = 0.4f,
+									postDashSpeed = 0,
+									doubleDashChance = 0,
+									avoidTarget = true,
+									ShootPoint = m_CachedGunAttachPoint,
+									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
+									fireAtDashStart = true,
+									stopOnCollision = false,
+									warpDashAnimLength = false,
+									hideGun = false,
+									hideShadow = false,
+									toggleTrailRenderer = true,
+									enableShadowTrail = true,
+									Cooldown = 1,
+									CooldownVariance = 2,
+									GlobalCooldown = 0.5f,
+									InitialCooldown = 2,
+									InitialCooldownVariance = 0,
+									GroupCooldown = 0,
+									GroupName = "",
+									Range = 0,
+									MinRange = 0,
+									MinWallDistance = 0,
+									MaxEnemiesInRoom = 0,
+									MinHealthThreshold = 0,
+									MaxHealthThreshold = 1,
+									HealthThresholds = new float[0],
+									AccumulateHealthThresholds = true,
+									targetAreaStyle = null,
+									IsBlackPhantom = false,
+									resetCooldownOnDamage = null,
+									RequiresLineOfSight = false,
+									MaxUsages = 0,
+									AttackCooldown = 0,
+									doDodgeDustUp = false,
+									chargeAnim = "",
+									dashAnim = "idle",
+								},
+								#endregion
+								#region dash1
+								new DashButGoodBehavior
+								{
+									dashDirection = DashButGoodBehavior.DashDirection.Random,
+									quantizeDirection = 0,
+									dashDistance = 8,
+									dashTime = 0.4f,
+									postDashSpeed = 0,
+									doubleDashChance = 0,
+									avoidTarget = true,
+									ShootPoint = m_CachedGunAttachPoint,
+									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
+									fireAtDashStart = true,
+									stopOnCollision = false,
+									warpDashAnimLength = false,
+									hideGun = false,
+									hideShadow = false,
+									toggleTrailRenderer = true,
+									enableShadowTrail = true,
+									Cooldown = 1,
+									CooldownVariance = 2,
+									GlobalCooldown = 0.5f,
+									InitialCooldown = 2,
+									InitialCooldownVariance = 0,
+									GroupCooldown = 0,
+									GroupName = "",
+									Range = 0,
+									MinRange = 0,
+									MinWallDistance = 0,
+									MaxEnemiesInRoom = 0,
+									MinHealthThreshold = 0,
+									MaxHealthThreshold = 1,
+									HealthThresholds = new float[0],
+									AccumulateHealthThresholds = true,
+									targetAreaStyle = null,
+									IsBlackPhantom = false,
+									resetCooldownOnDamage = null,
+									RequiresLineOfSight = false,
+									MaxUsages = 0,
+									AttackCooldown = 0,
+									doDodgeDustUp = false,
+									chargeAnim = "",
+									dashAnim = "idle",
+								},
+								#endregion
+								#region dash2
+
+
+								new DashButGoodBehavior
+								{
+									dashDirection = DashButGoodBehavior.DashDirection.Random,
+									quantizeDirection = 0,
+									dashDistance = 8,
+									dashTime = 0.4f,
+									postDashSpeed = 0,
+									doubleDashChance = 0,
+									avoidTarget = true,
+									ShootPoint = m_CachedGunAttachPoint,
+									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
+									fireAtDashStart = true,
+									stopOnCollision = false,
+									warpDashAnimLength = false,
+									hideGun = false,
+									hideShadow = false,
+									toggleTrailRenderer = true,
+									enableShadowTrail = true,
+									Cooldown = 1,
+									CooldownVariance = 2,
+									GlobalCooldown = 0.5f,
+									InitialCooldown = 2,
+									InitialCooldownVariance = 0,
+									GroupCooldown = 0,
+									GroupName = "",
+									Range = 0,
+									MinRange = 0,
+									MinWallDistance = 0,
+									MaxEnemiesInRoom = 0,
+									MinHealthThreshold = 0,
+									MaxHealthThreshold = 1,
+									HealthThresholds = new float[0],
+									AccumulateHealthThresholds = true,
+									targetAreaStyle = null,
+									IsBlackPhantom = false,
+									resetCooldownOnDamage = null,
+									RequiresLineOfSight = false,
+									MaxUsages = 0,
+									AttackCooldown = 0,
+									doDodgeDustUp = false,
+									chargeAnim = "",
+									dashAnim = "idle",
+								},
+								#endregion
+								#region dash1
+								new DashButGoodBehavior
+								{
+									dashDirection = DashButGoodBehavior.DashDirection.Random,
+									quantizeDirection = 0,
+									dashDistance = 8,
+									dashTime = 0.4f,
+									postDashSpeed = 0,
+									doubleDashChance = 0,
+									avoidTarget = true,
+									ShootPoint = m_CachedGunAttachPoint,
+									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
+									fireAtDashStart = true,
+									stopOnCollision = false,
+									warpDashAnimLength = false,
+									hideGun = false,
+									hideShadow = false,
+									toggleTrailRenderer = true,
+									enableShadowTrail = true,
+									Cooldown = 1,
+									CooldownVariance = 2,
+									GlobalCooldown = 0.5f,
+									InitialCooldown = 2,
+									InitialCooldownVariance = 0,
+									GroupCooldown = 0,
+									GroupName = "",
+									Range = 0,
+									MinRange = 0,
+									MinWallDistance = 0,
+									MaxEnemiesInRoom = 0,
+									MinHealthThreshold = 0,
+									MaxHealthThreshold = 1,
+									HealthThresholds = new float[0],
+									AccumulateHealthThresholds = true,
+									targetAreaStyle = null,
+									IsBlackPhantom = false,
+									resetCooldownOnDamage = null,
+									RequiresLineOfSight = false,
+									MaxUsages = 0,
+									AttackCooldown = 0,
+									doDodgeDustUp = false,
+									chargeAnim = "",
+									dashAnim = "idle",
+								},
+								#endregion
+								#region dash2
+
+
+								new DashButGoodBehavior
+								{
+									dashDirection = DashButGoodBehavior.DashDirection.Random,
+									quantizeDirection = 0,
+									dashDistance = 8,
+									dashTime = 0.4f,
+									postDashSpeed = 0,
+									doubleDashChance = 0,
+									avoidTarget = true,
+									ShootPoint = m_CachedGunAttachPoint,
+									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines2)),
+									fireAtDashStart = true,
+									stopOnCollision = false,
+									warpDashAnimLength = false,
+									hideGun = false,
+									hideShadow = false,
+									toggleTrailRenderer = true,
+									enableShadowTrail = true,
+									Cooldown = 1,
+									CooldownVariance = 2,
+									GlobalCooldown = 0.5f,
+									InitialCooldown = 2,
+									InitialCooldownVariance = 0,
+									GroupCooldown = 0,
+									GroupName = "",
+									Range = 0,
+									MinRange = 0,
+									MinWallDistance = 0,
+									MaxEnemiesInRoom = 0,
+									MinHealthThreshold = 0,
+									MaxHealthThreshold = 1,
+									HealthThresholds = new float[0],
+									AccumulateHealthThresholds = true,
+									targetAreaStyle = null,
+									IsBlackPhantom = false,
+									resetCooldownOnDamage = null,
+									RequiresLineOfSight = false,
+									MaxUsages = 0,
+									AttackCooldown = 0,
+									doDodgeDustUp = false,
+									chargeAnim = "",
+									dashAnim = "idle",
+								},
+								#endregion
+							},
+							OverrideCooldowns = new List<float>{ 0.04f, 0.04f, 0.04f, 0.04f, 0.04f, 0.04f, 0.04f, 5f },
+							RunInClass = false,
+						},
+					},
 
 					new AttackBehaviorGroup.AttackGroupItem()
 					{
 						//Probability = 0.7f,
-						Probability = 0.7f,
+						Probability = 0.5f,
 
 						Behavior = new SequentialAttackBehaviorGroup()
 						{
@@ -687,12 +944,12 @@ namespace BotsMod
 									teleportInAnim = "",
 									teleportOutAnim = "",
 									AttackCooldown = 1f,
-									InitialCooldown = 0f,
+									InitialCooldown = 1f,
 									RequiresLineOfSight = false,
 									roomMax = new Vector2(0,0),
 									roomMin = new Vector2(0,0),
 
-									teleportOutBulletScript = new CustomBulletScriptSelector(typeof(OverseerTeleportStartScript)),
+									teleportOutBulletScript = new CustomBulletScriptSelector(typeof(OverseerTeleportStartDoubleLinesScript)),
 									//teleportInBulletScript = new CustomBulletScriptSelector(typeof(OverseerBeam)),
 									//teleportInBulletScript = new CustomBulletScriptSelector(typeof(BEAM
 									GlobalCooldown = 0.5f,
@@ -845,6 +1102,56 @@ namespace BotsMod
 
 					new AttackBehaviorGroup.AttackGroupItem()
 					{
+						Probability = 2f,
+						Behavior = new DashAndShootBehavior
+						{
+							dashDirection = DashAndShootBehavior.DashDirection.Random,
+							quantizeDirection = 0,
+							dashDistance = 8,
+							dashTime = 0.4f,
+							postDashSpeed = 0,
+							dashCount = 8,
+							avoidTarget = true,
+							ShootPoint = m_CachedGunAttachPoint,
+							bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
+							secondBulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines2)),
+							fireAtDashStart = true,
+							stopOnCollision = false,
+							warpDashAnimLength = false,
+							hideGun = false,
+							hideShadow = false,
+							toggleTrailRenderer = true,
+							enableShadowTrail = true,
+							Cooldown = 1,
+							CooldownVariance = 2,
+							GlobalCooldown = 0.5f,
+							InitialCooldown = 2,
+							InitialCooldownVariance = 0,
+							GroupCooldown = 0,
+							GroupName = "",
+							Range = 0,
+							MinRange = 0,
+							MinWallDistance = 0,
+							MaxEnemiesInRoom = 0,
+							MinHealthThreshold = 0,
+							MaxHealthThreshold = 1,
+							HealthThresholds = new float[0],
+							AccumulateHealthThresholds = true,
+							targetAreaStyle = null,
+							IsBlackPhantom = false,
+							resetCooldownOnDamage = null,
+							RequiresLineOfSight = false,
+							MaxUsages = 0,
+							AttackCooldown = 0,
+							doDodgeDustUp = false,
+							chargeAnim = "",
+							dashAnim = "idle",
+						},
+						NickName = "dash lots and shoot lines ok? cool"
+					},
+
+					new AttackBehaviorGroup.AttackGroupItem()
+					{
 						Probability = 1f,
 						Behavior = new RemoteShootBehavior
 						{
@@ -888,7 +1195,7 @@ namespace BotsMod
 							Cooldown = 16,
 							CooldownVariance = 0,
 							GlobalCooldown = 0.5f,
-							InitialCooldown = 0,
+							InitialCooldown = 10,
 							InitialCooldownVariance = 0,
 							GroupCooldown = 0,
 							GroupName = "",
@@ -934,7 +1241,7 @@ namespace BotsMod
 							Cooldown = 7,
 							CooldownVariance = 0,
 							GlobalCooldown = 0.5f,
-							InitialCooldown = 0,
+							InitialCooldown = 10,
 							InitialCooldownVariance = 0,
 							GroupCooldown = 0,
 							GroupName = "",
@@ -956,9 +1263,27 @@ namespace BotsMod
 						},
 						NickName = "poor choices"
 					},
-
-
 					/*new AttackBehaviorGroup.AttackGroupItem()
+					{
+						Probability = 2f,
+						Behavior = new ShootBehavior
+						{
+							ShootPoint = m_CachedGunAttachPoint,
+							BulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
+							LeadAmount = 0f,
+							AttackCooldown = 1.2f,
+							TellAnimation = "",
+							FireAnimation = "",
+							RequiresLineOfSight = false,
+							Cooldown = 3f,
+
+							StopDuring = ShootBehavior.StopType.Attack,
+							Uninterruptible = true
+						},
+						NickName = "lines"
+					},
+
+					new AttackBehaviorGroup.AttackGroupItem()
 					{
 						Probability = 0.3f,
 						Behavior = new SummonEnemyBehavior{
@@ -1010,7 +1335,7 @@ namespace BotsMod
 
 					new AttackBehaviorGroup.AttackGroupItem()
 					{
-						Probability = 5f,
+						Probability = 0f,
 						Behavior = new ShootBehavior{
 						ShootPoint = m_CachedGunAttachPoint,
 						BulletScript = new CustomBulletScriptSelector(typeof(SixBeamScript2)),
@@ -1108,6 +1433,40 @@ namespace BotsMod
 				Game.Enemies.Add("bot:the_overseer", enemy.aiActor);
 
 			}
+		}
+
+		public class EnemyBehavior : BraveBehaviour
+		{
+
+
+
+
+			private void Start()
+			{
+				Material mat = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+				mat.mainTexture = base.aiActor.sprite.renderer.material.mainTexture;
+				mat.SetColor("_EmissiveColor", new Color32(255, 69, 245, 255));
+				mat.SetFloat("_EmissiveColorPower", 1.55f);
+				mat.SetFloat("_EmissivePower", 50);
+				aiActor.sprite.renderer.material = mat;
+				//base.aiActor.HasBeenEngaged = true;
+				base.aiActor.healthHaver.OnPreDeath += (obj) =>
+				{
+					//AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
+					//Chest chest2 = GameManager.Instance.RewardManager.SpawnTotallyRandomChest(spawnspot)rg;
+					//chest2.IsLocked = false;
+
+				};
+				base.healthHaver.healthHaver.OnDeath += (obj) =>
+				{
+
+
+				}; ;
+				this.aiActor.knockbackDoer.SetImmobile(true, "nope.");
+
+			}
+
+
 		}
 
 	}

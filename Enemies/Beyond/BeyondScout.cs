@@ -125,56 +125,8 @@ namespace BotsMod
 
 
 				bs.AttackBehaviors = new List<AttackBehaviorBase>() {
-					new TeleportBehavior()
-					{
-
-							AttackableDuringAnimation = true,
-							AllowCrossRoomTeleportation = true,
-							teleportRequiresTransparency = false,
-							hasOutlinesDuringAnim = true,
-							ManuallyDefineRoom = false,
-							MaxHealthThreshold = 1f,
-							StayOnScreen = false,
-							AvoidWalls = true,
-							GoneTime = 1f,
-							OnlyTeleportIfPlayerUnreachable = false,
-							MinDistanceFromPlayer = 4f,
-							MaxDistanceFromPlayer = -1f,
-							teleportInAnim = "",
-							teleportOutAnim = "",
-							AttackCooldown = 1f,
-							InitialCooldown = 0f,
-							RequiresLineOfSight = false,
-							roomMax = new Vector2(0,0),
-							roomMin = new Vector2(0,0),
-							
-							GlobalCooldown = 0.5f,
-							Cooldown = 4f,
-							CooldownVariance = 1f,
-							InitialCooldownVariance = 0f,
-							goneAttackBehavior = null,
-							IsBlackPhantom = false,
-
-
-							GroupName = null,
-							GroupCooldown = 0,
-							MinRange = 0,
-							Range = 0,
-							MinHealthThreshold = 0,
-							MaxEnemiesInRoom = 1,
-							MaxUsages = 0,
-							AccumulateHealthThresholds = true,
-							//shadowInAnim = null,
-							//shadowOutAnim = null,
-							targetAreaStyle = null,
-							HealthThresholds = new float[0],
-							MinWallDistance = 0,
-						//resetCooldownOnDamage = null,
-						//shadowSupport = (TeleportBehavior.ShadowSupport)1,
-					},
-
-
-					new ShootGunBehavior() {
+					
+					/*new ShootGunBehavior() {
 						GroupCooldownVariance = 0.2f,
 						LineOfSight = false,
 						WeaponType = WeaponType.AIShooterProjectile,
@@ -220,7 +172,12 @@ namespace BotsMod
 						RequiresLineOfSight = true,
 						MaxUsages = 0,
 
-					}
+					}*/
+
+					new GunHandBasicShootBehavior
+                    {
+
+                    }
 				};
 					bs.MovementBehaviors = new List<MovementBehaviorBase>
 				{

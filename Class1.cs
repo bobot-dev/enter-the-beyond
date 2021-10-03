@@ -44,7 +44,7 @@ public class ZenithGun : GunBehaviour
         projectile.transform.parent = gun.barrelOffset;
         projectile.sprite.renderer.enabled = false;
 
-        projectile.SetProjectileSpriteRight("zenith_projectile_001", 29, 10);
+        //projectile.SetProjectileSpriteRight("zenith_projectile_001", 29, 10);
         ETGMod.Databases.Items.Add(gun, null, "ANY");
 
     }

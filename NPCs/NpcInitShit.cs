@@ -14,7 +14,7 @@ namespace BotsMod.NPCs
     class NpcInitShit
     {
 
-
+        #region shopnpc
         public static void Init()
         {
             try
@@ -134,6 +134,7 @@ namespace BotsMod.NPCs
 
 
                 AIAnimator aIAnimator = Tools.GenerateBlankAIAnimator(npcObj);
+                
                 aIAnimator.IdleAnimation = new DirectionalAnimation
                 {
                     Type = DirectionalAnimation.DirectionType.Single,
@@ -315,5 +316,228 @@ namespace BotsMod.NPCs
                 BotsModule.Log(message.ToString());
             }
         }
+        #endregion
+    /*
+    #region jailnpc
+    public static void Init2()
+    {
+        try
+        {
+            List<string> testNpcIdleSprites = new List<string>
+            {
+                "shopkeep_001.png",
+                "shopkeep_002.png",
+                "shopkeep_003.png",
+                "shopkeep_004.png",
+                "shopkeep_005.png",
+                "shopkeep_006.png",
+                "shopkeep_007.png",
+                "shopkeep_008.png",
+                "shopkeep_009.png",
+            };
+
+            List<string> testNpcTalkSprites = new List<string>
+            {
+                "shopkeep_talk_001.png",
+                "shopkeep_talk_002.png",
+                "shopkeep_talk_003.png",
+                "shopkeep_talk_004.png",
+                "shopkeep_talk_005.png",
+            };
+
+            BotsModule.Log("anim lists done");
+
+            var SpeechPoint = new GameObject("SpeechPoint");
+            SpeechPoint.transform.position = new Vector3(0.8125f, 2.1875f, -1.31f);
+
+
+
+            var npcObj = SpriteBuilder.SpriteFromResource("BotsMod/sprites/Npcs/Beyond/shopkeep_001.png", new GameObject("Bot:Test_Npc_Jail"));
+
+            npcObj.layer = 22;
+
+            var collection = npcObj.GetComponent<tk2dSprite>().Collection;
+            SpeechPoint.transform.parent = npcObj.transform;
+
+            FakePrefab.MarkAsFakePrefab(SpeechPoint);
+            SpeechPoint.SetActive(true);
+
+            //-2729308948368026681
+            //-2729308948368026681
+
+            var idleIdsList = new List<int>();
+            var talkIdsList = new List<int>();
+
+            foreach (string sprite in testNpcIdleSprites)
+            {
+                idleIdsList.Add(SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/Npcs/Beyond/" + sprite, collection));
+            }
+
+            foreach (string sprite in testNpcTalkSprites)
+            {
+                talkIdsList.Add(SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/Npcs/Beyond/" + sprite, collection));
+            }
+
+
+            BotsModule.Log("anim lists done fr this time");
+
+            tk2dSpriteAnimator spriteAnimator = npcObj.AddComponent<tk2dSpriteAnimator>();
+
+            SpriteBuilder.AddAnimation(spriteAnimator, collection, idleIdsList, "beyond_npc_idle", tk2dSpriteAnimationClip.WrapMode.Loop, 6);
+            SpriteBuilder.AddAnimation(spriteAnimator, collection, talkIdsList, "beyond_npc_talk", tk2dSpriteAnimationClip.WrapMode.LoopSection, 8).loopStart = 3;
+
+            SpeculativeRigidbody rigidbody = Tools.GenerateOrAddToRigidBody(npcObj, CollisionLayer.BulletBlocker, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
+
+            BotsModule.Log("rigidbody done");
+
+
+
+
+
+            TalkDoerLite talkDoer = npcObj.AddComponent<TalkDoerLite>();
+
+            talkDoer.placeableWidth = 4;
+            talkDoer.placeableHeight = 3;
+            talkDoer.difficulty = 0;
+            talkDoer.isPassable = true;
+            talkDoer.usesOverrideInteractionRegion = false;
+            talkDoer.overrideRegionOffset = Vector2.zero;
+            talkDoer.overrideRegionDimensions = Vector2.zero;
+            talkDoer.overrideInteractionRadius = -1;
+            talkDoer.PreventInteraction = false;
+            talkDoer.AllowPlayerToPassEventually = true;
+            talkDoer.speakPoint = SpeechPoint.transform;
+            talkDoer.SpeaksGleepGlorpenese = false;
+            talkDoer.audioCharacterSpeechTag = "oldman";
+            talkDoer.playerApproachRadius = 5;
+            talkDoer.conversationBreakRadius = 5;
+            talkDoer.echo1 = null;
+            talkDoer.echo2 = null;
+            talkDoer.PreventCoopInteraction = false;
+            talkDoer.IsPaletteSwapped = false;
+            talkDoer.PaletteTexture = null;
+            talkDoer.OutlineDepth = 0.5f;
+            talkDoer.OutlineLuminanceCutoff = 0.05f;
+            talkDoer.MovementSpeed = 3;
+            talkDoer.PathableTiles = CellTypes.FLOOR;
+
+            BotsModule.Log("TalkDoerLite done");
+
+            UltraFortunesFavor dreamLuck = npcObj.AddComponent<UltraFortunesFavor>();
+
+            dreamLuck.goopRadius = 2;
+            dreamLuck.beamRadius = 2;
+            dreamLuck.bulletRadius = 2;
+            dreamLuck.bulletSpeedModifier = 0.8f;
+
+            dreamLuck.vfxOffset = 0.625f;
+            dreamLuck.sparkOctantVFX = Tools.shared_auto_001.LoadAsset<GameObject>("FortuneFavor_VFX_Spark");
+
+            BotsModule.Log("UltraFortunesFavor done");
+
+
+            AIAnimator aIAnimator = Tools.GenerateBlankAIAnimator(npcObj);
+
+            aIAnimator.IdleAnimation = new DirectionalAnimation
+            {
+                Type = DirectionalAnimation.DirectionType.Single,
+                Prefix = "beyond_npc_idle",
+                AnimNames = new string[]
+                {
+                    ""
+                },
+                Flipped = new DirectionalAnimation.FlipType[]
+                {
+                    DirectionalAnimation.FlipType.None
+                }
+
+            };
+
+            aIAnimator.TalkAnimation = new DirectionalAnimation
+            {
+                Type = DirectionalAnimation.DirectionType.Single,
+                Prefix = "beyond_npc_talk",
+                AnimNames = new string[]
+                {
+                    ""
+                },
+                Flipped = new DirectionalAnimation.FlipType[]
+                {
+                    DirectionalAnimation.FlipType.None
+                }
+            };
+
+            //PlayMakerFSM iHaveNoFuckingClueWhatThisIs = npcObj.AddComponent<PlayMakerFSM>();
+
+
+            var basenpc = ResourceManager.LoadAssetBundle("shared_auto_002").LoadAsset<GameObject>("NPC_Key_Jailed");
+            if (basenpc == null)
+            {
+                BotsModule.Log("fuck shit fuck fuck shit");
+            }
+
+            PlayMakerFSM iHaveNoFuckingClueWhatThisIs = npcObj.AddComponent<PlayMakerFSM>();
+
+            UnityEngine.JsonUtility.FromJsonOverwrite(UnityEngine.JsonUtility.ToJson(basenpc.GetComponent<PlayMakerFSM>()), iHaveNoFuckingClueWhatThisIs);
+
+
+            FieldInfo fsmStringParams = typeof(ActionData).GetField("fsmStringParams", BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo actionNames = typeof(ActionData).GetField("actionNames", BindingFlags.NonPublic | BindingFlags.Instance);
+
+
+
+            (actionNames.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[1].ActionData) as List<FsmString>)
+
+
+            (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[1].ActionData) as List<FsmString>)[0].Value = "#BEYOND_RUNBASEDMULTILINE_GENERIC";
+            (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[1].ActionData) as List<FsmString>)[1].Value = "#BEYOND_RUNBASEDMULTILINE_STOPPER";
+
+            (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[4].ActionData) as List<FsmString>)[0].Value = "#BEYOND_SHOP_PURCHASED";
+
+            (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[5].ActionData) as List<FsmString>)[0].Value = "#BEYOND_PURCHASE_FAILED";
+
+            (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[7].ActionData) as List<FsmString>)[0].Value = "#BEYOND_INTRO";
+
+            (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[8].ActionData) as List<FsmString>)[0].Value = "#BEYOND_TAKEPLAYERDAMAGE";
+
+            (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[9].ActionData) as List<FsmString>)[0].Value = "#SUBSHOP_GENERIC_CAUGHT_STEALING";
+
+            (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[10].ActionData) as List<FsmString>)[0].Value = "#SHOP_GENERIC_NO_SALE_LABEL";
+
+            (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[12].ActionData) as List<FsmString>)[0].Value = "#COOP_REBUKE";
+
+
+            ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_RUNBASEDMULTILINE_GENERIC", "You are not one of us free of the masters control...");
+            ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_RUNBASEDMULTILINE_GENERIC", "more words");
+            ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_RUNBASEDMULTILINE_GENERIC", "even more words");
+            ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_RUNBASEDMULTILINE_GENERIC", "to many words");
+
+            ETGMod.Databases.Strings.Core.Set("#BEYOND_RUNBASEDMULTILINE_STOPPER", "Enough talk");
+
+            ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_SHOP_PURCHASED", "Yes yes good good");
+            ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_SHOP_PURCHASED", "Enjoy this one");
+
+            ETGMod.Databases.Strings.Core.Set("#BEYOND_PURCHASE_FAILED", "To weak come back when you're in better condition");
+
+            ETGMod.Databases.Strings.Core.Set("#BEYOND_INTRO", "Welcome...");
+
+            ETGMod.Databases.Strings.Core.Set("#BEYOND_TAKEPLAYERDAMAGE", "The master's fury will not be kind to you!");
+
+
+
+            npcObj.name = "Bot:Test_Npc_Jail";
+
+
+
+            BotsModule.NPC = npcObj;
+            BotsModule.Log("all done :D");
+        }
+        catch (Exception message)
+        {
+            BotsModule.Log(message.ToString());
+        }
+    }
+    #endregion
+    */
     }
 }

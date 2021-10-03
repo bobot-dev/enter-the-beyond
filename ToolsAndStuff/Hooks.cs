@@ -79,7 +79,8 @@ namespace BotsMod
 
 				//Hook Portal = new Hook(typeof(ParadoxPortalController).GetProperty("Interact", BindingFlags.Instance | BindingFlags.Public).GetGetMethod(), typeof(Hooks).GetMethod("HookInteract"));
 
-				//Hook DumbPastHook = new Hook(typeof(GameManager).GetMethod("LoadCustomLevel", BindingFlags.Instance | BindingFlags.Public), typeof(Hooks).GetMethod("LoadCustomLevel"));
+				
+				Hook DumbPastHook = new Hook(typeof(GameManager).GetMethod("LoadCustomLevel", BindingFlags.Instance | BindingFlags.Public), typeof(Hooks).GetMethod("LoadCustomLevel"));
 
 
 				
@@ -253,12 +254,16 @@ namespace BotsMod
 					typeof(ShopItemController).GetMethod("InitializeInternal", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("InitializeInternalHook", BindingFlags.Static | BindingFlags.NonPublic));
 
+				var UpdateAnimationsHook = new Hook(
+					typeof(GunExt).GetMethod("UpdateAnimations", BindingFlags.Static | BindingFlags.Public),
+					typeof(Hooks).GetMethod("UpdateAnimationsHook", BindingFlags.Static | BindingFlags.Public));
+
 				/*var StupidFuckingHook = new Hook(
 					typeof(DebrisObject).GetMethod("Trigger", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("StupidFuckingHook", BindingFlags.Static | BindingFlags.Public));*/
-
-
-
+				var HandleHeroSwordSlashHook = new Hook(
+					typeof(Gun).GetMethod("HandleHeroSwordSlash", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("DodgeRollPleaseJustNullCheckShitIBegYou", BindingFlags.Static | BindingFlags.Public));
 			}
 			catch (Exception arg)
 			{
@@ -268,6 +273,31 @@ namespace BotsMod
 			}
 		}
 
+		
+		public static void DodgeRollPleaseJustNullCheckShitIBegYou(Action<Gun, List<SpeculativeRigidbody>, Vector2, int> orig, Gun self, List<SpeculativeRigidbody> alreadyHit, Vector2 arcOrigin, int slashId)
+		{
+			ReadOnlyCollection<Projectile> allProjectiles = StaticReferenceManager.AllProjectiles;
+			for (int i = allProjectiles.Count - 1; i >= 0; i--)
+			{
+				Projectile projectile = allProjectiles[i];
+				if(projectile != null && projectile.sprite == null)
+                {
+					BotsModule.Log(projectile.name);
+					StaticReferenceManager.RemoveProjectile(projectile);
+
+				}
+			}
+			orig(self, alreadyHit, arcOrigin, slashId);
+		}
+
+
+		public static void UpdateAnimationsHook(Action<Gun, tk2dSpriteCollectionData> orig, Gun gun, tk2dSpriteCollectionData collection = null)
+		{
+			orig(gun, collection);
+
+			gun.dodgeAnimation = gun.UpdateAnimation("dodge", collection, true);
+			gun.alternateIdleAnimation = gun.UpdateAnimation("alternate_idle", collection, false);
+		}
 
 		private static void InitializeInternalHook(Action<ShopItemController, PickupObject> orig, ShopItemController self, PickupObject i)
 		{
@@ -2953,9 +2983,9 @@ namespace BotsMod
 
 		public static void LoadCustomLevel(Action<GameManager, string> orig, GameManager self, string custom)
 		{
-			if (custom == "fs_guide" && self.PrimaryPlayer.name == "PlayerLost(Clone)")
+			if (custom == "tt_catacombs" && self.PrimaryPlayer.HasMTGConsoleID("bot:global_warming"))
 			{
-				custom = "botfs_lost";
+				custom = "tt_forge";
 			}
 			orig(self, custom);
 		}
@@ -3101,7 +3131,7 @@ namespace BotsMod
 						Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
 						material.SetTexture("_MainTexture", self.sprite.renderer.material.GetTexture("_MainTex"));
 						material.SetColor("_EmissiveColor", new Color32(255, 69, 248, 255));
-						material.SetFloat("_EmissiveColorPower", 4.55f);
+						material.SetFloat("_EmissiveColorPower", 1.55f);
 						material.SetFloat("_EmissivePower", 55);
 						self.sprite.renderer.material = material;
 						result = material.shader.name;

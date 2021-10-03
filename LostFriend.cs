@@ -93,12 +93,13 @@ namespace BotsMod
 			BasicBeamController beamComp = projectile4.GenerateBeamPrefab("BotsMod/sprites/beam/LostFriend/lost_friend_laser_middle_001", new Vector2(32, 4),new Vector2(0, 0),BeamAnimPaths, 8,ImpactAnimPaths, 13,new Vector2(0, 0),new Vector2(0, 0),
 				muzzleVFXAnimationPaths: StartAnimPaths, muzzleVFXColliderDimensions: new Vector2(32, 4), muzzleVFXColliderOffsets: new Vector2(0, 0), glows: true);
 			//projectile4.gameObject.SetActive(false);
+			projectile4.collidesWithPlayer = false;
 			FakePrefab.MarkAsFakePrefab(projectile4.gameObject);
 			UnityEngine.Object.DontDestroyOnLoad(projectile4);
 			projectile4.baseData.damage = 20f;
 			projectile4.baseData.range = 100;
 			projectile4.baseData.speed = 200;
-			projectile4.PenetratesInternalWalls = true;
+			projectile4.PenetratesInternalWalls = false;
 
 			beamComp.ContinueBeamArtToWall = false;
 			beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
@@ -114,7 +115,7 @@ namespace BotsMod
 			beamComp.gameObject.GetOrAddComponent<EmmisiveBeams>().EmissivePower = 42;
 
 			var beamCon = prefab.AddComponent<AIBeamShooter>();
-
+			
 
 			var shootpoint = new GameObject("attach");
 			shootpoint.transform.parent = prefab.transform;
@@ -320,6 +321,7 @@ namespace BotsMod
 
 			chanceKinBehavioar.CanInterceptBullets = false;
 			//chanceKinBehavioar.CanInterceptBullets = true;
+			chanceKinBehavioar.aiActor.CanTargetPlayers = false;
 			chanceKinBehavioar.aiActor.healthHaver.PreventAllDamage = true;
 			chanceKinBehavioar.aiActor.specRigidbody.CollideWithOthers = true;
 			chanceKinBehavioar.aiActor.specRigidbody.CollideWithTileMap = false;

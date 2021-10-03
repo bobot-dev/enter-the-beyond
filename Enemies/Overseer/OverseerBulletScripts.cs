@@ -49,7 +49,7 @@ namespace BotsMod
 			if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
 			{
 				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("6c43fddfd401456c916089fdd1c99b1c").bulletBank.GetBullet("sweep"));
-		
+				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("6c43fddfd401456c916089fdd1c99b1c").bulletBank.GetBullet("default"));
 
 			}
 
@@ -57,56 +57,94 @@ namespace BotsMod
 			Vector2 roomLowerLeft = area.UnitBottomLeft;
 			Vector2 roomUpperRight = area.UnitTopRight - new Vector2(0f, 3f);
 			Vector2 roomCenter = this.BulletBank.aiActor.Position;
-			for (int i = 0; i < 3; i++)
+			
+			for (int j = 0; j < 18; j++)
 			{
-				for (int j = 0; j < 20; j++)
+				for (int i = 0; i < 84; i++)
 				{
-					Vector2 vector = new Vector2(roomLowerLeft.x, this.SubdivideRange(roomLowerLeft.y, roomUpperRight.y, 21, j, true));
-					vector += new Vector2(0, 0);
-					vector.x -= 1.25f;
-					this.FireWallBullet(0f, vector, roomCenter);
+					Vector2 vector = this.BulletBank.aiActor.CenterPosition;
+					float angle = base.SubdivideCircle(0f, 84, i, 1f, false);
+					Vector2 vector2 = vector + (BraveMathCollege.DegreesToVector(angle, 5f) * 6);
+					Bullet bullet = new Default(vector, 12 + j);
+					if (j == 0)
+                    {
+						bullet = new SkellBullet(vector, 12 + j);
+
+					}
+					base.Fire(Offset.OverridePosition(vector2), bullet);
 				}
-				for (int k = 0; k < 20; k++)
-				{
-					Vector2 vector2 = new Vector2(this.SubdivideRange(roomLowerLeft.x, roomUpperRight.x, 21, k, true), roomUpperRight.y);
-					vector2 += new Vector2(0, 0);
-					vector2.y += 3.25f;
-					this.FireWallBullet(-90f, vector2, roomCenter);
-				}
-				for (int l = 0; l < 20; l++)
-				{
-					Vector2 vector3 = new Vector2(roomUpperRight.x, this.SubdivideRange(roomLowerLeft.y, roomUpperRight.y, 21, l, true));
-					vector3 += new Vector2(0, 0);
-					vector3.x += 1.25f;
-					this.FireWallBullet(180f, vector3, roomCenter);
-				}
-				for (int m = 0; m < 20; m++)
-				{
-					Vector2 vector4 = new Vector2(this.SubdivideRange(roomLowerLeft.x, roomUpperRight.x, 21, m, true), roomLowerLeft.y);
-					vector4 += new Vector2(0, 0);
-					vector4.y -= 1.25f;
-					this.FireWallBullet(90f, vector4, roomCenter);
-				}
-				if (i == 2)
-				{
-					this.EndOnBlank = true;
-				}
-				yield return this.Wait(75);
+				yield return this.Wait(15);
 			}
+
+			
+
 			yield return this.Wait(125);
 		}
-
-
-		private void FireWallBullet(float facingDir, Vector2 spawnPos, Vector2 roomCenter)
+		public class Default : Bullet
 		{
-			float angleDeg = (spawnPos - roomCenter).ToAngle();
-			int num = Mathf.RoundToInt(BraveMathCollege.ClampAngle360(angleDeg) / 45f) % 8;
-			float num2 = (float)num * 45f;
-			Vector2 targetPos = (roomCenter + BraveMathCollege.DegreesToVector(num2, 0.875f) + SixBeamScript2.TargetOffsets[num]).Quantize(0.0625f);
-			base.Fire(Offset.OverridePosition(spawnPos), new Direction(facingDir, DirectionType.Absolute, -1f), new Speed(0f, SpeedType.Absolute), new SixBeamScript2.CheeseWedgeBullet(this, SixBeamScript2.RampHeights[num], targetPos, num2 + 180f, 8));
+			public Default(Vector2 targetPos, float endingDist) : base("default", false, false, false)
+			{
+				this.m_targetPos = targetPos;
+
+				this.m_endDist = endingDist;
+
+			}
+			protected override IEnumerator Top()
+			{
+				this.Direction = (this.m_targetPos - this.Position).ToAngle();
+				this.Projectile.IgnoreTileCollisionsFor(90f);
+				this.Projectile.IgnoreCollisionsFor(2f);
+
+				this.Speed = 7f;
+				while (Vector3.Distance(m_targetPos, this.Position) > m_endDist)
+				{
+					yield return this.Wait(1);
+				}
+
+				//yield return this.Wait(travelTime);
+				this.Speed = 0f;
+				yield return this.Wait(14*60);
+				this.Vanish(true);
+			}
+
+			private Vector2 m_targetPos;
+			private float m_endDist;
 		}
 
-		public class CheeseWedgeBullet : Bullet
+
+		public class SkellBullet : Bullet
+        {
+            public SkellBullet(Vector2 targetPos, float endingDist) : base("sweep", false, false, false)
+            {
+				this.m_targetPos = targetPos;
+
+				this.m_endDist = endingDist;
+
+			}
+            protected override IEnumerator Top()
+            {
+				this.Direction = (this.m_targetPos - this.Position).ToAngle();
+				this.Projectile.IgnoreTileCollisionsFor(90f);
+				this.Projectile.IgnoreCollisionsFor(2f);
+				
+				this.Speed = 7f;
+				while (Vector3.Distance(m_targetPos, this.Position) > m_endDist)
+				{
+					yield return this.Wait(1);
+				}
+
+				//yield return this.Wait(travelTime);
+				this.Speed = 0f;
+				yield return this.Wait(14 * 60);
+				this.Vanish(true);
+			}
+
+			private Vector2 m_targetPos;
+			private float m_endDist;
+		}
+
+
+        public class CheeseWedgeBullet : Bullet
 		{
 			public CheeseWedgeBullet(SixBeamScript2 parent,  float additionalRampHeight, Vector2 targetPos, float endingAngle, float endingDist) : base("sweep", true, false, false)
 			{
@@ -165,10 +203,10 @@ namespace BotsMod
 
 			// Token: 0x04000B83 RID: 2947
 			private Vector2 m_targetPos;
-
+			private float m_endDist;
 			// Token: 0x04000B84 RID: 2948
 			private float m_endingAngle;
-			private float m_endDist;
+
 
 
 			// Token: 0x04000B86 RID: 2950
@@ -530,11 +568,14 @@ namespace BotsMod
 			}
 			var bulletCount = 6;
 
+
+
 			for (int j = 0; j <= (bulletCount); j++)
 			{
-				this.Fire(new Direction((float)((j * (360 / bulletCount)) + 360 / (bulletCount / 2)), DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
+				this.Fire(new Direction((float)(j * (360 / bulletCount)), DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
 			}
-			yield return this.Wait(4);
+
+			//yield return this.Wait(4);
 
 			for (int i = 0; i <= 3; i++)
 			{
@@ -551,13 +592,157 @@ namespace BotsMod
 				}
 				yield return this.Wait(4);
 			}
-
 			for (int j = 0; j <= (bulletCount); j++)
 			{
-				this.Fire(new Direction((float)(j * (360 / bulletCount)), DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
+				this.Fire(new Direction((float)((j * (360 / bulletCount)) + 360 / (bulletCount * 2)), DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
 			}
 
 			yield break;
+		}
+
+		public class SkellBullet : Bullet
+		{
+			public SkellBullet() : base("sweep", false, false, false)
+			{
+
+
+			}
+		}
+	}
+
+	public class OverseerRapidFireLines2 : Script
+	{
+
+		protected override IEnumerator Top() // This is just a simple example, but bullet scripts can do so much more.
+		{
+			if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
+			{
+				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("6c43fddfd401456c916089fdd1c99b1c").bulletBank.GetBullet("sweep"));
+
+			}
+			var bulletCount = 3;
+			var lineCount = 8;
+			var repCount = UnityEngine.Random.Range(2, 5);
+
+
+
+			//for (int k = 0; k <= repCount; k++)
+			//{
+				for (int i = 0; i <= bulletCount; i++)
+				{
+					for (int j = 0; j <= lineCount; j++)
+					{
+						this.Fire(new Direction((float)((j * (360 / bulletCount)) + 360 / (bulletCount * 2)), DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
+
+					}
+					yield return this.Wait(4);
+				}
+				yield return this.Wait(12);
+
+			//}
+
+			yield break;
+		}
+
+		public class SkellBullet : Bullet
+		{
+			public SkellBullet() : base("sweep", false, false, false)
+			{
+
+
+			}
+		}
+	}
+
+	public class OverseerRapidFireLines : Script
+	{
+
+		protected override IEnumerator Top() // This is just a simple example, but bullet scripts can do so much more.
+		{
+			if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
+			{
+				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("6c43fddfd401456c916089fdd1c99b1c").bulletBank.GetBullet("sweep"));
+
+			}
+			var bulletCount = 3;
+			var lineCount = 8;
+			var repCount = UnityEngine.Random.Range(2, 5);
+
+
+
+			//for (int k = 0; k <= repCount; k++)
+			//{
+				for (int i = 0; i <= bulletCount; i++)
+				{
+					for (int j = 0; j <= lineCount; j++)
+					{
+						this.Fire(new Direction((float)(j * (360 / bulletCount)), DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
+
+					}
+					yield return this.Wait(4);
+				}
+				yield return this.Wait(12);
+
+				for (int i = 0; i <= bulletCount; i++)
+				{
+					for (int j = 0; j <= lineCount; j++)
+					{
+						this.Fire(new Direction((float)((j * (360 / bulletCount)) + 360 / (bulletCount * 2)), DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
+
+					}
+					yield return this.Wait(4);
+				}
+				yield return this.Wait(12);
+
+			//}
+
+			yield break;
+		}
+
+		public class SkellBullet : Bullet
+		{
+			public SkellBullet() : base("sweep", false, false, false)
+			{
+
+
+			}
+		}
+	}
+
+	public class OverseerTeleportStartDoubleLinesScript : Script
+	{
+
+		protected override IEnumerator Top() // This is just a simple example, but bullet scripts can do so much more.
+		{
+			if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
+			{
+				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("6c43fddfd401456c916089fdd1c99b1c").bulletBank.GetBullet("sweep"));
+
+			}
+			var bulletCount = 7;
+			var dir = AimDirection;
+
+			for (int j = 0; j <= bulletCount; j++)
+			{
+				this.Fire(new Direction(dir + 25, DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
+				this.Fire(new Direction(dir + -25, DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
+
+				this.Fire(new Direction(dir + 35, DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());						
+				this.Fire(new Direction(dir + -35, DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
+
+				this.Fire(new Direction(dir + 45, DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
+				this.Fire(new Direction(dir + -45, DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
+				yield return this.Wait(4);
+			}
+			
+
+			yield break;
+		}
+		public class Default : Bullet
+		{
+			public Default() : base("default", false, false, false)
+			{
+			}
 		}
 
 		public class SkellBullet : Bullet
@@ -685,7 +870,13 @@ namespace BotsMod
 				{
 					this.Fire(new Direction(currentAngle + UnityEngine.Random.Range(-1f, 1f) * 20f, DirectionType.Absolute, -1f), new Speed(12f, SpeedType.Absolute), new SkellBullet());
 				}
-				if (i >= 60)
+
+				if (i == 60)
+				{
+					yield return this.Wait(45);
+				}
+
+				if (i > 60)
 				{
 					float num2 = Vector2.Distance(this.BulletManager.PlayerPosition(), this.Position);
 					float num3 = num2 / 18f * 30f;
@@ -881,9 +1072,9 @@ namespace BotsMod
 			shield2.self = shield2.gameObject;
 			shield3.self = shield3.gameObject;
 
-			shield1.leader = LostPastBoss.OverseerPrefab;
-			shield2.leader = LostPastBoss.OverseerPrefab;
-			shield3.leader = LostPastBoss.OverseerPrefab;
+			shield1.leader = OverseerFloor.OverseerPrefab;
+			shield2.leader = OverseerFloor.OverseerPrefab;
+			shield3.leader = OverseerFloor.OverseerPrefab;
 
 
 			shield1.offset = new Vector3(0, -2, 0);    //-1-
@@ -1040,286 +1231,8 @@ namespace BotsMod
 		*/
 	}
 
-	public class FourLaser : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
-	{
-		protected override IEnumerator Top()
-		{
-			if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
-			{
-				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("796a7ed4ad804984859088fc91672c7f").bulletBank.GetBullet("default"));
-				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible"));
-			}
-			for (int u = 0; u < 4; u++)
-			{
-				int scatter = UnityEngine.Random.Range(4, 7);
-				AkSoundEngine.PostEvent("Play_WPN_golddoublebarrelshotgun_shot_01", this.BulletBank.aiActor.gameObject);
-				for (int k = 0; k < scatter; k++)
-				{
-					base.Fire(new Direction(UnityEngine.Random.Range(-25f, 25f), DirectionType.Aim, -1f), new Speed(UnityEngine.Random.Range(9f, 13f), SpeedType.Absolute), new WallBullet());
-				}
-				yield return Wait(scatter - 1);
-				base.Fire(new Direction(UnityEngine.Random.Range(-60f, 60f), DirectionType.Aim, -1f), new Speed(UnityEngine.Random.Range(5f, 7f), SpeedType.Absolute), new SpeedUpBullet());
-				base.Fire(new Direction(UnityEngine.Random.Range(-60f, 60f), DirectionType.Aim, -1f), new Speed(UnityEngine.Random.Range(6f, 8f), SpeedType.Absolute), new SpeedUpBullet());
-				yield return Wait(4);
-			}
-			yield break;
-		}
-
-	}
-
-
-	public class BrrapScript : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
-	{
-		protected override IEnumerator Top()
-		{
-			if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
-			{
-				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("796a7ed4ad804984859088fc91672c7f").bulletBank.GetBullet("default"));
-				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible"));
-			}
-			for (int u = 0; u < 4; u++)
-			{
-				int scatter = UnityEngine.Random.Range(4, 7);
-				AkSoundEngine.PostEvent("Play_WPN_golddoublebarrelshotgun_shot_01", this.BulletBank.aiActor.gameObject);
-				for (int k = 0; k < scatter; k++)
-				{
-					base.Fire(new Direction(UnityEngine.Random.Range(-25f, 25f), DirectionType.Aim, -1f), new Speed(UnityEngine.Random.Range(9f, 13f), SpeedType.Absolute), new WallBullet());
-				}
-				yield return Wait(scatter - 1);
-				base.Fire(new Direction(UnityEngine.Random.Range(-60f, 60f), DirectionType.Aim, -1f), new Speed(UnityEngine.Random.Range(5f, 7f), SpeedType.Absolute), new SpeedUpBullet());
-				base.Fire(new Direction(UnityEngine.Random.Range(-60f, 60f), DirectionType.Aim, -1f), new Speed(UnityEngine.Random.Range(6f, 8f), SpeedType.Absolute), new SpeedUpBullet());
-				yield return Wait(4);
-			}
-			yield break;
-		}
-
-	}
-	public class SniperScript : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
-	{
-		protected override IEnumerator Top()
-		{
-			if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
-			{
-				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("796a7ed4ad804984859088fc91672c7f").bulletBank.GetBullet("default"));
-			}
-			int shots = UnityEngine.Random.Range(2, 6);
-			for (int e = 0; e < shots; e++)
-			{
-				base.PostWwiseEvent("Play_WPN_sniperrifle_shot_01", null);
-				for (int u = -2; u < 1; u++)
-				{
-					for (int h = 0; h < 2; h++)
-					{
-						base.Fire(new Direction((25 * u), DirectionType.Aim, -1f), new Speed(11.5f + h, SpeedType.Absolute), new WallBullet());
-
-					}
-
-				}
-				for (int p = 0; p < 4; p++)
-				{
-					base.Fire(new Direction(UnityEngine.Random.Range(-60f, 60f), DirectionType.Aim, -1f), new Speed(UnityEngine.Random.Range(8f, 10f), SpeedType.Absolute), new WallBullet());
-				}
-				base.Fire(new Direction(0f, DirectionType.Aim, -1f), new Speed(12.5f - (shots / 3), SpeedType.Absolute), new WallBullet());
-				base.PostWwiseEvent("Play_WPN_sniperrifle_shot_01", null);
-				yield return Wait(15 + shots);
-				for (int u = 0; u < 1; u++)
-				{
-					for (int h = 0; h < 2; h++)
-					{
-						base.Fire(new Direction(25f, DirectionType.Aim, -1f), new Speed(11.5f + h, SpeedType.Absolute), new WallBullet());
-						base.Fire(new Direction(-25f, DirectionType.Aim, -1f), new Speed(11.5f + h, SpeedType.Absolute), new WallBullet());
-					}
-					for (int p = 0; p < 3; p++)
-					{
-						base.Fire(new Direction(UnityEngine.Random.Range(-60f, 60f), DirectionType.Aim, -1f), new Speed(UnityEngine.Random.Range(8f, 10f), SpeedType.Absolute), new WallBullet());
-					}
-
-				}
-				base.Fire(new Direction(0f, DirectionType.Aim, -1f), new Speed(12.5f - (shots / 3), SpeedType.Absolute), new WallBullet());
-				yield return Wait(15 + shots);
-			}
-			base.PostWwiseEvent("Play_ENM_hammer_target_01", null);
-			yield return Wait(30);
-			base.PostWwiseEvent("Play_BOSS_RatMech_Stomp_01", null);
-			for (int u = 0; u < 4; u++)
-			{
-				for (int h = 0; h < 20; h++)
-				{
-					base.Fire(new Direction(18 * h + (9 * u), DirectionType.Aim, -1f), new Speed(11 + u, SpeedType.Absolute), new WallBullet());
-
-				}
-			}
-
-			yield break;
-		}
-
-	}
-	public class CannonScript : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
-	{
-		protected override IEnumerator Top()
-		{
-			if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
-			{
-				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("ec6b674e0acd4553b47ee94493d66422").bulletBank.GetBullet("bigBullet"));
-				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("da797878d215453abba824ff902e21b4").bulletBank.GetBullet("snakeBullet"));
-			}
-			AkSoundEngine.PostEvent("Play_BOSS_RatMech_Cannon_01", base.BulletBank.gameObject);
-			this.Fire(new Direction(0f, DirectionType.Aim, -1f), new Speed(1f, SpeedType.Absolute), new CannonScript.SplitBall());
-			this.Fire(new Direction(120f, DirectionType.Aim, -1f), new Speed(1f, SpeedType.Absolute), new CannonScript.SplitBall());
-			this.Fire(new Direction(240f, DirectionType.Aim, -1f), new Speed(1f, SpeedType.Absolute), new CannonScript.SplitBall());
-
-			yield break;
-			//yield return base.Wait(20);
-		}
-		public class SplitBall : Bullet
-		{
-			// Token: 0x06000007 RID: 7 RVA: 0x000021A2 File Offset: 0x000003A2
-			public SplitBall() : base("bigBullet", false, false, false)
-			{
-			}
-			protected override IEnumerator Top()
-			{
-				base.ChangeSpeed(new Speed(30f, SpeedType.Absolute), 120);
-				yield break;
-			}
-			public override void OnBulletDestruction(Bullet.DestroyType destroyType, SpeculativeRigidbody hitRigidbody, bool preventSpawningProjectiles)
-			{
-				if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
-				{
-					base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("ec6b674e0acd4553b47ee94493d66422").bulletBank.GetBullet("bigBullet"));
-					base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("1bc2a07ef87741be90c37096910843ab").bulletBank.GetBullet("reversible"));
-				}
-				if (!preventSpawningProjectiles)
-				{
-					float num = base.RandomAngle();
-					float Amount = 16;
-					float Angle = 360 / Amount;
-					for (int i = 0; i < Amount; i++)
-					{
-						base.Fire(new Direction(num + Angle * (float)i, DirectionType.Absolute, -1f), new Speed(10f, SpeedType.Absolute), new WallBullet());
-					}
-					for (int i = -1; i < 2; i++)
-					{
-						base.Fire(new Direction((10 * i), DirectionType.Aim, -1f), new Speed(1f, SpeedType.Absolute), new SpeedUpBullet());
-					}
-				}
-			}
-		}
-		// Token: 0x04000091 RID: 145		
-	}
-
-
-	public class BurstBullet : Bullet
-	{
-
-		public BurstBullet() : base("reversible", false, false, false)
-		{
-		}
-
-		protected override IEnumerator Top()
-		{
-			this.Projectile.spriteAnimator.Play();
-			yield break;
-		}
-		public override void OnBulletDestruction(Bullet.DestroyType destroyType, SpeculativeRigidbody hitRigidbody, bool preventSpawningProjectiles)
-		{
-			if (preventSpawningProjectiles)
-			{
-				return;
-			}
-			for (int i = 0; i < 4; i++)
-			{
-				base.Fire(new Direction((float)(i * 45), DirectionType.Absolute, -1f), new Speed(7f, SpeedType.Absolute), new WallBullet());
-			}
-		}
-	}
-
-	public class SpeedUpBullet : Bullet
-	{
-
-		public SpeedUpBullet() : base("reversible", false, false, false)
-		{
-		}
-
-
-		protected override IEnumerator Top()
-		{
-			float speed = this.Speed;
-			yield return this.Wait(100);
-			this.ChangeSpeed(new Speed(12f, SpeedType.Absolute), 20);
-			yield break;
-		}
-	}
-
-	public class WallBullet : Bullet
-	{
-
-		public WallBullet() : base("default", false, false, false)
-		{
-		}
-
-	}
-	public class ChuckScript : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
-	{
-		protected override IEnumerator Top()
-		{
-			if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
-			{
-				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("880bbe4ce1014740ba6b4e2ea521e49d").bulletBank.GetBullet("grenade"));
-			}
-			float airTime = base.BulletBank.GetBullet("grenade").BulletObject.GetComponent<ArcProjectile>().GetTimeInFlight();
-			Vector2 vector = this.BulletManager.PlayerPosition();
-			Bullet bullet2 = new Bullet("grenade", false, false, false);
-			float direction2 = (vector - base.Position).ToAngle();
-			base.Fire(new Direction(direction2, DirectionType.Absolute, -1f), new Speed(1f, SpeedType.Absolute), bullet2);
-			(bullet2.Projectile as ArcProjectile).AdjustSpeedToHit(vector);
-			bullet2.Projectile.ImmuneToSustainedBlanks = true;
-			yield break;
-		}
-
-	}
-
-
-	public class PleaseJustFuckingGlow : EnemyBehavior
-	{
-		public void Start()
-		{
-
-		}
-	}
-
-
-	public class EnemyBehavior : BraveBehaviour
-	{
 
 
 
-
-		private void Start()
-		{
-			Material mat = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
-			mat.mainTexture = base.aiActor.sprite.renderer.material.mainTexture;
-			mat.SetColor("_EmissiveColor", new Color32(255, 69, 245, 255));
-			mat.SetFloat("_EmissiveColorPower", 1.55f);
-			mat.SetFloat("_EmissivePower", 50);
-			aiActor.sprite.renderer.material = mat;
-			//base.aiActor.HasBeenEngaged = true;
-			base.aiActor.healthHaver.OnPreDeath += (obj) =>
-			{
-				//AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
-				//Chest chest2 = GameManager.Instance.RewardManager.SpawnTotallyRandomChest(spawnspot)rg;
-				//chest2.IsLocked = false;
-
-			};
-			base.healthHaver.healthHaver.OnDeath += (obj) =>
-			{
-
-
-			}; ;
-			this.aiActor.knockbackDoer.SetImmobile(true, "nope.");
-
-		}
-
-
-	}
+	
 }

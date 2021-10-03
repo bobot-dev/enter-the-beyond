@@ -25,6 +25,7 @@ using HutongGames.PlayMaker;
 using BotsMod.NPCs;
 using BotsMod.ToolsAndStuff;
 using LiveRecolor;
+using NpcApi;
 //using ChallengeAPI;
 
 
@@ -130,7 +131,8 @@ namespace BotsMod
 
                 //GungeonAP.Init();
 
-                GameManager.Instance.gameObject.AddComponent<DiscordController>();
+                //GameManager.Instance.gameObject.AddComponent<DiscordController>();
+
                 /*
                 var array = Tools.ReflectionHelpers.ReflectGetField<Type[]>(typeof(GameManager), "BraveLevelLoadedListeners", GameManager.Instance).ToList();
                 array.Add(typeof(FuckYouThisIsAnAwfulIdea));
@@ -143,9 +145,10 @@ namespace BotsMod
                 FrostAndGunfireItems.Hooks.Init();
 
                 //funny book api
-                AmmonomiconAPI.Tools.Init();
+                //AmmonomiconAPI.Tools.Init(); // <--- fuck you 
+                //Ammonomicon.Init();
 
-               
+
 
                 //my stuff
                 Tools.Init();
@@ -167,49 +170,50 @@ namespace BotsMod
 
                 //StuffIStoleFromApacheForChallengeMode.Init();
 
-                Ammonomicon.Init();
 
                 InitGameObjects.Init();
                 ChestInitStuff.Init();
 
-                
-
+                //GlobalWarning.Init();
 
                 BeyondMasteryToken.Init();
 
                 ScrapBook.Init();
 
                 Bob.Init();
-                CosmicSludge.Init();
-                BlessedOrb.Init();
-                BabyGoodMistake.Init();
+                //CosmicSludge.Init();
+                //BlessedOrb.Init();
+                //BabyGoodMistake.Init();
                 //LostsPast.Init();
                 PirmalShotgrub.Init();
                 BeyondKin.Init();
-                LostPastBoss.Init();
+                OverseerFloor.Init();
                 //OverseerDecoy.Init();
                 TestActive.Init();
                 //SpecialDungeon.Init();
                 //SpecialDungeon2CozFuckYou.Init();
-                RichPresenceItem.Register();
+                //RichPresenceItem.Register();
 
-                BeyondScout.Init();
+                //BeyondScout.Init();
 
                 TestGun.Add();
+
+                //AAAAAAAAAA.a.Init();
 
                 Coin.Init();
                 HellsRevolver2.Add();
                 HellsRevolver.Add();
                 HellsShotgun.Add();
+                NailGun.Add();
 
-                CompletlyRandomGun.Add();
+                //CompletlyRandomGun.Add();
 
-                PossetionItem.Init();
+                //PossetionItem.Init();
 
                 LostFriend.Init();
 
-                PortalThing.Init();
-                NoTimeToExplain.Add();
+                //PortalThing.Init();
+                //NoTimeToExplain.Add();
 
                 TheMessanger.Add();
 
@@ -217,15 +221,19 @@ namespace BotsMod
 
                 //LootTables.Init();
 
-                RedKey.Init();
+                //RedKey.Init();
 
                 LostSidearm.Add();
+                AltLostSidearm.Add();
 
-                TrailBullets.Init();
+                //TrailBullets.Init();
 
                 SpellInit.Init();
                 Wand.Add();
-               
+
+                //HellsGrasp.Init();
+
+
                 EnchantedEnemies.Init();
 
                 TestPassive.Init();
@@ -236,13 +244,52 @@ namespace BotsMod
 
                 Roomba.Init();
 
+                ThrowableTest.Init();
+
                 SpinDownDice.Init();
 
                 //OtherworldlyConnections.Init();
                 OtherwordlyFury.Init();
 
+                List<string> testNpcIdleSprites = new List<string>
+                {
+                    "test_npc_idle_001.png",
+                    "test_npc_idle_002.png",
+                    "test_npc_idle_003.png",
+                    "test_npc_idle_004.png",
+                   
+                };
+
+                List<string> testNpcTalkSprites = new List<string>
+                {
+                    "test_npc_talk_001.png",
+                    "test_npc_talk_002.png",
+                    
+                };
+
+                var devilLootTable = LootTableAPI.LootTableTools.CreateLootTable();
+                devilLootTable.AddItemToPool(349);
+                devilLootTable.AddItemToPool(279);
+                devilLootTable.AddItemToPool(500);
+                devilLootTable.AddItemToPool(350);
+                int z = 0;
+                int x = 0;
+                foreach (string sprite in testNpcIdleSprites)
+                {
+                    testNpcIdleSprites[z] = "BotsMod/sprites/Npcs/Test/" + sprite;
+                    z++;
+                }
+
+                foreach (string sprite in testNpcTalkSprites)
+                {
+                    testNpcTalkSprites[x] = "BotsMod/sprites/Npcs/Test/" + sprite;
+                    x++;
+                }
 
                 NpcInitShit.Init();
+                //NpcApi.ItsDaFuckinShopApi.SetUpShop("breachTest", "bot", testNpcIdleSprites, 6, testNpcTalkSprites, 8, devilLootTable, BaseShopController.AdditionalShopType.FOYER_META, "a", "a", "a", "a", "a", "a", 1, false, new Vector3(44.4f, 19, 19.5f), false);
+                //BotsModule.shop = NpcApi.ItsDaFuckinShopApi.SetUpShop("beyond", "bot", testNpcIdleSprites, 6, testNpcTalkSprites, 8, devilLootTable, BaseShopController.AdditionalShopType.TRUCK, "", "", "", "", "", "", false);
+                BreachShopTools.Init();
                 //GameManager.Instance.PrimaryPlayer.star
 
                 var stupidlist = Tools.ReflectionHelpers.ReflectGetField<Type[]>(typeof(GameManager), "BraveLevelLoadedListeners", GameManager.Instance).ToList();
@@ -298,17 +345,17 @@ namespace BotsMod
 
 
 
-                GUI.Init();
+                //GUI.Init();
 
-                CatogreyText = GUI.CreateText(null, new Vector2(15f, 265), "", TextAnchor.MiddleLeft, font_size: FontSize);
+                //CatogreyText = GUI.CreateText(null, new Vector2(15f, 265), "", TextAnchor.MiddleLeft, font_size: FontSize);
 
-                ETGModMainBehaviour.Instance.gameObject.AddComponent<CatogreyTeller>();
+                //ETGModMainBehaviour.Instance.gameObject.AddComponent<CatogreyTeller>();
 
                 InitSynergies.Init();
 
-                Loader.BuildCharacter("Lost", true, true, true, true, new Color32(255, 69, 248, 255), 4.55f, 55, 2, true, "botfs_lost");
-                Loader.BuildCharacter("Shade", false, true, true, false, new Color32(0, 0, 0, 0), 0, 0, 0, false, "");
-                Loader.BuildCharacter("The Blind", false, true, true, false, new Color32(0, 0, 0, 0), 0, 0, 0, false, "");
+                //Loader.BuildCharacter("Lost", true, true, true, true, new Color32(255, 69, 248, 255), 4.55f, 55, 2, true, "botfs_lost");
+                //Loader.BuildCharacter("Shade", false, true, true, false, new Color32(0, 0, 0, 0), 0, 0, 0, false, "");
+                //Loader.BuildCharacter("The Blind", false, true, true, false, new Color32(0, 0, 0, 0), 0, 0, 0, false, "");
 
                 //ShrineFactory.RegisterShrineRoom(NPC, protoroom, "bot:test_npc_shrine", new Vector2(1, 1));
 
@@ -335,9 +382,7 @@ namespace BotsMod
 
 
                 }*/
-
                 
-
 
                 AlphabetSoupSynergyProcessor alphabetSoupSynergyProcessor = PickupObjectDatabase.GetById(340).gameObject.GetComponent<AlphabetSoupSynergyProcessor>();
 
@@ -491,7 +536,21 @@ namespace BotsMod
 
                 });
 
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("cgRoomTest", delegate (string[] args)
+                {
+                    RoomHandler absoluteRoom = GameManager.Instance.PrimaryPlayer.transform.position.GetAbsoluteRoom();
+                    //var targetRoom = BraveUtility.RandomElement<WeightedRoom>(BeyondPrefabs.CastleRoomTable.includedRooms.elements).room;
+                    var targetRoom = (PickupObjectDatabase.GetById(625) as PaydayDrillItem).GenericFallbackCombatRoom;
+                    
+                    GameManager.Instance.Dungeon.StartCoroutine((new CgController { DelayPreExpansion = 2.5f, DelayPostExpansionPreEnemies = 2 }).HandleSeamlessTransitionToCombatRoom(absoluteRoom, targetRoom));
 
+                });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("cgRoomTestEnd", delegate (string[] args)
+                {
+                    CgController.aaaa = 4;
+
+                });
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("addSpellSlots", delegate (string[] args)
                 {
@@ -509,20 +568,69 @@ namespace BotsMod
                 });
 
 
+
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("addCoinToUi", delegate (string[] args)
                 {
-                    //foreach (var dumbfuck in GameUIRoot.Instance.coinUIControllers())
-                    //{
-                    //    Log("a");
-                    //}
+                    int sCount = 0;
+                    int aCount = 0;
+                    int BCount = 0;
+                    int CCount = 0;
+                    int DCount = 0;
+                    int specialCount = 0;
+                    int commonCount = 0;
+                    int excludedCount = 0;
 
-                    //GameUIRoot.Instance.coinUIControllers()[0].AddCoin();\
-                    //UnityEngine.JsonUtility.ToJson();
+                    foreach (var item in PickupObjectDatabase.Instance.Objects)
+                    {
+                        if (item != null && item.PickupObjectId <= 823)
+                        {
+                            switch (item.quality)
+                            {
+                                case PickupObject.ItemQuality.S:
+                                    sCount++;
+                                    break;
+                                case PickupObject.ItemQuality.A:
+                                    aCount++;
+                                    break;
+                                case PickupObject.ItemQuality.B:
+                                    BCount++;
+                                    break;
+                                case PickupObject.ItemQuality.C:
+                                    CCount++;
+                                    break;
+                                case PickupObject.ItemQuality.D:
+                                    DCount++;
+                                    break;
+                                case PickupObject.ItemQuality.EXCLUDED:
+                                    excludedCount++;
+                                    break;
+                                case PickupObject.ItemQuality.SPECIAL:
+                                    specialCount++;
+                                    break;
+                                case PickupObject.ItemQuality.COMMON:
+                                    commonCount++;
+                                    break;
+                            }
+                        }
+                    }
+                    Log($"S Count: {sCount}");
+                    Log($"A Count: {aCount}");
+                    Log($"B Count: {BCount}");
+                    Log($"C Count: {CCount}");
+                    Log($"D Count: {DCount}");
+                    Log($"EXCLUDED Count: {excludedCount}");
+                    Log($"SPECIAL Count: {specialCount}");
+                    Log($"COMMON Count: {commonCount}");
                 });
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("dumpPlayerSprites", delegate (string[] args)
                 {
                     CollectionDumper.DumpCollection(GameManager.Instance.PrimaryPlayer.sprite.Collection);
+                });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("dumpStuff", delegate (string[] args)
+                {
+                    CollectionDumper.DumpCollection((PickupObjectDatabase.GetById(542) as Gun).DefaultModule.projectiles[0].gameObject.GetComponent<StrafeBleedBuff>().vfx.gameObject.GetComponent<tk2dSprite>().Collection);
                 });
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("masterRound", delegate (string[] args)
@@ -615,7 +723,7 @@ namespace BotsMod
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("past_kill", delegate (string[] args)
                 {
 
-                    GameStatsManager.Instance.SetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Lost, CharacterSpecificGungeonFlags.KILLED_PAST, true);
+                    GameStatsManager.Instance.SetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Custom, CharacterSpecificGungeonFlags.KILLED_PAST, true);
                 });
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("past_killnt", delegate (string[] args)
@@ -757,6 +865,35 @@ namespace BotsMod
                 {
                     Log(StringTableManager.EvaluateReplacementToken("%PLAYTIMEHOURS"));
                     
+                });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("checkNails", delegate (string[] args)
+                {
+                    Log(NailMagnet.magnets.Count.ToString());
+                    foreach (var mag in NailMagnet.magnets)
+                    {
+                        Log(mag.transform.position.ToString());
+                    }
+                    
+
+                });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("refreshOutline", delegate (string[] args)
+                {
+
+                    SpriteOutlineManager.RemoveOutlineFromSprite(GameManager.Instance.PrimaryPlayer.sprite);
+                    SpriteOutlineManager.AddOutlineToSprite(GameManager.Instance.PrimaryPlayer.sprite, GameManager.Instance.PrimaryPlayer.outlineColor, 0.1f, 0.5f, SpriteOutlineManager.OutlineType.NORMAL);
+                    
+
+                });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("refreshOutline2", delegate (string[] args)
+                {
+
+                    SpriteOutlineManager.RemoveOutlineFromSprite(GameManager.Instance.PrimaryPlayer.sprite);
+                    SpriteOutlineManager.AddOutlineToSprite(GameManager.Instance.PrimaryPlayer.sprite, GameManager.Instance.PrimaryPlayer.outlineColor, 0.1f, 0f, SpriteOutlineManager.OutlineType.EEVEE);
+
+
                 });
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("spawnitems", delegate (string[] args)
@@ -944,21 +1081,21 @@ namespace BotsMod
 
 
 
-                    var devilLootTable = UnityEngine.Object.Instantiate(Tools.shared_auto_001.LoadAsset<GenericLootTable>("Shop_Key_Items_01"));
-                    devilLootTable.defaultItemDrops.elements.Clear();
+                    var devilLootTable2 = UnityEngine.Object.Instantiate(Tools.shared_auto_001.LoadAsset<GenericLootTable>("Shop_Key_Items_01"));
+                    devilLootTable2.defaultItemDrops.elements.Clear();
 
-                    devilLootTable.AddItemToPool(60);
-                    devilLootTable.AddItemToPool(125);
+                    devilLootTable2.AddItemToPool(60);
+                    devilLootTable2.AddItemToPool(125);
                     devilLootTable.AddItemToPool(434);
-                    devilLootTable.AddItemToPool(271);
-                    devilLootTable.AddItemToPool(407);
-                    devilLootTable.AddItemToPool(571);
-                    devilLootTable.AddItemToPool(33);
-                    devilLootTable.AddItemToPool(17);
-                    devilLootTable.AddItemToPool(347);
-                    devilLootTable.AddItemToPool(90);
-                    devilLootTable.AddItemToPool(336);
-                    devilLootTable.AddItemToPool(285);
+                    devilLootTable2.AddItemToPool(271);
+                    devilLootTable2.AddItemToPool(407);
+                    devilLootTable2.AddItemToPool(571);
+                    devilLootTable2.AddItemToPool(33);
+                    devilLootTable2.AddItemToPool(17);
+                    devilLootTable2.AddItemToPool(347);
+                    devilLootTable2.AddItemToPool(90);
+                    devilLootTable2.AddItemToPool(336);
+                    devilLootTable2.AddItemToPool(285);
 
                     var room = RoomFactory.BuildFromResource("BotsMod/rooms/npctest.room");
 
@@ -1325,18 +1462,22 @@ namespace BotsMod
                     try
                     {
 
-                        var baseSwapper = FakePrefab.Clone(ResourceManager.LoadAssetBundle("foyer_002").LoadAsset<GameObject>("costume_guide"));
-                        var altSwapper = FakePrefab.Clone(ResourceManager.LoadAssetBundle("foyer_002").LoadAsset<GameObject>("costume_guide_alt"));
+                        var baseSwapper = FakePrefab.Clone(Foyer.Instance.transform.Find("Livery xform").Find("costume_guide").gameObject);
+                        var altSwapper = FakePrefab.Clone(Foyer.Instance.transform.Find("Livery xform").Find("costume_guide_alt").gameObject);
+                        
 
                         var sprite = baseSwapper.GetComponent<tk2dSprite>();
                         var altSprite = altSwapper.GetComponent<tk2dSprite>();
+
+                        baseSwapper.transform.parent = Foyer.Instance.transform.Find("Livery xform");
+                        altSwapper.transform.parent = Foyer.Instance.transform.Find("Livery xform");
 
                         Log("objects set up");
 
                         sprite.SetSprite(sprite.Collection, sprite.spriteId);
                         altSprite.SetSprite(altSprite.Collection, altSprite.spriteId);
 
-                        baseSwapper.transform.parent = altSwapper.transform;
+                        
 
                         altSwapper.name = "costume_lost_alt";
 
@@ -1360,22 +1501,30 @@ namespace BotsMod
                         Log("variables set5");
 
 
-
-                        //GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(UnityEngine.Object.Instantiate(altSwapper, new Vector3(16.4f, 25.1f, 25.6f), Quaternion.identity).GetComponent<IPlayerInteractable>());
-                       // GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(UnityEngine.Object.Instantiate(baseSwapper, new Vector3(16.4f, 25.1f, 25.6f), Quaternion.identity).GetComponent<IPlayerInteractable>());
-
-                        var baseObj = UnityEngine.Object.Instantiate(baseSwapper, GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, Quaternion.identity);
-                        var altObj = UnityEngine.Object.Instantiate(altSprite, GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, Quaternion.identity);
-
-                        baseObj.gameObject.SetActive(true);
-                        altObj.gameObject.SetActive(true);
-
-                        if (!Dungeonator.RoomHandler.unassignedInteractableObjects.Contains(baseObj.GetComponent<IPlayerInteractable>()))
-                            Dungeonator.RoomHandler.unassignedInteractableObjects.Add(baseObj.GetComponent<IPlayerInteractable>());
-
-                        if (!Dungeonator.RoomHandler.unassignedInteractableObjects.Contains(altObj.GetComponent<IPlayerInteractable>()))
-                            Dungeonator.RoomHandler.unassignedInteractableObjects.Add(altObj.GetComponent<IPlayerInteractable>());
-
+                        baseSwapper.gameObject.SetActive(true);
+                        altSwapper.gameObject.SetActive(true);
+                        Log("variables set6");
+                        baseSwapper.transform.position = GameManager.Instance.PrimaryPlayer.sprite.WorldCenter;
+                        altSwapper.transform.position = GameManager.Instance.PrimaryPlayer.sprite.WorldCenter;
+                        Log("variables set7");
+                        if (!RoomHandler.unassignedInteractableObjects.Contains(baseSwapper.GetComponent<IPlayerInteractable>()))
+                        {
+                            RoomHandler.unassignedInteractableObjects.Add(baseSwapper.GetComponent<IPlayerInteractable>());
+                        }
+                        Log("variables set8");
+                        if (!RoomHandler.unassignedInteractableObjects.Contains(altSwapper.GetComponent<IPlayerInteractable>()))
+                        {
+                            RoomHandler.unassignedInteractableObjects.Add(altSwapper.GetComponent<IPlayerInteractable>());
+                        }
+                        Log("variables set9");
+                        foreach (var interactable in RoomHandler.unassignedInteractableObjects)
+                        {
+                            if (interactable != null)
+                            {
+                                Log(interactable.ToString());
+                            }
+                            
+                        }
 
                         Log("finished!");
                         /*foreach (var dumbpeiceofshit in UnityEngine.Object.FindObjectsOfType<tk2dSprite>())

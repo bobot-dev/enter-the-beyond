@@ -38,7 +38,6 @@ namespace BotsMod
 			gun.DefaultModule.ammoCost = 1;
 
 			gun.DefaultModule.shootStyle = ProjectileModule.ShootStyle.Charged;
-			gun.StarterGunForAchievement = true;
 
 			//gun.barrelOffset = gun4,
 
@@ -56,8 +55,23 @@ namespace BotsMod
 			gun.DefaultModule.numberOfShotsInClip = 10;
 			gun.quality = PickupObject.ItemQuality.B;
 			gun.gunClass = GunClass.CHARGE;
-			Projectile projectile = Tools.SetupProjectile(other.DefaultModule.projectiles[0]);
+			//Projectile projectile = Tools.SetupProjectile(other.DefaultModule.projectiles[0]);
+			Projectile projectile = Tools.SetupProjectile(17);
 			Projectile projectileBeam = Tools.SetupProjectile(383);
+
+			List<string> BeamAnimPaths = new List<string>()
+			{
+				"BotsMod/sprites/beam/LostFriend/lost_friend_laser_middle_001",
+				"BotsMod/sprites/beam/LostFriend/lost_friend_laser_middle_002",
+
+			};
+			List<string> StartAnimPaths = new List<string>()
+			{
+				"BotsMod/sprites/beam/LostFriend/lost_friend_laser_flare_001",
+				"BotsMod/sprites/beam/LostFriend/lost_friend_laser_flare_002",
+			};
+
+			projectile.AddFlashRayBeam(BeamAnimPaths, new Vector2(16, 4), new Vector2(0, 0), 12, StartAnimPaths);
 
 			gun.DefaultModule.projectiles[0] = projectile;
 			gun.DefaultModule.projectiles.Add(projectileBeam);
@@ -93,7 +107,7 @@ namespace BotsMod
 
 			projectile.transform.parent = gun.barrelOffset;
 			projectile.baseData.damage = 9f;
-			projectile.baseData.speed = 16f;
+			projectile.baseData.speed = 200;
 			projectile.baseData.force = 15f;
 			projectile.baseData.range = 1600000f;
 

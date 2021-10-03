@@ -124,6 +124,7 @@ namespace BotsMod
                 //otherwise we will use a different dungeon prefab
                 dungeonCollection = Tools.ReplaceDungeonCollection(gofuckyourself, BeyondPrefabs.ENV_Tileset_Beyond),
                 dungeonCollectionSupportsDiagonalWalls = false,
+                
                 aoTileIndices = RatDungeonPrefab.tileIndices.aoTileIndices,
                 placeBorders = true,
                 placePits = false,

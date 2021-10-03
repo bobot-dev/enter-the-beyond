@@ -3,6 +3,7 @@ using ItemAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnityEngine;
 
@@ -88,6 +89,13 @@ namespace BotsMod
 
 		}
 
+		public static DebrisObject SpawnItem(GameObject item, Vector3 spawnPosition, Vector2 spawnDirection, float force, bool invalidUntilGrounded = true, bool doDefaultItemPoof = false, bool disableHeightBoost = false)
+		{
+			GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(item, spawnPosition, Quaternion.identity);
+			GameObject spawnedItem = gameObject;
+			return typeof(LootEngine).GetMethod("SpawnInternal", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, new object[] { spawnedItem, spawnPosition, spawnDirection, force, invalidUntilGrounded, doDefaultItemPoof, false, disableHeightBoost }) as DebrisObject;
+		}
+
 		private void RerollItemsOnGround()
 		{
 			foreach (DebrisObject debrisObject in StaticReferenceManager.AllDebris.ToArray())
@@ -119,39 +127,47 @@ namespace BotsMod
 
 								}
 
-								var gameObject = PickupObjectDatabase.GetById(SpinDownID(pickupObject.PickupObjectId)).gameObject;
-								bool flag12 = gameObject == null;
-								if (flag12)
-								{
-									Console.WriteLine("Couldn't add an item! Giving junk instead.");
-									PickupObject pickupObject2 = Game.Items.Get("junk");
-									bool flag13 = pickupObject2 == null;
-									if (flag13)
-									{
-										Console.WriteLine("Cannot get 'gungeon:junk' item! Not changing ground item!");
-									}
-									else
-									{
-										gameObject = pickupObject2.gameObject;
-									}
-								}
-								bool flag14 = gameObject != null;
-								if (flag14)
-								{
-									PickupObject component = gameObject.GetComponent<PickupObject>();
-									Console.WriteLine(string.Format("Attempting to change ground item: {0}={1}={2} to {3}={4}={5}", new object[]
-									{
-									pickupObject.PickupObjectId,
-									pickupObject.name,
-									pickupObject.DisplayName,
-									component.PickupObjectId,
-									component.name,
-									component.DisplayName
-									}));
-									DebrisObject debrisObject2 = LootEngine.SpawnItem(gameObject, debrisObject.UnadjustedDebrisPosition, Vector2.zero, 0f, true, false, true);
-									LootEngine.DoDefaultItemPoof(debrisObject.UnadjustedDebrisPosition, false, false);
+								if (pickupObject.PickupObjectId <= 0)
+                                {
 									debrisObject.TriggerDestruction(true);
+								} else
+                                {
+									var gameObject = PickupObjectDatabase.GetById(SpinDownID(pickupObject.PickupObjectId)).gameObject;
+									bool flag12 = gameObject == null;
+									if (flag12)
+									{
+										Console.WriteLine("Couldn't add an item! Giving junk instead.");
+										PickupObject pickupObject2 = Game.Items.Get("junk");
+										bool flag13 = pickupObject2 == null;
+										if (flag13)
+										{
+											Console.WriteLine("Cannot get 'gungeon:junk' item! Not changing ground item!");
+										}
+										else
+										{
+											gameObject = pickupObject2.gameObject;
+										}
+									}
+									bool flag14 = gameObject != null;
+									if (flag14)
+									{
+										PickupObject component = gameObject.GetComponent<PickupObject>();
+										Console.WriteLine(string.Format("Attempting to change ground item: {0}={1}={2} to {3}={4}={5}", new object[]
+										{
+											pickupObject.PickupObjectId,
+											pickupObject.name,
+											pickupObject.DisplayName,
+											component.PickupObjectId,
+											component.name,
+											component.DisplayName
+										}));
+										DebrisObject debrisObject2 = SpawnItem(gameObject, debrisObject.UnadjustedDebrisPosition, Vector2.zero, 0f, true, false, true);
+										LootEngine.DoDefaultItemPoof(debrisObject.UnadjustedDebrisPosition, false, false);
+										debrisObject.TriggerDestruction(true);
+									}
 								}
+
+								
 							}
 
 							

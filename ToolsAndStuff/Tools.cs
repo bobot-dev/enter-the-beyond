@@ -625,6 +625,206 @@ namespace BotsMod
 			return m_cachedCustomPlacable;
 		}
 
+		public static void AddFlashRayBeam(this Projectile projectile, List<string> animationPaths, Vector2 colliderDimensions, Vector2 colliderOffsets, int fps = 12, List<string> startAnimationPaths = null, int startFps = 12, GameObject trailObject = null)
+		{
+			try
+			{
+				if (trailObject == null)
+                {
+					trailObject = new GameObject("trail");
+					FakePrefab.MarkAsFakePrefab(trailObject);
+					trailObject.layer = 22;
+
+				}
+
+				trailObject.transform.parent = projectile.transform;
+				//trailObject.transform.localPosition = new Vector3(-2.548388f, -0.06926762f, -0.06926762f);
+				trailObject.SetActive(true);
+
+				int spriteID = SpriteBuilder.AddSpriteToCollection(animationPaths[0], ETGMod.Databases.Items.ProjectileCollection);
+				tk2dTiledSprite tiledSprite = trailObject.GetOrAddComponent<tk2dTiledSprite>();
+				TrailController trailController = trailObject.GetOrAddComponent<TrailController>();
+
+				trailController.usesAnimation = true;
+				trailController.usesStartAnimation = true;
+
+				trailController.startAnimation = "trail_start";
+
+
+				trailController.animation = "trail";
+
+				trailController.usesCascadeTimer = false;
+				trailController.usesSoftMaxLength = false;
+				trailController.usesGlobalTimer = true;
+				trailController.destroyOnEmpty = false;
+				trailController.FlipUvsY = false;
+				trailController.rampHeight = false;
+
+				trailController.UsesDispersalParticles = false;
+
+				trailController.cascadeTimer = 0.1f;
+				trailController.softMaxLength = 0f;
+				trailController.globalTimer = 0f;
+				trailController.rampStartHeight = 2f;
+				trailController.rampTime = 1f;
+				trailController.DispersalDensity = 5f;
+				trailController.DispersalMinCoherency = 0.4f;
+				trailController.DispersalMaxCoherency = 0.9f;
+				trailController.boneSpawnOffset = Vector2.zero;
+				trailController.DispersalParticleSystemPrefab = null;
+
+				tk2dSpriteAnimator animator = trailObject.GetOrAddComponent<tk2dSpriteAnimator>();
+
+				tk2dSpriteAnimation animation = trailObject.GetOrAddComponent<tk2dSpriteAnimation>();
+
+				float convertedColliderX = colliderDimensions.x / 16f;
+				float convertedColliderY = colliderDimensions.y / 16f;
+				float convertedOffsetX = colliderOffsets.x / 16f;
+				float convertedOffsetY = colliderOffsets.y / 16f;
+
+
+				tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
+				tiledSprite.automaticallyManagesDepth = true;
+
+				tiledSprite.dimensions = new Vector2(0, 14);
+				tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
+				def.colliderVertices = new Vector3[]{
+					new Vector3(convertedOffsetX, convertedOffsetY, 0f),
+					new Vector3(convertedColliderX, convertedColliderY, 0f)
+				};
+
+				def.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+
+
+				animation.clips = new tk2dSpriteAnimationClip[0];
+				animator.Library = animation;
+				
+				if (animationPaths != null)
+				{
+					tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = "trail", frames = new tk2dSpriteAnimationFrame[0], fps = fps, wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop };
+					List<string> spritePaths = animationPaths;
+
+					List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+					foreach (string path in spritePaths)
+					{
+						tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
+						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+						tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
+						frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+						frameDef.colliderVertices = def.colliderVertices;
+						frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
+					}
+					
+					clip.frames = frames.ToArray();
+					animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+				}
+
+				if (startAnimationPaths != null)
+				{
+					tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = "trail_start", frames = new tk2dSpriteAnimationFrame[0], fps = fps, wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop };
+					List<string> spritePaths = startAnimationPaths;
+
+					List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+					foreach (string path in spritePaths)
+					{
+						tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
+						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+						tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
+						frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+						frameDef.colliderVertices = def.colliderVertices;
+						frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
+					}
+
+					clip.frames = frames.ToArray();
+					animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+				}
+				else
+                {
+					tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = "trail_start", frames = new tk2dSpriteAnimationFrame[0], fps = fps, wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop };
+					List<string> spritePaths = animationPaths;
+
+					List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+					foreach (string path in spritePaths)
+					{
+						tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
+						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+						tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
+						frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+						frameDef.colliderVertices = def.colliderVertices;
+						frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
+					}
+
+					clip.frames = frames.ToArray();
+					animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+				}
+
+
+				animator.DefaultClipId = animation.GetClipIdByName("trail");
+
+			}
+			catch (Exception e)
+			{
+				ETGModConsole.Log(e.ToString());
+			}
+		}
+
+		public static GameObject MakeLine(string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> beamAnimationPaths = null, int beamFPS = -1)
+		{
+			try
+			{
+
+				var line = new GameObject("line");
+
+				float convertedColliderX = colliderDimensions.x / 16f;
+				float convertedColliderY = colliderDimensions.y / 16f;
+				float convertedOffsetX = colliderOffsets.x / 16f;
+				float convertedOffsetY = colliderOffsets.y / 16f;
+
+				int spriteID = SpriteBuilder.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
+				tk2dTiledSprite tiledSprite = line.GetOrAddComponent<tk2dTiledSprite>();
+
+				tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
+				tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
+				def.colliderVertices = new Vector3[]{
+					new Vector3(convertedOffsetX, convertedOffsetY, 0f),
+					new Vector3(convertedColliderX, convertedColliderY, 0f)
+				};
+
+				def.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+
+				//tiledSprite.anchor = tk2dBaseSprite.Anchor.MiddleCenter;
+				tk2dSpriteAnimator animator = line.GetOrAddComponent<tk2dSpriteAnimator>();
+				tk2dSpriteAnimation animation = line.GetOrAddComponent<tk2dSpriteAnimation>();
+				animation.clips = new tk2dSpriteAnimationClip[0];
+				animator.Library = animation;
+				
+				if (beamAnimationPaths != null)
+				{
+					tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip() { name = "line_idle_thing", frames = new tk2dSpriteAnimationFrame[0], fps = beamFPS };
+					List<string> spritePaths = beamAnimationPaths;
+
+					List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+					foreach (string path in spritePaths)
+					{
+						tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
+						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+						tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
+						frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+						frameDef.colliderVertices = def.colliderVertices;
+						frames.Add(new tk2dSpriteAnimationFrame { spriteId = frameSpriteId, spriteCollection = collection });
+					}
+					clip.frames = frames.ToArray();
+					animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+				}
+				
+				return line;
+			}
+			catch (Exception e)
+			{
+				ETGModConsole.Log(e.ToString());
+				return null;
+			}
+		}
 
 		public static BasicBeamController GenerateBeamPrefab(this Projectile projectile, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> beamAnimationPaths = null, int beamFPS = -1, List<string> impactVFXAnimationPaths = null, int beamImpactFPS = -1, Vector2? impactVFXColliderDimensions = null, Vector2? impactVFXColliderOffsets = null, List<string> endVFXAnimationPaths = null, int beamEndFPS = -1, Vector2? endVFXColliderDimensions = null, Vector2? endVFXColliderOffsets = null, List<string> muzzleVFXAnimationPaths = null, int beamMuzzleFPS = -1, Vector2? muzzleVFXColliderDimensions = null, Vector2? muzzleVFXColliderOffsets = null, bool glows = false)
 		{
@@ -662,7 +862,7 @@ namespace BotsMod
 				animator.Library = animation;
 				UnityEngine.Object.Destroy(projectile.GetComponentInChildren<tk2dSprite>());
 				BasicBeamController beamController = projectile.gameObject.GetOrAddComponent<BasicBeamController>();
-
+				projectile.sprite = tiledSprite;
 				//BotsModule.Log("---------------- Sets up the animation for the main part of the beam");
 				if (beamAnimationPaths != null)
 				{
@@ -1905,9 +2105,32 @@ namespace BotsMod
 			};
 		}
 
-		
-		public static void SetProjectileSpriteRight(this Projectile proj, string name, int pixelWidth, int pixelHeight, bool lightened = true, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.LowerLeft, bool anchorChangesCollider = true, int? overrideColliderPixelWidth = null,
-	 int? overrideColliderPixelHeight = null, int? overrideColliderOffsetX = null, int? overrideColliderOffsetY = null, Projectile overrideProjectileToCopyFrom = null)
+		public static tk2dSpriteDefinition SetProjectileSpriteRight(this Projectile proj, string name, int pixelWidth, int pixelHeight, bool lightened = true, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.LowerLeft, int? overrideColliderPixelWidth = null, int? overrideColliderPixelHeight = null, 
+			bool anchorChangesCollider = true, bool fixesScale = false, int? overrideColliderOffsetX = null, int? overrideColliderOffsetY = null, Projectile overrideProjectileToCopyFrom = null)
+		{
+			try
+			{
+				proj.GetAnySprite().spriteId = ETGMod.Databases.Items.ProjectileCollection.inst.GetSpriteIdByName(name);
+				
+				tk2dSpriteDefinition def = SetupDefinitionForProjectileSprite(name, proj.GetAnySprite().spriteId, pixelWidth, pixelHeight, lightened, overrideColliderPixelWidth, overrideColliderPixelHeight, overrideColliderOffsetX,
+					overrideColliderOffsetY, overrideProjectileToCopyFrom);
+				def.ConstructOffsetsFromAnchor(anchor, def.position3, fixesScale, anchorChangesCollider);
+				proj.GetAnySprite().scale = new Vector3(1f, 1f, 1f);
+				proj.transform.localScale = new Vector3(1f, 1f, 1f);
+				proj.GetAnySprite().transform.localScale = new Vector3(1f, 1f, 1f);
+				proj.AdditionalScaleMultiplier = 1f;
+				return def;
+			}
+			catch (Exception ex)
+			{
+				ETGModConsole.Log("Ooops! Seems like something got very, Very, VERY wrong. Here's the exception:");
+				ETGModConsole.Log(ex.ToString());
+				return null;
+			}
+		}
+
+		public static void SetProjectileSpriteRight2(this Projectile proj, string name, int pixelWidth, int pixelHeight, bool lightened = true, tk2dBaseSprite.Anchor anchor = tk2dBaseSprite.Anchor.LowerLeft, bool anchorChangesCollider = true, int? overrideColliderPixelWidth = null,
+int? overrideColliderPixelHeight = null, int? overrideColliderOffsetX = null, int? overrideColliderOffsetY = null, Projectile overrideProjectileToCopyFrom = null)
 		{
 			try
 			{
@@ -1926,6 +2149,8 @@ namespace BotsMod
 				ETGModConsole.Log(ex.ToString());
 			}
 		}
+
+
 
 		public static tk2dSpriteDefinition SetupDefinitionForProjectileSprite(string name, int id, int pixelWidth, int pixelHeight, bool lightened = true, int? overrideColliderPixelWidth = null, int? overrideColliderPixelHeight = null,
 			int? overrideColliderOffsetX = null, int? overrideColliderOffsetY = null, Projectile overrideProjectileToCopyFrom = null)
@@ -2354,6 +2579,18 @@ namespace BotsMod
 			}
 		}
 
+		public static void IgnoreCollisionsFor(this Projectile proj, float time)
+		{
+			proj.specRigidbody.CollideWithOthers = false;
+			GameManager.Instance.StartCoroutine(collisionDelay(proj, time));
+		}
+
+		static IEnumerator collisionDelay(Projectile proj, float time)
+        {
+			yield return new WaitForSeconds(time);
+			proj.specRigidbody.CollideWithOthers = true;
+		}
+
 		public static List<AIBeamShooter2> ExtremeLaziness(GameObject prefab, Transform parent, int amountOfBeams, List<string> names)
         {
 			var beamList = new List<AIBeamShooter2>();
@@ -2630,7 +2867,7 @@ namespace BotsMod
 
 		public static void AddComplex(this StringDBTable stringdb, string key, string value)
 		{
-			StringTableManager.StringCollection stringCollection = new StringTableManager.ComplexStringCollection();
+			StringTableManager.ComplexStringCollection stringCollection = new StringTableManager.ComplexStringCollection();
 			stringCollection.AddString(value, 1f);
 			stringdb[key] = stringCollection;
 		}

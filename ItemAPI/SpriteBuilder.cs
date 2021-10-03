@@ -73,6 +73,7 @@ namespace ItemAPI
         /// <returns>The spriteID of the defintion in the collection</returns>
         public static int AddSpriteToCollection(string resourcePath, tk2dSpriteCollectionData collection, string name = "")
         {
+
             string extension = !resourcePath.EndsWith(".png") ? ".png" : "";
             resourcePath += extension;
             var texture = ResourceExtractor.GetTextureFromResource(resourcePath); //Get Texture

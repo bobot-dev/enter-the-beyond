@@ -32,49 +32,49 @@ namespace BotsMod
 			gun.SetAnimationFPS(gun.shootAnimation, 12);
 			gun.SetAnimationFPS(gun.reloadAnimation, 10);
 			
-			var gunToCopy = PickupObjectDatabase.GetById(60) as Gun;
-
-			gun.shootAnimation = gunToCopy.shootAnimation;
-
-
-			Gun other = PickupObjectDatabase.GetById(60) as Gun;
+			
+			Gun other = PickupObjectDatabase.GetById(86) as Gun;
+			gun.AddProjectileModuleFrom(other, true, false);
+			gun.AddProjectileModuleFrom(other, true, false);
+			gun.AddProjectileModuleFrom(other, true, false);
+			gun.AddProjectileModuleFrom(other, true, false);
 			gun.AddProjectileModuleFrom(other, true, false);
 			gun.SetBaseMaxAmmo(27616);
 			gun.InfiniteAmmo = true;
 
-			gun.DefaultModule.ammoCost = 1;
-			
-			gun.DefaultModule.shootStyle = ProjectileModule.ShootStyle.Beam;
+
 			gun.StarterGunForAchievement = true;
 
 			gun.gunSwitchGroup = "EnergyCannon";
 
+
+
 			//gun.damageModifier = 1;
 			gun.reloadTime = 1.3f;
-
-			gun.DefaultModule.ammoType = GameUIAmmoType.AmmoType.BEAM;
-			gun.DefaultModule.customAmmoType = "yellow_beam";
-
+			
 
 			Gun gun5 = PickupObjectDatabase.GetById(37) as Gun;
 			gun.finalMuzzleFlashEffects = gun5.muzzleFlashEffects;
 
-			gun.DefaultModule.cooldownTime = 0.3f;
-			gun.DefaultModule.numberOfShotsInClip = 1000;
 
-			gun.DefaultModule.burstCooldownTime = 0.2f;
-			gun.DefaultModule.burstShotCount = 3;
+
 
 				
 
 			gun.quality = PickupObject.ItemQuality.EXCLUDED;
 			Guid.NewGuid().ToString();
-			gun.gunClass = GunClass.BEAM;
+			gun.gunClass = GunClass.CHARGE;
 			gun.CanBeDropped = true;
 			gun.PreventStartingOwnerFromDropping = true;
 
-
-			List<string> BeamAnimPaths = new List<string>()
+			Projectile projectile = Tools.SetupProjectile(86);
+			projectile.transform.parent = gun.barrelOffset;
+			projectile.baseData.damage = 9f;
+			projectile.baseData.speed = 20;
+			projectile.baseData.force = 15f;
+			projectile.baseData.range = 1600000f;
+			gun.DefaultModule.projectiles[0] = projectile;
+			/*List<string> BeamAnimPaths = new List<string>()
 			{
 				"BotsMod/sprites/beam/OtherWorldlyFury/otherworldly_fury_beam_middle_001",
 				"BotsMod/sprites/beam/OtherWorldlyFury/otherworldly_fury_beam_middle_002",
@@ -120,12 +120,48 @@ namespace BotsMod
 			beamComp.homingAngularVelocity = 1000;
 
 			beamComp.gameObject.GetOrAddComponent<EmmisiveBeams>().EmissiveColorPower = 7;
-			beamComp.gameObject.GetOrAddComponent<EmmisiveBeams>().EmissivePower = 42;
+			beamComp.gameObject.GetOrAddComponent<EmmisiveBeams>().EmissivePower = 42;*/
 
-			
+			foreach(var module in gun.Volley.projectiles)
+            {
+				module.ammoCost = 1;
+
+				module.shootStyle = ProjectileModule.ShootStyle.Charged;
+				module.ammoType = GameUIAmmoType.AmmoType.BEAM;
+				module.customAmmoType = "yellow_beam";
+				module.cooldownTime = 0.3f;
+				module.numberOfShotsInClip = 1000;
+				module.chargeProjectiles = new List<ProjectileModule.ChargeProjectile>
+				{
+					new ProjectileModule.ChargeProjectile
+					{
+						AmmoCost = 1,
+						Projectile = projectile,
+						ChargeTime = 0.7f,
+						
+					}
+				};
+			}
+
+			gun.DefaultModule.chargeProjectiles = new List<ProjectileModule.ChargeProjectile>
+			{
+				new ProjectileModule.ChargeProjectile
+				{
+					AmmoCost = 1,
+					Projectile = projectile,
+					ChargeTime = 0,
+				},
+				new ProjectileModule.ChargeProjectile
+				{
+					AmmoCost = 1,
+					Projectile = projectile,
+					ChargeTime = 0.7f,
+					
 
 
-			gun.DefaultModule.projectiles[0] = projectile4;
+				}
+			};
+
 
 
 			ETGMod.Databases.Items.Add(gun, null, "ANY");

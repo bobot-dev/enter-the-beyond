@@ -35,12 +35,15 @@ namespace NpcApi
         /// <param name="introStringKey">String key for when the player enters the room</param> 
         /// <param name="attackedStringKey">String key for when the player shoots at the npc</param> 
         /// 
+        /// <param name="costModifier">The multiplier for shop prices</param> 
+        /// 
         /// <param name="hasCarpet">Wether the shop has a carpet or something else that they sit on</param> 
         /// <param name="carpetSpritePath">Sprite path for the carpet or whatever</param> 
         /// <returns></returns>
         public static GameObject SetUpShop(string name, string prefix, List<string> idleSpritePaths, int idleFps, List<string> talkSpritePaths, int talkFps, GenericLootTable lootTable, BaseShopController.AdditionalShopType shopType, string runBasedMultilineGenericStringKey,
-            string runBasedMultilineStopperStringKey, string purchaseItemStringKey, string purchaseItemFailedStringKey, string introStringKey, string attackedStringKey, bool hasCarpet = false, string carpetSpritePath = "")
+            string runBasedMultilineStopperStringKey, string purchaseItemStringKey, string purchaseItemFailedStringKey, string introStringKey, string attackedStringKey, float costModifier = 1, bool isBreachShop = false, Vector3 breachPos = new Vector3(), bool hasCarpet = false, string carpetSpritePath = "")
         {
+            
             try
             {
                 var shared_auto_001 = ResourceManager.LoadAssetBundle("shared_auto_001");
@@ -50,6 +53,10 @@ namespace NpcApi
 
 
                 var npcObj = SpriteBuilder.SpriteFromResource(idleSpritePaths[0], new GameObject(prefix + ":" + name));
+
+                FakePrefab.MarkAsFakePrefab(npcObj);
+                UnityEngine.Object.DontDestroyOnLoad(npcObj);
+                npcObj.SetActive(false);
 
                 npcObj.layer = 22;
 
@@ -121,6 +128,7 @@ namespace NpcApi
 
 
                 AIAnimator aIAnimator = GenerateBlankAIAnimator(npcObj);
+                aIAnimator.spriteAnimator = spriteAnimator;
                 aIAnimator.IdleAnimation = new DirectionalAnimation
                 {
                     Type = DirectionalAnimation.DirectionType.Single,
@@ -145,9 +153,9 @@ namespace NpcApi
                         ""
                     },
                     Flipped = new DirectionalAnimation.FlipType[]
-                        {
-                            DirectionalAnimation.FlipType.None
-                        }
+                    {
+                        DirectionalAnimation.FlipType.None
+                    }
                 };
 
                 var basenpc = ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<GameObject>("Merchant_Key").transform.Find("NPC_Key").gameObject;
@@ -179,9 +187,7 @@ namespace NpcApi
 
                 npcObj.name = prefix + ":" + name;
                 
-                FakePrefab.MarkAsFakePrefab(npcObj);
-                UnityEngine.Object.DontDestroyOnLoad(npcObj);
-                npcObj.SetActive(true);
+
 
 
                 var ItemPoint1 = new GameObject("ItemPoint1");
@@ -207,6 +213,8 @@ namespace NpcApi
 
                 shopObj.gameObject.SetActive(false);
 
+                
+
                 shopObj.placeableHeight = 5;
                 shopObj.placeableWidth = 5;
                 shopObj.difficulty = 0;
@@ -230,13 +238,40 @@ namespace NpcApi
                 shopObj.spawnGroupTwoItem3Chance = 0.5f;
                 shopObj.shopkeepFSM = npcObj.GetComponent<PlayMakerFSM>();
                 shopObj.shopItemShadowPrefab = shared_auto_001.LoadAsset<GameObject>("Merchant_Key").GetComponent<BaseShopController>().shopItemShadowPrefab;
+                shopObj.shopItemShadowPrefab = 
                 shopObj.cat = null;
                 shopObj.OptionalMinimapIcon = null;
-                shopObj.ShopCostModifier = 1;
+                shopObj.ShopCostModifier = costModifier;
                 shopObj.FlagToSetOnEncounter = GungeonFlags.NONE;
+
+
+                if (isBreachShop)
+                {
+                    shopObj.gameObject.AddComponent<BreachShopComp>().offset = breachPos;
+                    BreachShopTools.registeredShops.Add(prefix + ":" + name, shopObj.gameObject);
+
+                    shopObj.FoyerMetaShopForcedTiers = true;
+
+                    var exampleBlueprintObj = SpriteBuilder.SpriteFromResource(carpetSpritePath, new GameObject(prefix + ":" + name + "_ExampleBlueprintPrefab"));
+                    exampleBlueprintObj.GetComponent<tk2dSprite>().SortingOrder = 2;
+                    FakePrefab.MarkAsFakePrefab(exampleBlueprintObj);
+                    UnityEngine.Object.DontDestroyOnLoad(exampleBlueprintObj);
+                    exampleBlueprintObj.SetActive(false);
+
+                    //var item = exampleBlueprintObj.AddComponent<ItemBlueprintItem>();
+                    //item.quality = PickupObject.ItemQuality.SPECIAL;
+                    //item.PickupObjectId = 99999999;
+                    
+
+
+                    shopObj.ExampleBlueprintPrefab = shared_auto_001.LoadAsset<GameObject>("NPC_Beetle_Merchant_Foyer").GetComponent<BaseShopController>().ExampleBlueprintPrefab;
+                }
 
                 npcObj.transform.parent = shopObj.gameObject.transform;
                 npcObj.transform.position = new Vector3(1.9375f, 3.4375f, 5.9375f);
+
+
+
 
                 if (hasCarpet)
                 {
@@ -250,7 +285,7 @@ namespace NpcApi
                     carpetObj.transform.parent = shopObj.gameObject.transform;
                     carpetObj.layer = 20;
                 }
-                
+                npcObj.SetActive(true);
                 return shopObj.gameObject;
             }
             catch (Exception message)
@@ -259,6 +294,8 @@ namespace NpcApi
                 return null;
             }
         }
+
+        
 
         public static void RegisterShopRoom(GameObject shop, PrototypeDungeonRoom protoroom, Vector2 offset)
         {

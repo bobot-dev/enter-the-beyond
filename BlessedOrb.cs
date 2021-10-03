@@ -34,6 +34,7 @@ namespace BotsMod
 			player.GunChanged += this.OnGunChanged;
 			//player.DoPostProcessThrownGun += this.PostProcessThrownGun;
 			//PlayerItem item = LootEngine.GetItemOfTypeAndQuality<PlayerItem>(ItemQuality.D, GameManager.Instance.RewardManager.ItemsLootTable, true);
+			
 			base.Pickup(player);
 
 		}
