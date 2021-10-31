@@ -91,7 +91,7 @@ namespace CustomCharacters
 					typeof(Hooks).GetMethod("InteractHook", BindingFlags.Static | BindingFlags.Public)
 				);
 
-				Hook getNumMetasToQuickRestartHook = new Hook(
+				/*Hook getNumMetasToQuickRestartHook = new Hook(
 					typeof(AmmonomiconDeathPageController).GetMethod("GetNumMetasToQuickRestart", BindingFlags.Static | BindingFlags.Public),
 					typeof(Hooks).GetMethod("GetNumMetasToQuickRestartHook", BindingFlags.Static | BindingFlags.Public)
 				);

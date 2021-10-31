@@ -321,6 +321,7 @@ namespace BotsMod
 
 			chanceKinBehavioar.CanInterceptBullets = false;
 			//chanceKinBehavioar.CanInterceptBullets = true;
+			
 			chanceKinBehavioar.aiActor.CanTargetPlayers = false;
 			chanceKinBehavioar.aiActor.healthHaver.PreventAllDamage = true;
 			chanceKinBehavioar.aiActor.specRigidbody.CollideWithOthers = true;

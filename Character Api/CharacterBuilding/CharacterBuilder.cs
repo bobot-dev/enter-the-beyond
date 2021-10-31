@@ -49,7 +49,7 @@ namespace CustomCharacters
 
             basePrefab = null;
             storedCharacters.Add(data.nameInternal.ToLower(), new Tuple<CustomCharacterData, GameObject>(data, gameObject));
-            BotsModule.Log("nameInternal: " + data.nameInternal, BotsModule.TEXT_COLOR);
+            //BotsModule.Log("nameInternal: " + data.nameInternal, BotsModule.TEXT_COLOR);
             var character = gameObject.AddComponent<CustomCharacterController>();   
             
             character.data = data;
@@ -176,8 +176,19 @@ namespace CustomCharacters
             StringHandler.AddDFStringDefinition("#CHAR_" + keyBase + "_SHORT", data.nameShort);
         }
 
-        public static void HandleLoadout(PlayerController player, List<Tuple<PickupObject, bool>> loadout, string altGun)
+        public static void HandleLoadout(PlayerController player, List<Tuple<PickupObject, bool>> loadout, List<Tuple<PickupObject, bool>> altGun)
         {
+
+            if (loadout == null)
+            {
+                ToolsGAPI.PrintError("loadout is null :((((((((");
+            }
+
+            if (altGun == null)
+            {
+                ToolsGAPI.PrintError("altGun is null :((((((((");
+            }
+
             StripPlayer(player);
             foreach (var tuple in loadout)
             {
@@ -194,21 +205,28 @@ namespace CustomCharacters
                 else if (gun)
                 {
                     player.startingGunIds.Add(id);
-                    //if (altGun == "")
-                    //{
-                        player.startingAlternateGunIds.Add(id);
-                   // }
-                    
                 }
                 else
                 {
                     ToolsGAPI.PrintError("Is this even an item? It has no passive, active or gun component! " + item.EncounterNameOrDisplayName);
                 }
             }
-           // if (altGun != "")
-            //{
-            //    player.startingAlternateGunIds.Add(PickupObjectDatabase.GetByEncounterName(altGun).PickupObjectId);
-            //}
+
+            foreach (var tuple in altGun)
+            {
+                var item = tuple.First;
+                int id = item.PickupObjectId;
+                var gun = item.GetComponent<Gun>();
+
+                if (gun)
+                {
+                    player.startingAlternateGunIds.Add(id);
+                }
+                else
+                {
+                    ToolsGAPI.PrintError("Is this even an gun? It has no gun component! " + item.EncounterNameOrDisplayName);
+                }
+            }
         }
 
         public static void StripPlayer(PlayerController player)

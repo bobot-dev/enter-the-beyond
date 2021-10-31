@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using ItemAPI;
 
 namespace BotsMod
 {
@@ -14,6 +15,8 @@ namespace BotsMod
 		public static AssetBundle shared_auto_001;
 		public static AssetBundle ModAssets;
 		public static AssetBundle braveResources;
+
+		public static GameObject lostFigurePlaceable;
 
 		private static Dungeon TutorialDungeonPrefab;
 		private static Dungeon SewerDungeonPrefab;
@@ -52,7 +55,7 @@ namespace BotsMod
 			ModAssets = AssetBundleLoader.LoadAssetBundleFromLiterallyAnywhere("modassets");
 
 			//ENV_Tileset_Beyond = ModAssets.LoadAsset<Texture2D>("ENV_Tileset_Beyond");
-			ENV_Tileset_Beyond = ResourceExtractor.GetTextureFromResource("BotsMod/sprites/ENV_Tileset_Beyond.png");
+			ENV_Tileset_Beyond = ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/ENV_Tileset_Beyond.png");
 
 			AssetBundle assetBundle = ResourceManager.LoadAssetBundle("shared_auto_001");
 			AssetBundle assetBundle2 = ResourceManager.LoadAssetBundle("shared_auto_002");
@@ -72,9 +75,6 @@ namespace BotsMod
 			ForgeDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Forge");
 			CatacombsDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Catacombs");
 			NakatomiDungeonPrefab = DungeonDatabase.GetOrLoadByName("base_nakatomi");
-
-
-
 
 			reward_room = shared_auto_002.LoadAsset<PrototypeDungeonRoom>("reward room");
 			gungeon_rewardroom_1 = shared_auto_002.LoadAsset<PrototypeDungeonRoom>("gungeon_rewardroom_1");
@@ -99,6 +99,50 @@ namespace BotsMod
 			BulletHellRoomTable = BulletHellDungeonPrefab.PatternSettings.flows[0].fallbackRoomTable;
 
 			doublebeholsterroom01 = BeyondDungeonFlows.LoadOfficialFlow("Secret_DoubleBeholster_Flow").AllNodes[2].overrideExactRoom;
+
+
+			lostFigurePlaceable = ItemAPI.SpriteBuilder.SpriteFromResource("BotsMod/sprites/loststatuethatlooksawful");
+
+			FakePrefab.MarkAsFakePrefab(lostFigurePlaceable);
+			lostFigurePlaceable.SetActive(false);
+
+			SpeculativeRigidbody rigidbody = NpcApi.ItsDaFuckinShopApi.GenerateOrAddToRigidBody(lostFigurePlaceable, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(17, 27), new IntVector2(0, 0)) ;
+
+
+			PlacedWallDecorator placedWallDecorator = lostFigurePlaceable.AddComponent<PlacedWallDecorator>();
+			
+
+			placedWallDecorator.ignoresBorders = false;
+			placedWallDecorator.ignoreWallDrawing = false;
+			placedWallDecorator.wallClearanceHeight = 3;
+			placedWallDecorator.wallClearanceWidth = 1;
+			placedWallDecorator.wallClearanceXStart = 0;
+			placedWallDecorator.wallClearanceXStart = 0;
+
+			var comp = shared_auto_002.LoadAsset<GameObject>("RatFigure_Bullet").GetComponent<MinorBreakable>();
+
+			lostFigurePlaceable.AddComponent(comp);
+
+
+			DungeonPlaceableBehaviour dungeonPlaceableBehaviour = lostFigurePlaceable.AddComponent<DungeonPlaceableBehaviour>();
+			dungeonPlaceableBehaviour.placeableWidth = 1;
+			dungeonPlaceableBehaviour.placeableHeight = 1;
+			dungeonPlaceableBehaviour.difficulty = 0;
+			dungeonPlaceableBehaviour.isPassable = false;
+
+			shared_auto_002.LoadAsset<DungeonPlaceable>("Rat Figure Random").variantTiers.Add(new DungeonPlaceableVariant
+			{
+				percentChance = 1,
+				unitOffset = Vector2.zero,
+				nonDatabasePlaceable = lostFigurePlaceable,
+				enemyPlaceableGuid = "",
+				pickupObjectPlaceableId = -1,
+				forceBlackPhantom = false,
+				addDebrisObject = false,	
+				prerequisites = new DungeonPrerequisite[0],
+				materialRequirements = new DungeonPlaceableRoomMaterialRequirement[0]
+				
+			});
 
 
 		}

@@ -1,4 +1,5 @@
 ﻿using Dungeonator;
+using ItemAPI;
 using MonoMod.RuntimeDetour;
 using System;
 using System.Collections.Generic;
@@ -54,27 +55,28 @@ namespace BotsMod
         public static Dungeon BeyondGeon(Dungeon dungeon)
         {
             Debug.Log("beyond setup 1");
-            Dungeon MinesDungeonPrefab = FloorHooks.GetOrLoadByName_Orig("Base_Mines");
+            Dungeon CastleDungeonPrefab = FloorHooks.GetOrLoadByName_Orig("base_castle");
             Dungeon CatacombsPrefab = FloorHooks.GetOrLoadByName_Orig("Base_Catacombs");
             Dungeon MarinePastPrefab = FloorHooks.GetOrLoadByName_Orig("Finalscenario_Soldier");
             Dungeon RatDungeonPrefab = FloorHooks.GetOrLoadByName_Orig("Base_ResourcefulRat");
 
             if (gofuckyourself == null)
             {
-                gofuckyourself = RatDungeonPrefab.tileIndices.dungeonCollection;
+                gofuckyourself = MarinePastPrefab.tileIndices.dungeonCollection;
             }
 
+            
             //DungeonMaterial FinalScenario_MainMaterial = UnityEngine.Object.Instantiate(RatDungeonPrefab.roomMaterialDefinitions[0]);
-            DungeonMaterial FinalScenario_MainMaterial = UnityEngine.Object.Instantiate(MinesDungeonPrefab.roomMaterialDefinitions[0]);
+            DungeonMaterial FinalScenario_MainMaterial = UnityEngine.Object.Instantiate(MarinePastPrefab.roomMaterialDefinitions[0]);
             FinalScenario_MainMaterial.supportsPits = true;
-            FinalScenario_MainMaterial.doPitAO = false;
+            FinalScenario_MainMaterial.doPitAO = true;
             // FinalScenario_MainMaterial.pitsAreOneDeep = true;
             FinalScenario_MainMaterial.useLighting = true;
             // FinalScenario_MainMaterial.supportsLavaOrLavalikeSquares = true;
-            FinalScenario_MainMaterial.lightPrefabs.elements[0].rawGameObject = MinesDungeonPrefab.roomMaterialDefinitions[0].lightPrefabs.elements[0].rawGameObject;
-            FinalScenario_MainMaterial.roomFloorBorderGrid = MinesDungeonPrefab.roomMaterialDefinitions[0].roomFloorBorderGrid;
-            FinalScenario_MainMaterial.pitLayoutGrid = MinesDungeonPrefab.roomMaterialDefinitions[0].pitLayoutGrid;
-            FinalScenario_MainMaterial.pitBorderFlatGrid = MinesDungeonPrefab.roomMaterialDefinitions[0].pitBorderFlatGrid;
+            FinalScenario_MainMaterial.lightPrefabs.elements[0].rawGameObject = MarinePastPrefab.roomMaterialDefinitions[0].lightPrefabs.elements[0].rawGameObject;
+            FinalScenario_MainMaterial.roomFloorBorderGrid = MarinePastPrefab.roomMaterialDefinitions[0].roomFloorBorderGrid;
+            FinalScenario_MainMaterial.pitBorderFlatGrid = MarinePastPrefab.roomMaterialDefinitions[0].pitBorderFlatGrid;
+            FinalScenario_MainMaterial.pitLayoutGrid = MarinePastPrefab.roomMaterialDefinitions[0].pitLayoutGrid;
 
             Debug.Log("beyond setup 2");
 
@@ -85,7 +87,7 @@ namespace BotsMod
             m_FloorNameStampData.objectStampWeight = 1;
             m_FloorNameStampData.stamps = new TileStampData[0];
             m_FloorNameStampData.spriteStamps = new SpriteStampData[0];
-            m_FloorNameStampData.objectStamps = RatDungeonPrefab.stampData.objectStamps;
+            m_FloorNameStampData.objectStamps = MarinePastPrefab.stampData.objectStamps;
             m_FloorNameStampData.SymmetricFrameChance = 0.25f;
             m_FloorNameStampData.SymmetricCompleteChance = 0.6f;
 
@@ -115,6 +117,27 @@ namespace BotsMod
             dungeon.ForceRegenerationOfCharacters = false;
             dungeon.ActuallyGenerateTilemap = true;
             Debug.Log("beyond setup 3");
+            /*tk2dSpriteCollectionData mycollecion = new GameObject("aaaa").AddComponent<tk2dSpriteCollectionData>();
+            FakePrefab.MarkAsFakePrefab(mycollecion.gameObject);
+
+            UnityEngine.JsonUtility.FromJsonOverwrite(Tools.fucktilesets.LoadAsset<TextAsset>("Beyond_Collection_Data").text, mycollecion);
+            mycollecion.textures = new Texture[] { ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/atlas0.png") };
+            mycollecion.material = Tools.fucktilesets.LoadAsset<Material>("atlas0 material");
+            mycollecion.materials = new Material[] { Tools.fucktilesets.LoadAsset<Material>("atlas0 material") };
+            for (int i = 0; i < mycollecion.spriteDefinitions.Length; i++)
+            {
+                mycollecion.spriteDefinitions[i].material = Tools.fucktilesets.LoadAsset<Material>("atlas0 material");
+                mycollecion.spriteDefinitions[i].metadata.dungeonRoomSubType = 0;
+                mycollecion.spriteDefinitions[i].metadata.preventWallStamping = true;
+                mycollecion.spriteDefinitions[i].metadata.secondRoomSubType = -1;
+                mycollecion.spriteDefinitions[i].metadata.thirdRoomSubType = -1;
+                mycollecion.spriteDefinitions[i].metadata.weight = 0.1f;
+                mycollecion.spriteDefinitions[i].metadata.usesAnimSequence = false;
+                mycollecion.spriteDefinitions[i].metadata.usesNeighborDependencies = false;
+                mycollecion.spriteDefinitions[i].metadata.usesPerTileVFX = false;
+
+                //mycollecion.spriteDefinitions[i].colliderType = gofuckyourself.spriteDefinitions[i].colliderType;
+            }*/
 
             dungeon.tileIndices = new TileIndices()
             {
@@ -122,13 +145,46 @@ namespace BotsMod
 
                 //since the tileset im using here is a copy of the Rat dungeon tileset, the first variable in ReplaceDungeonCollection is RatDungeonPrefab.tileIndices.dungeonCollection,
                 //otherwise we will use a different dungeon prefab
-                dungeonCollection = Tools.ReplaceDungeonCollection(gofuckyourself, BeyondPrefabs.ENV_Tileset_Beyond),
-                dungeonCollectionSupportsDiagonalWalls = false,
+                //dungeonCollection = Tools.ReplaceDungeonCollection(gofuckyourself, BeyondPrefabs.ENV_Tileset_Beyond),
+                dungeonCollection = gofuckyourself,
                 
-                aoTileIndices = RatDungeonPrefab.tileIndices.aoTileIndices,
+
+                dungeonCollectionSupportsDiagonalWalls = false,
+
+                //aoTileIndices = MarinePastPrefab.tileIndices.aoTileIndices,
+                aoTileIndices = new AOTileIndices
+                {
+                    AOFloorTileIndex = -1,
+                    AOBottomWallBaseTileIndex = -1,
+                    AOBottomWallTileRightIndex = -1,
+                    AOBottomWallTileLeftIndex = -1,
+                    AOBottomWallTileBothIndex = -1,
+                    AOTopFacewallRightIndex = -1,
+                    AOTopFacewallLeftIndex = -1,
+                    AOTopFacewallBothIndex = -1,
+                    AOFloorWallLeft = -1,
+                    AOFloorWallRight = -1,
+                    AOFloorWallBoth = -1,
+                    AOFloorPizzaSliceLeft = -1,
+                    AOFloorPizzaSliceRight = -1,
+                    AOFloorPizzaSliceBoth = -1,
+                    AOFloorPizzaSliceLeftWallRight = -1,
+                    AOFloorPizzaSliceRightWallLeft = -1,
+                    AOFloorWallUpAndLeft = -1,
+                    AOFloorWallUpAndRight = -1,
+                    AOFloorWallUpAndBoth = -1,
+                    AOFloorDiagonalWallNortheast = -1,
+                    AOFloorDiagonalWallNortheastLower = -1,
+                    AOFloorDiagonalWallNortheastLowerJoint = -1,
+                    AOFloorDiagonalWallNorthwest = -1,
+                    AOFloorDiagonalWallNorthwestLower = -1,
+                    AOFloorDiagonalWallNorthwestLowerJoint = -1,
+                    AOBottomWallDiagonalNortheast = -1,
+                    AOBottomWallDiagonalNorthwest = -1
+                },
                 placeBorders = true,
                 placePits = false,
-                chestHighWallIndices = new List<TileIndexVariant>() {
+                chestHighWallIndices = new List<TileIndexVariant>() { 
                     new TileIndexVariant() {
                         index = 41,
                         likelihood = 0.5f,
@@ -136,11 +192,14 @@ namespace BotsMod
                         overrideIndex = 0
                     }
                 },
+            
+                
                 decalIndexGrid = null,
-                patternIndexGrid = RatDungeonPrefab.tileIndices.patternIndexGrid,
+                //patternIndexGrid = RatDungeonPrefab.tileIndices.patternIndexGrid,
+                patternIndexGrid = null,
                 globalSecondBorderTiles = new List<int>(0),
                 edgeDecorationTiles = null,
-                
+
             };
             Debug.Log("beyond setup 3.5");
 
@@ -157,6 +216,9 @@ namespace BotsMod
             Debug.Log(dungeon.tileIndices.dungeonCollection.name);
             dungeon.tileIndices.dungeonCollection.name = "ENV_Beyond_Collection";
             Debug.Log("beyond setup 3.6");
+
+            
+
             dungeon.roomMaterialDefinitions = new DungeonMaterial[] {
                 FinalScenario_MainMaterial,
                 FinalScenario_MainMaterial,
@@ -164,28 +226,32 @@ namespace BotsMod
                 FinalScenario_MainMaterial,
                 FinalScenario_MainMaterial,
                 FinalScenario_MainMaterial,
-                FinalScenario_MainMaterial
+                FinalScenario_MainMaterial,
             };
             dungeon.dungeonWingDefinitions = new DungeonWingDefinition[0];
             Debug.Log("beyond setup 4");
             //This section can be used to take parts from other floors and use them as our own.
             //we can make the running dust from one floor our own, the tables from another our own, 
             //we can use all of the stuff from the same floor, or if you want, you can make your own.
-            dungeon.pathGridDefinitions = new List<TileIndexGrid>() { MinesDungeonPrefab.pathGridDefinitions[0] };
+
+            //
+            //MarinePastPrefab.pathGridDefinitions[0]
+            dungeon.pathGridDefinitions = new List<TileIndexGrid>() {  };
+            //dungeon.pathGridDefinitions = new List<TileIndexGrid>() { BeyondTileGrids.floorBorderGrid };
             dungeon.dungeonDustups = new DustUpVFX()
             {
-                runDustup = MinesDungeonPrefab.dungeonDustups.runDustup,
-                waterDustup = MinesDungeonPrefab.dungeonDustups.waterDustup,
-                additionalWaterDustup = MinesDungeonPrefab.dungeonDustups.additionalWaterDustup,
-                rollNorthDustup = MinesDungeonPrefab.dungeonDustups.rollNorthDustup,
-                rollNorthEastDustup = MinesDungeonPrefab.dungeonDustups.rollNorthEastDustup,
-                rollEastDustup = MinesDungeonPrefab.dungeonDustups.rollEastDustup,
-                rollSouthEastDustup = MinesDungeonPrefab.dungeonDustups.rollSouthEastDustup,
-                rollSouthDustup = MinesDungeonPrefab.dungeonDustups.rollSouthDustup,
-                rollSouthWestDustup = MinesDungeonPrefab.dungeonDustups.rollSouthWestDustup,
-                rollWestDustup = MinesDungeonPrefab.dungeonDustups.rollWestDustup,
-                rollNorthWestDustup = MinesDungeonPrefab.dungeonDustups.rollNorthWestDustup,
-                rollLandDustup = MinesDungeonPrefab.dungeonDustups.rollLandDustup
+                runDustup = MarinePastPrefab.dungeonDustups.runDustup,
+                waterDustup = MarinePastPrefab.dungeonDustups.waterDustup,
+                additionalWaterDustup = MarinePastPrefab.dungeonDustups.additionalWaterDustup,
+                rollNorthDustup = MarinePastPrefab.dungeonDustups.rollNorthDustup,
+                rollNorthEastDustup = MarinePastPrefab.dungeonDustups.rollNorthEastDustup,
+                rollEastDustup = MarinePastPrefab.dungeonDustups.rollEastDustup,
+                rollSouthEastDustup = MarinePastPrefab.dungeonDustups.rollSouthEastDustup,
+                rollSouthDustup = MarinePastPrefab.dungeonDustups.rollSouthDustup,
+                rollSouthWestDustup = MarinePastPrefab.dungeonDustups.rollSouthWestDustup,
+                rollWestDustup = MarinePastPrefab.dungeonDustups.rollWestDustup,
+                rollNorthWestDustup = MarinePastPrefab.dungeonDustups.rollNorthWestDustup,
+                rollLandDustup = MarinePastPrefab.dungeonDustups.rollLandDustup
             };
             dungeon.PatternSettings = new SemioticDungeonGenSettings()
             {
@@ -201,7 +267,7 @@ namespace BotsMod
                 DEBUG_RENDER_CANVASES_SEPARATELY = false
             };
             Debug.Log("beyond setup 5");
-            dungeon.damageTypeEffectMatrix = MinesDungeonPrefab.damageTypeEffectMatrix;
+            dungeon.damageTypeEffectMatrix = MarinePastPrefab.damageTypeEffectMatrix;
             dungeon.stampData = m_FloorNameStampData;
             dungeon.UsesCustomFloorIdea = false;
             dungeon.FloorIdea = new RobotDaveIdea()
@@ -225,16 +291,28 @@ namespace BotsMod
             dungeon.decoSettings = new TilemapDecoSettings
             {
 
-                decalExpansion = RatDungeonPrefab.decoSettings.decalExpansion,
-                decalLayerStyle = RatDungeonPrefab.decoSettings.decalLayerStyle,
-                decalSize = RatDungeonPrefab.decoSettings.decalSize,
-                decoPatchFrequency = RatDungeonPrefab.decoSettings.decoPatchFrequency,
-                decalSpacing = RatDungeonPrefab.decoSettings.decalSpacing,
-                patternExpansion = RatDungeonPrefab.decoSettings.patternExpansion,
+                decalExpansion = MarinePastPrefab.decoSettings.decalExpansion,
+                decalLayerStyle = MarinePastPrefab.decoSettings.decalLayerStyle,
+                decalSize = MarinePastPrefab.decoSettings.decalSize,
+                decoPatchFrequency = MarinePastPrefab.decoSettings.decoPatchFrequency,
+                decalSpacing = MarinePastPrefab.decoSettings.decalSpacing,
+                patternExpansion = MarinePastPrefab.decoSettings.patternExpansion,
                 patternLayerStyle = RatDungeonPrefab.decoSettings.patternLayerStyle,
-                patternSize = RatDungeonPrefab.decoSettings.patternSize,
-                patternSpacing = RatDungeonPrefab.decoSettings.patternSpacing,
-                standardRoomVisualSubtypes = RatDungeonPrefab.decoSettings.standardRoomVisualSubtypes,
+                patternSize = MarinePastPrefab.decoSettings.patternSize,
+                patternSpacing = MarinePastPrefab.decoSettings.patternSpacing,
+                standardRoomVisualSubtypes = new WeightedIntCollection
+                {
+                    elements = new WeightedInt[]
+                    {
+                        new WeightedInt
+                        {
+                            annotation = "brick",
+                            value = 0,
+                            weight = 1,
+                            additionalPrerequisites = new DungeonPrerequisite[0]
+                        }
+                    },
+                },//RatDungeonPrefab.decoSettings.standardRoomVisualSubtypes,
 
 
                 ambientLightColor = new Color32(170, 150, 180, 255),
@@ -262,12 +340,12 @@ namespace BotsMod
             Debug.Log("beyond setup 7");
             //more variable we can copy from other floors, or make our own
             dungeon.PlaceDoors = true;
-            dungeon.doorObjects = CatacombsPrefab.doorObjects;
-            dungeon.oneWayDoorObjects = MinesDungeonPrefab.oneWayDoorObjects;
-            dungeon.oneWayDoorPressurePlate = MinesDungeonPrefab.oneWayDoorPressurePlate;
-            dungeon.phantomBlockerDoorObjects = MinesDungeonPrefab.phantomBlockerDoorObjects;
+            dungeon.doorObjects = MarinePastPrefab.doorObjects;
+            dungeon.oneWayDoorObjects = MarinePastPrefab.oneWayDoorObjects;
+            dungeon.oneWayDoorPressurePlate = MarinePastPrefab.oneWayDoorPressurePlate;
+            dungeon.phantomBlockerDoorObjects = MarinePastPrefab.phantomBlockerDoorObjects;
             dungeon.UsesWallWarpWingDoors = false;
-            dungeon.baseChestContents = CatacombsPrefab.baseChestContents;
+            dungeon.baseChestContents = MarinePastPrefab.baseChestContents;
             dungeon.SecretRoomSimpleTriggersFacewall = new List<GameObject>() { CatacombsPrefab.SecretRoomSimpleTriggersFacewall[0] };
             dungeon.SecretRoomSimpleTriggersSidewall = new List<GameObject>() { CatacombsPrefab.SecretRoomSimpleTriggersSidewall[0] };
             dungeon.SecretRoomComplexTriggers = new List<ComplexSecretRoomTrigger>(0);
@@ -279,7 +357,7 @@ namespace BotsMod
             dungeon.BossMasteryTokenItemId = BotsItemIds.BeyondMasteryToken;
             dungeon.UsesOverrideTertiaryBossSets = false;
             dungeon.OverrideTertiaryRewardSets = new List<TertiaryBossRewardSet>(0);
-            dungeon.defaultPlayerPrefab = MinesDungeonPrefab.defaultPlayerPrefab;
+            dungeon.defaultPlayerPrefab = MarinePastPrefab.defaultPlayerPrefab;
             dungeon.StripPlayerOnArrival = false;
             dungeon.SuppressEmergencyCrates = false;
             dungeon.SetTutorialFlag = false;
@@ -296,7 +374,7 @@ namespace BotsMod
 
             CatacombsPrefab = null;
             RatDungeonPrefab = null;
-            MinesDungeonPrefab = null;
+            MarinePastPrefab = null;
 
             return dungeon;
         }

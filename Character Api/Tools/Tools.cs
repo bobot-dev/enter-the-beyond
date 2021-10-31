@@ -6,6 +6,7 @@ using System.IO;
 using System.Reflection;
 
 using UnityEngine;
+
 using Dungeonator;
 using MonoMod.RuntimeDetour;
 
@@ -75,7 +76,10 @@ namespace GungeonAPI
         {
             return atlas.Items.Convert(delegate (dfAtlas.ItemInfo item)
             {
-                return new RectInt(Mathf.RoundToInt(item.region.x * atlas.Texture.width), Mathf.RoundToInt(item.region.y * atlas.Texture.height), Mathf.RoundToInt(item.region.width * atlas.Texture.width),
+                return new RectInt(
+                    Mathf.RoundToInt(item.region.x * atlas.Texture.width),
+                    Mathf.RoundToInt(item.region.y * atlas.Texture.height),
+                    Mathf.RoundToInt(item.region.width * atlas.Texture.width),
                     Mathf.RoundToInt(item.region.height * atlas.Texture.height));
             });
         }
@@ -99,6 +103,8 @@ namespace GungeonAPI
         }
 
 
+
+        
         /// <summary>
 		/// Gets the first empty space in <paramref name="atlas"/> that has at least the size of <paramref name="pixelScale"/>.
 		/// </summary>
@@ -107,6 +113,10 @@ namespace GungeonAPI
 		/// <returns>The rect of the empty space divided by the atlas texture's size.</returns>
 		public static Rect FindFirstValidEmptySpace(this dfAtlas atlas, IntVector2 pixelScale)
         {
+            
+
+
+
             if (atlas == null || atlas.Texture == null || !atlas.Texture.IsReadable())
             {
                 return new Rect(0f, 0f, 0f, 0f);
@@ -114,12 +124,17 @@ namespace GungeonAPI
             Vector2Int point = new Vector2Int(0, 0);
             int pointIndex = -1;
             List<RectInt> rects = atlas.GetPixelRegions();
+            float x = 0;
+            float y = 0;
+
+            
             while (true)
             {
                 bool shouldContinue = false;
                 foreach (RectInt rint in rects)
                 {
-                    if (rint.Contains(point))
+                    
+                    if (rint.DoseOverlap(new RectInt(point, pixelScale.ToVector2Int())))
                     {
                         shouldContinue = true;
                         pointIndex++;
@@ -144,7 +159,7 @@ namespace GungeonAPI
                         }
                         else
                         {
-                            if (currentRect.Contains(rint2.position))
+                            if (currentRect.DoseOverlap(rint2))
                             {
                                 shouldContinue = true;
                                 shouldBreak = true;
@@ -317,6 +332,11 @@ namespace GungeonAPI
             Log(obj.ToString());
         }
 
+
+        public static bool DoseOverlap(this RectInt rect1, RectInt rect2)
+        {
+            return rect2.xMax > rect1.xMin && rect2.xMin < rect1.xMax && rect2.yMax > rect1.yMin && rect2.yMin < rect1.yMax;
+        }
 
 
         public static void PrintRaw<T>(T obj, bool force = false)

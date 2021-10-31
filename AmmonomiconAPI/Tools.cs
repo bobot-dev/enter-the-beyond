@@ -47,7 +47,7 @@ namespace AmmonomiconAPI
                 "dungeons/finalscenario_robot",
                 "dungeons/finalscenario_soldier"
             };
-            AmmonomiconHooks.Init();
+            //AmmonomiconHooks.Init();
         }
 
         public static void Log(string text, string color = "#FFFFFF")

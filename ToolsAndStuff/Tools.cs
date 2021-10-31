@@ -20,6 +20,7 @@ namespace BotsMod
 		public static GameObject Mines_Cave_In;
 		public static GameObject Foyer_ElevatorChamber;
 		public static AssetBundle AHHH;
+		public static AssetBundle fucktilesets;
 		public static AssetBundle BotsAssetBundle;
 		public static List<int> BeyondItems = new List<int>();
 
@@ -768,7 +769,7 @@ namespace BotsMod
 			}
 		}
 
-		public static GameObject MakeLine(string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> beamAnimationPaths = null, int beamFPS = -1)
+		public static GameObject MakeLine(string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets)
 		{
 			try
 			{
@@ -790,10 +791,10 @@ namespace BotsMod
 					new Vector3(convertedColliderX, convertedColliderY, 0f)
 				};
 
-				def.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
+				def.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.LowerLeft);
 
 				//tiledSprite.anchor = tk2dBaseSprite.Anchor.MiddleCenter;
-				tk2dSpriteAnimator animator = line.GetOrAddComponent<tk2dSpriteAnimator>();
+				/*tk2dSpriteAnimator animator = line.GetOrAddComponent<tk2dSpriteAnimator>();
 				tk2dSpriteAnimation animation = line.GetOrAddComponent<tk2dSpriteAnimation>();
 				animation.clips = new tk2dSpriteAnimationClip[0];
 				animator.Library = animation;
@@ -815,7 +816,7 @@ namespace BotsMod
 					}
 					clip.frames = frames.ToArray();
 					animation.clips = animation.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
-				}
+				}*/
 				
 				return line;
 			}
@@ -2617,7 +2618,6 @@ int? overrideColliderPixelHeight = null, int? overrideColliderOffsetX = null, in
 
 				beamList.Add(bholsterbeam1);
 
-				BotsModule.Log(names[i]);
 			}
 			
 

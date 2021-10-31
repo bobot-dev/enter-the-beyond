@@ -11,6 +11,7 @@ using HutongCharacter = HutongGames.PlayMaker.Actions.ChangeToNewCharacter;
 
 using SaveAPI;
 using ItemAPI;
+using Dungeonator;
 
 namespace CustomCharacters
 
@@ -164,6 +165,10 @@ namespace CustomCharacters
                 }
             }
 
+
+            MakeSkinSwapper(customCharacter.First);
+            Tools.Print("    Added swapper");
+
             //Make interactable
             if (!Dungeonator.RoomHandler.unassignedInteractableObjects.Contains(td))
                 Dungeonator.RoomHandler.unassignedInteractableObjects.Add(td);
@@ -211,6 +216,70 @@ namespace CustomCharacters
             selectCharacter.spriteAnimator.Play(coreIdleAnimation);
         }
 
+        static void MakeSkinSwapper(CustomCharacterData data)
+        {
+            var baseSwapper = FakePrefab.Clone(Foyer.Instance.transform.Find("Livery xform").Find("costume_guide").gameObject);
+            var altSwapper = FakePrefab.Clone(Foyer.Instance.transform.Find("Livery xform").Find("costume_guide_alt").gameObject);
+
+            var sprite = baseSwapper.GetComponent<tk2dSprite>();
+            var altSprite = altSwapper.GetComponent<tk2dSprite>();
+
+            baseSwapper.transform.parent = Foyer.Instance.transform.Find("Livery xform");
+            altSwapper.transform.parent = Foyer.Instance.transform.Find("Livery xform");
+
+            sprite.SetSprite(sprite.Collection, SpriteHandler.AddSpriteToCollection(data.altObjSprite1, sprite.Collection));
+            altSprite.SetSprite(altSprite.Collection, SpriteHandler.AddSpriteToCollection(data.altObjSprite2, sprite.Collection));
+
+            altSwapper.name = $"costume_{data.nameShort}_alt";
+
+            baseSwapper.name = $"costume_{data.nameShort}";
+
+            var characterCostumeSwapper = baseSwapper.GetComponent<CharacterCostumeSwapper>();
+
+            characterCostumeSwapper.TargetCharacter = (PlayableCharacters)CustomPlayableCharacters.Custom;
+
+            characterCostumeSwapper.AlternateCostumeSprite = altSprite;
+
+            characterCostumeSwapper.CostumeSprite = sprite;
+
+            characterCostumeSwapper.HasCustomTrigger = false;
+            characterCostumeSwapper.CustomTriggerIsFlag = false;
+            characterCostumeSwapper.TriggerFlag = GungeonFlags.NONE;
+            characterCostumeSwapper.CustomTriggerIsSpecialReserve = false;
+
+            characterCostumeSwapper.TargetLibrary = data.AlternateCostumeLibrary;
+
+            if (sprite.transform == null)
+            {
+                ETGModConsole.Log("somehow the transform nulled... god is fucking dead and BraveBehaviours killed him");
+            }
+
+            if (altSprite.transform == null)
+            {
+                ETGModConsole.Log("somehow the transform nulled... god is fucking dead (again) and BraveBehaviours killed him");
+            }
+
+            baseSwapper.gameObject.SetActive(true);
+            altSwapper.gameObject.SetActive(true);
+
+            baseSwapper.transform.position = data.skinSwapperPos;
+
+            altSwapper.transform.position = data.skinSwapperPos;
+            
+
+            BotsMod.BotsModule.Log($"{baseSwapper.name}: {baseSwapper.transform.position}");
+
+            if (!RoomHandler.unassignedInteractableObjects.Contains(baseSwapper.GetComponent<IPlayerInteractable>()))
+            {
+                RoomHandler.unassignedInteractableObjects.Add(baseSwapper.GetComponent<IPlayerInteractable>());
+            }
+
+            if (!RoomHandler.unassignedInteractableObjects.Contains(altSwapper.GetComponent<IPlayerInteractable>()))
+            {
+                RoomHandler.unassignedInteractableObjects.Add(altSwapper.GetComponent<IPlayerInteractable>());
+            }
+        }
+
         private static void ResetToIdle(BraveBehaviour idler)
         {
             SpriteOutlineManager.RemoveOutlineFromSprite(idler.sprite, true);
@@ -225,10 +294,9 @@ namespace CustomCharacters
         {
             //Create new card instance
             selectCharacter.ClearOverheadElement();
-            selectCharacter.OverheadElement = FakePrefab.Clone(selectCharacter.OverheadElement);
+            selectCharacter.OverheadElement = UnityEngine.Object.Instantiate(selectCharacter.OverheadElement);
             selectCharacter.OverheadElement.SetActive(true);
-
-
+            
             if (data.removeFoyerExtras)
             {
                 foreach (var child in selectCharacter.gameObject.transform)
@@ -269,12 +337,17 @@ namespace CustomCharacters
 
             //Change text
             var infoPanel = selectCharacter.OverheadElement.GetComponent<FoyerInfoPanelController>();
+            infoPanel.followTransform = selectCharacter.transform;
+            foreach (var comp in selectCharacter.OverheadElement.GetComponentsInChildren<Component>())
+            {
+                ETGModConsole.Log($"{comp.gameObject.name}: {comp.GetType()}");
+            }
 
 
 
             dfLabel nameLabel = infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>();
             nameLabel.Text = nameLabel.GetLocalizationKey().Replace(replaceKey, data.identity.ToString());
-            BotsMod.BotsModule.Log(replaceKey, BotsMod.BotsModule.LOST_COLOR);
+            //BotsMod.BotsModule.Log(replaceKey, BotsMod.BotsModule.LOST_COLOR);
             dfLabel pastKilledLabel = infoPanel.textPanel.transform.Find("PastKilledLabel").GetComponent<dfLabel>();
             pastKilledLabel.Text = "(Past Killed)";
             pastKilledLabel.ProcessMarkup = true;

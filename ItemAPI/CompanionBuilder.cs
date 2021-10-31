@@ -28,7 +28,7 @@ namespace ItemAPI
                 if (child != behaviorSpeculatorPrefab.transform)
                     GameObject.DestroyImmediate(child);
             }
-
+            
             foreach (var comp in behaviorSpeculatorPrefab.GetComponents<Component>())
             {
                 if (comp.GetType() != typeof(BehaviorSpeculator))

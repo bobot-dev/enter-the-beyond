@@ -50,7 +50,7 @@ namespace CustomCharacters
 
 
             //face card stuff
-            uiAtlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;
+            uiAtlas = data.atlas;//GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;
             if (data.faceCard != null)
                 HandleFacecards(player, data);
 
@@ -62,6 +62,28 @@ namespace CustomCharacters
                 HandleLoudoutSprites(player, data);
             else
                 ToolsGAPI.Print("        loadout sprites is null.", "FFBB00");
+        }
+        private static tk2dSpriteCollectionData itemCollection = PickupObjectDatabase.GetByEncounterName("singularity").sprite.Collection;
+        /// <summary>
+        /// Returns an object with a tk2dSprite component with the texture provided
+        /// </summary>
+        public static GameObject SpriteFromTexture(Texture2D texture, GameObject obj = null)
+        {
+            if (obj == null)
+            {
+                obj = new GameObject();
+            }
+            tk2dSprite sprite;
+            sprite = obj.AddComponent<tk2dSprite>();
+
+            int id = AddSpriteToCollection(texture, itemCollection);
+            sprite.SetSprite(itemCollection, id);
+            sprite.SortingOrder = 0;
+            sprite.IsPerpendicular = true;
+
+            obj.GetComponent<BraveBehaviour>().sprite = sprite;
+
+            return obj;
         }
 
         public static void HandleLoudoutSprites(PlayerController player, CustomCharacterData data)
@@ -78,6 +100,93 @@ namespace CustomCharacters
                 data.loadoutSpriteNames.Add(data.loadoutSprites[i].name.Replace(" ", "_"));
             }
             ToolsGAPI.ExportTexture(uiAtlas.Texture, "SpriteDump/" + "atlasthingo");
+        }
+
+
+        /// <summary>
+        /// Adds a sprite (from a resource) to a collection
+        /// </summary>
+        /// <returns>The spriteID of the defintion in the collection</returns>
+        public static int AddSpriteToCollection(Texture2D texture, tk2dSpriteCollectionData collection, string name = "")
+        {
+
+            var definition = ConstructDefinition(texture); //Generate definition
+            if (string.IsNullOrEmpty(name))
+            {
+                definition.name = texture.name; //naming the definition is actually extremely important 
+            }
+            else
+            {
+                definition.name = name; //naming the definition is actually extremely important 
+            }
+
+
+            return AddSpriteToCollection(definition, collection);
+        }
+
+        /// <summary>
+        /// Constructs a new tk2dSpriteDefinition with the given texture
+        /// </summary>
+        /// <returns>A new sprite definition with the given texture</returns>
+        public static tk2dSpriteDefinition ConstructDefinition(Texture2D texture)
+        {
+            RuntimeAtlasSegment ras = ETGMod.Assets.Packer.Pack(texture); //pack your resources beforehand or the outlines will turn out weird
+
+            Material material = new Material(ShaderCache.Acquire(PlayerController.DefaultShaderName));
+            material.mainTexture = ras.texture;
+            //material.mainTexture = texture;
+
+            var width = texture.width;
+            var height = texture.height;
+
+            var x = 0f;
+            var y = 0f;
+
+            var w = width / 16f;
+            var h = height / 16f;
+
+            var def = new tk2dSpriteDefinition
+            {
+                normals = new Vector3[] {
+                new Vector3(0.0f, 0.0f, -1.0f),
+                new Vector3(0.0f, 0.0f, -1.0f),
+                new Vector3(0.0f, 0.0f, -1.0f),
+                new Vector3(0.0f, 0.0f, -1.0f),
+            },
+                tangents = new Vector4[] {
+                new Vector4(1.0f, 0.0f, 0.0f, 1.0f),
+                new Vector4(1.0f, 0.0f, 0.0f, 1.0f),
+                new Vector4(1.0f, 0.0f, 0.0f, 1.0f),
+                new Vector4(1.0f, 0.0f, 0.0f, 1.0f),
+            },
+                texelSize = new Vector2(1 / 16f, 1 / 16f),
+                extractRegion = false,
+                regionX = 0,
+                regionY = 0,
+                regionW = 0,
+                regionH = 0,
+                flipped = tk2dSpriteDefinition.FlipMode.None,
+                complexGeometry = false,
+                physicsEngine = tk2dSpriteDefinition.PhysicsEngine.Physics3D,
+                colliderType = tk2dSpriteDefinition.ColliderType.None,
+                collisionLayer = CollisionLayer.HighObstacle,
+                position0 = new Vector3(x, y, 0f),
+                position1 = new Vector3(x + w, y, 0f),
+                position2 = new Vector3(x, y + h, 0f),
+                position3 = new Vector3(x + w, y + h, 0f),
+                material = material,
+                materialInst = material,
+                materialId = 0,
+                //uvs = ETGMod.Assets.GenerateUVs(texture, 0, 0, width, height), //uv machine broke
+                uvs = ras.uvs,
+                boundsDataCenter = new Vector3(w / 2f, h / 2f, 0f),
+                boundsDataExtents = new Vector3(w, h, 0f),
+                untrimmedBoundsDataCenter = new Vector3(w / 2f, h / 2f, 0f),
+                untrimmedBoundsDataExtents = new Vector3(w, h, 0f),
+            };
+
+            def.name = texture.name;
+            return def;
         }
 
         public static Texture2D AddOutlineToTexture(Texture2D sprite, Color color)
@@ -496,7 +605,11 @@ namespace CustomCharacters
 
         public static void HandleFacecards(PlayerController player, CustomCharacterData data)
         {
-            var atlas = uiAtlas;
+
+
+            
+
+            /*var atlas = uiAtlas;
             var atlasTex = atlas.Texture;
 
             dfAtlas.ItemInfo info = new dfAtlas.ItemInfo();
@@ -509,9 +622,9 @@ namespace CustomCharacters
             if (atlas.Replacement)
             {
                 atlas.Replacement.Material.mainTexture = atlasTex;
-            }
-
-            uiFaceCards.Add(info);
+            }*/
+            var sprite = uiAtlas.AddNewItemToAtlas(data.faceCard, player.name + "_facecard");
+            uiFaceCards.Add(sprite);
         }
 
         public static void HandlePunchoutSprites(PunchoutPlayerController player, CustomCharacterData data)
@@ -542,13 +655,14 @@ namespace CustomCharacters
                 int count = Mathf.Min(data.punchoutFaceCards.Count, 3);
                 for (int i = 0; i < count; i++)
                 {
-                    dfAtlas.ItemInfo info = new dfAtlas.ItemInfo();
-                    info.name = data.nameInternal + "_punchout_facecard" + (i + 1);
-                    info.region = TextureStitcher.AddFaceCardToAtlas(data.punchoutFaceCards[i], atlasTex, uiFaceCards.Count, uiFacecardBounds);
-                    info.sizeInPixels = faceCardSizeInPixels;
+                    var sprite = uiAtlas.AddNewItemToAtlas(data.punchoutFaceCards[i], data.nameInternal + "_punchout_facecard" + (i + 1));
+                    //dfAtlas.ItemInfo info = new dfAtlas.ItemInfo();
+                    //info.name = data.nameInternal + "_punchout_facecard" + (i + 1);
+                    //info.region = TextureStitcher.AddFaceCardToAtlas(data.punchoutFaceCards[i], atlasTex, uiFaceCards.Count, uiFacecardBounds);
+                    //info.sizeInPixels = faceCardSizeInPixels;
 
-                    atlas.AddItem(info);
-                    uiFaceCards.Add(info);
+                    //atlas.AddItem(info);
+                    uiFaceCards.Add(sprite);
                 }
             }
         }

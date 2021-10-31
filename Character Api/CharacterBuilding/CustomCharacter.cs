@@ -15,13 +15,13 @@ namespace CustomCharacters
         public PlayableCharacters baseCharacter = PlayableCharacters.Pilot;
         public PlayableCharacters identity;
         public CustomDungeonFlags unlockFlag;
-        public string name, nameShort, nickname, nameInternal, altGun;
+        public string name, nameShort, nickname, nameInternal;
         public Dictionary<PlayerStats.StatType, float> stats;
         public List<Texture2D> sprites, altSprites, foyerCardSprites, punchoutSprites, punchoutFaceCards, loadoutSprites;
         public List<string> loadoutSpriteNames = new List<string>();
-        public Texture2D altPlayerSheet, playerSheet, minimapIcon, bossCard, junkanWinPic, pastWinPic;
+        public Texture2D altPlayerSheet, playerSheet, minimapIcon, bossCard, junkanWinPic, pastWinPic, altObjSprite1, altObjSprite2;
         public Texture2D faceCard;
-        public List<Tuple<PickupObject, bool>> loadout;
+        public List<Tuple<PickupObject, bool>> loadout, altGun;
         public int characterID, metaCost;
         public float health = 3, armor = 0;
         public tk2dSpriteAnimation AlternateCostumeLibrary;
@@ -29,9 +29,13 @@ namespace CustomCharacters
         public bool useGlow;
         public Color emissiveColor;
         public float emissiveColorPower, emissivePower, emissiveThresholdSensitivity;
+        public dfAtlas atlas;
 
         public CustomCharacterController customCharacterController;
 
+        public Vector3 skinSwapperPos;
+
+        public tk2dSpriteAnimation altLibary;
     }
 
     public class CustomCharacter : MonoBehaviour

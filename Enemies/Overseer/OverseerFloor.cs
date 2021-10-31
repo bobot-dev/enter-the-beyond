@@ -23,7 +23,6 @@ namespace BotsMod
 	{
 		public static GameObject OverseerPrefab;
 		public static readonly string guid = "bot:Overseer";
-		private static tk2dSpriteCollectionData StagngerCollection;
 		public static GameObject shootpoint;
 		private static Texture2D BossCardTexture = ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod\\sprites\\overseer_floor\\overseerf_Bosscard_001.png");
 		public static string TargetVFX;
@@ -396,6 +395,13 @@ namespace BotsMod
 				OverseerPrefab.AddAnimation("beam", "BotsMod/sprites/overseer_floor/beam", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
 
 				OverseerPrefab.AddAnimation("gaurd", "BotsMod/sprites/overseer_floor/gaurd", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
+				
+				OverseerPrefab.AddAnimation("remote_end", "BotsMod/sprites/overseer_floor/remoteEnd", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Single;
+
+
+				var beamTel = OverseerPrefab.AddAnimation("remote_tell", "BotsMod/sprites/overseer_floor/remoteTell", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None);
+				beamTel.wrapMode = tk2dSpriteAnimationClip.WrapMode.LoopSection;
+				beamTel.loopStart = 6;
 
 				OverseerPrefab.GetComponent<tk2dSpriteAnimator>().GetClipByName("blank").frames[2].eventInfo = "blank";
 
@@ -546,12 +552,13 @@ namespace BotsMod
 
 							AttackBehaviors = new List<AttackBehaviorBase>
 							{
+								//5
 								#region dash1
 								new DashButGoodBehavior
 								{
-									dashDirection = DashButGoodBehavior.DashDirection.Random,
+									dashDirection = DashButGoodBehavior.DashDirection.TowardTarget,
 									quantizeDirection = 0,
-									dashDistance = 8,
+									dashDistance = 15,
 									dashTime = 0.4f,
 									postDashSpeed = 0,
 									doubleDashChance = 0,
@@ -590,7 +597,8 @@ namespace BotsMod
 									chargeAnim = "",
 									dashAnim = "idle",
 								},
-								#endregion
+								#endregion//5
+								//8
 								#region dash2
 
 
@@ -638,12 +646,13 @@ namespace BotsMod
 									dashAnim = "idle",
 								},
 								#endregion
+								//5
 								#region dash1
 								new DashButGoodBehavior
 								{
-									dashDirection = DashButGoodBehavior.DashDirection.Random,
+									dashDirection = DashButGoodBehavior.DashDirection.TowardTarget,
 									quantizeDirection = 0,
-									dashDistance = 8,
+									dashDistance = 5,
 									dashTime = 0.4f,
 									postDashSpeed = 0,
 									doubleDashChance = 0,
@@ -683,6 +692,7 @@ namespace BotsMod
 									dashAnim = "idle",
 								},
 								#endregion
+								//8
 								#region dash2
 
 
@@ -730,12 +740,13 @@ namespace BotsMod
 									dashAnim = "idle",
 								},
 								#endregion
+								//5
 								#region dash1
 								new DashButGoodBehavior
 								{
-									dashDirection = DashButGoodBehavior.DashDirection.Random,
+									dashDirection = DashButGoodBehavior.DashDirection.TowardTarget,
 									quantizeDirection = 0,
-									dashDistance = 8,
+									dashDistance = 5,
 									dashTime = 0.4f,
 									postDashSpeed = 0,
 									doubleDashChance = 0,
@@ -775,6 +786,7 @@ namespace BotsMod
 									dashAnim = "idle",
 								},
 								#endregion
+								//8
 								#region dash2
 
 
@@ -822,12 +834,13 @@ namespace BotsMod
 									dashAnim = "idle",
 								},
 								#endregion
+								//5
 								#region dash1
 								new DashButGoodBehavior
 								{
-									dashDirection = DashButGoodBehavior.DashDirection.Random,
+									dashDirection = DashButGoodBehavior.DashDirection.TowardTarget,
 									quantizeDirection = 0,
-									dashDistance = 8,
+									dashDistance = 5,
 									dashTime = 0.4f,
 									postDashSpeed = 0,
 									doubleDashChance = 0,
@@ -867,6 +880,7 @@ namespace BotsMod
 									dashAnim = "idle",
 								},
 								#endregion
+								//8
 								#region dash2
 
 
@@ -915,7 +929,7 @@ namespace BotsMod
 								},
 								#endregion
 							},
-							OverrideCooldowns = new List<float>{ 0.04f, 0.04f, 0.04f, 0.04f, 0.04f, 0.04f, 0.04f, 5f },
+							OverrideCooldowns = new List<float>{ 0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.5f },
 							RunInClass = false,
 						},
 					},
@@ -1100,7 +1114,7 @@ namespace BotsMod
 						NickName = "looks cool"
 					},
 
-					new AttackBehaviorGroup.AttackGroupItem()
+					/*new AttackBehaviorGroup.AttackGroupItem()
 					{
 						Probability = 2f,
 						Behavior = new DashAndShootBehavior
@@ -1148,7 +1162,7 @@ namespace BotsMod
 							dashAnim = "idle",
 						},
 						NickName = "dash lots and shoot lines ok? cool"
-					},
+					},*/
 
 					new AttackBehaviorGroup.AttackGroupItem()
 					{
@@ -1159,7 +1173,7 @@ namespace BotsMod
 							MinRadius = 4,
 							MaxRadius = 12,
 							RemoteFootprint = new IntVector2(1,1),
-							TellTime = 0,
+							TellTime = 0.8f,
 							remoteBulletScript = new CustomBulletScriptSelector(typeof(OverseerRemoteBullets)),
 							FireTime = 3.5f,
 							Multifire = true,
@@ -1167,6 +1181,9 @@ namespace BotsMod
 							MaxShots = 5,
 							MidShotTime = 0.7f,
 							ShootVfx = "magic",
+							PostFireAnim = "remote_end",
+							TellAnim = "remote_tell",
+							StopDuringAnimation = true,
 							
 
 						},

@@ -41,7 +41,7 @@ namespace BotsMod.NPCs
                     "shopkeep_talk_005.png",
                 };
 
-                BotsModule.Log("anim lists done");
+                //BotsModule.Log("anim lists done");
 
                 var SpeechPoint = new GameObject("SpeechPoint");
                 SpeechPoint.transform.position = new Vector3(0.8125f, 2.1875f, -1.31f);
@@ -76,7 +76,7 @@ namespace BotsMod.NPCs
                 }
 
 
-                BotsModule.Log("anim lists done fr this time");
+                //BotsModule.Log("anim lists done fr this time");
 
                 tk2dSpriteAnimator spriteAnimator = npcObj.AddComponent<tk2dSpriteAnimator>();
 
@@ -85,11 +85,11 @@ namespace BotsMod.NPCs
 
                 SpeculativeRigidbody rigidbody = Tools.GenerateOrAddToRigidBody(npcObj, CollisionLayer.BulletBlocker, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
 
-                BotsModule.Log("rigidbody done");
+                //BotsModule.Log("rigidbody done");
 
                
 
-                BotsModule.Log("talkPoint done");
+                //BotsModule.Log("talkPoint done");
 
                 TalkDoerLite talkDoer = npcObj.AddComponent<TalkDoerLite>();
 
@@ -118,7 +118,7 @@ namespace BotsMod.NPCs
                 talkDoer.MovementSpeed = 3;
                 talkDoer.PathableTiles = CellTypes.FLOOR;
 
-                BotsModule.Log("TalkDoerLite done");
+                //BotsModule.Log("TalkDoerLite done");
 
                 UltraFortunesFavor dreamLuck = npcObj.AddComponent<UltraFortunesFavor>();
 
@@ -130,7 +130,7 @@ namespace BotsMod.NPCs
                 dreamLuck.vfxOffset = 0.625f;
                 dreamLuck.sparkOctantVFX = Tools.shared_auto_001.LoadAsset<GameObject>("FortuneFavor_VFX_Spark");
                 
-                BotsModule.Log("UltraFortunesFavor done");
+                //BotsModule.Log("UltraFortunesFavor done");
 
 
                 AIAnimator aIAnimator = Tools.GenerateBlankAIAnimator(npcObj);
@@ -170,7 +170,7 @@ namespace BotsMod.NPCs
                 var basenpc = ResourceManager.LoadAssetBundle("shared_auto_001").LoadAsset<GameObject>("Merchant_Key").transform.Find("NPC_Key").gameObject;
                 if (basenpc == null)
                 {
-                    BotsModule.Log("fuck shit fuck fuck shit");
+                    //BotsModule.Log("fuck shit fuck fuck shit");
                 }
 
                 PlayMakerFSM iHaveNoFuckingClueWhatThisIs = npcObj.AddComponent<PlayMakerFSM>();
@@ -250,7 +250,7 @@ namespace BotsMod.NPCs
                 //var npc = UnityEngine.Object.Instantiate(npcObj, GameManager.Instance.PrimaryPlayer.gameObject.transform.position, Quaternion.identity);
                 //GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(npc.GetComponent<TalkDoerLite>());
 
-                BotsModule.Log("npc set up now moving to shop");
+                //BotsModule.Log("npc set up now moving to shop");
 
                 var shopObj = new GameObject("Test_Npc_Shop").AddComponent<BaseShopController>();
                 FakePrefab.MarkAsFakePrefab(shopObj.gameObject);
@@ -309,7 +309,7 @@ namespace BotsMod.NPCs
                 //DungeonPlaceableUtility.InstantiateDungeonPlaceable(shopObj.gameObject, GameManager.Instance.PrimaryPlayer.CurrentRoom, new IntVector2((int)GameManager.Instance.PrimaryPlayer.gameObject.transform.position.x, (int)GameManager.Instance.PrimaryPlayer.gameObject.transform.position.y), false);
                 //UnityEngine.Object.Instantiate(shopObj, , Quaternion.identity).GetComponent<BaseShopController>().ConfigureOnPlacement();
                 //shopObj.baseShopType = (BaseShopController.AdditionalShopType)CustomEnums.CustomAdditionalShopType.DEVIL_DEAL;
-                BotsModule.Log("all done :D");
+                //BotsModule.Log("all done :D");
             }
             catch (Exception message)
             {

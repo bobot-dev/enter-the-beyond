@@ -14,11 +14,11 @@ namespace BotsMod
     {
 
 		static Projectile beam;
-
+		public static GameObject orbitalPrefab;
 		public static void Init()
 		{
 			//The name of the item
-			string itemName = "Otherwordly Fury";
+			string itemName = "Otherworldy Fury";
 			string resourceName = "BotsMod/sprites/otherworldly_fury";
 			GameObject obj = new GameObject();
 			var item = obj.AddComponent<OtherwordlyFury>();
@@ -73,11 +73,31 @@ namespace BotsMod
 
 
 			beamComp.ProjectileAndBeamMotionModule = new HelixProjectileMotionModule();
-			beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
+			beamComp.boneType = BasicBeamController.BeamBoneType.Straight;
 
 			beamComp.gameObject.GetOrAddComponent<EmmisiveBeams>().EmissiveColorPower = 7;
 			beamComp.gameObject.GetOrAddComponent<EmmisiveBeams>().EmissivePower = 42;
 
+
+			var orbital = SpriteBuilder.SpriteFromResource("BotsMod/sprites/otherworldlyfuryorbital");
+			orbital.name = "Otherwordly Fury Orbital";
+			orbital.layer = 22;
+			SpeculativeRigidbody speculativeRigidbody = orbital.GetComponent<tk2dSprite>().SetUpSpeculativeRigidbody(IntVector2.Zero, new IntVector2(6, 8));
+			speculativeRigidbody.CollideWithTileMap = false;
+			speculativeRigidbody.CollideWithOthers = false;
+			speculativeRigidbody.PrimaryPixelCollider.CollisionLayer = CollisionLayer.EnemyBulletBlocker;
+			var orb = orbital.AddComponent<PlayerOrbital>();
+			orb.motionStyle = PlayerOrbital.OrbitalMotionStyle.ORBIT_PLAYER_ALWAYS;
+			orb.shouldRotate = true;
+			orb.orbitDegreesPerSecond = 120;
+			orb.orbitRadius = 3;
+			
+			orb.SetOrbitalTier(0);
+			UnityEngine.Object.DontDestroyOnLoad(orbital);
+			FakePrefab.MarkAsFakePrefab(orbital);
+			orbital.SetActive(false);
+
+			orbitalPrefab = orbital;
 
 			beam = projectile4;
 
@@ -147,25 +167,7 @@ namespace BotsMod
 						for (int i = 0; i < 3; i++)
 						{
 
-							var obj = SpriteBuilder.SpriteFromResource("BotsMod/sprites/otherworldlyfuryorbital");
-							obj.name = "Otherwordly Fury Orbital";
-							obj.layer = 22;
-							SpeculativeRigidbody speculativeRigidbody = obj.GetComponent<tk2dSprite>().SetUpSpeculativeRigidbody(IntVector2.Zero, new IntVector2(6, 8));
-							speculativeRigidbody.CollideWithTileMap = false;
-							speculativeRigidbody.CollideWithOthers = false;
-							speculativeRigidbody.PrimaryPixelCollider.CollisionLayer = CollisionLayer.EnemyBulletBlocker;
-							var orb = obj.AddComponent<PlayerOrbital>();
-							orb.motionStyle = PlayerOrbital.OrbitalMotionStyle.ORBIT_PLAYER_ALWAYS;
-							orb.shouldRotate = false;
-							orb.orbitDegreesPerSecond = 120;
-							orb.orbitRadius = 3;
-							orb.SetOrbitalTier(0);
-							UnityEngine.Object.DontDestroyOnLoad(obj);
-							FakePrefab.MarkAsFakePrefab(obj);
-							obj.SetActive(false);
-
-
-							var orbObj = PlayerOrbitalItem.CreateOrbital(base.LastOwner, obj, false);
+							var orbObj = PlayerOrbitalItem.CreateOrbital(base.LastOwner, orbitalPrefab, false);
 
 							orbitals.Add(orbObj);
 						}

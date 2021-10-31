@@ -98,7 +98,7 @@ namespace BotsMod
 			projectile.baseData.range = 16f;
 
 
-			gun.additionalHandState = AdditionalHandState.HideBoth;
+			//gun.additionalHandState = AdditionalHandState.HideBoth;
 			MeshRenderer component = gun.GetComponent<MeshRenderer>();
 			if (!component)
 			{

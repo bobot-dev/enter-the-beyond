@@ -43,7 +43,7 @@ namespace BotsMod
                 copy.ReplaceTexture(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/chest/" + spriteDef.name.Replace("green", "beyond") + ".png"));
                 copy.name = spriteDef.name.Replace("green", "beyond");
                 idList.Add(SpriteHandler.AddSpriteToCollection(copy, collection));
-                BotsModule.Log(copy.name);
+                //BotsModule.Log(copy.name);
             }
 
 

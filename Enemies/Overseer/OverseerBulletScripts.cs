@@ -869,13 +869,7 @@ namespace BotsMod
 				if (i > 30 && i % 30 == 29)
 				{
 					this.Fire(new Direction(currentAngle + UnityEngine.Random.Range(-1f, 1f) * 20f, DirectionType.Absolute, -1f), new Speed(12f, SpeedType.Absolute), new SkellBullet());
-				}
-
-				if (i == 60)
-				{
-					yield return this.Wait(45);
-				}
-
+				}				
 				if (i > 60)
 				{
 					float num2 = Vector2.Distance(this.BulletManager.PlayerPosition(), this.Position);

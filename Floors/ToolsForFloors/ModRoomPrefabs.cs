@@ -24,8 +24,8 @@ namespace BotsMod
            
             Mod_Exit_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Exit.room");
 
-            Mod_Shop_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Shop.room");
-            ItsDaFuckinShopApi.RegisterShopRoom(BotsModule.shop.gameObject, Mod_Shop_Room, new UnityEngine.Vector2(-2.5f, -3));
+            Mod_Shop_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Shop2.room");
+            ItsDaFuckinShopApi.RegisterShopRoom(BotsModule.shop.gameObject, Mod_Shop_Room, new UnityEngine.Vector2(5f, 12f));
             
 
             Mod_Entrance_Room.category = PrototypeDungeonRoom.RoomCategory.ENTRANCE;
@@ -84,6 +84,25 @@ namespace BotsMod
             Mod_Boss_Past.overriddenTilesets = GlobalDungeonData.ValidTilesets.BELLYGEON;
 
 
+            var Play_Test_Boss = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/overseerbossroombutround.room");
+            Play_Test_Boss.category = PrototypeDungeonRoom.RoomCategory.BOSS;
+            Play_Test_Boss.subCategoryBoss = PrototypeDungeonRoom.RoomBossSubCategory.MINI_BOSS;
+            Play_Test_Boss.subCategoryNormal = PrototypeDungeonRoom.RoomNormalSubCategory.COMBAT;
+            Play_Test_Boss.subCategorySpecial = PrototypeDungeonRoom.RoomSpecialSubCategory.STANDARD_SHOP;
+            Play_Test_Boss.subCategorySecret = PrototypeDungeonRoom.RoomSecretSubCategory.UNSPECIFIED_SECRET;
+            Play_Test_Boss.roomEvents = new List<RoomEventDefinition>() {
+                new RoomEventDefinition(RoomEventTriggerCondition.ON_ENTER_WITH_ENEMIES, RoomEventTriggerAction.SEAL_ROOM),
+                new RoomEventDefinition(RoomEventTriggerCondition.ON_ENEMIES_CLEARED, RoomEventTriggerAction.UNSEAL_ROOM),
+            };
+            Play_Test_Boss.associatedMinimapIcon = BeyondPrefabs.doublebeholsterroom01.associatedMinimapIcon;
+            Play_Test_Boss.usesProceduralLighting = false;
+            Play_Test_Boss.usesProceduralDecoration = false;
+            Play_Test_Boss.rewardChestSpawnPosition = new IntVector2(25, 20); //Where the reward pedestal spawns, should be changed based on room size
+            Play_Test_Boss.overriddenTilesets = GlobalDungeonData.ValidTilesets.CASTLEGEON;
+
+            StairWayRoom = RoomFactory.BuildFromResource("BotsMod/rooms/StairWayNpcRoom.room");
+            ItsDaFuckinShopApi.RegisterShopRoom(BotsModule.shop2.gameObject, StairWayRoom, new UnityEngine.Vector2(4f, 17));
+
             //foreach (PrototypeRoomExit exit in Mod_Boss.exitData.exits) { exit.exitType = PrototypeRoomExit.ExitType.ENTRANCE_ONLY; }
             //    RoomBuilder.AddExitToRoom(Mod_Boss, new Vector2(26, 37), DungeonData.Direction.NORTH, PrototypeRoomExit.ExitType.EXIT_ONLY, PrototypeRoomExit.ExitGroup.B);
         }
@@ -98,10 +117,15 @@ namespace BotsMod
         public static PrototypeDungeonRoom Mod_Entrance_Room;
         public static PrototypeDungeonRoom Mod_Entrance_Room_Past;
         public static PrototypeDungeonRoom Mod_Exit_Room;
+
         public static PrototypeDungeonRoom Mod_Shop_Room;
+
         public static PrototypeDungeonRoom[] Mod_Rooms;
         public static PrototypeDungeonRoom Mod_Boss;
         public static PrototypeDungeonRoom Mod_Boss_Past;
+
+        public static PrototypeDungeonRoom StairWayRoom;
+
         public static List<string> Mod_RoomList; // this will contain all of our mods rooms.
     }
 }

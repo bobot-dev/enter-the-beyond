@@ -60,11 +60,10 @@ namespace BotsMod
 				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/crosshair_beyond" + ".png"), "crosshair_beyond");
 				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/object_box_beyond_001" + ".png"), "object_box_beyond_001");
 
-
-				beyondClip = new dfAnimationClip
-				{
-					Atlas = UIRootPrefab.Manager.DefaultAtlas,
-				};
+				var beyondClipObj = new GameObject("Notification_Box_Shine_Clip_Beyond");
+				FakePrefab.MarkAsFakePrefab(beyondClipObj);
+				beyondClip = beyondClipObj.AddComponent<dfAnimationClip>();
+				beyondClip.Atlas = UIRootPrefab.Manager.DefaultAtlas;
 
 				FieldInfo _sprites = typeof(dfAnimationClip).GetField("sprites", BindingFlags.NonPublic | BindingFlags.Instance);
 				_sprites.SetValue(beyondClip, new List<string> { "notification_box_beyond_001", "notification_box_beyond_002", "notification_box_beyond_003", "notification_box_beyond_004", "notification_box_beyond_005", "notification_box_beyond_006", "notification_box_beyond_007", "notification_box_beyond_008", "notification_box_beyondns_001" });
@@ -80,7 +79,7 @@ namespace BotsMod
 				//Hook Portal = new Hook(typeof(ParadoxPortalController).GetProperty("Interact", BindingFlags.Instance | BindingFlags.Public).GetGetMethod(), typeof(Hooks).GetMethod("HookInteract"));
 
 				
-				Hook DumbPastHook = new Hook(typeof(GameManager).GetMethod("LoadCustomLevel", BindingFlags.Instance | BindingFlags.Public), typeof(Hooks).GetMethod("LoadCustomLevel"));
+				//Hook DumbPastHook = new Hook(typeof(GameManager).GetMethod("LoadCustomLevel", BindingFlags.Instance | BindingFlags.Public), typeof(Hooks).GetMethod("LoadCustomLevel"));
 
 
 				
@@ -123,22 +122,22 @@ namespace BotsMod
 						m.GetParameters()[0].ParameterType == typeof(string)),
 					typeof(Hooks).GetMethod("PostEventHook", BindingFlags.Static | BindingFlags.Public));*/
 
-				BotsModule.Log("ahhhhh 1", "#eb1313");
+				//BotsModule.Log("ahhhhh 1", "#eb1313");
 				var dumbPainfulHook = new Hook(
 					typeof(BraveOptionsMenuItem).GetMethod("DetermineAvailableOptions", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("DetermineAvailableOptionsHook", BindingFlags.Static | BindingFlags.NonPublic));
 
 
 
-				BotsModule.Log("ahhhhh 2", "#eb1313");
+				//BotsModule.Log("ahhhhh 2", "#eb1313");
 				var lessPainfulButStillDumbHook = new Hook(
 					typeof(FinalIntroSequenceManager).GetMethod("TriggerSequence", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("TriggerSequenceHook", BindingFlags.Static | BindingFlags.Public));
-				BotsModule.Log("ahhhhh 3", "#eb1313");
+				//BotsModule.Log("ahhhhh 3", "#eb1313");
 				var painlessHook = new Hook(
 					typeof(CharacterSelectController).GetMethod("orig_GetCharacterPathFromQuickStart", BindingFlags.Static | BindingFlags.Public),
 					typeof(Hooks).GetMethod("GetCharacterPathFromQuickStartHook", BindingFlags.Static | BindingFlags.Public));
-				BotsModule.Log("ahhhhh 4", "#eb1313");
+				//BotsModule.Log("ahhhhh 4", "#eb1313");
 
 				var dumbHookINeedCozZatherzDumb = new Hook(
 					typeof(CharacterSelectController).GetMethod("GetCharacterPathFromIdentity", BindingFlags.Static | BindingFlags.Public),
@@ -163,9 +162,14 @@ namespace BotsMod
 					typeof(Hooks).GetMethod("DoNotificationInternalHook", BindingFlags.Static | BindingFlags.NonPublic));
 				
 
-				var purchaseItemHook = new Hook(
+				/*var purchaseItemHook = new Hook(
 					typeof(BaseShopController).GetMethod("PurchaseItem", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("PurchaseItemHook", BindingFlags.Static | BindingFlags.Public));
+
+				var DoSetupHook = new Hook(
+					typeof(BaseShopController).GetMethod("DoSetup", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("DoSetupHook", BindingFlags.Static | BindingFlags.Public));
+
 
 				var interactHook = new Hook(
 					typeof(ShopItemController).GetMethod("Interact", BindingFlags.Instance | BindingFlags.Public),
@@ -175,20 +179,23 @@ namespace BotsMod
 					typeof(ShopItemController).GetMethod("OnEnteredRange", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("OnEnteredRangeHook", BindingFlags.Static | BindingFlags.Public));
 				
-				var DoSetupHook = new Hook(
-					typeof(BaseShopController).GetMethod("DoSetup", BindingFlags.Instance | BindingFlags.NonPublic),
-					typeof(Hooks).GetMethod("DoSetupHook", BindingFlags.Static | BindingFlags.Public));
 				
 				var ModifiedPriceHook = new Hook(
 				   typeof(ShopItemController).GetProperty("ModifiedPrice", BindingFlags.Public | BindingFlags.Instance).GetGetMethod(),
 				   typeof(Hooks).GetMethod("ModifiedPriceHook"));
 
-				BotsModule.Log("pre unfix hook");
+
+				var InitializeInternalHook = new Hook(
+					typeof(ShopItemController).GetMethod("InitializeInternal", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("InitializeInternalHook", BindingFlags.Static | BindingFlags.NonPublic));*/
+
+
+				/*BotsModule.Log("pre unfix hook");
 				var HandlePreDropHook = new Hook(
 					typeof(OnActiveItemUsedSynergyProcessor).GetMethod("HandlePreDrop", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("HandlePreDropHook", BindingFlags.Static | BindingFlags.NonPublic));
 
-				BotsModule.Log("pre unfix hook2");
+				BotsModule.Log("pre unfix hook2");*/
 				var HandleActivationStatusChangedHook = new Hook(
 					typeof(OnActiveItemUsedSynergyProcessor).GetMethod("HandleActivationStatusChanged", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("HandleActivationStatusChangedHook", BindingFlags.Static | BindingFlags.NonPublic));
@@ -208,7 +215,7 @@ namespace BotsMod
 						m.GetParameters().Length == 1 &&
 						m.GetParameters()[0].ParameterType == typeof(object)),
 					typeof(Hooks).GetMethod("LogHookU", BindingFlags.Static | BindingFlags.Public));
-				ETGModConsole.Log("post shitty hook");
+				//ETGModConsole.Log("post shitty hook");
 
 				var Crime = new Hook(
 					typeof(CharacterCostumeSwapper).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic),
@@ -219,7 +226,13 @@ namespace BotsMod
 					typeof(GameUIRoot).GetMethod("InformNeedsReload", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("InformNeedsReloadHook", BindingFlags.Static | BindingFlags.Public));
 
-				
+				var SpawnProjectilesHook = new Hook(
+					typeof(SuperReaperController).GetMethod("SpawnProjectiles", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("SpawnProjectilesHook", BindingFlags.Static | BindingFlags.NonPublic));
+
+				var HandleMotionHook = new Hook(
+					typeof(SuperReaperController).GetMethod("HandleMotion", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("HandleMotionHook", BindingFlags.Static | BindingFlags.NonPublic));
 
 				/*var UpdateHealthHook = new Hook(
 					typeof(GameUIHeartController).GetMethod("UpdateHealth", BindingFlags.Instance | BindingFlags.Public),
@@ -250,10 +263,6 @@ namespace BotsMod
 					typeof(ShortcutElevatorController).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("StartHookSC", BindingFlags.Static | BindingFlags.NonPublic));
 
-				var InitializeInternalHook = new Hook(
-					typeof(ShopItemController).GetMethod("InitializeInternal", BindingFlags.Instance | BindingFlags.NonPublic),
-					typeof(Hooks).GetMethod("InitializeInternalHook", BindingFlags.Static | BindingFlags.NonPublic));
-
 				var UpdateAnimationsHook = new Hook(
 					typeof(GunExt).GetMethod("UpdateAnimations", BindingFlags.Static | BindingFlags.Public),
 					typeof(Hooks).GetMethod("UpdateAnimationsHook", BindingFlags.Static | BindingFlags.Public));
@@ -264,6 +273,10 @@ namespace BotsMod
 				var HandleHeroSwordSlashHook = new Hook(
 					typeof(Gun).GetMethod("HandleHeroSwordSlash", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("DodgeRollPleaseJustNullCheckShitIBegYou", BindingFlags.Static | BindingFlags.Public));
+
+				var GetIndexFromTupleArrayHook = new Hook(
+					typeof(TK2DDungeonAssembler).GetMethod("GetIndexFromTupleArray", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("GetIndexFromTupleArrayHook", BindingFlags.Static | BindingFlags.NonPublic));
 			}
 			catch (Exception arg)
 			{
@@ -273,7 +286,49 @@ namespace BotsMod
 			}
 		}
 
-		
+		private static int GetIndexFromTupleArrayHook(TK2DDungeonAssembler self, CellData current, List<Tuple<int, TilesetIndexMetadata>> list, int roomTypeIndex)
+		{
+			float uniqueHash = current.UniqueHash;
+			float num = 0f;
+			if (current == null)
+            {
+				Debug.Log("ah fuck");
+			}
+			if (list == null)
+			{
+				Debug.Log("god fucking damn it");
+			}
+
+			for (int i = 0; i < list.Count; i++)
+			{
+				if (list[i] == null)
+				{
+					Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+				}
+				if (list[i].Second.dungeonRoomSubType == roomTypeIndex || list[i].Second.secondRoomSubType == roomTypeIndex || list[i].Second.thirdRoomSubType == roomTypeIndex)
+				{
+
+					num += list[i].Second.weight;
+				}
+			}
+			
+			float num2 = uniqueHash * num;
+			for (int j = 0; j < list.Count; j++)
+			{
+				if (list[j].Second.dungeonRoomSubType == roomTypeIndex || list[j].Second.secondRoomSubType == roomTypeIndex || list[j].Second.thirdRoomSubType == roomTypeIndex)
+				{
+					num2 -= list[j].Second.weight;
+					if (num2 <= 0f)
+					{
+						return list[j].First;
+					}
+				}
+			}
+
+			return list[0].First;
+		}
+
+
 		public static void DodgeRollPleaseJustNullCheckShitIBegYou(Action<Gun, List<SpeculativeRigidbody>, Vector2, int> orig, Gun self, List<SpeculativeRigidbody> alreadyHit, Vector2 arcOrigin, int slashId)
 		{
 			ReadOnlyCollection<Projectile> allProjectiles = StaticReferenceManager.AllProjectiles;
@@ -909,6 +964,17 @@ namespace BotsMod
 			GameUIRoot.Instance.AddControlToMotionGroups(component, (!self.IsRightAligned) ? DungeonData.Direction.WEST : DungeonData.Direction.EAST, false);
 		}
 
+		private static void HandleMotionHook(Action<SuperReaperController> orig, SuperReaperController self)
+		{
+			self.specRigidbody.Velocity = Vector2.zero;
+			if (self.aiAnimator.IsPlaying("attack"))
+			{
+				return;
+			}
+			orig(self);
+
+		}
+
 		private static void SpawnProjectilesHook(SuperReaperController self)
 		{
 
@@ -931,11 +997,40 @@ namespace BotsMod
 			{
 				_bulletSource.SetValue(self, self.ShootPoint.gameObject.GetOrAddComponent<BulletScriptSource>());
 			}
+
+			self.StartCoroutine(Dash(self, self.specRigidbody.Velocity));
+
 			(_bulletSource.GetValue(self) as BulletScriptSource).BulletManager = self.bulletBank;
 			(_bulletSource.GetValue(self) as BulletScriptSource).BulletScript = self.BulletScript;
 			BotsModule.Log(self.BulletScript.GetType().ToString());
-			//(_bulletSource.GetValue(self) as BulletScriptSource).BulletScript = new CustomBulletScriptSelector(typeof(PrimalShotgrubScrip));
+			(_bulletSource.GetValue(self) as BulletScriptSource).BulletScript = new CustomBulletScriptSelector(typeof(PrimalShotgrubScrip));
 			(_bulletSource.GetValue(self) as BulletScriptSource).Initialize();
+		}
+
+		public static IEnumerator Dash(SuperReaperController self, Vector3 dir)
+        {
+			
+			self.specRigidbody.OnEnterTrigger += ReaperPreCollision;
+			float duration = Mathf.Max(0.0001f, 45 / 20);
+			float elapsed = -BraveTime.DeltaTime;
+			while (elapsed < duration)
+			{
+				elapsed += BraveTime.DeltaTime;
+				float adjSpeed = Mathf.Min(20, 45 / BraveTime.DeltaTime);
+				self.specRigidbody.Velocity = BraveMathCollege.DegreesToVector(self.ShootPoint.rotation.z) * adjSpeed;
+				yield return null;
+			}
+			self.specRigidbody.OnEnterTrigger -= ReaperPreCollision;
+		}
+
+		private static void ReaperPreCollision(SpeculativeRigidbody specRigidbody, SpeculativeRigidbody sourceSpecRigidbody, CollisionData collisionData)
+		{
+			BotsModule.Log(sourceSpecRigidbody.gameObject.name);
+			if (sourceSpecRigidbody.healthHaver != null && sourceSpecRigidbody.healthHaver.gameObject.GetComponent<PlayerController>() != null)
+			{
+				sourceSpecRigidbody.healthHaver.PreventAllDamage = false;
+				sourceSpecRigidbody.healthHaver.NextShotKills = true;
+			}
 		}
 
 		public class PrimalShotgrubScrip : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
@@ -1180,7 +1275,7 @@ namespace BotsMod
 
 			FieldInfo _active = typeof(CharacterCostumeSwapper).GetField("m_active", BindingFlags.NonPublic | BindingFlags.Instance);
 
-			bool flag = GameStatsManager.Instance.GetCharacterSpecificFlag(self.TargetCharacter, CharacterSpecificGungeonFlags.KILLED_PAST);
+			bool flag = true;//GameStatsManager.Instance.GetCharacterSpecificFlag(self.TargetCharacter, CharacterSpecificGungeonFlags.KILLED_PAST);
 			if (self.HasCustomTrigger)
 			{
 				if (self.CustomTriggerIsFlag)
@@ -1847,7 +1942,23 @@ namespace BotsMod
 				elapsed += BraveTime.DeltaTime;
 				if (!hasPlayedAnim && elapsed > 0.75f)
 				{
-					self.BoxSprite.GetComponent<dfSpriteAnimation>().Clip = ((!isPurple) ? ((!isGold) ? ((!isBeyond) ? self.SilverAnimClip : beyondClip) : self.GoldAnimClip) : self.PurpleAnimClip);
+					if (isPurple)
+                    {
+						self.BoxSprite.GetComponent<dfSpriteAnimation>().Clip = self.PurpleAnimClip;
+					} 
+					else if (isGold)
+                    {
+						self.BoxSprite.GetComponent<dfSpriteAnimation>().Clip = self.GoldAnimClip;
+					}
+					else if (isBeyond)
+					{
+						self.BoxSprite.GetComponent<dfSpriteAnimation>().Clip = beyondClip;
+					}
+					else
+					{
+						self.BoxSprite.GetComponent<dfSpriteAnimation>().Clip = self.SilverAnimClip;
+					}
+					
 					hasPlayedAnim = true;
 					self.ObjectBoxSprite.Parent.GetComponent<dfSpriteAnimation>().Play();
 				}
@@ -3115,6 +3226,7 @@ namespace BotsMod
 
 		public static string LocalShaderNameGetHook(Func<PlayerController, string> orig, PlayerController self)
 		{
+			
 			bool flag = !GameOptions.SupportsStencil;
 			string result;
 			if (flag)

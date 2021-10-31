@@ -12,6 +12,7 @@ using Ionic.Zip;
 using BotsMod;
 using SaveAPI;
 using System.Reflection;
+using ItemAPI;
 
 namespace CustomCharacters
 {
@@ -61,12 +62,23 @@ namespace CustomCharacters
             }
         }*/
         
-        public static void BuildCharacter(string filePath, bool hasAltSkin, bool removeFoyerExtras, bool paradoxUsesSprites, bool useGlow, Color emissiveColor, float emissiveColorPower, float emissivePower, int metaCost = 0, bool hasCustomPast = false, string customPast = "")
+        public static void BuildCharacter(string filePath, bool hasAltSkin, Vector3 altSwapperPos, bool removeFoyerExtras, bool paradoxUsesSprites, bool useGlow, Color emissiveColor, float emissiveColorPower, float emissivePower, int metaCost = 0, bool hasCustomPast = false, string customPast = "")
         {
 
 
             var data = GetCharacterData(filePath);
 
+            GameObject obj = new GameObject("atlas object for " + data.nameShort);
+            obj.SetActive(false);
+            FakePrefab.MarkAsFakePrefab(obj);
+            UnityEngine.Object.DontDestroyOnLoad(obj);
+
+            data.atlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;//obj.GetOrAddComponent<dfAtlas>();
+
+
+
+
+            data.skinSwapperPos = altSwapperPos;
             bool success = true;
             try
             {
@@ -103,28 +115,28 @@ namespace CustomCharacters
                 return null;
             }
 
-            var lines = ResourceExtractor.GetLinesFromFile(dataFilePath);
+            var lines = GungeonAPI.ResourceExtractor.GetLinesFromFile(dataFilePath);
             var data = ParseCharacterData(lines);
 
             string spritesDir = Path.Combine(customCharacterDir, "sprites");
             if (Directory.Exists(spritesDir))
             {
                 ToolsGAPI.Print("Found: Sprites folder");
-                data.sprites = ResourceExtractor.GetTexturesFromDirectory(spritesDir);
+                data.sprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(spritesDir);
             }
 
             string altSpritesDir = Path.Combine(customCharacterDir, "alt_sprites");
             if (Directory.Exists(altSpritesDir))
             {
                 ToolsGAPI.Print("Found: Alt Sprites folder");
-                data.altSprites = ResourceExtractor.GetTexturesFromDirectory(altSpritesDir);
+                data.altSprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(altSpritesDir);
             }
 
             string foyerDir = Path.Combine(customCharacterDir, "foyercard");
             if (Directory.Exists(foyerDir))
             {
                 ToolsGAPI.Print("Found: Foyer card folder");
-                data.foyerCardSprites = ResourceExtractor.GetTexturesFromDirectory(foyerDir);
+                data.foyerCardSprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(foyerDir);
             }
 
 
@@ -132,10 +144,10 @@ namespace CustomCharacters
             if (Directory.Exists(foyerDir))
             {
                 ToolsGAPI.Print("Found: Loadout card folder");
-                data.loadoutSprites = ResourceExtractor.GetTexturesFromDirectory(loadoutDir);
+                data.loadoutSprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(loadoutDir);
             }
 
-            List<Texture2D> miscTextures = ResourceExtractor.GetTexturesFromDirectory(customCharacterDir);
+            List<Texture2D> miscTextures = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(customCharacterDir);
             foreach (var tex in miscTextures)
             {
                 string name = tex.name.ToLower();
@@ -170,6 +182,17 @@ namespace CustomCharacters
                     data.pastWinPic = tex;
                 }
 
+                if (name.Equals("alt_skin_obj_sprite_001"))
+                {
+                    ToolsGAPI.Print("Found: alt_skin_obj_sprite_001");
+                    data.altObjSprite1 = tex;
+                }
+                if (name.Equals("alt_skin_obj_sprite_002"))
+                {
+                    ToolsGAPI.Print("Found: alt_skin_obj_sprite_002");
+                    data.altObjSprite2 = tex;
+                }
+
 
             }
 
@@ -179,13 +202,13 @@ namespace CustomCharacters
             if (Directory.Exists(punchoutSpritesDir))
             {
                 ToolsGAPI.Print("Found: Punchout Sprites folder");
-                data.punchoutSprites = ResourceExtractor.GetTexturesFromDirectory(punchoutSpritesDir);
+                data.punchoutSprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(punchoutSpritesDir);
             }
 
             if (Directory.Exists(punchoutDir))
             {
                 data.punchoutFaceCards = new List<Texture2D>();
-                var punchoutSprites = ResourceExtractor.GetTexturesFromDirectory(punchoutDir);
+                var punchoutSprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(punchoutDir);
                 foreach (var tex in punchoutSprites)
                 {
                     string name = tex.name.ToLower();
@@ -272,7 +295,7 @@ namespace CustomCharacters
                 byte[] textureData = entry.ReadAllBytes();
                 string fileName = Path.GetFileName(entry.FileName);
                 string resourceName = fileName.Substring(0, fileName.Length - 4);
-                Texture2D texture = ResourceExtractor.BytesToTexture(textureData, resourceName);
+                Texture2D texture = GungeonAPI.ResourceExtractor.BytesToTexture(textureData, resourceName);
 
                 string directoryName = Path.GetDirectoryName(entry.FileName);
                 if (directories.TryGetValue(directoryName, out var list))
@@ -365,8 +388,10 @@ namespace CustomCharacters
         public static CustomCharacterData ParseCharacterData(string[] lines)
         {
             CustomCharacterData data = new CustomCharacterData();
+            
             for (int i = 0; i < lines.Length; i++)
             {
+                
                 string line = lines[i].ToLower().Trim();
                 string lineCaseSensitive = lines[i].Trim();
 
@@ -376,6 +401,13 @@ namespace CustomCharacters
                 if (line.StartsWith("<loadout>"))
                 {
                     data.loadout = GetLoadout(lines, i + 1, out i);
+                    continue;
+                }
+
+                if (line.StartsWith("<altguns>"))
+                {
+                    ToolsGAPI.PrintError("alt guns found");
+                    data.altGun = GetAltguns(lines, i + 1, out i);
                     continue;
                 }
 
@@ -404,20 +436,15 @@ namespace CustomCharacters
                 }
 
 
-                if (line.StartsWith("unlock:"))
+                /*if (line.StartsWith("unlock:"))
                 {
                     data.unlockFlag = GetFlagFromString(value);
                     //BotsModule.Log(data.unlockFlag+"", BotsModule.LOST_COLOR);
                     continue;
-                }
+                }*/
 
 
-                if (line.StartsWith("alt:"))
-                {
-                    data.altGun = value;
-                    continue;
-                }
-
+               
                 if (line.StartsWith("name short:"))
                 {
                     data.nameShort = value.Replace(" ", "_");
@@ -626,6 +653,74 @@ namespace CustomCharacters
             }
 
             ToolsGAPI.PrintError("Invalid loadout setup, expecting '</loadout>' but found none");
+            return new List<Tuple<PickupObject, bool>>();
+        }
+
+        public static List<Tuple<PickupObject, bool>> GetAltguns(string[] lines, int startIndex, out int endIndex)
+        {
+            endIndex = startIndex;
+
+            ToolsGAPI.Print("altguns loadout...");
+            List<Tuple<PickupObject, bool>> items = new List<Tuple<PickupObject, bool>>();
+            ToolsGAPI.PrintError("go fuck yourself");
+            string line;
+            string[] args;
+            for (int i = startIndex; i < lines.Length; i++)
+            {
+                endIndex = i;
+                line = lines[i].ToLower().Trim();
+                if (string.IsNullOrEmpty(line)) continue;
+                if (line.StartsWith("</altguns>")) return items;
+
+                args = line.Split(' ');
+                if (args.Length == 0) continue;
+
+                if (!Gungeon.Game.Items.ContainsID(args[0]))
+                {
+                    ToolsGAPI.PrintError("Could not find item with ID: \"" + args[0] + "\"");
+                    continue;
+                }
+                var item = Gungeon.Game.Items[args[0]];
+                if (item == null)
+                {
+                    ToolsGAPI.PrintError("Could not find item with ID: \"" + args[0] + "\"");
+                    continue;
+                }
+                var gun = item.GetComponent<Gun>();
+
+                if (gun == null)
+                {
+                    ToolsGAPI.PrintError("\"" + args[0] + "\" isn't a gun...");
+                    continue;
+                }
+
+                if (args.Length > 1 && args[1].Contains("infinite"))
+                {
+                    
+
+                    if (gun != null)
+                    {
+                        if (!CharacterBuilder.guns.Contains(gun) && !gun.InfiniteAmmo)
+                            CharacterBuilder.guns.Add(gun);
+
+                        items.Add(new Tuple<PickupObject, bool>(item, true));
+                        ToolsGAPI.Print("    " + item.EncounterNameOrDisplayName + " (infinite)");
+                        continue;
+                    }
+                    else
+                    {
+                        ToolsGAPI.PrintError(item.EncounterNameOrDisplayName + " is not a gun, and therefore cannot be infinite");
+                    }
+                }
+                else
+                {
+                    items.Add(new Tuple<PickupObject, bool>(item, false));
+                    ToolsGAPI.Print("    " + item.EncounterNameOrDisplayName);
+                }
+
+            }
+
+            ToolsGAPI.PrintError("Invalid loadout setup, expecting '</altguns>' but found none");
             return new List<Tuple<PickupObject, bool>>();
         }
 
