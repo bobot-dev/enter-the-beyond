@@ -23,7 +23,8 @@ namespace SaveAPI
         EXAMPLE_ENEMY_ACTIVATION_FLAG,
 
         BOT_LOST_UNLOCKED,
-        BOT_HAS_ROBE,
         BOT_BOSSKILLED_LOST_PAST,
+
+        BOT_EFFIGY_POWERED,
     }
 }

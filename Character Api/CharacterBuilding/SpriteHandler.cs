@@ -6,6 +6,8 @@ using UnityEngine;
 using GungeonAPI;
 using BotsMod;
 using System;
+using ItemAPI;
+using System.IO;
 
 namespace CustomCharacters
 {
@@ -31,6 +33,86 @@ namespace CustomCharacters
 
         private static Dictionary<string, Material[]> usedMaterialDictionary = new Dictionary<string, Material[]>();
 
+        //sorry not sorry
+        static Dictionary<string, Tuple<tk2dSpriteAnimationClip.WrapMode, int>> playerAnimInfo = new Dictionary<string, Tuple<tk2dSpriteAnimationClip.WrapMode, int>>
+        {
+            { "this one dose nothing im just putting it here to say im really really sorry you have to look at this code", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 0) },
+
+            { "chest_recover", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
+            { "death", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
+            { "death_coop", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 16) },
+            { "death_shot", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
+            { "dodge", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
+            { "dodge_bw", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
+            { "dodge_left", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
+            { "dodge_left_bw", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
+            { "doorway", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 10) },
+            { "ghost_idle_back", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 4) },
+            { "ghost_idle_back_left", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 4) },
+            { "ghost_idle_back_right", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 4) },
+            { "ghost_idle_front", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 4) },
+            { "ghost_idle_left", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 4) },
+            { "ghost_idle_right", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 4) },
+            { "ghost_sneeze_left", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 8) },
+            { "ghost_sneeze_right", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 8) },
+
+            { "idle", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "idle_backward", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "idle_backward_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "idle_backward_twohands", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "idle_bw", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            //{ "idle_bw_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "idle_bw_twohands", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "idle_forward", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "idle_forward_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "idle_forward_twohands", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "idle_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "idle_twohands", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+
+            { "item_get", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 9) },
+
+            { "jetpack_down", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "jetpack_down_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "jetpack_right", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "jetpack_right_bw", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "jetpack_right_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+            { "jetpack_up", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+
+            { "pet", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 6) },
+
+            { "pitfall", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 15) },
+            { "pitfall_down", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 15) },
+            { "pitfall_return", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 11) },
+
+            { "run_down", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 9) },
+            { "run_down_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 9) },
+            { "run_down_twohands", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 9) },
+            { "run_right", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 9) },
+            { "run_right_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 9) },
+            { "run_right_twohands", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 9) },
+
+            { "run_right_bw", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 9) },
+            { "run_right_bw_twohands", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 9) },
+          
+            { "run_up", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 9) },
+            { "run_up_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 9) },
+            { "run_up_twohands", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 9) },
+
+            { "slide_right", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 2) },
+            { "slide_up", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 2) },
+            { "slide_down", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 2) },           
+
+            { "spinfall", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 16) },
+            { "spit_out", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
+
+            { "tablekick_down", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
+            { "tablekick_down_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
+            { "tablekick_right", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
+            { "tablekick_right_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
+            { "tablekick_up", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
+            { "timefall", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
+        };
+
         public static void HandleSprites(PlayerController player, CustomCharacterData data)
         {
             if (data.minimapIcon != null)
@@ -39,14 +121,15 @@ namespace CustomCharacters
             if (data.bossCard != null)
                 HandleBossCards(player, data);
 
-            if (data.altSprites != null || data.altPlayerSheet != null)
+            if ((data.altSprites != null || data.altPlayerSheet != null) && string.IsNullOrEmpty(data.pathForSprites))
                 HandleAltAnimations(player, data);
 
 
-            if (data.sprites != null || data.playerSheet != null)
+            if ((data.sprites != null || data.playerSheet != null) && string.IsNullOrEmpty(data.pathForSprites))
                 HandleAnimations(player, data);
 
-
+            if (!string.IsNullOrEmpty(data.pathForSprites))
+                SetupLitterallyEverything(player, data, data.pathForSprites);
 
 
             //face card stuff
@@ -102,37 +185,22 @@ namespace CustomCharacters
             ToolsGAPI.ExportTexture(uiAtlas.Texture, "SpriteDump/" + "atlasthingo");
         }
 
-
-        /// <summary>
-        /// Adds a sprite (from a resource) to a collection
-        /// </summary>
-        /// <returns>The spriteID of the defintion in the collection</returns>
-        public static int AddSpriteToCollection(Texture2D texture, tk2dSpriteCollectionData collection, string name = "")
-        {
-
-            var definition = ConstructDefinition(texture); //Generate definition
-            if (string.IsNullOrEmpty(name))
-            {
-                definition.name = texture.name; //naming the definition is actually extremely important 
-            }
-            else
-            {
-                definition.name = name; //naming the definition is actually extremely important 
-            }
-
-
-            return AddSpriteToCollection(definition, collection);
-        }
-
         /// <summary>
         /// Constructs a new tk2dSpriteDefinition with the given texture
         /// </summary>
         /// <returns>A new sprite definition with the given texture</returns>
-        public static tk2dSpriteDefinition ConstructDefinition(Texture2D texture)
+        public static tk2dSpriteDefinition ConstructDefinition(Texture2D texture, Material overrideMat = null)
         {
             RuntimeAtlasSegment ras = ETGMod.Assets.Packer.Pack(texture); //pack your resources beforehand or the outlines will turn out weird
-
-            Material material = new Material(ShaderCache.Acquire(PlayerController.DefaultShaderName));
+            Material material = null;
+            if (overrideMat != null)
+            {
+                material = overrideMat;
+            }
+            else
+            {
+                material = new Material(ShaderCache.Acquire(PlayerController.DefaultShaderName));
+            }        
             material.mainTexture = ras.texture;
             //material.mainTexture = texture;
 
@@ -225,7 +293,7 @@ namespace CustomCharacters
                 }
             }
 
-            ToolsGAPI.ExportTexture(sprite, "SpriteDump/" + "OutlineTest");
+            //ToolsGAPI.ExportTexture(sprite, "SpriteDump/" + "OutlineTest");
 
             // Color[] pix = sprite.GetPixels(x, y, width, height);
             //Texture2D destTex = new Texture2D(width, height);
@@ -302,12 +370,224 @@ namespace CustomCharacters
             return tex.Resize(width, height);
         }
 
+        static string[] multiHandAnimNames = new string[]
+        {
+            "idle_backward_hand",
+            "idle_backward_twohands",
+
+            "idle_bw_hand",
+            "idle_bw_twohands",
+
+            "idle_forward_hand",
+            "idle_forward_twohands",
+
+            "idle_hand",
+            "idle_twohands",
+
+            "run_down_hand",
+            "run_down_twohands",
+
+            "run_right_bw_hand",
+            "run_right_bw_twohands",
+
+            "run_right_hand",
+            "run_right_twohands",
+
+            "run_up_hand",
+            "run_up_twohands",
+
+            "tablekick_down_hand",
+            "tablekick_right_hand"
+        };
+        static Dictionary<string, object> rooms;
+
+
+        public static void SetupLitterallyEverything(PlayerController player, CustomCharacterData data, string path)
+        {
+            //BotsModule.Log(path);
+
+            //
+            List<string> anims = new List<string>();
+
+            GameObject libaryObject = new GameObject((data.nameShort + "Animator").Replace(" ", "_"));
+
+            FakePrefab.MarkAsFakePrefab(libaryObject);
+
+            data.collection = SpriteBuilder.ConstructCollection(libaryObject, (data.nameShort + "CustomCollection").Replace(" ", "_"));
+            
+            //UnityEngine.Object.DontDestroyOnLoad(data.collection);
+            data.animator = libaryObject.GetOrAddComponent<tk2dSpriteAnimator>();
+
+            foreach (var file in GungeonAPI.ResourceExtractor.GetResourceNames())
+            {
+                var splitPath = file.Split('.');
+
+                if (file.Contains(path) && file.Contains(".png") && splitPath[splitPath.Count() - 2] != "hand_001" && !anims.Contains(splitPath[splitPath.Count() - 3]))// && splitPath[splitPath.Count() - 4] != "custom")
+                {
+                    anims.Add(splitPath[splitPath.Count() - 3]);
+
+
+
+                    var dirName = splitPath[splitPath.Count() - 4] == "custom" ? "custom" : splitPath[splitPath.Count() - 3];//(file.Replace(path, ""));//.Replace(".", "");
+                    //BotsModule.Log($"{file} -=- {dirName}");
+                    var animName = data.nameShort + "_" + dirName;
+                    List<Texture2D> textures = new List<Texture2D>();
+                    List<int> spriteIds = new List<int>();
+
+                    if (!file.Contains("cc_sprite_placeholder"))
+                    {
+                        textures = GungeonAPI.ResourceExtractor.GetTexturesFromResource($"{path}.{dirName}");
+                    }
+
+                    if (dirName.Contains("custom"))
+                    {
+                        //continue;
+                        //foreach (var customDir in Directory.GetDirectories(file))
+                        //{
+                            //var customDirName = customDir.Replace(file, "").Replace(".", "");
+                        var customDirName = splitPath[splitPath.Count() - 3];
+                        BotsModule.Log($"Custom animation found \"{customDirName}\"");
+                        animName = data.nameShort + "_" + customDirName;
+                        textures = GungeonAPI.ResourceExtractor.GetTexturesFromResource($"{path}.{dirName}.{customDirName}");
+
+                        for (int i = 1; i < textures.Count; i++)
+                        {
+                            spriteIds.Add(AddSpriteToCollection(textures[i], data.collection, animName + i.ToString()));
+                        }
+                        if (textures.Count > 0)
+                        {
+                            SpriteBuilder.AddAnimation(data.animator, data.collection, spriteIds, customDirName, tk2dSpriteAnimationClip.WrapMode.Loop, 8);
+                        }
+
+                        //}
+                    }
+                    else if (dirName == "breach_idles")
+                    {
+                        continue;
+                        foreach (var customDir in Directory.GetDirectories(file))
+                        {
+                            var customDirName = customDir.Replace(file, "").Replace(".", "");
+                            BotsModule.Log($"Breach Idle animation found \"{customDirName}\"");
+                            animName = data.nameShort + "_" + customDirName;
+                            textures = GungeonAPI.ResourceExtractor.GetTexturesFromResource(customDir);
+
+                            for (int i = 1; i < textures.Count; i++)
+                            {
+                                spriteIds.Add(AddSpriteToCollection(textures[i], data.collection, animName + i.ToString()));
+                            }
+                            if (textures.Count > 0)
+                            {
+                                SpriteBuilder.AddAnimation(data.animator, data.collection, spriteIds, customDirName, tk2dSpriteAnimationClip.WrapMode.Loop, 8);
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        if ((dirName.EndsWith("_hand") || dirName.EndsWith("_twohands")) && file.Contains("cc_sprite_placeholder"))//textures.Count <= 0)
+                        {
+                            BotsModule.Log($"hands located! lethal force engaged against {dirName}");
+                            textures = GungeonAPI.ResourceExtractor.GetTexturesFromResource((path + "." + dirName).Replace("_twohands", "").Replace("_hand", ""));
+                        }
+                        if (textures.Count > 0)
+                        {
+                            BotsModule.Log(textures.Count.ToString());
+                            for (int i = 1; i < textures.Count; i++)
+                            {
+                                spriteIds.Add(AddSpriteToCollection(textures[i], data.collection, animName + i.ToString()));
+                            }
+                            if (playerAnimInfo.ContainsKey(dirName.Replace("_armorless", "")))
+                            {
+                                //BotsModule.Log(spriteIds.Count.ToString());
+
+                                SpriteBuilder.AddAnimation(data.animator, data.collection, spriteIds, dirName, playerAnimInfo[dirName.Replace("_armorless", "")].First, playerAnimInfo[dirName.Replace("_armorless", "")].Second);
+                            }
+                            else
+                            {
+                                BotsModule.Log($"well well well {dirName} has decided its special and can do whatever the fuck it wants but its wrong so im throwing it into containment");
+                            }
+                        }
+                        else
+                        {
+                            BotsModule.Log($"No sprites found in {dirName} please make sure youve actually put sprites in that folder");
+                        }
+                    }
+                }
+            }
+            player.spriteAnimator.Library = data.animator.Library;
+
+            player.sprite.Collection = data.collection;
+
+            //ToolsGAPI.ExportTexture(TextureStitcher.GetReadable(data.collection.textures[0]), "SpriteDump/balls", data.nameShort + UnityEngine.Random.Range(1, 10000));
+
+            foreach (var anim in data.animator.Library.clips)
+            {
+                //BotsModule.Log($"Name: {anim.name} - Fps: {anim.fps} - Frame Count: {anim.frames.Count()} - Loop Mode: {anim.wrapMode}");
+            }
+
+        }
+
+        /// <summary>
+        /// Adds a sprite (from a texture) to a collection
+        /// </summary>
+        /// <returns>The spriteID of the defintion in the collection</returns>
+        public static int AddSpriteToCollection(Texture2D texture, tk2dSpriteCollectionData collection, string name = "")
+        {
+            var definition = ConstructDefinition(texture); //Generate definition
+            if (string.IsNullOrEmpty(name))
+            {
+                definition.name = texture.name; //naming the definition is actually extremely important 
+            }
+            else
+            {
+                definition.name = name; //naming the definition is actually extremely important 
+            }
+
+
+            return AddSpriteToCollection(definition, collection);
+        }
+
+        /// <summary>
+        /// Adds a sprite (from a texture) to a collection
+        /// </summary>
+        /// <returns>The spriteID of the defintion in the collection</returns>
+        public static int AddSpriteToCollection(Texture2D texture, tk2dSpriteCollectionData collection, Material overrideMat, string name = "")
+        {
+            var definition = ConstructDefinition(texture, overrideMat); //Generate definition
+            if (string.IsNullOrEmpty(name))
+            {
+                definition.name = texture.name; //naming the definition is actually extremely important 
+            }
+            else
+            {
+                definition.name = name; //naming the definition is actually extremely important 
+            }
+
+
+            return AddSpriteToCollection(definition, collection);
+        }
+
+
         public static void HandleAnimations(PlayerController player, CustomCharacterData data)
         {
             var orig = player.sprite.Collection;
             var copyCollection = GameObject.Instantiate(orig);
             GameObject.DontDestroyOnLoad(copyCollection);
 
+
+
+            for (int i = 0; i < orig.materials.Length; i++)
+            {
+                if (orig.materials[i] == null)
+                {
+                    BotsModule.Log("material is null: " + i);
+                }
+                else
+                {
+                    BotsModule.Log($"{orig.materials[i]} - {orig.materials[i].shader}");
+                }
+                
+            }
             tk2dSpriteDefinition[] copyDefinitions = new tk2dSpriteDefinition[orig.spriteDefinitions.Length];
             for (int i = 0; i < copyCollection.spriteDefinitions.Length; i++)
             {
@@ -339,12 +619,38 @@ namespace CustomCharacters
                         {
                             copyDefinitions[i].material = mat;
                             copyDefinitions[i].materialInst = new Material(mat);
+                            //copyCollection.materials.co
                         }
                     }
                 }
             }
             else if (data.sprites != null)
             {
+
+
+                /*var materialsToCopy2 = orig.materials;
+                copyCollection.materials = new Material[orig.materials.Length];
+                for (int i = 0; i < copyCollection.materials.Length; i++)
+                {
+                    if (materialsToCopy2[i] == null) continue;
+                    var mat = new Material(materialsToCopy2[i]);
+                    GameObject.DontDestroyOnLoad(mat);
+                    mat.mainTexture = data.playerSheet;
+                    mat.name = materialsToCopy2[i].name;
+                    copyCollection.materials[i] = mat;
+                }
+
+                for (int i = 0; i < copyCollection.spriteDefinitions.Length; i++)
+                {
+                    foreach (var mat in copyCollection.materials)
+                    {
+                        if (mat != null && copyDefinitions[i].material.name.Equals(mat.name))
+                        {
+                            copyDefinitions[i].material = mat;
+                            copyDefinitions[i].materialInst = new Material(mat);
+                        }
+                    }
+                }*/
 
                 ToolsGAPI.Print("        Using individual sprite replacement.", "FFBB00");
                 bool notSlinger = data.baseCharacter != PlayableCharacters.Gunslinger;
@@ -363,16 +669,22 @@ namespace CustomCharacters
 
                         if (notSlinger && def.boundsDataCenter != Vector3.zero)
                         {
+                            
                             var ras = page.Pack(tex);
+
+                            //def.material = mat;
+                            //def.materialInst = new Material(def.material);
+
                             def.materialInst.mainTexture = ras.texture;
+                            def.material.mainTexture = ras.texture;
+
                             def.uvs = ras.uvs;
                             def.extractRegion = true;
                             def.position0 = new Vector3(0, 0, 0);
                             def.position1 = new Vector3(nw, 0, 0);
                             def.position2 = new Vector3(0, nh, 0);
                             def.position3 = new Vector3(nw, nh, 0);
-
-                            //BotsModule.Log(def.name + ": " + def.material.name + ", " + def.material.shader.name);
+                            //BotsModule.Log($"{def.name}: [{def.material.name}/{def.materialInst.name}], [{def.material.shader.name}/{def.materialInst.shader.name}]");
 
                             def.boundsDataCenter = new Vector2(nw / 2, nh / 2);
                             def.untrimmedBoundsDataCenter = def.boundsDataCenter;
@@ -382,30 +694,89 @@ namespace CustomCharacters
                         }
                         else
                         {
+                            BotsModule.Log("god fucking damn it", "#fa0000");
                             def.ReplaceTexture(tex);
                         }
                     }
                 }
+
+                
+
+
                 page.Apply();
                 ToolsGAPI.ExportTexture(TextureStitcher.GetReadable(page.Texture), "SpriteDump/balls", TextureStitcher.GetReadable(copyCollection.textures[0]).name + UnityEngine.Random.Range(1, 10000));
+
+                var materialsToCopy = orig.materials;
+                copyCollection.materials = new Material[orig.materials.Length];
+                copyCollection.materialInsts = new Material[orig.materials.Length];
+                for (int i = 0; i < copyCollection.materials.Length; i++)
+                {
+                    if (materialsToCopy[i] == null) continue;
+                    var mat = new Material(materialsToCopy[i]);
+                    GameObject.DontDestroyOnLoad(mat);
+                    mat.mainTexture = page.Texture;
+                    mat.name = materialsToCopy[i].name;
+                    copyCollection.materials[i] = mat;
+                    copyCollection.materialInsts[i] = mat;
+                    
+                }
+                copyCollection.textures = new Texture[] { page.Texture };
+                for (int i = 0; i < copyCollection.spriteDefinitions.Length; i++)
+                {
+                    foreach (var mat in copyCollection.materials)
+                    {
+                        if (mat != null && copyDefinitions[i].material.name.Equals(mat.name))
+                        {
+                            copyDefinitions[i].material = copyCollection.materials[0];
+                            copyDefinitions[i].materialInst = new Material(copyCollection.materials[0]);
+
+                            
+                        }
+                    }
+                }
+                copyCollection.textureFilterMode = FilterMode.Point;
+                for (int i = 0; i < player.sprite.Collection.spriteDefinitions.Length; i++)
+                {
+                    //BotsModule.Log($"[{player.sprite.Collection.spriteDefinitions[i].materialId}]: {player.sprite.Collection.spriteDefinitions[i].name} -===- {player.sprite.Collection.spriteDefinitions[i].material} -===- {player.sprite.Collection.spriteDefinitions[i].material.mainTexture}", "#00d9ff");
+                    //BotsModule.Log($"[{copyDefinitions[i].materialId}]: {copyDefinitions[i].name} -===- {copyDefinitions[i].material} -===- {copyDefinitions[i].material.mainTexture}", "#a100ba");
+                }
+
             }
             else
             {
                 ToolsGAPI.Print("        Not replacing sprites.", "FFFF00");
             }
+
             
+
             player.spriteAnimator.Library = GameObject.Instantiate(player.spriteAnimator.Library);
             GameObject.DontDestroyOnLoad(player.spriteAnimator.Library);
 
+           
+
             foreach (var clip in player.spriteAnimator.Library.clips)
             {
+                if(clip.fps != 12)
+                {
+                    BotsModule.Log($"{clip.name}: {clip.fps}");
+                }
+
                 for (int i = 0; i < clip.frames.Length; i++)
                 {
                     clip.frames[i].spriteCollection = copyCollection;
                 }
             }
+            foreach (var sdef in copyCollection.materials)
+            {
+                BotsModule.Log("Norm: " + sdef.mainTexture.ToString());
+                BotsModule.Log("Norm: " + sdef.ToString());
+            }
 
-
+            foreach (var sdef in copyCollection.materialInsts)
+            {
+                BotsModule.Log("Inst: " + sdef.mainTexture.ToString());
+                BotsModule.Log("Inst: " + sdef.ToString());
+            }
 
             copyCollection.name = player.OverrideDisplayName;
 
@@ -485,6 +856,7 @@ namespace CustomCharacters
                         {
                             var ras = page.Pack(tex);
                             def.materialInst.mainTexture = ras.texture;
+                            //def.material.mainTexture = ras.texture;
                             def.uvs = ras.uvs;
                             def.extractRegion = true;
                             def.position0 = new Vector3(0, 0, 0);
@@ -595,12 +967,8 @@ namespace CustomCharacters
 
         public static void HandleBossCards(PlayerController player, CustomCharacterData data)
         {
-            int count = player.BosscardSprites.Count;
-            player.BosscardSprites = new List<Texture2D>();
-            for (int i = 0; i < count; i++)
-            {
-                player.BosscardSprites.Add(data.bossCard);
-            }
+            //int count = player.BosscardSprites.Count;
+            player.BosscardSprites = data.bossCard;
         }
 
         public static void HandleFacecards(PlayerController player, CustomCharacterData data)

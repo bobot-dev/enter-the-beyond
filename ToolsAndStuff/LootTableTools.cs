@@ -61,6 +61,31 @@ namespace LootTableAPI
                 additionalPrerequisites = new DungeonPrerequisite[0]
             });
         }
+
+        /// <summary>
+        /// Adds an item to a loot table via PickupObject
+        /// </summary>
+        /// <param name="lootTable">The loot table you want to add to</param> 
+        /// <param name="po">The PickupObject you're adding</param>
+        /// <param name="weight">The Weight of the item you're adding (default is 1)</param>
+        /// <returns></returns>
+        public static void AddItemToPool(this GenericLootTable lootTable, params int[] items)
+        {
+            foreach(int id in items)
+            {
+                var po = PickupObjectDatabase.GetById(id);
+                lootTable.defaultItemDrops.Add(new WeightedGameObject()
+                {
+                    pickupId = po.PickupObjectId,
+                    weight = 1,
+                    rawGameObject = po.gameObject,
+                    forceDuplicatesPossible = false,
+                    additionalPrerequisites = new DungeonPrerequisite[0]
+                });
+            }
+            
+        }
+
         /// <summary>
         /// Adds an item to a loot table via PickupObjectId
         /// </summary>

@@ -173,8 +173,10 @@ namespace BotsMod
 				PhysicsEngine.SkipCollision = true;
 				if (!this.bulletsPassed.Contains(otherRigidbody.projectile))
 				{
-					otherRigidbody.projectile.baseData.speed = 0;
-					otherRigidbody.projectile.UpdateSpeed();
+					//otherRigidbody.projectile.baseData.speed = 0;
+
+					//otherRigidbody.projectile.UpdateSpeed();
+					otherRigidbody.projectile.gameObject.GetOrAddComponent<DarkArtsSlowDown>().overrideTimeScale = 0;
 					this.bulletsPassed.Add(otherRigidbody.projectile);
 				}
 			}
@@ -238,4 +240,9 @@ namespace BotsMod
 		private List<MajorBreakable> breakablesPassed;
 		private List<Projectile> bulletsPassed;
 	}
+
+	public class DarkArtsSlowDown : MonoBehaviour
+    {
+		public int overrideTimeScale = 1;
+    }
 }

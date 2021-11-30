@@ -272,7 +272,7 @@ namespace GungeonAPI
 		private static string defaultLog = Path.Combine(ETGMod.ResourcesDirectory, "customCharacterLog.txt");
 
 		// Token: 0x04000041 RID: 65
-		public static string modID = "NN";
+		public static string modID = "ETB";
 
 		// Token: 0x04000042 RID: 66
 		private static Dictionary<string, float> timers = new Dictionary<string, float>();

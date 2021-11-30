@@ -19,6 +19,27 @@ namespace BotsMod
         //    GameManager.Instance.StartCoroutine(PlaySound());
         //}
 
+        public void ModifyCamera(bool value)
+        {
+            if (!GameManager.HasInstance || GameManager.Instance.IsLoadingLevel || GameManager.IsReturningToBreach)
+            {
+                return;
+            }
+            CameraController mainCameraController = GameManager.Instance.MainCameraController;
+            if (!mainCameraController)
+            {
+                return;
+            }
+            if (value)
+            {
+                mainCameraController.OverrideZoomScale = 0.75f;                
+            }
+            else
+            {
+                mainCameraController.OverrideZoomScale = 1f;
+            }
+        }
+
         public override void PlayerWalkedIn(PlayerController player, List<tk2dSpriteAnimator> animators)
         {
             GameManager.Instance.StartCoroutine(PlaySound());
@@ -26,6 +47,7 @@ namespace BotsMod
 
         private IEnumerator PlaySound()
         {
+            ModifyCamera(true);
             yield return StartCoroutine(WaitForSecondsInvariant(3.2f));
             AkSoundEngine.PostEvent("Play_WPN_bsg_shot_01", base.aiActor.gameObject);
             yield break;

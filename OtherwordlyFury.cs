@@ -27,7 +27,7 @@ namespace BotsMod
 			string shortDesc = "";
 			string longDesc = "";
 			ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
-			ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.None, 0);
+			ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Damage, 300);
 			item.consumable = false;
 			item.quality = ItemQuality.B;
 
@@ -197,6 +197,7 @@ namespace BotsMod
 			float elapsed = 0f;
 			BeamController beam = this.BeginFiringBeam(projectileToSpawn, source, source.CurrentGun.CurrentAngle, pos, obj);
 			yield return null;
+			this.m_activeDuration = duration;
 			while (elapsed < duration && obj != null)
 			{
 				elapsed += BraveTime.DeltaTime;

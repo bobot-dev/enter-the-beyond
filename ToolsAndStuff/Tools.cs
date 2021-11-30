@@ -21,6 +21,7 @@ namespace BotsMod
 		public static GameObject Foyer_ElevatorChamber;
 		public static AssetBundle AHHH;
 		public static AssetBundle fucktilesets;
+		public static AssetBundle EtbAssetBundle;
 		public static AssetBundle BotsAssetBundle;
 		public static List<int> BeyondItems = new List<int>();
 
@@ -626,6 +627,90 @@ namespace BotsMod
 			return m_cachedCustomPlacable;
 		}
 
+		public static List<T> ConstructListOfSameValues<T>(T value, int length)
+		{
+			List<T> list = new List<T>();
+			for (int i = 0; i < length; i++)
+			{
+				list.Add(value);
+			}
+			return list;
+		}
+
+		public static void AnimateProjectile(this Projectile proj, List<string> names, int fps, tk2dSpriteAnimationClip.WrapMode wrapMode, int loopStart, List<IntVector2> pixelSizes, List<bool> lighteneds, List<tk2dBaseSprite.Anchor> anchors, List<bool> anchorsChangeColliders,
+			List<bool> fixesScales, List<Vector3?> manualOffsets, List<IntVector2?> overrideColliderPixelSizes, List<IntVector2?> overrideColliderOffsets, List<Projectile> overrideProjectilesToCopyFrom)
+		{
+			tk2dSpriteAnimationClip clip = new tk2dSpriteAnimationClip();
+			clip.name = "idle";
+			clip.fps = fps;
+			List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+			for (int i = 0; i < names.Count; i++)
+			{
+				string name = names[i];
+				IntVector2 pixelSize = pixelSizes[i];
+				IntVector2? overrideColliderPixelSize = overrideColliderPixelSizes[i];
+				IntVector2? overrideColliderOffset = overrideColliderOffsets[i];
+				Vector3? manualOffset = manualOffsets[i];
+				bool anchorChangesCollider = anchorsChangeColliders[i];
+				bool fixesScale = fixesScales[i];
+				if (!manualOffset.HasValue)
+				{
+					manualOffset = new Vector2?(Vector2.zero);
+				}
+				tk2dBaseSprite.Anchor anchor = anchors[i];
+				bool lightened = lighteneds[i];
+				Projectile overrideProjectileToCopyFrom = overrideProjectilesToCopyFrom[i];
+				tk2dSpriteAnimationFrame frame = new tk2dSpriteAnimationFrame();
+				frame.spriteId = ETGMod.Databases.Items.ProjectileCollection.inst.GetSpriteIdByName(name);
+				frame.spriteCollection = ETGMod.Databases.Items.ProjectileCollection;
+				frames.Add(frame);
+				int? overrideColliderPixelWidth = null;
+				int? overrideColliderPixelHeight = null;
+				if (overrideColliderPixelSize.HasValue)
+				{
+					overrideColliderPixelWidth = overrideColliderPixelSize.Value.x;
+					overrideColliderPixelHeight = overrideColliderPixelSize.Value.y;
+				}
+				int? overrideColliderOffsetX = null;
+				int? overrideColliderOffsetY = null;
+				if (overrideColliderOffset.HasValue)
+				{
+					overrideColliderOffsetX = overrideColliderOffset.Value.x;
+					overrideColliderOffsetY = overrideColliderOffset.Value.y;
+				}
+				tk2dSpriteDefinition def = SetupDefinitionForProjectileSprite(name, frame.spriteId, pixelSize.x, pixelSize.y, lightened, overrideColliderPixelWidth, overrideColliderPixelHeight, overrideColliderOffsetX, overrideColliderOffsetY,
+					overrideProjectileToCopyFrom);
+				def.ConstructOffsetsFromAnchor(anchor, def.position3, fixesScale, anchorChangesCollider);
+				def.position0 += manualOffset.Value;
+				def.position1 += manualOffset.Value;
+				def.position2 += manualOffset.Value;
+				def.position3 += manualOffset.Value;
+				if (i == 0)
+				{
+					proj.GetAnySprite().SetSprite(frame.spriteCollection, frame.spriteId);
+				}
+			}
+			clip.wrapMode = wrapMode;
+			clip.loopStart = loopStart;
+			clip.frames = frames.ToArray();
+			if (proj.sprite.spriteAnimator == null)
+			{
+				proj.sprite.spriteAnimator = proj.sprite.gameObject.AddComponent<tk2dSpriteAnimator>();
+			}
+			proj.sprite.spriteAnimator.playAutomatically = true;
+			bool flag = proj.sprite.spriteAnimator.Library == null;
+			if (flag)
+			{
+				proj.sprite.spriteAnimator.Library = proj.sprite.spriteAnimator.gameObject.AddComponent<tk2dSpriteAnimation>();
+				proj.sprite.spriteAnimator.Library.clips = new tk2dSpriteAnimationClip[0];
+				proj.sprite.spriteAnimator.Library.enabled = true;
+			}
+			proj.sprite.spriteAnimator.Library.clips = proj.sprite.spriteAnimator.Library.clips.Concat(new tk2dSpriteAnimationClip[] { clip }).ToArray();
+			proj.sprite.spriteAnimator.DefaultClipId = proj.sprite.spriteAnimator.Library.GetClipIdByName("idle");
+			proj.sprite.spriteAnimator.deferNextStartClip = false;
+		}
+
+		
 		public static void AddFlashRayBeam(this Projectile projectile, List<string> animationPaths, Vector2 colliderDimensions, Vector2 colliderOffsets, int fps = 12, List<string> startAnimationPaths = null, int startFps = 12, GameObject trailObject = null)
 		{
 			try
@@ -827,11 +912,23 @@ namespace BotsMod
 			}
 		}
 
+		public static void SetupSpriteOffset(this tk2dSpriteDefinition def, Vector3 offset, bool useDodgeRollUnits = true)
+        {
+			if (useDodgeRollUnits)
+            {
+				offset = offset / 16;
+			}
+			def.position0 += offset;
+			def.position1 += offset;
+			def.position2 += offset;
+			def.position3 += offset;
+		}
+
 		public static BasicBeamController GenerateBeamPrefab(this Projectile projectile, string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets, List<string> beamAnimationPaths = null, int beamFPS = -1, List<string> impactVFXAnimationPaths = null, int beamImpactFPS = -1, Vector2? impactVFXColliderDimensions = null, Vector2? impactVFXColliderOffsets = null, List<string> endVFXAnimationPaths = null, int beamEndFPS = -1, Vector2? endVFXColliderDimensions = null, Vector2? endVFXColliderOffsets = null, List<string> muzzleVFXAnimationPaths = null, int beamMuzzleFPS = -1, Vector2? muzzleVFXColliderDimensions = null, Vector2? muzzleVFXColliderOffsets = null, bool glows = false)
 		{
 			try
 			{
-				BotsModule.Log("beam 0");
+				//BotsModule.Log("beam 0");
 				if (projectile.specRigidbody != null)
                 {
 					projectile.specRigidbody.CollideWithOthers = false;
@@ -845,7 +942,7 @@ namespace BotsMod
 				int spriteID = SpriteBuilder.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
 				tk2dTiledSprite tiledSprite = projectile.gameObject.GetOrAddComponent<tk2dTiledSprite>();
 
-				BotsModule.Log("beam 1");
+				//BotsModule.Log("beam 1");
 
 				tiledSprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteID);
 				tk2dSpriteDefinition def = tiledSprite.GetCurrentSpriteDef();
@@ -2111,6 +2208,8 @@ namespace BotsMod
 		{
 			try
 			{
+				
+
 				proj.GetAnySprite().spriteId = ETGMod.Databases.Items.ProjectileCollection.inst.GetSpriteIdByName(name);
 				
 				tk2dSpriteDefinition def = SetupDefinitionForProjectileSprite(name, proj.GetAnySprite().spriteId, pixelWidth, pixelHeight, lightened, overrideColliderPixelWidth, overrideColliderPixelHeight, overrideColliderOffsetX,
@@ -2136,6 +2235,9 @@ int? overrideColliderPixelHeight = null, int? overrideColliderOffsetX = null, in
 			try
 			{
 				proj.GetAnySprite().spriteId = ETGMod.Databases.Items.ProjectileCollection.inst.GetSpriteIdByName(name);
+				var sprite = proj.GetAnySprite();
+				BotsModule.Log($"[{sprite.spriteId}]: {sprite.Collection.spriteDefinitions[sprite.spriteId].name}");
+
 				tk2dSpriteDefinition def = Tools.SetupDefinitionForProjectileSprite(name, proj.GetAnySprite().spriteId, pixelWidth, pixelHeight, lightened, overrideColliderPixelWidth, overrideColliderPixelHeight, overrideColliderOffsetX,
 					overrideColliderOffsetY, overrideProjectileToCopyFrom);
 				def.ConstructOffsetsFromAnchor(anchor, def.position3);
@@ -3010,61 +3112,7 @@ int? overrideColliderPixelHeight = null, int? overrideColliderOffsetX = null, in
 			return m_TileIndexGridData;
 		}
 
-		public static void ApplyGlitchShader(tk2dBaseSprite sprite, bool usesOverrideMaterial = true, float GlitchInterval = 0.1f, float DispProbability = 0.4f, float DispIntensity = 0.01f, float ColorProbability = 0.4f, float ColorIntensity = 0.04f)
-		{
-			try
-			{
-				if (sprite == null) { return; }
-				// Material m_cachedMaterial = new Material(ShaderCache.Acquire("Brave/Internal/Glitch"));
-				
-				//Material m_cachedMaterial = new Material(ResourceManager.LoadAssetBundle("ExpandSharedAuto").LoadAsset<Material>("ExpandGlitchBasicMaterial").shader);
-				Material m_cachedMaterial = new Material(AHHH.LoadAsset<Shader>("assets/customglitchshader.shader"));
-				//m_cachedMaterial.shader = AHHH.LoadAsset<Shader>("assets/customglitchshader.shader");
-				m_cachedMaterial.name = "GlitchMaterial";
-				m_cachedMaterial.SetFloat("_GlitchInterval", GlitchInterval);
-				m_cachedMaterial.SetFloat("_DispProbability", DispProbability);
-				m_cachedMaterial.SetFloat("_DispIntensity", DispIntensity);
-				m_cachedMaterial.SetFloat("_ColorProbability", ColorProbability);
-				m_cachedMaterial.SetFloat("_ColorIntensity", ColorIntensity);
-
-				m_cachedMaterial.SetFloat("_WrapDispCoords", 0);
-
-				MeshRenderer spriteComponent = sprite.GetComponent<MeshRenderer>();
-				if (spriteComponent == null) { return; }
-
-				Material[] sharedMaterials = spriteComponent.sharedMaterials;
-				if (sharedMaterials == null) { return; }
-				if (sharedMaterials.Length > 0)
-				{
-					foreach (Material material in sharedMaterials)
-					{
-						if (material.name.ToLower().StartsWith("glitchmaterial")) { return; }
-						if (material.name.ToLower().StartsWith("hologrammaterial")) { return; }
-						if (material.name.ToLower().StartsWith("galaxymaterial")) { return; }
-						if (material.name.ToLower().StartsWith("spacematerial")) { return; }
-						if (material.name.ToLower().StartsWith("paradoxmaterial")) { return; }
-						if (material.name.ToLower().StartsWith("cosmichorrormaterial")) { return; }
-						if (material.name.ToLower().StartsWith("rainbowmaterial")) { return; }
-					}
-				}
-				Array.Resize(ref sharedMaterials, sharedMaterials.Length + 1);
-				// Material CustomMaterial = Instantiate(m_cachedGlitchMaterial);
-				if (sharedMaterials[0].GetTexture("_MainTex") == null) { return; }
-				m_cachedMaterial.SetTexture("_MainTex", sharedMaterials[0].GetTexture("_MainTex"));
-				sharedMaterials[sharedMaterials.Length - 1] = m_cachedMaterial;
-				spriteComponent.sharedMaterials = sharedMaterials;
-				sprite.usesOverrideMaterial = usesOverrideMaterial;
-			}
-			catch (Exception ex)
-			{
-
-				ETGModConsole.Log("[ExpandTheGungeon] Warning: Caught exception in ExpandShaders.ApplyGlitchShader!");
-				ETGModConsole.Log("[ExpandTheGungeon] Warning: Caught exception in ExpandShaders.ApplyGlitchShader!");
-				ETGModConsole.Log(ex.ToString());
-
-				return;
-			}
-		}
+		
 
 		public static void GenerateSpriteAnimator(GameObject targetObject, tk2dSpriteAnimation library = null, int DefaultClipId = 0, float AdditionalCameraVisibilityRadius = 0f, bool AnimateDuringBossIntros = false, bool AlwaysIgnoreTimeScale = false, bool ignoreTimeScale = false, bool ForceSetEveryFrame = false, bool playAutomatically = false, bool IsFrameBlendedAnimation = false, float clipTime = 0f, float ClipFps = 15f, bool deferNextStartClip = false, bool alwaysUpdateOffscreen = false, bool maximumDeltaOneFrame = false)
 		{

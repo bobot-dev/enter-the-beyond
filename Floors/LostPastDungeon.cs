@@ -13,7 +13,7 @@ namespace BotsMod
     {
         public static GameLevelDefinition LostPastDefinition;
         public static GameObject GameManagerObject;
-
+        public static tk2dSpriteCollectionData gofuckyourself;
 
         public static Hook getOrLoadByName_Hook;
         public static void InitCustomDungeon()
@@ -56,6 +56,13 @@ namespace BotsMod
             Dungeon CatacombsPrefab = FloorHooks.GetOrLoadByName_Orig("Base_Catacombs");
             Dungeon MarinePastPrefab = FloorHooks.GetOrLoadByName_Orig("Finalscenario_Soldier");
             Dungeon RatDungeonPrefab = FloorHooks.GetOrLoadByName_Orig("Base_ResourcefulRat");
+
+
+            if (gofuckyourself == null)
+            {
+                gofuckyourself = MarinePastPrefab.tileIndices.dungeonCollection;
+            }
+
             //DungeonMaterial FinalScenario_MainMaterial = UnityEngine.Object.Instantiate(RatDungeonPrefab.roomMaterialDefinitions[0]);
             DungeonMaterial FinalScenario_MainMaterial = UnityEngine.Object.Instantiate(MinesDungeonPrefab.roomMaterialDefinitions[0]);
             FinalScenario_MainMaterial.supportsPits = true;
@@ -114,7 +121,7 @@ namespace BotsMod
 
                 //since the tileset im using here is a copy of the Rat dungeon tileset, the first variable in ReplaceDungeonCollection is RatDungeonPrefab.tileIndices.dungeonCollection,
                 //otherwise we will use a different dungeon prefab
-                dungeonCollection = Tools.ReplaceDungeonCollection(RatDungeonPrefab.tileIndices.dungeonCollection, BeyondPrefabs.ENV_Tileset_Beyond),
+                dungeonCollection = gofuckyourself,//Tools.ReplaceDungeonCollection(RatDungeonPrefab.tileIndices.dungeonCollection, BeyondPrefabs.ENV_Tileset_Beyond),
                 dungeonCollectionSupportsDiagonalWalls = false,
                 aoTileIndices = RatDungeonPrefab.tileIndices.aoTileIndices,
                 placeBorders = true,

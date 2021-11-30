@@ -3,6 +3,7 @@
 using Brave.BulletScript;
 using CustomCharacters;
 using Dungeonator;
+using ETGGUI;
 using ETGGUI.Inspector;
 using FrostAndGunfireItems;
 using GungeonAPI;
@@ -11,6 +12,7 @@ using InControl;
 using ItemAPI;
 using MonoMod.RuntimeDetour;
 using SaveAPI;
+using SGUI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -40,36 +42,7 @@ namespace BotsMod
 			{
 				
 
-				var UIRootPrefab = AmmonomiconAPI.Tools.LoadAssetFromAnywhere<GameObject>("UI Root").GetComponent<GameUIRoot>();
-				if (UIRootPrefab.Manager.DefaultAtlas == null)
-				{
-					BotsModule.Log("BoxSprite.Atlas is null");
-				}
-
-				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_001" + ".png"), "notification_box_beyond_001");
-				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_002" + ".png"), "notification_box_beyond_002");
-				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_003" + ".png"), "notification_box_beyond_003");
-				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_004" + ".png"), "notification_box_beyond_004");
-				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_005" + ".png"), "notification_box_beyond_005");
-				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_006" + ".png"), "notification_box_beyond_006");
-				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_007" + ".png"), "notification_box_beyond_007");
-				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_008" + ".png"), "notification_box_beyond_008");
-
-				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/notification_box_beyond_001" + ".png"), "notification_box_beyondns_001");
-
-				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/crosshair_beyond" + ".png"), "crosshair_beyond");
-				UIRootPrefab.Manager.DefaultAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/NotificationSprites/object_box_beyond_001" + ".png"), "object_box_beyond_001");
-
-				var beyondClipObj = new GameObject("Notification_Box_Shine_Clip_Beyond");
-				FakePrefab.MarkAsFakePrefab(beyondClipObj);
-				beyondClip = beyondClipObj.AddComponent<dfAnimationClip>();
-				beyondClip.Atlas = UIRootPrefab.Manager.DefaultAtlas;
-
-				FieldInfo _sprites = typeof(dfAnimationClip).GetField("sprites", BindingFlags.NonPublic | BindingFlags.Instance);
-				_sprites.SetValue(beyondClip, new List<string> { "notification_box_beyond_001", "notification_box_beyond_002", "notification_box_beyond_003", "notification_box_beyond_004", "notification_box_beyond_005", "notification_box_beyond_006", "notification_box_beyond_007", "notification_box_beyond_008", "notification_box_beyondns_001" });
 				
-
-
 				getOrLoadByName_Hook = new Hook(
 					typeof(DungeonDatabase).GetMethod("GetOrLoadByName", BindingFlags.Static | BindingFlags.Public),
 					typeof(Hooks).GetMethod("GetOrLoadByNameHook", BindingFlags.Static | BindingFlags.Public));
@@ -128,7 +101,7 @@ namespace BotsMod
 					typeof(Hooks).GetMethod("DetermineAvailableOptionsHook", BindingFlags.Static | BindingFlags.NonPublic));
 
 
-
+				BotsModule.Log("aaa2");
 				//BotsModule.Log("ahhhhh 2", "#eb1313");
 				var lessPainfulButStillDumbHook = new Hook(
 					typeof(FinalIntroSequenceManager).GetMethod("TriggerSequence", BindingFlags.Instance | BindingFlags.Public),
@@ -200,11 +173,13 @@ namespace BotsMod
 					typeof(OnActiveItemUsedSynergyProcessor).GetMethod("HandleActivationStatusChanged", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("HandleActivationStatusChangedHook", BindingFlags.Static | BindingFlags.NonPublic));
 
-				var HandlePostProcessProjectileHook = new Hook(
+				/*var HandlePostProcessProjectileHook = new Hook(
 					typeof(AlphabetSoupSynergyProcessor).GetMethod("HandlePostProcessProjectile", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("HandlePostProcessProjectileHook", BindingFlags.Static | BindingFlags.NonPublic));
+				*/
 
-
+				
+				//BotsModule.Log("aaa3");
 				var HookToWriteLogToTxtFile = new Hook(
 					typeof(ETGModConsole).GetMethod("Log", BindingFlags.Static | BindingFlags.Public),
 					typeof(Hooks).GetMethod("LogHook", BindingFlags.Static | BindingFlags.Public));
@@ -230,11 +205,11 @@ namespace BotsMod
 					typeof(SuperReaperController).GetMethod("SpawnProjectiles", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("SpawnProjectilesHook", BindingFlags.Static | BindingFlags.NonPublic));
 
-				var HandleMotionHook = new Hook(
+				/*var HandleMotionHook = new Hook(
 					typeof(SuperReaperController).GetMethod("HandleMotion", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("HandleMotionHook", BindingFlags.Static | BindingFlags.NonPublic));
 
-				/*var UpdateHealthHook = new Hook(
+				var UpdateHealthHook = new Hook(
 					typeof(GameUIHeartController).GetMethod("UpdateHealth", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("UpdateHealthHook", BindingFlags.Static | BindingFlags.Public));
 
@@ -244,17 +219,17 @@ namespace BotsMod
 
 				var AddArmourHook = new Hook(
 					typeof(GameUIHeartController).GetMethod("AddArmor", BindingFlags.Instance | BindingFlags.Public),
-					typeof(Hooks).GetMethod("AddArmorHook", BindingFlags.Static | BindingFlags.Public));*/
+					typeof(Hooks).GetMethod("AddArmorHook", BindingFlags.Static | BindingFlags.Public));
 
 				var IsValidHook = new Hook(
 					typeof(GunFormeData).GetMethod("IsValid", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("IsValidHook", BindingFlags.Static | BindingFlags.Public));
-
-				/*var UpdatePlayerConsumablesHook = new Hook(
+				
+				var UpdatePlayerConsumablesHook = new Hook(
 					typeof(GameUIRoot).GetMethod("UpdatePlayerConsumables", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("UpdatePlayerConsumablesHook", BindingFlags.Static | BindingFlags.Public));
 
-				var UpdateAnimationNamesselfdOnSacksHook = new Hook(
+				/*var UpdateAnimationNamesselfdOnSacksHook = new Hook(
 					typeof(SackKnightController).GetMethod("UpdateAnimationNamesselfdOnSacks", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("UpdateAnimationNamesselfdOnSacksHook", BindingFlags.Static | BindingFlags.NonPublic));*/
 
@@ -277,6 +252,44 @@ namespace BotsMod
 				var GetIndexFromTupleArrayHook = new Hook(
 					typeof(TK2DDungeonAssembler).GetMethod("GetIndexFromTupleArray", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("GetIndexFromTupleArrayHook", BindingFlags.Static | BindingFlags.NonPublic));
+
+				var TheresNoFuckingWayThisWorks = new Hook(
+					typeof(Projectile).GetMethod("OnRigidbodyCollision", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("TheresNoFuckingWayThisWorks", BindingFlags.Static | BindingFlags.NonPublic));
+
+
+				/*var TriggerSilencerHook = new Hook(
+					typeof(SilencerInstance).GetMethod("TriggerSilencer", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("TriggerSilencerHook", BindingFlags.Static | BindingFlags.Public));
+
+				var UpdateBlanksHook = new Hook(
+					typeof(GameUIBlankController).GetMethod("UpdateBlanks", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("UpdateBlanksHook", BindingFlags.Static | BindingFlags.Public));
+				BotsModule.Log("aaa");
+				var ProcessHeartSpriteModificationsHook = new Hook(
+					typeof(GameUIHeartController).GetMethod("ProcessHeartSpriteModifications", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("ProcessHeartSpriteModificationsHook", BindingFlags.Static | BindingFlags.NonPublic));
+				//ProcessHeartSpriteModificationsHook
+
+				var ApplyDamageDirectionalHook = new Hook(
+					typeof(HealthHaver).GetMethod("ApplyDamageDirectional", BindingFlags.NonPublic | BindingFlags.Instance),
+					typeof(Hooks).GetMethod("ApplyDamageDirectionalHook", BindingFlags.Static | BindingFlags.Public));
+
+
+				var LocalTimeScaleHook = new Hook(
+				   typeof(Projectile).GetProperty("LocalTimeScale", BindingFlags.Instance | BindingFlags.NonPublic).GetGetMethod(),
+				   typeof(Hooks).GetMethod("LocalTimeScaleHook", BindingFlags.Static | BindingFlags.Public));
+				*/
+				//var InitSGUI = new Hook(
+				//   typeof(SGUIIMBackend).GetMethod("Init", BindingFlags.Instance | BindingFlags.Public),
+				//   typeof(Hooks).GetMethod("InitSGUI", BindingFlags.Static | BindingFlags.Public));
+
+				//var BraveLogHook = new Hook(
+				//typeof(BraveUtility).GetMethod("Log", BindingFlags.Static | BindingFlags.Public),
+				//typeof(Hooks).GetMethod("BraveLogHook", BindingFlags.Static | BindingFlags.Public));
+
+				BotsModule.Log("hooks set up hopefully");
+
 			}
 			catch (Exception arg)
 			{
@@ -286,6 +299,77 @@ namespace BotsMod
 			}
 		}
 
+
+		public static void InitSGUI(Action<SGUIIMBackend> orig, SGUIIMBackend self)
+		{
+
+			FieldInfo initialized = typeof(SGUIIMBackend).GetField("Initialized", BindingFlags.Public | BindingFlags.Instance);
+
+			if (self.Font == null)
+			{
+				//if (SGUIIMBackend.GetFont != null)
+				//{
+				//	GUI.skin.font = SGUIIMBackend.GetFont(self);
+				//}
+				self.Font = GUI.skin.font;
+				GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+				GUI.skin.textField.alignment = TextAnchor.MiddleLeft;
+				GUI.skin.verticalScrollbar.fixedWidth = 0f;
+				GUI.skin.verticalScrollbarThumb.fixedWidth = 0f;
+			}
+			initialized.SetValue(self, true);
+		}
+
+
+		public static void BraveLogHook(string s, Color c, BraveUtility.LogVerbosity v = BraveUtility.LogVerbosity.VERBOSE)
+		{
+			BotsModule.Log("Brave Log: " + s);
+			BotsModule.Log("Brave Log: " + s, ColorUtility.ToHtmlStringRGB(c));
+		}
+
+		public static void LocalTimeScaleHook(Func<Projectile, float> orig, Projectile self)
+		{
+			if (self.gameObject?.GetComponent<DarkArtsSlowDown>()?.overrideTimeScale != 1)
+			{
+				//self.gameObject.GetComponent<DarkArtsSlowDown>().overrideTimeScale;
+			}			
+			orig(self);
+		}
+
+		private static void ProcessHeartSpriteModificationsHook(Action<GameUIHeartController, PlayerController> orig, GameUIHeartController self, PlayerController associatedPlayer)
+		{
+			FieldInfo _currentHalfHeartName = typeof(GameUIHeartController).GetField("m_currentHalfHeartName", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _currentEmptyHeartName = typeof(GameUIHeartController).GetField("m_currentEmptyHeartName", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _currentFullHeartName = typeof(GameUIHeartController).GetField("m_currentFullHeartName", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _currentArmorName = typeof(GameUIHeartController).GetField("m_currentArmorName", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			orig(self, associatedPlayer);
+
+			if (associatedPlayer?.name == "PlayerShade(Clone)" && (string)_currentArmorName.GetValue(self) == self.armorSpritePrefab.SpriteName)
+			{
+				//_currentHalfHeartName.SetValue(self, "");
+				//_currentEmptyHeartName.SetValue(self, "");
+				//_currentFullHeartName.SetValue(self, "");
+				_currentArmorName.SetValue(self, "shade_armour");
+			}
+
+		}
+
+		private static void TheresNoFuckingWayThisWorks(Action<Projectile, CollisionData> orig, Projectile self, CollisionData rigidbodyCollision)
+		{
+			if (self.Owner && self.Owner is PlayerController && PassiveItem.IsFlagSetAtAll(typeof(FracturedRounds)) == true)
+            {
+				for (int i = 0; i < 2; i++)
+				{
+					orig(self, rigidbodyCollision);
+				}
+			} 
+			else
+            {
+				orig(self, rigidbodyCollision);
+			}
+			
+		}
 		private static int GetIndexFromTupleArrayHook(TK2DDungeonAssembler self, CellData current, List<Tuple<int, TilesetIndexMetadata>> list, int roomTypeIndex)
 		{
 			float uniqueHash = current.UniqueHash;
@@ -506,10 +590,68 @@ namespace BotsMod
 			
 		}
 
+		public static void TriggerSilencerHook(CoolerAction<SilencerInstance, Vector2, float, float, GameObject, float, float, float, float, float, float, float, PlayerController, bool, bool> orig, SilencerInstance self, Vector2 centerPoint, float expandSpeed, float maxRadius,
+			GameObject silencerVFX, float distIntensity, float distRadius, float pushForce, float pushRadius, float knockbackForce, float knockbackRadius, float additionalTimeAtMaxRadius, PlayerController user, bool breaksWalls = true, bool skipBreakables = false)
+		{
+			BotsMod.BotsModule.Log("blank triggered");
+			if (user.HasPickupID(BotsItemIds.VoidAmmolet))
+			{
+				BotsMod.BotsModule.Log("spawning shards");
 
+				if (breaksWalls)
+				{
+					RoomHandler absoluteRoomFromPosition = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(centerPoint.ToIntVector2(VectorConversions.Floor));
+					for (int j = 0; j < StaticReferenceManager.AllMajorBreakables.Count; j++)
+					{
+						if (StaticReferenceManager.AllMajorBreakables[j].IsSecretDoor)
+						{
+							RoomHandler absoluteRoomFromPosition2 = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(StaticReferenceManager.AllMajorBreakables[j].transform.position.IntXY(VectorConversions.Floor));
+							if (absoluteRoomFromPosition2 == absoluteRoomFromPosition)
+							{
+								StaticReferenceManager.AllMajorBreakables[j].ApplyDamage(1E+10f, Vector2.zero, false, true, true);
+								StaticReferenceManager.AllMajorBreakables[j].ApplyDamage(1E+10f, Vector2.zero, false, true, true);
+								StaticReferenceManager.AllMajorBreakables[j].ApplyDamage(1E+10f, Vector2.zero, false, true, true);
+							}
+						}
+					}
+				}
+
+				if (silencerVFX != null)
+				{
+					GameObject obj = UnityEngine.Object.Instantiate<GameObject>(silencerVFX, centerPoint.ToVector3ZUp(centerPoint.y), Quaternion.identity);
+					UnityEngine.Object.Destroy(obj, 1f);
+				}
+				VoidAmmolet.VoidBlank(user, centerPoint.ToVector3ZUp(centerPoint.y));
+			}
+			else
+			{
+				orig(self, centerPoint, expandSpeed, maxRadius, silencerVFX, distIntensity, distRadius, pushForce, pushRadius, knockbackForce, knockbackRadius, additionalTimeAtMaxRadius, user, breaksWalls, skipBreakables);
+			}
+			
+		}
+
+		#region custom ui hooks (mostly broken)
 		static dfLabel p_playerArmourLabel;
 		static dfSprite p_playerArmourSprite;
 
+		public static void UpdateBlanksHook(Action<GameUIBlankController, int> orig, GameUIBlankController self, int numBlanks)
+		{
+			orig(self, numBlanks);
+
+			foreach(var blank in self.extantBlanks)
+            {
+				if(GameManager.Instance.PrimaryPlayer != null && GameManager.Instance.PrimaryPlayer.HasPickupID(BotsItemIds.VoidAmmolet))
+                {
+					blank.SpriteName = "void_blank";
+				} 
+				else
+                {
+					blank.SpriteName = "ui_blank";
+				}
+				//BotsModule.Log(blank.SpriteName);
+            }
+		}
+		
 		public static void UpdatePlayerConsumablesHook(GameUIRoot self, PlayerConsumables playerConsumables)
 		{
 			Debug.LogWarning("0");
@@ -518,10 +660,12 @@ namespace BotsMod
 			{
 				
 				p_playerArmourLabel = FakePrefab.Clone(self.p_playerCoinLabel.gameObject).GetComponent<dfLabel>();
+				p_playerArmourLabel.transform.parent = self.p_playerCoinLabel.transform.parent;
 				if (!p_playerArmourLabel.gameObject.activeSelf)
                 {
 					p_playerArmourLabel.gameObject.SetActive(true);
 					Debug.LogWarning("activated p_playerArmourLabel");
+					Debug.LogWarning(self.p_playerCoinLabel.transform.parent.ToString());
 				}
 			}
 			Debug.LogWarning("1");
@@ -529,8 +673,17 @@ namespace BotsMod
 			{
 				Debug.LogWarning("1.5");
 
-				var fuckhead = Tools.shared_auto_001.LoadAsset<GameObject>("CoinSprite");//Tools.ReflectionHelpers.ReflectGetField<dfSprite>(typeof(GameUIRoot), "p_playerCoinSprite", self);
 
+				//UI Root/CoinPanel/CoinSprite
+
+				foreach(var child in self.gameObject.transform)
+                {
+					Debug.LogError(child.ToString());
+				}
+
+				var fuckhead = self.p_playerCoinLabel.transform.parent.Find("CoinSprite").gameObject; //Tools.shared_auto_001.LoadAsset<GameObject>("CoinSprite");//Tools.ReflectionHelpers.ReflectGetField<dfSprite>(typeof(GameUIRoot), "p_playerCoinSprite", self);
+				fuckhead.transform.parent = self.p_playerCoinLabel.transform.parent;
+				Debug.LogWarning("1.55");
 				if (fuckhead == null)
 				{
 					Debug.LogWarning("fuck fuck fuck fuck");
@@ -544,7 +697,7 @@ namespace BotsMod
 					Debug.LogWarning("fuck fuck fuck fuck3 ");
 				}*/
 				
-				var obj = FakePrefab.Clone(fuckhead.gameObject);
+				var obj = FakePrefab.Clone(fuckhead);
 				Debug.LogWarning("1.6");
 				
 
@@ -567,7 +720,7 @@ namespace BotsMod
 			Debug.LogWarning("3");
 
 			typeof(GameUIRoot).GetMethod("UpdateSpecialKeys", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { playerConsumables });
-
+			Debug.LogWarning("3.5");
 			if (GameManager.Instance.PrimaryPlayer != null && GameManager.Instance.PrimaryPlayer.Blanks == 0)
 			{
 				self.p_playerCoinLabel.Parent.Parent.RelativePosition = self.p_playerCoinLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y);
@@ -622,6 +775,35 @@ namespace BotsMod
 			return orig(self, p);
 		}
 
+		public static void ApplyDamageDirectionalHook(Action<HealthHaver, float, Vector2, string, CoreDamageTypes, DamageCategory, bool, PixelCollider, bool> orig, HealthHaver self, float damage, Vector2 direction, string damageSource, CoreDamageTypes damageTypes, DamageCategory damageCategory = DamageCategory.Normal, bool ignoreInvulnerabilityFrames = false, PixelCollider hitPixelCollider = null, bool ignoreDamageCaps = false)
+		{
+
+			FieldInfo isPlayerCharacter = typeof(HealthHaver).GetField("isPlayerCharacter", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _player = typeof(HealthHaver).GetField("m_player", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			if (self.Armor <= 0)
+			{
+				OtherworldlyConnections.gotHitThisFloor = true;
+			}
+
+			if (!self.NextDamageIgnoresArmor && !self.NextShotKills)
+			{
+				if (self.Armor <= 0f && SoulHeartController.soulHeartCount > 0 && (bool)isPlayerCharacter.GetValue(self))
+				{
+					SoulHeartController.soulHeartCount -= 1f;
+					damage = 0.00000000000000000000000000000000000000000001f;
+					if ((bool)isPlayerCharacter.GetValue(self))
+					{
+						SoulHeartController.OnSoulHeartLost(_player.GetValue(self) as PlayerController);
+					}
+				}
+			}
+
+			orig(self, damage, direction, damageSource, damageTypes, damageCategory, ignoreInvulnerabilityFrames, hitPixelCollider, ignoreDamageCaps);
+		}
+
+
+		
 		public static void UpdateHealthHook(GameUIHeartController self, HealthHaver hh)
 		{
 
@@ -1006,8 +1188,8 @@ namespace BotsMod
 			(_bulletSource.GetValue(self) as BulletScriptSource).BulletScript = new CustomBulletScriptSelector(typeof(PrimalShotgrubScrip));
 			(_bulletSource.GetValue(self) as BulletScriptSource).Initialize();
 		}
-
-		public static IEnumerator Dash(SuperReaperController self, Vector3 dir)
+        #endregion
+        public static IEnumerator Dash(SuperReaperController self, Vector3 dir)
         {
 			
 			self.specRigidbody.OnEnterTrigger += ReaperPreCollision;
@@ -1379,8 +1561,8 @@ namespace BotsMod
 		}
 
 
-
-		private static void HandleActivationStatusChangedHook(Action<OnActiveItemUsedSynergyProcessor, PlayerItem> orig, OnActiveItemUsedSynergyProcessor self, PlayerItem sourceItem)
+        #region unfix that synergy
+        private static void HandleActivationStatusChangedHook(Action<OnActiveItemUsedSynergyProcessor, PlayerItem> orig, OnActiveItemUsedSynergyProcessor self, PlayerItem sourceItem)
 		{
 
 			FieldInfo _item = typeof(OnActiveItemUsedSynergyProcessor).GetField("m_item", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -1410,12 +1592,12 @@ namespace BotsMod
 
 		Dictionary<string, List<object>> problemSolver = new Dictionary<string, List<object>>();
 
+        #endregion
 
 
-
-		public delegate void Action<T, T2, T3, T4, T5, T6, T7, T8, T9>(T arg, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9);
-
-		public static void DoSetupHook(Action<BaseShopController> orig, BaseShopController self)
+        public delegate void Action<T, T2, T3, T4, T5, T6, T7, T8, T9>(T arg, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9);
+        #region old shop hooks
+        public static void DoSetupHook(Action<BaseShopController> orig, BaseShopController self)
 		{
 			orig(self);
 			FieldInfo _numberThingsPurchased = typeof(BaseShopController).GetField("m_numberThingsPurchased", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -1838,244 +2020,29 @@ namespace BotsMod
 				}
 			}
 		}
+        #endregion
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		static bool setup = false;
-		static dfAnimationClip beyondClip;
-		private static void DoNotificationInternalHook(UINotificationController self, NotificationParams notifyParams)
+		private static void DoNotificationInternalHook(Action<UINotificationController, NotificationParams> orig, UINotificationController self, NotificationParams notifyParams)
 		{
-			if (!setup)
-			{
-
-				setup = true;
-			}
-
-
-			FieldInfo _queuedNotifications = typeof(UINotificationController).GetField("m_queuedNotifications", BindingFlags.NonPublic | BindingFlags.Instance);
-
-			FieldInfo _queuedNotificationParams = typeof(UINotificationController).GetField("m_queuedNotificationParams", BindingFlags.NonPublic | BindingFlags.Instance);
-
-			(_queuedNotifications.GetValue(self) as List<IEnumerator>).Add(HandleNotification(self, notifyParams));
-			(_queuedNotificationParams.GetValue(self) as List<NotificationParams>).Add(notifyParams);
-			self.StartCoroutine((IEnumerator)typeof(UINotificationController).GetMethod("PruneQueuedNotifications", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null));
-		}
-
-		private static IEnumerator HandleNotification(UINotificationController self, NotificationParams notifyParams)
-		{
-			yield return null;
-			typeof(UINotificationController).GetMethod("SetupSprite", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { notifyParams.SpriteCollection, notifyParams.SpriteID });
-
-			FieldInfo _doingNotification = typeof(UINotificationController).GetField("m_doingNotification", BindingFlags.NonPublic | BindingFlags.Instance);
-			FieldInfo _panel = typeof(UINotificationController).GetField("m_panel", BindingFlags.NonPublic | BindingFlags.Instance);
-
-
-			self.DescriptionLabel.ProcessMarkup = true;
-			self.DescriptionLabel.ColorizeSymbols = true;
-			self.NameLabel.Text = notifyParams.PrimaryTitleString.ToUpperInvariant();
-			self.DescriptionLabel.Text = notifyParams.SecondaryDescriptionString;
-			self.CenterLabel.Opacity = 1f;
-			self.NameLabel.Opacity = 1f;
-			self.DescriptionLabel.Opacity = 1f;
-			self.CenterLabel.IsVisible = false;
-			self.NameLabel.IsVisible = true;
-			self.DescriptionLabel.IsVisible = true;
-			dfSpriteAnimation component = self.BoxSprite.GetComponent<dfSpriteAnimation>();
-			component.Stop();
-			dfSpriteAnimation component2 = self.CrosshairSprite.GetComponent<dfSpriteAnimation>();
-			component2.Stop();
-			dfSpriteAnimation component3 = self.ObjectBoxSprite.GetComponent<dfSpriteAnimation>();
-			component3.Stop();
-			UINotificationController.NotificationColor forcedColor = notifyParams.forcedColor;
-			string trackableGuid = notifyParams.EncounterGuid;
-			bool isGold = forcedColor == UINotificationController.NotificationColor.GOLD || (!string.IsNullOrEmpty(trackableGuid) && GameStatsManager.Instance.QueryEncounterable(trackableGuid) == 1);
-			bool isPurple = forcedColor == UINotificationController.NotificationColor.PURPLE || (!string.IsNullOrEmpty(trackableGuid) && EncounterDatabase.GetEntry(trackableGuid).usesPurpleNotifications);
-			bool isBeyond = forcedColor == (UINotificationController.NotificationColor)CustomEnums.CustomNotificationColor.BEYOND || !string.IsNullOrEmpty(trackableGuid) && Tools.BeyondItems.Contains(EncounterDatabase.GetEntry(trackableGuid).pickupObjectId);
-			typeof(UINotificationController).GetMethod("ToggleGoldStatus", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { isGold });
-			typeof(UINotificationController).GetMethod("TogglePurpleStatus", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { isPurple });
-			ToggleBeyondStatus(self, isBeyond);
-			bool singleLineSansSprite = notifyParams.isSingleLine;
-			if (singleLineSansSprite || notifyParams.SpriteCollection == null)
-			{
-				self.ObjectBoxSprite.IsVisible = false;
-				self.StickerSprite.IsVisible = false;
-			}
-			if (singleLineSansSprite)
-			{
-				self.CenterLabel.IsVisible = true;
-				self.NameLabel.IsVisible = false;
-				self.DescriptionLabel.IsVisible = false;
-				self.CenterLabel.Text = self.NameLabel.Text;
+			
+			if ((!string.IsNullOrEmpty(notifyParams.EncounterGuid) && Tools.BeyondItems.Contains(EncounterDatabase.GetEntry(notifyParams.EncounterGuid).pickupObjectId) &&  GameStatsManager.Instance.QueryEncounterable(notifyParams.EncounterGuid) != 1))
+            {
+				FieldInfo _queuedNotifications = typeof(UINotificationController).GetField("m_queuedNotifications", BindingFlags.NonPublic | BindingFlags.Instance);
+				FieldInfo _queuedNotificationParams = typeof(UINotificationController).GetField("m_queuedNotificationParams", BindingFlags.NonPublic | BindingFlags.Instance);
+				(_queuedNotifications.GetValue(self) as List<IEnumerator>).Add(BeyondNotificaionHandler.HandleBeyondNotification(self, notifyParams));
+				(_queuedNotificationParams.GetValue(self) as List<NotificationParams>).Add(notifyParams);
+				self.StartCoroutine((IEnumerator)typeof(UINotificationController).GetMethod("PruneQueuedNotifications", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null));
 			}
 			else
-			{
-				self.NameLabel.IsVisible = true;
-				self.DescriptionLabel.IsVisible = true;
-				self.CenterLabel.IsVisible = false;
-			}
-			_doingNotification.SetValue(self, true);
-			(_panel.GetValue(self) as dfPanel).IsVisible = false;
-			GameUIRoot.Instance.MoveNonCoreGroupOnscreen((_panel.GetValue(self) as dfPanel), false);
-			float elapsed = 0f;
-			float duration = 5f;
-			bool hasPlayedAnim = false;
-			if (singleLineSansSprite)
-			{
-				self.notificationObjectSprite.renderer.enabled = false;
-				SpriteOutlineManager.ToggleOutlineRenderers(self.notificationObjectSprite, false);
-			}
-			while (elapsed < ((!notifyParams.HasAttachedSynergy) ? duration : (duration - 2f)))
-			{
-				elapsed += BraveTime.DeltaTime;
-				if (!hasPlayedAnim && elapsed > 0.75f)
-				{
-					if (isPurple)
-                    {
-						self.BoxSprite.GetComponent<dfSpriteAnimation>().Clip = self.PurpleAnimClip;
-					} 
-					else if (isGold)
-                    {
-						self.BoxSprite.GetComponent<dfSpriteAnimation>().Clip = self.GoldAnimClip;
-					}
-					else if (isBeyond)
-					{
-						self.BoxSprite.GetComponent<dfSpriteAnimation>().Clip = beyondClip;
-					}
-					else
-					{
-						self.BoxSprite.GetComponent<dfSpriteAnimation>().Clip = self.SilverAnimClip;
-					}
-					
-					hasPlayedAnim = true;
-					self.ObjectBoxSprite.Parent.GetComponent<dfSpriteAnimation>().Play();
-				}
-				yield return null;
-				(_panel.GetValue(self) as dfPanel).IsVisible = true;
-				if (!singleLineSansSprite && notifyParams.SpriteCollection != null)
-				{
-					self.notificationObjectSprite.renderer.enabled = true;
-					SpriteOutlineManager.ToggleOutlineRenderers(self.notificationObjectSprite, true);
-				}
-			}
-			if (notifyParams.HasAttachedSynergy)
-			{
-				AdvancedSynergyEntry pairedSynergy = notifyParams.AttachedSynergy;
-				EncounterDatabaseEntry encounterSource = EncounterDatabase.GetEntry(trackableGuid);
-				int pickupObjectId = (encounterSource == null) ? -1 : encounterSource.pickupObjectId;
-				PickupObject puo = PickupObjectDatabase.GetById(pickupObjectId);
-				if (puo)
-				{
-					//int pID = self.GetIDOfOwnedSynergizingItem(puo.PickupObjectId, pairedSynergy);
-					int pID = (int)typeof(UINotificationController).GetMethod("GetIDOfOwnedSynergizingItem", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { puo.PickupObjectId, pairedSynergy });
-					PickupObject puo2 = PickupObjectDatabase.GetById(pID);
-					if (puo2 && puo2.sprite)
-					{
-						typeof(UINotificationController).GetMethod("SetupSynergySprite", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { puo2.sprite.Collection, puo2.sprite.spriteId });
-						elapsed = 0f;
-						duration = 4f;
-						self.notificationSynergySprite.renderer.enabled = true;
-						SpriteOutlineManager.ToggleOutlineRenderers(self.notificationSynergySprite, true);
-						dfSpriteAnimation boxSpriteAnimator = self.BoxSprite.GetComponent<dfSpriteAnimation>();
-						boxSpriteAnimator.Clip = self.SynergyTransformClip;
-						boxSpriteAnimator.Play();
-						dfSpriteAnimation crosshairSpriteAnimator = self.CrosshairSprite.GetComponent<dfSpriteAnimation>();
-						crosshairSpriteAnimator.Clip = self.SynergyCrosshairTransformClip;
-						crosshairSpriteAnimator.Play();
-						dfSpriteAnimation objectSpriteAnimator = self.ObjectBoxSprite.GetComponent<dfSpriteAnimation>();
-						objectSpriteAnimator.Clip = self.SynergyBoxTransformClip;
-						objectSpriteAnimator.Play();
-						string synergyName = string.IsNullOrEmpty(pairedSynergy.NameKey) ? string.Empty : StringTableManager.GetSynergyString(pairedSynergy.NameKey, -1);
-						bool synergyHasName = !string.IsNullOrEmpty(synergyName);
-						if (synergyHasName)
-						{
-							self.CenterLabel.IsVisible = true;
-							self.CenterLabel.Text = synergyName;
-						}
-						while (elapsed < duration)
-						{
-							float baseSpriteLocalX = self.notificationObjectSprite.transform.localPosition.x;
-							float synSpriteLocalX = self.notificationSynergySprite.transform.localPosition.x;
-							self.CrosshairSprite.Size = self.CrosshairSprite.SpriteInfo.sizeInPixels * 3f;
-							float p2u = self.BoxSprite.PixelsToUnits();
-							Vector3 endPosition = self.ObjectBoxSprite.GetCenter();
-							Vector3 startPosition = endPosition + new Vector3(0f, -120f * p2u, 0f);
-							Vector3 startPosition2 = endPosition;
-							Vector3 endPosition2 = endPosition + new Vector3(0f, 12f * p2u, 0f);
-							endPosition -= new Vector3(0f, 21f * p2u, 0f);
-							float t = elapsed / duration;
-							float quickT = elapsed / 1f;
-							float smoothT = Mathf.SmoothStep(0f, 1f, quickT);
-							if (synergyHasName)
-							{
-								float num = Mathf.SmoothStep(0f, 1f, elapsed / 0.5f);
-								float opacity = Mathf.SmoothStep(0f, 1f, (elapsed - 0.5f) / 0.5f);
-								self.NameLabel.Opacity = 1f - num;
-								self.DescriptionLabel.Opacity = 1f - num;
-								self.CenterLabel.Opacity = opacity;
-							}
-							Vector3 t2 = Vector3.Lerp(startPosition, endPosition, smoothT).Quantize(p2u * 3f).WithX(startPosition.x);
-							Vector3 t3 = Vector3.Lerp(startPosition2, endPosition2, smoothT).Quantize(p2u * 3f).WithX(startPosition2.x);
-							t3.y = Mathf.Max(startPosition2.y, t3.y);
-							self.notificationSynergySprite.PlaceAtPositionByAnchor(t2, tk2dBaseSprite.Anchor.MiddleCenter);
-							self.notificationSynergySprite.transform.position = self.notificationSynergySprite.transform.position + new Vector3(0f, 0f, -0.125f);
-							self.notificationObjectSprite.PlaceAtPositionByAnchor(t3, tk2dBaseSprite.Anchor.MiddleCenter);
-							self.notificationObjectSprite.transform.localPosition = self.notificationObjectSprite.transform.localPosition.WithX(baseSpriteLocalX);
-							self.notificationSynergySprite.transform.localPosition = self.notificationSynergySprite.transform.localPosition.WithX(synSpriteLocalX);
-							self.notificationSynergySprite.UpdateZDepth();
-							self.notificationObjectSprite.UpdateZDepth();
-							elapsed += BraveTime.DeltaTime;
-							yield return null;
-						}
-					}
-				}
-			}
-			GameUIRoot.Instance.MoveNonCoreGroupOnscreen((_panel.GetValue(self) as dfPanel), true);
-			elapsed = 0f;
-			duration = 0.25f;
-			while (elapsed < duration)
-			{
-				elapsed += BraveTime.DeltaTime;
-				yield return null;
-			}
-			self.CenterLabel.Opacity = 1f;
-			self.NameLabel.Opacity = 1f;
-			self.DescriptionLabel.Opacity = 1f;
-			self.CenterLabel.IsVisible = false;
-			self.NameLabel.IsVisible = true;
-			self.DescriptionLabel.IsVisible = true;
-
-			typeof(UINotificationController).GetMethod("DisableRenderers", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null);
-			_doingNotification.SetValue(self, false);
-			yield break;
+            {
+				orig(self, notifyParams);
+			}			
 		}
 
+		
 
-		private static void ToggleBeyondStatus(UINotificationController self, bool beyond)
-		{
-			if (beyond)
-			{
-				self.CrosshairSprite.SpriteName = "crosshair_beyond";
-				self.CrosshairSprite.Size = self.CrosshairSprite.SpriteInfo.sizeInPixels * 3f;
-				self.BoxSprite.SpriteName = "notification_box_beyondns_001";
-				self.ObjectBoxSprite.IsVisible = true;
-				self.ObjectBoxSprite.SpriteName = "object_box_beyond_001";
-				self.StickerSprite.IsVisible = false;
-			}
 
-		}
+
 
 
 		public static void BreakHook(Action<MinorBreakable, Vector2> orig, MinorBreakable self, Vector2 direction)
@@ -2993,6 +2960,7 @@ namespace BotsMod
 			}
 			return -1;
 		}
+
 		
 
 
@@ -3092,37 +3060,12 @@ namespace BotsMod
 			BotsModule.Log("5", BotsModule.TEXT_COLOR);
 		}
 
-		public static void LoadCustomLevel(Action<GameManager, string> orig, GameManager self, string custom)
-		{
-			if (custom == "tt_catacombs" && self.PrimaryPlayer.HasMTGConsoleID("bot:global_warming"))
-			{
-				custom = "tt_forge";
-			}
-			orig(self, custom);
-		}
+		
 
 		public delegate void CoolerAction<in T1, in t2, in t3, in t4, in t5, in t6, in t7, in t8, in t9, in t10, in t11, in t12, in t13, in t14, in t15 >(T1 a, t2 b, t3 c, t4 d, t5 e, t6 f, t7 g, t8 h, t9 i, t10 j, t11 k, t12 l, t13 m, t14 n, t15 o);
 		public delegate void CoolerAction2<in T1, in t2, in t3, in t4, in t5, in t6, in t7, in t8, in t9>(T1 a, t2 b, t3 c, t4 d, t5 e, t6 f, t7 g, t8 h, t9 i);
 
-		public static void TriggerSilencerHook(CoolerAction<SilencerInstance, Vector2, float, float, GameObject, float, float, float, float, float, float, float, PlayerController, bool, bool> orig, SilencerInstance self, Vector2 centerPoint, float expandSpeed, float maxRadius, GameObject silencerVFX, float distIntensity, float distRadius, float pushForce, float pushRadius, float knockbackForce, float knockbackRadius, float additionalTimeAtMaxRadius, PlayerController user, bool breaksWalls = true, bool skipBreakables = false)
-		{
-			var enemyList = user.CurrentRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
-
-			foreach (AIActor aIActor in enemyList)
-			{
-				if (aIActor.EnemyGuid == PirmalShotgrub.guid)
-				{
-					if (silencerVFX != null)
-					{
-						GameObject obj = UnityEngine.Object.Instantiate<GameObject>(silencerVFX, centerPoint.ToVector3ZUp(centerPoint.y), Quaternion.identity);
-						UnityEngine.Object.Destroy(obj, 1f);
-					}
-					return;
-				}
-			}
-
-			orig(self, centerPoint, expandSpeed, maxRadius, silencerVFX, distIntensity, distRadius, pushForce, pushRadius,  knockbackForce,  knockbackRadius,  additionalTimeAtMaxRadius,  user, breaksWalls, skipBreakables);
-		}
+		
 
 
 		public static void DestroyBulletsInRangeHook(CoolerAction2< Vector2, float, bool, bool, PlayerController, bool, float?, bool, Action<Projectile>> orig, Vector2 centerPoint, float radius, bool destroysEnemyBullets, bool destroysPlayerBullets, PlayerController user = null, bool reflectsBullets = false, float? previousRadius = null, bool useCallback = false, Action<Projectile> callback = null)

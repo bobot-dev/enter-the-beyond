@@ -30,7 +30,7 @@ namespace BotsMod
             item.CanBeDropped = false;
 
         }
-        public override void Pickup(PlayerController player)
+        /*public override void Pickup(PlayerController player)
         {
 
             CreateText(player.gameObject.transform, new Vector2(0f, 0f), "FUCK", TextAnchor.MiddleLeft, 7);
@@ -57,7 +57,7 @@ namespace BotsMod
             text2.color = Color.white;
             return text2;
         }
-
+        */
 
 
 

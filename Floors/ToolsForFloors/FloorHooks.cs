@@ -22,7 +22,7 @@ namespace BotsMod
         {
             Dungeon dungeon = null;
             string dungeonPrefabTemplate = "Base_ResourcefulRat";
-            if (name.ToLower() == "Base_LostPast")
+            if (name.ToLower() == "base_lostpast")
             {
                 dungeon = LostPastDungeon.LostPastGeon(GetOrLoadByName_Orig(dungeonPrefabTemplate));
             }

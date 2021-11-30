@@ -6,6 +6,7 @@ using System.Text;
 using UnityEngine;
 using ItemAPI;
 using Dungeonator;
+using static BotsMod.UltraKillGun;
 
 namespace BotsMod
 {
@@ -24,7 +25,7 @@ namespace BotsMod
 			gun.SetupSprite(null, "nail_vulcan_idle_001", 8);
 			gun.SetAnimationFPS(gun.shootAnimation, 12);
 			gun.SetAnimationFPS(gun.reloadAnimation, 10);
-
+			gun.gameObject.AddComponent<UltraKillGun>();
 
 			Gun other = PickupObjectDatabase.GetById(26) as Gun;
 			gun.AddProjectileModuleFrom(other, true, false);

@@ -17,6 +17,10 @@ namespace BotsMod
 		public static AssetBundle braveResources;
 
 		public static GameObject lostFigurePlaceable;
+		public static GameObject beyondEnterance;
+		public static GameObject pastControllerObject;
+
+		public static PlayerHandController basicBeyondHands;
 
 		private static Dungeon TutorialDungeonPrefab;
 		private static Dungeon SewerDungeonPrefab;
@@ -99,36 +103,17 @@ namespace BotsMod
 			BulletHellRoomTable = BulletHellDungeonPrefab.PatternSettings.flows[0].fallbackRoomTable;
 
 			doublebeholsterroom01 = BeyondDungeonFlows.LoadOfficialFlow("Secret_DoubleBeholster_Flow").AllNodes[2].overrideExactRoom;
-
-
-			lostFigurePlaceable = ItemAPI.SpriteBuilder.SpriteFromResource("BotsMod/sprites/loststatuethatlooksawful");
-
-			FakePrefab.MarkAsFakePrefab(lostFigurePlaceable);
-			lostFigurePlaceable.SetActive(false);
-
-			SpeculativeRigidbody rigidbody = NpcApi.ItsDaFuckinShopApi.GenerateOrAddToRigidBody(lostFigurePlaceable, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(17, 27), new IntVector2(0, 0)) ;
-
-
-			PlacedWallDecorator placedWallDecorator = lostFigurePlaceable.AddComponent<PlacedWallDecorator>();
 			
-
-			placedWallDecorator.ignoresBorders = false;
-			placedWallDecorator.ignoreWallDrawing = false;
-			placedWallDecorator.wallClearanceHeight = 3;
-			placedWallDecorator.wallClearanceWidth = 1;
-			placedWallDecorator.wallClearanceXStart = 0;
-			placedWallDecorator.wallClearanceXStart = 0;
-
-			var comp = shared_auto_002.LoadAsset<GameObject>("RatFigure_Bullet").GetComponent<MinorBreakable>();
-
-			lostFigurePlaceable.AddComponent(comp);
-
-
-			DungeonPlaceableBehaviour dungeonPlaceableBehaviour = lostFigurePlaceable.AddComponent<DungeonPlaceableBehaviour>();
-			dungeonPlaceableBehaviour.placeableWidth = 1;
-			dungeonPlaceableBehaviour.placeableHeight = 1;
-			dungeonPlaceableBehaviour.difficulty = 0;
-			dungeonPlaceableBehaviour.isPassable = false;
+			lostFigurePlaceable = FakePrefab.Clone(shared_auto_002.LoadAsset<GameObject>("RatFigure_Bullet"));
+			lostFigurePlaceable.SetActive(false);
+			var tksprite = lostFigurePlaceable.GetComponent<tk2dSprite>();
+			tksprite.SetSprite(SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/loststatuethatlooksawful", lostFigurePlaceable.GetComponent<tk2dSprite>().Collection));
+			var spriteDef = tksprite.Collection.spriteDefinitions[tksprite.spriteId];
+			spriteDef.position0 = new Vector3(0.125f, 0.3125f, 0);
+			spriteDef.position1 = new Vector3(1.125f, 0.3125f, 0);
+			spriteDef.position2 = new Vector3(0.125f, 2.0625f, 0);
+			spriteDef.position3 = new Vector3(1.125f, 2.0625f, 0);
+			spriteDef.material = tksprite.Collection.spriteDefinitions[shared_auto_002.LoadAsset<GameObject>("RatFigure_Bullet").GetComponent<tk2dSprite>().spriteId].material;
 
 			shared_auto_002.LoadAsset<DungeonPlaceable>("Rat Figure Random").variantTiers.Add(new DungeonPlaceableVariant
 			{
@@ -143,8 +128,96 @@ namespace BotsMod
 				materialRequirements = new DungeonPlaceableRoomMaterialRequirement[0]
 				
 			});
+			var idleIdsList = new List<int>();
+			var unchargedIdleIdsList = new List<int>();
+			var chargingIdsList = new List<int>();
+			var collection = (PickupObjectDatabase.GetById(108) as SpawnObjectPlayerItem).objectToSpawn.GetComponent<tk2dSpriteAnimator>().Library.clips[0].frames[0].spriteCollection;
+			List<string> idleSpritePaths = new List<string>
+			{
+				"BotsMod/sprites/effigy/effigy_of_the_beyond1.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond2.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond3.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond4.png",
+			};
+
+			List<string> unchargedIdleSpritePaths = new List<string>
+			{
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_empty_001.png",
+			};
+
+			List<string> chargingSpritePaths = new List<string>
+			{
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_001.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_002.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_003.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_004.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_005.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_006.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_007.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_008.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_009.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_010.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_011.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_012.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_013.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_014.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_015.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_016.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_017.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_018.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_019.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_020.png",
+				"BotsMod/sprites/effigy/effigy_of_the_beyond_charge_021.png",
+			};
 
 
+			foreach (string sprite in idleSpritePaths)
+			{
+				idleIdsList.Add(SpriteBuilder.AddSpriteToCollection(sprite, collection));
+			}
+
+			foreach (string sprite in unchargedIdleSpritePaths)
+			{
+				unchargedIdleIdsList.Add(SpriteBuilder.AddSpriteToCollection(sprite, collection));
+			}
+
+			foreach (string sprite in chargingSpritePaths)
+			{
+				chargingIdsList.Add(SpriteBuilder.AddSpriteToCollection(sprite, collection));
+			}
+
+			pastControllerObject = new GameObject("PastControllerObject");
+			FakePrefab.MarkAsFakePrefab(pastControllerObject);
+
+			pastControllerObject.AddComponent<LostPastController>();
+
+
+			basicBeyondHands = SpriteBuilder.SpriteFromResource("BotsMod/sprites/Enemies/hand.png", new GameObject("BeyondHand")).AddComponent<PlayerHandController>();
+			FakePrefab.MarkAsFakePrefab(basicBeyondHands.gameObject);
+			basicBeyondHands.ForceRenderersOff = false;
+
+
+			beyondEnterance = SpriteBuilder.SpriteFromResource(idleSpritePaths[0], new GameObject("EffigyOfTheBeyond"));
+			beyondEnterance.SetActive(false);
+			FakePrefab.MarkAsFakePrefab(beyondEnterance);
+
+			tk2dSpriteAnimator spriteAnimator = beyondEnterance.AddComponent<tk2dSpriteAnimator>();
+
+			SpriteBuilder.AddAnimation(spriteAnimator, collection, idleIdsList, "idle", tk2dSpriteAnimationClip.WrapMode.Loop, 8);
+			SpriteBuilder.AddAnimation(spriteAnimator, collection, unchargedIdleIdsList, "unchargedIdle", tk2dSpriteAnimationClip.WrapMode.Loop, 8);
+			SpriteBuilder.AddAnimation(spriteAnimator, collection, chargingIdsList, "charging", tk2dSpriteAnimationClip.WrapMode.Once, 8);
+
+			spriteAnimator.DefaultClipId = spriteAnimator.GetClipIdByName("idle");
+			spriteAnimator.playAutomatically = true;
+
+			var secretFloorInteractable = beyondEnterance.AddComponent<EffigyInteractableComp>();
+			secretFloorInteractable.placeableWidth = 2;
+			secretFloorInteractable.placeableHeight = 2;
+			secretFloorInteractable.isPassable = true;
+			secretFloorInteractable.targetLevelName = "tt_beyond";
+			secretFloorInteractable.overridePitIndex = null;
+			secretFloorInteractable.targetTileset = (GlobalDungeonData.ValidTilesets)CustomValidTilesets.BEYOND;
+			secretFloorInteractable.worldLocks = null;
 		}
 	}
 }

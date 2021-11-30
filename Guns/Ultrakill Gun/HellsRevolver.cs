@@ -28,11 +28,11 @@ namespace BotsMod
 			gun.SetupSprite(null, "hells_revolver_idle_001", 8);
 			gun.SetAnimationFPS(gun.shootAnimation, 12);
 			gun.SetAnimationFPS(gun.reloadAnimation, 10);
-
+			gun.gameObject.AddComponent<UltraKillGun>();
 
 			Gun other = PickupObjectDatabase.GetById(99) as Gun;
 			gun.AddProjectileModuleFrom(other, true, false);
-			gun.SetBaseMaxAmmo(500);
+			gun.SetBaseMaxAmmo(50);
 			gun.InfiniteAmmo = false;
 
 			gun.DefaultModule.ammoCost = 1;
@@ -105,13 +105,13 @@ namespace BotsMod
 
 			gun.shellsToLaunchOnFire = 0;
 
-			projectile.transform.parent = gun.barrelOffset;
+			//projectile.transform.parent = gun.barrelOffset;
 			projectile.baseData.damage = 9f;
 			projectile.baseData.speed = 200;
 			projectile.baseData.force = 15f;
 			projectile.baseData.range = 1600000f;
 
-			projectileBeam.transform.parent = gun.barrelOffset;
+			//projectileBeam.transform.parent = gun.barrelOffset;
 			projectileBeam.baseData.damage = 30f;
 			projectileBeam.baseData.speed = 300f;
 			projectileBeam.baseData.force = 0f;
@@ -156,7 +156,7 @@ namespace BotsMod
 
 			ETGMod.Databases.Items.Add(gun, null, "ANY");
 
-			var foreSyn = gun.gameObject.AddComponent<GunFormeSynergyProcessor>();
+			/*var foreSyn = gun.gameObject.AddComponent<GunFormeSynergyProcessor>();
 			foreSyn.Formes = new GunFormeData[]
 			{
 
@@ -172,7 +172,7 @@ namespace BotsMod
 					RequiresSynergy = true,
 				}
 			};
-
+			*/
 
 			GameObject coin = SpriteBuilder.SpriteFromResource("BotsMod/sprites/TempCoinSprite-export", new GameObject("HellsCoin"));
 			coin.SetActive(false);

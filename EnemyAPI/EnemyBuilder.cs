@@ -237,6 +237,11 @@ namespace ItemAPI
                     aiAnimator.IdleFidgetAnimations.Add(animation);
                     break;
                 default:
+                    if(aiAnimator.OtherAnimations == null)
+                    {
+                        aiAnimator.OtherAnimations = new List<AIAnimator.NamedDirectionalAnimation>();
+                    }
+
                     aiAnimator.OtherAnimations.Add(new AIAnimator.NamedDirectionalAnimation()
                     {
                         anim = animation,

@@ -63,7 +63,6 @@ namespace BotsMod
             }
             else
             {
-
                 StatModifier statModifier = new StatModifier();
                 statModifier.statToBoost = PlayerStats.StatType.Health;
                 statModifier.amount = -(cost);
@@ -76,7 +75,7 @@ namespace BotsMod
 
         public static bool CustomCanBuyBeyond(CustomShopController shop, PlayerController player, int cost)
         {
-            if (shop.gameObject.GetOrAddComponent<DevilDealShopHelper>().usingArmour = true ||  player.healthHaver.Armor >= cost)
+            if (shop.gameObject.GetOrAddComponent<DevilDealShopHelper>().usingArmour = true && player.healthHaver.Armor >= cost)
             {
                 BotsModule.Log($"Armour is {player.healthHaver.Armor} and the Price is {cost}");
                 return player.healthHaver.Armor >= cost;

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace BotsMod
 {
-	public static class GUI
+	/*public static class GUI
 	{
 			// Token: 0x06000001 RID: 1 RVA: 0x00002050 File Offset: 0x00000250
 			public static bool Toggle()
@@ -128,5 +128,5 @@ namespace BotsMod
 
 			// Token: 0x04000006 RID: 6
 			private static Color defaultTextColor = new Color(1f, 1f, 1f, 0.5f);
-	}
+	}*/
 }

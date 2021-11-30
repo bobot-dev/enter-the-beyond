@@ -80,7 +80,7 @@ namespace BotsMod
 
 			gun.shellsToLaunchOnFire = 0;
 
-			projectile.transform.parent = gun.barrelOffset;
+			//projectile.transform.parent = gun.barrelOffset;
 			projectile.hitEffects = gun4.DefaultModule.projectiles[0].hitEffects;
 			projectile.baseData.damage = 6f;
 			projectile.baseData.speed = 23f;

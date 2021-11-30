@@ -519,6 +519,8 @@ namespace BotsMod
                 DungeonFlowNode bossfoyerNode = GenerateDefaultNode(m_CachedFlow, PrototypeDungeonRoom.RoomCategory.SPECIAL, overrideTable: BeyondPrefabs.boss_foyertable);
                 DungeonFlowNode bossNode = GenerateDefaultNode(m_CachedFlow, PrototypeDungeonRoom.RoomCategory.BOSS, ModRoomPrefabs.Mod_Boss);
 
+                DungeonFlowNode BeyondShopNode = GenerateDefaultNode(m_CachedFlow, BeyondPrefabs.shop02.category, ModRoomPrefabs.Mod_Shop_Room);
+
                 m_CachedFlow.name = "F1b_Beyond_flow_Overseer_Test_01";
                 //m_CachedFlow.fallbackRoomTable = BeyondPrefabs.BeyondRoomTable;
                 m_CachedFlow.fallbackRoomTable = BeyondPrefabs.CastleRoomTable;
@@ -530,6 +532,9 @@ namespace BotsMod
                 m_CachedFlow.Initialize();
 
                 m_CachedFlow.AddNodeToFlow(entranceNode, null);
+
+                m_CachedFlow.AddNodeToFlow(BeyondShopNode, entranceNode);
+
 
                 m_CachedFlow.AddNodeToFlow(bossfoyerNode, entranceNode);
                 m_CachedFlow.AddNodeToFlow(bossNode, bossfoyerNode);

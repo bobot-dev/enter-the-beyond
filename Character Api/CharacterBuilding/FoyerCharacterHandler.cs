@@ -292,76 +292,70 @@ namespace CustomCharacters
 
         private static void CreateOverheadCard(FoyerCharacterSelectFlag selectCharacter, CustomCharacterData data)
         {
-            //Create new card instance
-            selectCharacter.ClearOverheadElement();
-            selectCharacter.OverheadElement = UnityEngine.Object.Instantiate(selectCharacter.OverheadElement);
-            selectCharacter.OverheadElement.SetActive(true);
-            
-            if (data.removeFoyerExtras)
+            try
             {
-                foreach (var child in selectCharacter.gameObject.transform)
+                //Create new card instance
+                selectCharacter.ClearOverheadElement();
+                selectCharacter.OverheadElement = FakePrefab.Clone(selectCharacter.OverheadElement);
+                selectCharacter.OverheadElement.SetActive(true);
+                selectCharacter.OverheadElement.GetComponent<FoyerInfoPanelController>().followTransform = selectCharacter.transform;
+
+                if (data.removeFoyerExtras)
                 {
-                    if (((Transform)child).gameObject.name == "Doggy")
+                    foreach (var child in selectCharacter.gameObject.transform)
                     {
-                        UnityEngine.Object.DestroyImmediate(((Transform)child).gameObject);
+                        if (((Transform)child).gameObject.name == "Doggy")
+                        {
+                            UnityEngine.Object.DestroyImmediate(((Transform)child).gameObject);
+                        }
+                    }
+                    foreach (var phase in selectCharacter.gameObject.GetComponent<CharacterSelectIdleDoer>().phases)
+                    {
+                        phase.vfxTrigger = CharacterSelectIdlePhase.VFXPhaseTrigger.NONE;
+                        phase.endVFXSpriteAnimator = null;
                     }
                 }
 
-                foreach (var phase in selectCharacter.gameObject.GetComponent<CharacterSelectIdleDoer>().phases)
+                var customFoyerController = selectCharacter.gameObject.AddComponent<CustomCharacterFoyerController>();
+                customFoyerController.customCharacterController = data.customCharacterController;
+                customFoyerController.metaCost = data.metaCost;
+
+
+                customFoyerController.useGlow = data.useGlow;
+                customFoyerController.emissiveColor = data.emissiveColor;
+                customFoyerController.emissiveColorPower = data.emissiveColorPower;
+                customFoyerController.emissivePower = data.emissivePower;
+                customFoyerController.emissiveThresholdSensitivity = data.emissiveThresholdSensitivity;
+
+                string replaceKey = data.baseCharacter.ToString().ToUpper();
+                if (data.baseCharacter == PlayableCharacters.Soldier)
+                    replaceKey = "MARINE";
+                if (data.baseCharacter == PlayableCharacters.Pilot)
+                    replaceKey = "ROGUE";
+                if (data.baseCharacter == PlayableCharacters.Eevee)
+                    replaceKey = "PARADOX";
+
+
+                //Change text
+                var infoPanel = selectCharacter.OverheadElement.GetComponent<FoyerInfoPanelController>();
+            
+
+
+                dfLabel nameLabel = infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>();
+                nameLabel.Text = nameLabel.GetLocalizationKey().Replace(replaceKey, data.identity.ToString());
+                //BotsMod.BotsModule.Log(replaceKey, BotsMod.BotsModule.LOST_COLOR);
+                dfLabel pastKilledLabel = infoPanel.textPanel.transform.Find("PastKilledLabel").GetComponent<dfLabel>();
+                pastKilledLabel.Text = "(Past Killed)";
+                pastKilledLabel.ProcessMarkup = true;
+                pastKilledLabel.ColorizeSymbols = true;
+                if (data.metaCost != 0)
                 {
-                    phase.vfxTrigger = CharacterSelectIdlePhase.VFXPhaseTrigger.NONE;
-                    phase.endVFXSpriteAnimator = null;
+                    pastKilledLabel.ModifyLocalizedText(pastKilledLabel.Text + " (" + data.metaCost.ToString() + "[sprite \"hbux_text_icon\"])");
                 }
 
-            }
 
-            var customFoyerController = selectCharacter.gameObject.AddComponent<CustomCharacterFoyerController>();
-            customFoyerController.customCharacterController = data.customCharacterController;
-            customFoyerController.metaCost = data.metaCost;
+                infoPanel.itemsPanel.enabled = true;
 
-
-            customFoyerController.useGlow = data.useGlow;
-            customFoyerController.emissiveColor = data.emissiveColor;
-            customFoyerController.emissiveColorPower = data.emissiveColorPower;
-            customFoyerController.emissivePower = data.emissivePower;
-            customFoyerController.emissiveThresholdSensitivity = data.emissiveThresholdSensitivity;
-
-            string replaceKey = data.baseCharacter.ToString().ToUpper();
-            if (data.baseCharacter == PlayableCharacters.Soldier)
-                replaceKey = "MARINE";
-            if (data.baseCharacter == PlayableCharacters.Pilot)
-                replaceKey = "ROGUE";
-            if (data.baseCharacter == PlayableCharacters.Eevee)
-                replaceKey = "PARADOX";
-
-
-            //Change text
-            var infoPanel = selectCharacter.OverheadElement.GetComponent<FoyerInfoPanelController>();
-            infoPanel.followTransform = selectCharacter.transform;
-            foreach (var comp in selectCharacter.OverheadElement.GetComponentsInChildren<Component>())
-            {
-                ETGModConsole.Log($"{comp.gameObject.name}: {comp.GetType()}");
-            }
-
-
-
-            dfLabel nameLabel = infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>();
-            nameLabel.Text = nameLabel.GetLocalizationKey().Replace(replaceKey, data.identity.ToString());
-            //BotsMod.BotsModule.Log(replaceKey, BotsMod.BotsModule.LOST_COLOR);
-            dfLabel pastKilledLabel = infoPanel.textPanel.transform.Find("PastKilledLabel").GetComponent<dfLabel>();
-            pastKilledLabel.Text = "(Past Killed)";
-            pastKilledLabel.ProcessMarkup = true;
-            pastKilledLabel.ColorizeSymbols = true;
-            if (data.metaCost != 0)
-            {
-                pastKilledLabel.ModifyLocalizedText(pastKilledLabel.Text + " (" + data.metaCost.ToString() + "[sprite \"hbux_text_icon\"])");
-            }
-
-
-            infoPanel.itemsPanel.enabled = true;
-
-            try
-            {
 
                 var spriteObject = FakePrefab.Clone(infoPanel.itemsPanel.GetComponentInChildren<dfSprite>().gameObject);
 
@@ -373,7 +367,7 @@ namespace CustomCharacters
                 foreach (var child in infoPanel.itemsPanel.GetComponentsInChildren<dfSprite>())
                 { 
 
-                    BotsMod.BotsModule.Log(child.name + " " + child.transform.position + " -- " + child.transform.localPosition);
+                    //BotsMod.BotsModule.Log(child.name + " " + child.transform.position + " -- " + child.transform.localPosition);
                     posList.Add(child.transform.position);
                     locPosList.Add(child.transform.localPosition);
                     UnityEngine.Object.DestroyImmediate(child.gameObject);
@@ -399,10 +393,10 @@ namespace CustomCharacters
                     sprite.transform.position = new Vector3(1 + ((i + 0.1f) * 0.1f), -((i + 0.1f) * 0.1f), 0);
                     sprite.transform.localPosition = new Vector3(((i + 0.1f) * 0.1f), 0, 0);
 
-                    BotsMod.BotsModule.Log(data.loadoutSpriteNames[i] + sprite.transform.position + " -- " + sprite.transform.localPosition);
+                    //BotsMod.BotsModule.Log(data.loadoutSpriteNames[i] + sprite.transform.position + " -- " + sprite.transform.localPosition);
 
                 }
-                selectCharacter.CreateOverheadElement();
+                //selectCharacter.CreateOverheadElement();
 
             }
 

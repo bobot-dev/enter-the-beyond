@@ -10,7 +10,7 @@ namespace CustomCharacters
     public class CustomCharacterController : MonoBehaviour
     {
         public CustomCharacterData data;
-        public string past;
+        public string past, overrideAnimation;
         public bool hasPast;
         public int metaCost;
 
@@ -26,6 +26,7 @@ namespace CustomCharacters
         public Color emissiveColor;
         public float emissiveColorPower, emissivePower, emissiveThresholdSensitivity;
         public CustomCharacterController customCharacterController;
+        public Func<PlayerController, float> coopBlankReplacement;
 
         private void Start()
         {
