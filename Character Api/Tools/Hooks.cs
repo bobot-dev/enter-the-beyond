@@ -116,6 +116,20 @@ namespace CustomCharacters
 					typeof(Hooks).GetMethod("OnSelectedCharacterCallbackHook", BindingFlags.Static | BindingFlags.Public)
 				);
 
+				Hook DoGhostBlankHook = new Hook(
+					typeof(PlayerController).GetMethod("DoGhostBlank", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("DoGhostBlankHook", BindingFlags.Static | BindingFlags.Public)
+				);
+
+				Hook GetBaseAnimationNameHook = new Hook(
+					typeof(PlayerController).GetMethod("GetBaseAnimationName", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("GetBaseAnimationNameHook", BindingFlags.Static | BindingFlags.Public)
+				);
+
+				Hook AddPrefabHook = new Hook(
+					typeof(dfGUIManager).GetMethod("AddPrefab", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("AddPrefabHook", BindingFlags.Static | BindingFlags.Public)
+				);
 
 				BotsModule.Log("hooks done");
 			}
@@ -125,7 +139,113 @@ namespace CustomCharacters
             }
         }
 
+		public static dfControl AddPrefabHook(dfGUIManager self,GameObject prefab)
+		{
+			if (prefab.GetComponent<dfControl>() == null)
+			{
+				Debug.LogWarning("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+				throw new InvalidCastException();
+			}
+			GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab);
+			gameObject.transform.parent = self.transform;
+			gameObject.layer = self.gameObject.layer;
 
+			foreach(var comp in gameObject.GetComponents<Component>())
+            {
+				Debug.LogWarning(comp.ToString());
+            }
+
+			dfControl component = gameObject?.GetComponent<dfControl>();
+			component.transform.parent = self.transform;
+			component.PerformLayout();
+			self.BringToFront(component);
+			return component;
+		}
+
+		public delegate TResult Func<T1, T2, T3, T4, T5, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+		public static string GetBaseAnimationNameHook(Func<PlayerController, Vector2, float, bool, bool, string> orig, PlayerController self, Vector2 v, float gunAngle, bool invertThresholds = false, bool forceTwoHands = false)
+        {
+			if (!string.IsNullOrEmpty(self.gameObject?.GetComponent<CustomCharacterController>()?.overrideAnimation))
+			{
+				return self.gameObject?.GetComponent<CustomCharacterController>()?.overrideAnimation;
+			} 
+			else
+            {
+				return orig(self, v, gunAngle, invertThresholds, forceTwoHands);
+			}
+			
+        }
+
+		static Projectile ghostProj;
+		public static void DoGhostBlankHook(Action<PlayerController> orig, PlayerController self)
+		{
+			if(self.gameObject.GetComponent<CustomCharacterFoyerController>()?.coopBlankReplacement != null)
+            {
+				FieldInfo _blankCooldownTimer = typeof(PlayerController).GetField("m_blankCooldownTimer", BindingFlags.NonPublic | BindingFlags.Instance);
+				self.QueueSpecificAnimation("ghost_sneeze_right");
+				ReflectionHelper.SetValue(_blankCooldownTimer, self, self.gameObject.GetComponent<CustomCharacterFoyerController>().coopBlankReplacement(self));
+
+			} 
+			else
+            {
+				orig(self);
+            }
+
+			//if (action != null)
+			//{
+			//
+			//}
+			// else 
+			//{
+			//	call orig
+			/*}
+
+			if (ghostProj == null)
+            {
+				ghostProj = UnityEngine.Object.Instantiate<Projectile>((PickupObjectDatabase.GetById(15) as Gun).DefaultModule.projectiles[0]);
+				ghostProj.gameObject.SetActive(false);
+
+				ghostProj.baseData.speed = 50;
+				ghostProj.baseData.UsesCustomAccelerationCurve = true;
+				ghostProj.baseData.AccelerationCurve = new AnimationCurve
+				{
+					postWrapMode = WrapMode.Clamp,
+					preWrapMode = WrapMode.Clamp,
+					keys = new Keyframe[]
+					{
+					new Keyframe
+					{
+						time = 0f,
+						value = 0f,
+						inTangent = 0f,
+						outTangent = 0f
+					},
+					new Keyframe
+					{
+						time = 1f,
+						value = 1f,
+						inTangent = 2f,
+						outTangent = 2f
+					},
+					}
+				};
+				ghostProj.baseData.CustomAccelerationCurveDuration = 0.3f;
+				ghostProj.baseData.IgnoreAccelCurveTime = 0f;
+				ghostProj.shouldRotate = true;
+				ghostProj.SetProjectileSpriteRight("lost_ghost_blank_proj", 9, 7, true, tk2dBaseSprite.Anchor.LowerLeft);
+			}
+			self.QueueSpecificAnimation("ghost_sneeze_right");		
+			for (int i = 0; i < 8; i++)
+			{
+				//BotsModule.Log(i + ": proj hopefully spawned");
+				GameObject gameObject = SpawnManager.SpawnProjectile(ghostProj.gameObject, self.specRigidbody.UnitCenter, Quaternion.Euler(0f, 0f, i * 45), true);
+				gameObject.SetActive(true);
+				Projectile component = gameObject.GetComponent<Projectile>();
+				component.Owner = self;
+				component.Shooter = self.specRigidbody;
+			}
+			self.m_blankCooldownTimer = 5f;*/
+		}
 		private static void UpdateHook(Action<CharacterSelectIdleDoer> orig, CharacterSelectIdleDoer self)
 		{
 			if (self.GetComponent<CustomCharacterFoyerController>() != null && self.GetComponent<CustomCharacterFoyerController>().useGlow)

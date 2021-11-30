@@ -445,7 +445,98 @@ namespace BotsMod
 
 				bs.AttackBehaviorGroup.AttackBehaviors = new List<AttackBehaviorGroup.AttackGroupItem>
 				{
+										/*new AttackBehaviorGroup.AttackGroupItem()
+					{
+						Probability = 1,
 
+						Behavior = new SequentialAttackBehaviorGroup()
+						{
+
+							AttackBehaviors = new List<AttackBehaviorBase>
+							{
+								new TeleportToMiddleBehavior()
+								{
+
+									AttackableDuringAnimation = true,
+									AllowCrossRoomTeleportation = false,
+									teleportRequiresTransparency = false,
+									hasOutlinesDuringAnim = true,
+									ManuallyDefineRoom = false,
+									MaxHealthThreshold = 1f,
+									GoneTime = 1f,
+									OnlyTeleportIfPlayerUnreachable = false,
+									teleportInAnim = "",
+									teleportOutAnim = "",
+									AttackCooldown = 1f,
+									InitialCooldown = 1f,
+									RequiresLineOfSight = false,
+									roomMax = new Vector2(0,0),
+									roomMin = new Vector2(0,0),
+
+									teleportOutBulletScript = new CustomBulletScriptSelector(typeof(OverseerTeleportStartLinesScript)),
+									//teleportInBulletScript = new CustomBulletScriptSelector(typeof(OverseerBeam)),
+									//teleportInBulletScript = new CustomBulletScriptSelector(typeof(BEAM
+									GlobalCooldown = 0.5f,
+									Cooldown = 4f,
+									CooldownVariance = 1f,
+									InitialCooldownVariance = 0f,
+									goneAttackBehavior = null,
+									IsBlackPhantom = false,
+
+
+									GroupName = null,
+									GroupCooldown = 0,
+									MinRange = 0,
+									Range = 0,
+									MinHealthThreshold = 0,
+									MaxEnemiesInRoom = 1,
+									MaxUsages = 0,
+									AccumulateHealthThresholds = true,
+									//shadowInAnim = null,
+									//shadowOutAnim = null,
+									targetAreaStyle = null,
+									HealthThresholds = new float[0],
+									MinWallDistance = 0,
+									//resetCooldownOnDamage = null,
+									//shadowSupport = (TeleportBehavior.ShadowSupport)1,
+								},
+								new TwoBeamsBehavior() {
+									//ShootPoint = m_CachedGunAttachPoint,
+									initialAimOffset = -15f,
+									InitialCooldown = 2f,
+									firingTime = 14f,
+									AttackCooldown = 2f,
+									RequiresLineOfSight = true,
+									BulletScript =  new CustomBulletScriptSelector(typeof(SixBeamScript2)),
+									//BulletScript =  new CustomBulletScriptSelector(typeof(SixBeamScript)),
+									chargeTime = 2,
+									UsesBaseSounds = true,
+									LaserFiringSound = "Play_ENM_deathray_shot_01",
+									StopLaserFiringSound = "Stop_ENM_deathray_loop_01",
+									ChargeAnimation = "beam_tell",
+									FireAnimation = "beam",
+									PostFireAnimation = "",
+									beamSelection = ShootBeamBehavior.BeamSelection.All,
+									//initialAimType = CustomShootBeamBehavior.InitialAimType.Aim,
+									maxTurnRate = 32f,
+									turnRateAcceleration = 24,
+									turnRateMultiplier = 1.5f,
+									LockInPlaceWhileAttacking = true,
+									ShootPoint = m_CachedGunAttachPoint.transform,
+									//BulletScript = new CustomBulletScriptSelector(typeof(Wailer.Wail))
+									MinWallDistance = 5,
+								},
+							},
+							OverrideCooldowns = new List<float>
+							{
+								0
+							},
+							RunInClass = false,
+
+						},
+						NickName = "Beam Teleport Magic bs"
+
+					},*/
 
 					new AttackBehaviorGroup.AttackGroupItem()
 					{
@@ -1472,6 +1563,8 @@ namespace BotsMod
 					//AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
 					//Chest chest2 = GameManager.Instance.RewardManager.SpawnTotallyRandomChest(spawnspot)rg;
 					//chest2.IsLocked = false;
+					LostPastController convictPastController = UnityEngine.Object.FindObjectOfType<LostPastController>();
+					convictPastController.OnBossKilled(base.transform);
 
 				};
 				base.healthHaver.healthHaver.OnDeath += (obj) =>

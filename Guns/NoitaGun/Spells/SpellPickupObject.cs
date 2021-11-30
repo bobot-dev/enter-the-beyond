@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace BotsMod
 { 
+	[Serializable]
     class SpellPickupObject : PickupObject, IPlayerInteractable
     {
 		public Spell spellToGive;

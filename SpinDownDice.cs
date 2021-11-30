@@ -21,24 +21,15 @@ namespace BotsMod
 
 			//WandOfWonderItem
 			ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
-			string shortDesc = "Hehe SPIIIIIIIIIIIIIIIIIIIIIIIINNNNNNNNNNNNNNNNNNNNNNNNNNNNNN";
-			string longDesc = "drugs maybe have been involved with this item idfk";
+			string shortDesc = "SPIIIIIIIIIIIIIIIIIIIIIIIINNNNNNNNNNNNNNNNNNNNNNNNNNNNNN";
+			string longDesc = "Rerolls all items in the room to by lowering the item's id by 1";
 			ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
-			ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.None, 0);
+			ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Damage, 650);
 			item.consumable = false;
 			item.quality = ItemQuality.S;
 
 			Tools.BeyondItems.Add(item.PickupObjectId);
 
-		}
-
-		public override void Update()
-		{
-
-
-
-
-			base.Update();
 		}
 
 
@@ -74,7 +65,7 @@ namespace BotsMod
 				num++;
 
 
-				if (PickupObjectDatabase.GetById(newId) != null)
+				if (PickupObjectDatabase.GetById(newId) != null && PickupObjectDatabase.GetById(newId).PrerequisitesMet())
 				{
 					return newId;
 				} 

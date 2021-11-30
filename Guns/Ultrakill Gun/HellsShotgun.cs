@@ -50,7 +50,7 @@ namespace BotsMod
 
 			Projectile projectile = Tools.SetupProjectile(other.DefaultModule.projectiles[0]);
 
-			projectile.transform.parent = gun.barrelOffset;
+			//projectile.transform.parent = gun.barrelOffset;
 			projectile.baseData.damage = 4f;
 			projectile.baseData.speed = 6f;
 			projectile.baseData.force = 15f;
@@ -84,7 +84,7 @@ namespace BotsMod
 				gun.Volley.projectiles[i].numberOfShotsInClip = 5;
 				
 
-				projectile.transform.parent = gun.barrelOffset;
+				//projectile.transform.parent = gun.barrelOffset;
 				projectile.baseData.damage = 4f;
 				projectile.baseData.speed = 6f;
 				projectile.baseData.force = 15f;

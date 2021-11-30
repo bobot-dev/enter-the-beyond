@@ -28,7 +28,7 @@ namespace BotsMod
             ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
 
             //Ammonomicon entry variables
-            string shortDesc = "Divide and Conquer";
+            string shortDesc = "Divide and Conqueror";
             string longDesc = "Bullets have a chance to mark enemies, mark enemies chain to other nearby marked enemies, damage is split between chained enemies.";
 
             //Adds the item to the gungeon item list, the ammonomicon, the loot table, etc.
@@ -84,11 +84,8 @@ namespace BotsMod
                     AppliesDeathTint = true,
                     DeathTintColor = new Color32(48, 48, 48, 255),
                     duration = 10,
-                    SpeedMultiplier = 0.7f,
-                    CooldownMultiplier = 1.5f,
                     PlaysVFXOnActor = true,
                     AppliesOutlineTint = false,
-                    OnlyAffectPlayerWhenGrounded = false,
                     chainedTo = new List<AIActor>(),
                     OutlineTintColor = Color.white,
                     resistanceType = EffectResistanceType.None

@@ -120,8 +120,8 @@ namespace CustomCharacters
             StringHandler.AddDFStringDefinition("#CHAR_" + data.nameShort.ToString().ToUpper(), data.name);
             StringHandler.AddDFStringDefinition("#CHAR_" + data.nameShort.ToString().ToUpper() + "_SHORT", data.nameShort);
 
-            BotsModule.Log("Player is: " + data.nameShort.ToString(), BotsModule.LOST_COLOR);
-            BotsModule.Log("#CHAR_" + data.nameShort.ToUpper(), BotsModule.LOST_COLOR);
+            //BotsModule.Log("Player is: " + data.nameShort.ToString(), BotsModule.LOST_COLOR);
+            //BotsModule.Log("#CHAR_" + data.nameShort.ToUpper(), BotsModule.LOST_COLOR);
 
             if (!hasClearedEeveeAnims)
             {
@@ -139,12 +139,12 @@ namespace CustomCharacters
                 if (player.spriteAnimator.Library != null && eevee != null)
                 {
                     eevee.GetComponent<CharacterAnimationRandomizer>().AddOverrideAnimLibrary(player.spriteAnimator.Library);
-                    BotsModule.Log("player.spriteAnimator.Library added");
+                    //BotsModule.Log("player.spriteAnimator.Library added");
                 }
                 if (player.AlternateCostumeLibrary != null && eevee != null)
                 {
                     eevee.GetComponent<CharacterAnimationRandomizer>().AddOverrideAnimLibrary(player.AlternateCostumeLibrary);
-                    BotsModule.Log("AlternateCostumeLibrary added");
+                    //BotsModule.Log("AlternateCostumeLibrary added");
                 }
             }
 

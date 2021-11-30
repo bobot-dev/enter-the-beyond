@@ -37,6 +37,8 @@ namespace GungeonAPI
 			return result;
 		}
 
+		
+
 		// Token: 0x0600002F RID: 47 RVA: 0x00003694 File Offset: 0x00001894
 		public static Texture2D GetTextureFromFile(string fileName, string extension = ".png")
 		{
@@ -148,7 +150,6 @@ namespace GungeonAPI
 			return result;
 		}
 
-		// Token: 0x06000037 RID: 55 RVA: 0x00003918 File Offset: 0x00001B18
 		public static Texture2D GetTextureFromResource(string resourceName)
 		{
 			byte[] array = ResourceExtractor.ExtractEmbeddedResource(resourceName);
@@ -156,7 +157,7 @@ namespace GungeonAPI
 			Texture2D result;
 			if (flag)
 			{
-				//Tools.PrintError<string>("No bytes found in " + resourceName, "FF0000");
+				Tools.PrintError<string>("No bytes found in " + resourceName, "FF0000");
 				result = null;
 			}
 			else
@@ -176,7 +177,29 @@ namespace GungeonAPI
 			return result;
 		}
 
-		// Token: 0x06000038 RID: 56 RVA: 0x000039B8 File Offset: 0x00001BB8
+		public static List<Texture2D> GetTexturesFromResource(string resourceName)
+		{
+			string[] resources = ResourceExtractor.GetResourceNames();
+			List<Texture2D> result = new List<Texture2D>();
+
+			for (int i = 0; i < resources.Length; i++)
+			{
+				if (resources[i].StartsWith(resourceName.Replace('/', '.') + ".", StringComparison.OrdinalIgnoreCase))
+				{
+					//Tools.PrintError<string>(resourceName, "FF0000");
+					result.Add(GetTextureFromResource(resources[i]));
+				}
+			}
+
+			if (result.Count == 0)
+			{
+				Tools.PrintError<string>("No bytes found in " + resourceName, "FF0000");
+				result = null;
+			}
+
+			return result;
+		}
+
 		public static string[] GetResourceNames()
 		{
 			Assembly callingAssembly = Assembly.GetCallingAssembly();

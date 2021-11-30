@@ -68,7 +68,7 @@ namespace BotsMod
 			gun.PreventStartingOwnerFromDropping = true;
 
 			Projectile projectile = Tools.SetupProjectile(86);
-			projectile.transform.parent = gun.barrelOffset;
+			//projectile.transform.parent = gun.barrelOffset;
 			projectile.baseData.damage = 9f;
 			projectile.baseData.speed = 20;
 			projectile.baseData.force = 15f;

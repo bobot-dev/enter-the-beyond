@@ -21,9 +21,9 @@ namespace BotsMod
             var item = obj.AddComponent<LightningRounds>();
             ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
             string shortDesc = "Truly Shocking";
-            string longDesc = "this item is purly for testing";
+            string longDesc = "bullets have a chance to spawn chain lightning";
             ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
-            item.quality = ItemQuality.B;
+            item.quality = ItemQuality.A;
 
 			item.PlaceItemInAmmonomiconAfterItemById(298);
 			CustomLightning.Init();

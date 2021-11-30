@@ -1,4 +1,5 @@
 ﻿using Dungeonator;
+using ItemAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,16 +26,40 @@ namespace BotsMod
 			if (target.aiActor != null && fatal)
 			{
 				//ETGModConsole.Log("murder");
+
+				var blood = FakePrefab.Clone(PickupObjectDatabase.GetById(449).GetComponent<TeleporterPrototypeItem>().TelefragVFXPrefab.gameObject).GetComponent<ParticleSystem>();			
+
 				for (int i = 0; i < bloodAmount; i++)
 				{
-					Instantiate(PickupObjectDatabase.GetById(449).GetComponent<TeleporterPrototypeItem>().TelefragVFXPrefab.gameObject, target.UnitCenter, Quaternion.identity);
+					Instantiate(blood, target.UnitCenter, Quaternion.identity);
 				}
 
+				if (projectile.Owner != null && projectile.Owner is PlayerController)
+                {
+					var player = projectile.Owner as PlayerController;
+					//BotsModule.Log(Vector2.Distance(player.specRigidbody.UnitCenter, target.UnitCenter).ToString());
+					if (Vector2.Distance(player.specRigidbody.UnitCenter, target.UnitCenter) <= 4.5f && player.CurrentGun?.GetComponent<UltraKillGun>() != null)
+					{
+						//BotsModule.Log((50 - (Vector2.Distance(player.specRigidbody.UnitCenter, target.UnitCenter)) * 10).ToString());
+						player.CurrentGun.GainAmmo((int)(50 - (Vector2.Distance(player.specRigidbody.UnitCenter, target.UnitCenter)) * 10));
+					}
+				}				
 			}
 
 		}
 	}
 
+
+	class UltraKillGun : MonoBehaviour
+	{
+		void Start()
+		{
+			if (this.GetComponent<Gun>() != null)
+			{
+
+			}
+		}
+	}
 	class ProjBoost : BraveBehaviour
 	{
 		public void Start()

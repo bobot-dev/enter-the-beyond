@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Reflection;
 using BotsMod;
 using Dungeonator;
 using UnityEngine;
@@ -40,8 +41,32 @@ namespace BotsMod
             if (GameManager.Instance.IsLoadingLevel || !GameManager.Instance.Dungeon)
             {
                 return GlobalDungeonData.ValidTilesets.CASTLEGEON;
-            }
+            }           
             return GameManager.Instance.Dungeon.tileIndices.tilesetId;
+        }
+
+        public bool IsCurrentTileset(int curTilesetId, out int gunFormId)
+        {
+            gunFormId = 0;
+            foreach (var comp in base.GetComponents<Component>())
+            {
+                if (comp.ToString().ToLower().Contains("customchambergun"))
+                {
+
+                    int[] fields = new int[3];
+                    fields[0] = (int)ReflectionHelper.GetValue(comp.GetType().GetField("TilesetId"), comp);
+                    fields[1] = (int)ReflectionHelper.GetValue(comp.GetType().GetField("MasterRoundId"), comp);
+                    fields[2] = (int)ReflectionHelper.GetValue(comp.GetType().GetField("GunId"), comp);
+
+                    if (fields[0] == curTilesetId)
+                    {
+                        gunFormId = fields[2];
+                        return true;
+                    }
+                }
+            }
+            
+            return false;
         }
 
         private bool IsValidTileset(GlobalDungeonData.ValidTilesets t)
@@ -73,9 +98,20 @@ namespace BotsMod
                 {
                     return true;
                 }
-                if (t == (GlobalDungeonData.ValidTilesets)CustomValidTilesets.BEYOND && playerController.HasPassiveItem(BotsItemIds.BeyondMasteryToken))
+                foreach (var comp in base.GetComponents<Component>())
                 {
-                    return true;
+                    if (comp.ToString().ToLower().Contains("customchambergun"))
+                    {
+                        int[] fields = new int[3];
+                        fields[0] = (int)ReflectionHelper.GetValue(comp.GetType().GetField("TilesetId"), comp);
+                        fields[1] = (int)ReflectionHelper.GetValue(comp.GetType().GetField("MasterRoundId"), comp);
+                        fields[2] = (int)ReflectionHelper.GetValue(comp.GetType().GetField("GunId"), comp);
+
+                        if (fields[0] == (int)t && playerController.HasPassiveItem(fields[1]))
+                        {
+                            return true;
+                        }                    
+                    }
                 }
             }
             return false;
@@ -153,10 +189,10 @@ namespace BotsMod
                 this.ChangeForme(this.OldWestGunID);
                 this.m_currentTileset = GlobalDungeonData.ValidTilesets.WESTGEON;
             }
-            else if (t == (GlobalDungeonData.ValidTilesets)CustomValidTilesets.BEYOND)
+            else if (IsCurrentTileset((int)t, out int i))
             {
-                this.ChangeForme(this.BeyondGunID);
-                this.m_currentTileset = (GlobalDungeonData.ValidTilesets)CustomValidTilesets.BEYOND;
+                this.ChangeForme(i);
+                this.m_currentTileset = t;
             }
             else
             {

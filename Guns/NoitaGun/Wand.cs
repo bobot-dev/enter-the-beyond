@@ -153,7 +153,7 @@ namespace BotsMod
 
 			//gun.DefaultModule.projectiles[0] = projectile;
 
-			projectile.transform.parent = gun.barrelOffset;
+			//projectile.transform.parent = gun.barrelOffset;
 			
 
 			projectile.baseData.damage = 4f;

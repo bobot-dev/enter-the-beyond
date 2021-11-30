@@ -35,6 +35,17 @@ namespace BotsMod
 			float value = UnityEngine.Random.value;
 			if (target.healthHaver != null)
 			{
+
+
+				Material material = target.sprite.renderer.material;
+
+				var mat = new Material(Tools.AHHH.LoadAsset<Shader>("Chained"));
+				mat.SetTexture("_MainTex", material.mainTexture);
+				mat.SetTexture("_Gradient", ResourceExtractor.GetTextureFromResource("BotsMod/sprites/gradient.png"));
+
+				//target.sprite.renderer.material = mat;
+				//material.SetFloat("_PhantomGradientScale", 1);
+
 				target.behaviorSpeculator.CooldownScale *= 0.2f;
 
 				var partObj = UnityEngine.Object.Instantiate(Tools.BotsAssetBundle.LoadAsset<GameObject>("ParticleSystemObj 1"));

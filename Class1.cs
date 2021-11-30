@@ -41,7 +41,7 @@ public class ZenithGun : GunBehaviour
         gun.DefaultModule.projectiles[0] = projectile;
         projectile.baseData.damage *= 1.0f;
         projectile.baseData.speed *= 0f;
-        projectile.transform.parent = gun.barrelOffset;
+        //projectile.transform.parent = gun.barrelOffset;
         projectile.sprite.renderer.enabled = false;
 
         //projectile.SetProjectileSpriteRight("zenith_projectile_001", 29, 10);

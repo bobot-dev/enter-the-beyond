@@ -27,7 +27,7 @@ namespace BotsMod
 
 
             string shortDesc = "";
-            string longDesc = "";
+            string longDesc = "spawns a ";
             ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
             item.quality = ItemQuality.A;
 

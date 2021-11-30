@@ -21,5 +21,15 @@ namespace BotsMod
 
         public static int HellsRevolver;
         public static int TheMarksman;
+
+        public static int Relic1;
+        public static int Relic2;
+        public static int Relic3;
+
+        public static int BeyondSniper;
+
+        public static int VoidAmmolet;
+
+
     }
 }

@@ -15,12 +15,13 @@ namespace CustomCharacters
         public PlayableCharacters baseCharacter = PlayableCharacters.Pilot;
         public PlayableCharacters identity;
         public CustomDungeonFlags unlockFlag;
-        public string name, nameShort, nickname, nameInternal;
+        public string name, nameShort, nickname, nameInternal, pathForSprites;
         public Dictionary<PlayerStats.StatType, float> stats;
         public List<Texture2D> sprites, altSprites, foyerCardSprites, punchoutSprites, punchoutFaceCards, loadoutSprites;
         public List<string> loadoutSpriteNames = new List<string>();
-        public Texture2D altPlayerSheet, playerSheet, minimapIcon, bossCard, junkanWinPic, pastWinPic, altObjSprite1, altObjSprite2;
+        public Texture2D altPlayerSheet, playerSheet, minimapIcon, junkanWinPic, pastWinPic, altObjSprite1, altObjSprite2;
         public Texture2D faceCard;
+        public List<Texture2D> bossCard = new List<Texture2D>();
         public List<Tuple<PickupObject, bool>> loadout, altGun;
         public int characterID, metaCost;
         public float health = 3, armor = 0;
@@ -36,6 +37,24 @@ namespace CustomCharacters
         public Vector3 skinSwapperPos;
 
         public tk2dSpriteAnimation altLibary;
+        public tk2dSpriteAnimation libary;
+
+        public tk2dSpriteAnimation armouredAltLibary;
+        public tk2dSpriteAnimation armouredLibary;
+
+        public tk2dSpriteAnimator altAnimator;
+        public tk2dSpriteAnimator animator;
+
+        public tk2dSpriteAnimator armouredAltAnimator;
+        public tk2dSpriteAnimator armouredAnimator;
+
+        public tk2dSpriteCollectionData collection;
+        public tk2dSpriteCollectionData altCollection;
+
+        public tk2dSpriteCollectionData armouredCollection;
+        public tk2dSpriteCollectionData armouredAltCollection;
+
+        
     }
 
     public class CustomCharacter : MonoBehaviour

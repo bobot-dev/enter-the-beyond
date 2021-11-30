@@ -134,8 +134,10 @@ namespace CustomCharacters
                     RenderTextureReadWrite.Linear);
 
             // Blit the pixels on texture to the RenderTexture
+            
             Graphics.Blit(texture, tmp);
-
+            
+            
             RenderTexture previous = RenderTexture.active;
             RenderTexture.active = tmp;
 

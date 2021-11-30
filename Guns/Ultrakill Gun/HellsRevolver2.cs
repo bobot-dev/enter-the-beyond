@@ -66,7 +66,7 @@ namespace BotsMod
 
 			gun.shellsToLaunchOnFire = 0;
 
-			projectile.transform.parent = gun.barrelOffset;
+			//projectile.transform.parent = gun.barrelOffset;
 			projectile.baseData.damage = 6f;
 			projectile.baseData.speed = 16f;
 			projectile.baseData.force = 10f;

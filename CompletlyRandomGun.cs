@@ -207,7 +207,7 @@ namespace BotsMod
 
 			gun.shellsToLaunchOnFire = 0;
 
-			projectile.transform.parent = gun.barrelOffset;
+			//projectile.transform.parent = gun.barrelOffset;
 			projectile.hitEffects = gun4.DefaultModule.projectiles[0].hitEffects;
 
 			projectile.baseData.damage = rngStats[1];

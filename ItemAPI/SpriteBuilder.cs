@@ -60,6 +60,7 @@ namespace ItemAPI
             int id = AddSpriteToCollection(spriteName, itemCollection);
             sprite.SetSprite(itemCollection, id);
             sprite.SortingOrder = 0;
+            
             sprite.IsPerpendicular = true;
 
             obj.GetComponent<BraveBehaviour>().sprite = sprite;
@@ -120,7 +121,7 @@ namespace ItemAPI
 
 
 
-        public static tk2dSpriteAnimationClip AddAnimation(tk2dSpriteAnimator animator, string name, string spriteDirectory, int fps, BossBuilder.AnimationType type, DirectionType directionType = DirectionType.None, FlipType flipType = FlipType.None)
+        /*public static tk2dSpriteAnimationClip AddAnimation(tk2dSpriteAnimator animator, string name, string spriteDirectory, int fps, BossBuilder.AnimationType type, DirectionType directionType = DirectionType.None, FlipType flipType = FlipType.None)
         {
             var obj = animator.gameObject;
             AIAnimator aiAnimator = obj.GetOrAddComponent<AIAnimator>();
@@ -140,7 +141,7 @@ namespace ItemAPI
             animation.Flipped = animation.Flipped.Concat(new FlipType[] { flipType }).ToArray();
             aiAnimator.AssignDirectionalAnimation(name, animation, type);
             return BuildAnimation(aiAnimator, name, spriteDirectory, fps);
-        }
+        }*/
 
         public static tk2dSpriteAnimationClip BuildAnimation(AIAnimator aiAnimator, string name, string spriteDirectory, int fps)
         {
@@ -162,23 +163,27 @@ namespace ItemAPI
             return clip;
         }
 
-        public static tk2dSpriteAnimationClip AddAnimation(tk2dSpriteAnimator animator, tk2dSpriteCollectionData collection, List<int> spriteIDs,
-            string clipName, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, float fps = 15)
+        public static tk2dSpriteAnimationClip AddAnimation(GameObject libaryObj, tk2dSpriteCollectionData collection, List<int> spriteIDs,
+           string clipName, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, float fps = 15)
         {
-            if (animator.Library == null)
+            BotsMod.BotsModule.Log("a1");
+            tk2dSpriteAnimation library = null;
+            if (library == null)
             {
-                animator.Library = animator.gameObject.AddComponent<tk2dSpriteAnimation>();
-                animator.Library.clips = new tk2dSpriteAnimationClip[0];
-                animator.Library.enabled = true;
+                library = libaryObj.GetOrAddComponent<tk2dSpriteAnimation>();
+                library.clips = new tk2dSpriteAnimationClip[0];
+                library.enabled = true;
 
             }
-
+            BotsMod.BotsModule.Log("a2");
             List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
             for (int i = 0; i < spriteIDs.Count; i++)
             {
+                BotsMod.BotsModule.Log("a2.25");
                 tk2dSpriteDefinition sprite = collection.spriteDefinitions[spriteIDs[i]];
                 if (sprite.Valid)
                 {
+                    BotsMod.BotsModule.Log("a2.5");
                     frames.Add(new tk2dSpriteAnimationFrame()
                     {
                         spriteCollection = collection,
@@ -186,7 +191,48 @@ namespace ItemAPI
                     });
                 }
             }
+            BotsMod.BotsModule.Log("a3");
+            var clip = new tk2dSpriteAnimationClip()
+            {
+                name = clipName,
+                fps = fps,
+                wrapMode = wrapMode,
+            };
+            Array.Resize(ref library.clips, library.clips.Length + 1);
+            library.clips[library.clips.Length - 1] = clip;
 
+            clip.frames = frames.ToArray();
+            return clip;
+        }
+
+        public static tk2dSpriteAnimationClip AddAnimation(tk2dSpriteAnimator animator, tk2dSpriteCollectionData collection, List<int> spriteIDs,
+            string clipName, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, float fps = 15)
+        {
+            //BotsMod.BotsModule.Log("a1");
+            if (animator.Library == null)
+            {
+                animator.Library = animator.gameObject.AddComponent<tk2dSpriteAnimation>();
+                animator.Library.clips = new tk2dSpriteAnimationClip[0];
+                animator.Library.enabled = true;
+
+            }
+            //BotsMod.BotsModule.Log("a2");
+            List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+            for (int i = 0; i < spriteIDs.Count; i++)
+            {
+                //BotsMod.BotsModule.Log("a2.25");
+                tk2dSpriteDefinition sprite = collection.spriteDefinitions[spriteIDs[i]];
+                if (sprite.Valid)
+                {
+                    //BotsMod.BotsModule.Log("a2.5");
+                    frames.Add(new tk2dSpriteAnimationFrame()
+                    {
+                        spriteCollection = collection,
+                        spriteId = spriteIDs[i]
+                    });
+                }
+            }
+            //BotsMod.BotsModule.Log("a3");
             var clip = new tk2dSpriteAnimationClip()
             {
                 name = clipName,
@@ -285,7 +331,7 @@ namespace ItemAPI
         public static tk2dSpriteCollectionData ConstructCollection(GameObject obj, string name)
         {
             var collection = obj.AddComponent<tk2dSpriteCollectionData>();
-            UnityEngine.Object.DontDestroyOnLoad(collection);
+            //UnityEngine.Object.DontDestroyOnLoad(collection);
 
             collection.assetName = name;
             collection.spriteCollectionGUID = name;

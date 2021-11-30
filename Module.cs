@@ -26,6 +26,8 @@ using BotsMod.NPCs;
 using BotsMod.ToolsAndStuff;
 using LiveRecolor;
 using NpcApi;
+using ChamberGunApi;
+using static BotsMod.RandomComps;
 //using ChallengeAPI;
 
 
@@ -160,11 +162,13 @@ namespace BotsMod
                 //BeyondPrefabs.Init();
                 //RoomPrefabs.Init();
                 CustomFire.Init();
+                BeyondNotificaionHandler.Init();
 
+                
 
-
-                Tools.AHHH = this.LoadAssetBundleFromLiterallyAnywhere("customglitchshader");
+                Tools.AHHH = this.LoadAssetBundleFromLiterallyAnywhere("coolshader");
                 Tools.fucktilesets = this.LoadAssetBundleFromLiterallyAnywhere("fucktilesets");
+                Tools.EtbAssetBundle = this.LoadAssetBundleFromLiterallyAnywhere("enterthebeyond");
 
                 Tools.BotsAssetBundle = this.LoadAssetBundleFromLiterallyAnywhere("botsassetbundle");
 
@@ -175,14 +179,18 @@ namespace BotsMod
                 //StuffIStoleFromApacheForChallengeMode.Init();
 
 
-                InitGameObjects.Init();
+                //InitGameObjects.Init();
                 ChestInitStuff.Init();
 
                 //GlobalWarning.Init();
 
                 BeyondMasteryToken.Init();
+                BeyondSniper.Add();
+                BeyondChamberGun.Add();
+               
+                //ScrapBook.Init();
 
-                ScrapBook.Init();
+
 
                 Bob.Init();
                 //CosmicSludge.Init();
@@ -199,6 +207,8 @@ namespace BotsMod
                 //RichPresenceItem.Register();
 
                 BeyondScout.Init();
+                DeadEye.Init();
+                TheOrb.Init();
 
                 TestGun.Add();
 
@@ -211,6 +221,23 @@ namespace BotsMod
                 NailGun.Add();
 
                 ChargeLance.Add();
+
+                Kr82m.Add();
+
+                Alternator.Add();
+
+                BeyondUnlock.Add();
+                BeyondUnlock.Add2();
+                BeyondUnlock.Add3();
+
+                Tools.shared_auto_002.LoadAsset<GameObject>("NPC_GunberMuncher").GetComponent<GunberMuncherController>().DefinedRecipes.Add(new GunberMuncherRecipe
+                {
+                    Annotation = "beyond unlock stuff",
+                    gunIDs_A = new List<int> { BotsItemIds.Relic1 },
+                    gunIDs_B = new List<int> { BotsItemIds.Relic2 },
+                    resultID = BotsItemIds.Relic3,
+                });
+
 
                 //CompletlyRandomGun.Add();
 
@@ -246,9 +273,10 @@ namespace BotsMod
 
                 LightningRounds.Init();
                 ChainedBullets.Init();
+                FracturedRounds.Init();
 
                 Sin.Init();
-
+                PhyGun.Add();
                 Roomba.Init();
 
                 ThrowableTest.Init();
@@ -257,6 +285,11 @@ namespace BotsMod
                 DarkArts.Init();
                 //OtherworldlyConnections.Init();
                 OtherwordlyFury.Init();
+
+                VoidGlassGuonStone.Init();
+                VoidAmmolet.Init();
+
+                #region shop setup
 
                 List<string> testNpcIdleSprites = new List<string>
                 {
@@ -356,10 +389,33 @@ namespace BotsMod
                 shop2 = NpcApi.ItsDaFuckinShopApi.SetUpShop("ItemForGuns", "bot", testNpcIdleSprites, 6, testNpcTalkSprites, 8, Tools.shared_auto_001.LoadAsset<GenericLootTable>("All_Item_Loot_Table"), CustomShopItemController.ShopCurrencyType.CUSTOM, "a", "a", "a", "a", "a", "a", ItsDaFuckinShopApi.defaultTalkPointOffset,
                     new Vector3[] { new Vector3(1.125f, 2.125f, 1), new Vector3(0f, 3.250f, 1), new Vector3(5.250f, 3.250f, 1), new Vector3(4.125f, 2.125f, 1), new Vector3(2.625f, 1f, 1) }, 1, false, null, ShopMerchantStuff.CustomCanBuyWeapons, ShopMerchantStuff.RemoveCurrencyWeapons,
                     ShopMerchantStuff.CustomPriceWeapons, null, null, "BotsMod/sprites/shopguygunmoneyicon.png", "gunTextIcon", true, false).GetComponent<CustomShopController>();
-
+                //mapiconshop
                 shop = NpcApi.ItsDaFuckinShopApi.SetUpShop("BeyondShopKeep", "bot", beyondNpcIdleSprites, 6, beyondNpcTalkSprites, 8, beyondLootTable, CustomShopItemController.ShopCurrencyType.CUSTOM, "#BEYOND_RUNBASEDMULTILINE_GENERIC", "#BEYOND_RUNBASEDMULTILINE_STOPPER", "#BEYOND_SHOP_PURCHASED",
                     "#BEYOND_PURCHASE_FAILED", "#BEYOND_INTRO", "#BEYOND_TAKEPLAYERDAMAGE", ItsDaFuckinShopApi.defaultTalkPointOffset, ItsDaFuckinShopApi.defaultItemPositions, 1, false, null, ShopMerchantStuff.CustomCanBuyBeyond, ShopMerchantStuff.RemoveCurrencyBeyond,
-                    ShopMerchantStuff.CustomPriceBeyond, null, null, "", "heart_big_idle_001", false, true, "BotsMod/sprites/Npcs/beyond_merch_carpet_001.png").GetComponent<CustomShopController>();
+                    ShopMerchantStuff.CustomPriceBeyond, null, null, "", "heart_big_idle_001", false, true, "BotsMod/sprites/Npcs/beyond_merch_carpet_001.png", true, "BotsMod/sprites/Npcs/mapiconshop.png", true, 0.01f).GetComponent<CustomShopController>();
+
+                shop.gameObject.GetComponentInChildren<tk2dSpriteAnimator>().Library.clips[1].wrapMode = tk2dSpriteAnimationClip.WrapMode.LoopSection;
+                shop.gameObject.GetComponentInChildren<tk2dSpriteAnimator>().Library.clips[1].loopStart = 3;
+
+                //ItsDaFuckinShopApi.SetUpJailedNpc("BeyondShopKeep", "bot", beyondNpcIdleSprites, 6, ItsDaFuckinShopApi.defaultTalkPointOffset, GungeonFlags.ACHIEVEMENT_ACCESS_ABBEY);
+
+                foreach (var frame in shop.gameObject.GetComponentInChildren<tk2dSpriteAnimator>().Library.clips[1].frames)
+                {
+                    var sprite = frame.spriteCollection.spriteDefinitions[frame.spriteId];
+                    sprite.position0 -= new Vector3(0.25f, 0, 0);
+                    sprite.position1 -= new Vector3(0.25f, 0, 0);
+                    sprite.position2 -= new Vector3(0.25f, 0, 0);
+                    sprite.position3 -= new Vector3(0.25f, 0, 0);
+                }
+
+                Material mat = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+                mat.mainTexture = shop.gameObject.GetComponentInChildren<tk2dSpriteAnimator>().renderer.material.mainTexture;
+                mat.SetColor("_EmissiveColor", new Color32(255, 69, 245, 255));
+                mat.SetFloat("_EmissiveColorPower", 1.55f);
+                mat.SetFloat("_EmissivePower", 50);
+                shop.gameObject.GetComponentInChildren<tk2dSpriteAnimator>().sprite.renderer.material = mat;
+
+                #endregion
 
                 //Examples.Init();
                 //GameManager.Instance.PrimaryPlayer.star
@@ -426,8 +482,13 @@ namespace BotsMod
 
                 InitSynergies.Init();
 
-                Loader.BuildCharacter("Lost", true, new Vector3(15.3f, 24.8f, 25.3f), true, true, true, new Color32(255, 69, 248, 255), 4.55f, 55, 2, true, "botfs_lost");
-                //Loader.BuildCharacter("Shade", false, true, true, false, new Color32(0, 0, 0, 0), 0, 0, 0, false, "");
+                var name = Loader.BuildCharacter("BotsMod/Characters/Lost", true, new Vector3(15.3f, 24.8f, 25.3f), true, true, true, new Color32(255, 69, 248, 255), 4.55f, 55, 2, true, "botfs_lost").nameInternal;
+                
+
+                //Loader.BuildCharacter("Shade", false, Vector2.zero, true, true, false, new Color32(0, 0, 0, 0), 0, 0, 0, false, "");
+
+                Loader.SetupCustomAnimation(name, "dance", 12, tk2dSpriteAnimationClip.WrapMode.Loop);
+
                 //Loader.BuildCharacter("The Blind", false, true, true, false, new Color32(0, 0, 0, 0), 0, 0, 0, false, "");
 
                 //ShrineFactory.RegisterShrineRoom(NPC, protoroom, "bot:test_npc_shrine", new Vector2(1, 1));
@@ -435,15 +496,18 @@ namespace BotsMod
                 //CollectionDumper.DumpCollection();
 
 
+                ChamberGunAPI.Init("EnterTheBeyond");
+
                 //Ammonomicon.Init();
 
+                /*
                 ChamberGun = (PickupObjectDatabase.GetById(647) as Gun);
                 if (ChamberGun.gameObject.GetComponent<ChamberGunProcessor>())
                 {
                     UnityEngine.Object.Destroy(ChamberGun.gameObject.GetComponent<ChamberGunProcessor>());
-                    ChamberGun.gameObject.AddComponent<BotChamberGunProcessor>();
+                    ChamberGun.gameObject.AddComponent<BotChamberGunProcessor>();                    
                 }
-
+                ChamberGun.gameObject.AddComponent<BotsCustomChamberGun>();
                 //MakeThemAllPetable.Init();
                 //MakeThemAllPetable.Init();
                 //RichPresence.init();
@@ -456,7 +520,7 @@ namespace BotsMod
 
 
                 }*/
-                
+
 
                 AlphabetSoupSynergyProcessor alphabetSoupSynergyProcessor = PickupObjectDatabase.GetById(340).gameObject.GetComponent<AlphabetSoupSynergyProcessor>();
 
@@ -579,6 +643,44 @@ namespace BotsMod
 
                 });
 
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("floorRoomCount", delegate (string[] args)
+                {
+
+                    string[] BundlePrereqs = new string[]
+                    {
+                        "base_bullethell",
+                        "base_castle",
+                        "base_catacombs",
+                        "base_cathedral",
+                        "base_forge",
+                        "base_foyer",
+                        "base_gungeon",
+                        "base_mines",
+                        "base_nakatomi",
+                        "base_resourcefulrat",
+                        "base_sewer",
+                        "base_tutorial",
+                        "finalscenario_bullet",
+                        "finalscenario_convict",
+                        "finalscenario_coop",
+                        "finalscenario_guide",
+                        "finalscenario_pilot",
+                        "finalscenario_robot",
+                        "finalscenario_soldier"
+                    };
+                    foreach (string floorName in BundlePrereqs)
+                    {
+                        foreach (var flow in DungeonDatabase.GetOrLoadByName(floorName).PatternSettings.flows)
+                        {
+                            Log($"[{floorName}] {flow.name}: {flow.AllNodes.Count}");
+                        }
+                        
+                    }
+
+                });
+
+
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("cgRoomTest", delegate (string[] args)
                 {
                     RoomHandler absoluteRoom = GameManager.Instance.PrimaryPlayer.transform.position.GetAbsoluteRoom();
@@ -592,6 +694,21 @@ namespace BotsMod
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("cgRoomTestEnd", delegate (string[] args)
                 {
                     CgController.aaaa = 4;
+
+                });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("blockthisoverhead", delegate (string[] args)
+                {
+                    //var overVfx = new GameObject("deez nuts");
+                    //var bar = new dfProgressBarIsShit("BotsMod/sprites/VFX/chained_full.png", "BotsMod/sprites/VFX/chained_empty.png");
+
+                    //backgroundSprite = Atlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource(BackgroundSprite)).name;
+                    //progressSprite = Atlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource(ProgressSprite)).name;
+
+                    //bar.transform.parent = GameUIRoot.Instance.p_playerReloadBar.statusBarPoison.transform.parent;
+
+                    GameUIRoot.Instance.p_playerReloadBar.statusBarPoison = dfProgressBarIsShit.Init("BotsMod/sprites/VFX/chained_full.png", "BotsMod/sprites/VFX/chained_empty.png");
+
 
                 });
 
@@ -610,7 +727,19 @@ namespace BotsMod
 
                 });
 
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("playanimation", delegate (string[] args)
+                {
+                    GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacterController>().overrideAnimation = args[0];
+                    GameManager.Instance.PrimaryPlayer.spriteAnimator.Play(args[0]);
 
+                });
+
+                ETGModConsole.Commands.GetGroup("bot").AddUnit("magnificence_check", delegate (string[] args)
+                {
+                    Log($"Generated: {GameManager.Instance.Dungeon.GeneratedMagnificence}");
+                    Log($"Heart: {RewardManager.AdditionalHeartTierMagnificence}");
+                    Log($"Floor + Normal: {GameManager.Instance.PrimaryPlayer.stats.Magnificence}");
+                });
 
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("addCoinToUi", delegate (string[] args)
                 {
@@ -630,9 +759,14 @@ namespace BotsMod
                 {
                     foreach(var item in PickupObjectDatabase.Instance.Objects)
                     {
-                        if(item != null && item.ShouldBeExcludedFromShops)
+                        if(item != null && item is PassiveItem && (item as PassiveItem).ItemRespectsHeartMagnificence)
                         {
-                            Log(item.EncounterNameOrDisplayName);
+                            Log("respect " + item.EncounterNameOrDisplayName);
+                        }
+
+                        if (item != null && item.ItemSpansBaseQualityTiers)
+                        {
+                            Log("span " + item.EncounterNameOrDisplayName);
                         }
                     }
                 });
@@ -675,13 +809,18 @@ namespace BotsMod
                     {
                         Log("shop did a null");
                     }
-
-                    var shopObj = DungeonPlaceableUtility.InstantiateDungeonPlaceable(shop.gameObject, GameManager.Instance.PrimaryPlayer.CurrentRoom, (GameManager.Instance.PrimaryPlayer.CurrentRoom.area.UnitCenter - GameManager.Instance.PrimaryPlayer.CurrentRoom.area.basePosition.ToVector2()).ToIntVector2(), false).transform.Find("Bot:Test_Npc").gameObject;
-                    GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(shopObj.GetComponent<TalkDoerLite>());
+                    foreach(var australian in Tools.shared_auto_002.LoadAsset<DungeonPlaceable>("Generic Jailed NPC").variantTiers)
+                    {
+                        var shopObj = DungeonPlaceableUtility.InstantiateDungeonPlaceable(australian.nonDatabasePlaceable, GameManager.Instance.PrimaryPlayer.CurrentRoom, ((GameManager.Instance.PrimaryPlayer.CurrentRoom.area.UnitCenter + new Vector2(UnityEngine.Random.Range(8, -8), UnityEngine.Random.Range(8, -8))) 
+                            - GameManager.Instance.PrimaryPlayer.CurrentRoom.area.basePosition.ToVector2()).ToIntVector2(), false);
+                        GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(shopObj.GetComponent<TalkDoerLite>());
+                    }
+                    
+                    
 
 
                     //
-                    File.WriteAllText("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Enter the Gungeon\\Resources\\EnterTheBeyond/fuckingdie.txt", UnityEngine.JsonUtility.ToJson(shopObj.GetComponent<PlayMakerFSM>(), true));
+                    //File.WriteAllText("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Enter the Gungeon\\Resources\\EnterTheBeyond/fuckingdie.txt", UnityEngine.JsonUtility.ToJson(shopObj.GetComponent<PlayMakerFSM>(), true));
 
                     
                     Log("2");
@@ -1374,8 +1513,13 @@ namespace BotsMod
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("lost_unlocks", delegate (string[] args)
                 {
 
-                    Log("Killed Past: " + GameStatsManager.Instance.GetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Lost, CharacterSpecificGungeonFlags.KILLED_PAST), LOST_COLOR);
-                    Log("Killed Past Alt: " + GameStatsManager.Instance.GetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Lost, CharacterSpecificGungeonFlags.KILLED_PAST_ALTERNATE_COSTUME), LOST_COLOR);
+                    foreach(var stat in GameStatsManager.Instance.m_characterStats)
+                    {
+                        Log($"{stat.Key}");
+                    }
+
+                    Log("Killed Past: " + GameStatsManager.Instance.GetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Custom, CharacterSpecificGungeonFlags.KILLED_PAST), LOST_COLOR);
+                    Log("Killed Past Alt: " + GameStatsManager.Instance.GetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Custom, CharacterSpecificGungeonFlags.KILLED_PAST_ALTERNATE_COSTUME), LOST_COLOR);
 
 
                 });
@@ -1744,26 +1888,6 @@ namespace BotsMod
 
                 });
 
-                ETGModConsole.Commands.GetGroup("bot").AddUnit("brave_asset_bundle_objects", delegate (string[] args)
-                {
-                    
-                    AssetBundle assetBundle3 = ResourceManager.LoadAssetBundle("brave_resources_001");
-                    foreach (string str in assetBundle3.GetAllAssetNames())
-                    {
-                        ETGModConsole.Log(str);
-                    }
-                });
-
-                ETGModConsole.Commands.GetGroup("bot").AddUnit("foyer2_asset_bundle_objects", delegate (string[] args)
-                {
-
-                    AssetBundle assetBundle3 = ResourceManager.LoadAssetBundle("foyer_002");
-                    foreach (string str in assetBundle3.GetAllAssetNames())
-                    {
-                        ETGModConsole.Log(str);
-                    }
-                });
-
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("audioSwitch", delegate (string[] args)
                 {
                     var player = GameManager.Instance.PrimaryPlayer;
@@ -1816,18 +1940,25 @@ namespace BotsMod
                 ETGModConsole.Commands.GetGroup("bot").AddUnit("asset_bundle_objects", delegate (string[] args)
                 {
                     ETGModConsole.Log("===================================");
-                    foreach (string str in Tools.fucktilesets.GetAllAssetNames())
+                    foreach (string str in Tools.AHHH.GetAllAssetNames())
                     {
-                        ETGModConsole.Log(Tools.fucktilesets.name + ": " + str);
+                        ETGModConsole.Log(Tools.AHHH.name + ": " + str);
                     }
                     ETGModConsole.Log("===================================");
+                    var part = UnityEngine.Object.Instantiate<GameObject>(Tools.AHHH.LoadAsset<GameObject>("Cylinder"), GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, Quaternion.identity);
 
+                    if (part.layer != LayerMask.NameToLayer("Unpixelated"))
+                    {
+                        part.SetLayerRecursively(LayerMask.NameToLayer("Unpixelated"));
+                    }
+
+                    //part.AddComponent<MakeObjSpin>();
                 });
 
                 ETGModConsole.Commands.AddGroup("bot_saveapi");
                 ETGModConsole.Commands.GetGroup("bot_saveapi").AddUnit("get_flag", delegate (string[] args)
                 {
-                    ETGModConsole.Log("CustomDungeonFlags.BOT_LOST_UNLOCKED's value: " + SaveAPIManager.GetFlag(CustomDungeonFlags.BOT_LOST_UNLOCKED).ToString());                    
+                    ETGModConsole.Log("CustomDungeonFlags.BOT_EFFIGY_POWERED's value: " + SaveAPIManager.GetFlag(CustomDungeonFlags.BOT_EFFIGY_POWERED).ToString());                    
                 });
                 ETGModConsole.Commands.GetGroup("bot_saveapi").AddUnit("set_flag", delegate (string[] args)
                 {
@@ -1835,12 +1966,12 @@ namespace BotsMod
                     {
                         return;
                     }
-                    SaveAPIManager.SetFlag(CustomDungeonFlags.BOT_LOST_UNLOCKED, bool.Parse(args[0]));
-                    ETGModConsole.Log("CustomDungeonFlags.BOT_LOST_UNLOCKED's new value: " + SaveAPIManager.GetFlag(CustomDungeonFlags.BOT_LOST_UNLOCKED).ToString());
+                    SaveAPIManager.SetFlag(CustomDungeonFlags.BOT_EFFIGY_POWERED, bool.Parse(args[0]));
+                    ETGModConsole.Log("CustomDungeonFlags.BOT_EFFIGY_POWERED's new value: " + SaveAPIManager.GetFlag(CustomDungeonFlags.BOT_EFFIGY_POWERED).ToString());
                 });
                 ETGModConsole.Commands.GetGroup("bot_saveapi").AddUnit("get_stat", delegate (string[] args)
                 {
-                    ETGModConsole.Log("CustomTrackedStats.BOT_LOST_UNLOCKED's value: " + SaveAPIManager.GetPlayerStatValue(CustomTrackedStats.EXAMPLE_STATS).ToString());
+                    ETGModConsole.Log("CustomTrackedStats.BOT_EFFIGY_POWERED's value: " + SaveAPIManager.GetPlayerStatValue(CustomTrackedStats.EXAMPLE_STATS).ToString());
                 });
                 ETGModConsole.Commands.GetGroup("bot_saveapi").AddUnit("set_stat", delegate (string[] args)
                 {
@@ -1849,7 +1980,7 @@ namespace BotsMod
                         return;
                     }
                     SaveAPIManager.SetStat(CustomTrackedStats.EXAMPLE_STATS, float.Parse(args[0]));
-                    ETGModConsole.Log("CustomTrackedStats.BOT_LOST_UNLOCKED's new value: " + SaveAPIManager.GetPlayerStatValue(CustomTrackedStats.EXAMPLE_STATS).ToString());
+                    ETGModConsole.Log("CustomTrackedStats.BOT_EFFIGY_POWERED's new value: " + SaveAPIManager.GetPlayerStatValue(CustomTrackedStats.EXAMPLE_STATS).ToString());
                 });
                 ETGModConsole.Commands.GetGroup("bot_saveapi").AddUnit("increment_stat", delegate (string[] args)
                 {
@@ -1858,7 +1989,7 @@ namespace BotsMod
                         return;
                     }
                     SaveAPIManager.RegisterStatChange(CustomTrackedStats.EXAMPLE_STATS, float.Parse(args[0]));
-                    ETGModConsole.Log("CustomTrackedStats.BOT_LOST_UNLOCKED's new value: " + SaveAPIManager.GetPlayerStatValue(CustomTrackedStats.EXAMPLE_STATS).ToString());
+                    ETGModConsole.Log("CustomTrackedStats.BOT_EFFIGY_POWERED's new value: " + SaveAPIManager.GetPlayerStatValue(CustomTrackedStats.EXAMPLE_STATS).ToString());
                 });
                 ETGModConsole.Commands.GetGroup("bot_saveapi").AddUnit("get_maximum", delegate (string[] args)
                 {
@@ -1903,9 +2034,7 @@ namespace BotsMod
                     MainMenuFoyerUpdateHook = new Hook(
                         typeof(MainMenuFoyerController).GetMethod("Update", BindingFlags.NonPublic | BindingFlags.Instance),
                         typeof(BotsModule).GetMethod("MainMenuUpdateHook", BindingFlags.NonPublic | BindingFlags.Instance),
-                        typeof(MainMenuFoyerController)
-
-                    );
+                        typeof(MainMenuFoyerController));
                 }
                 catch (Exception ex)
                 {

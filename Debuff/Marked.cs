@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace BotsMod
 {
-    public class Marked : GameActorSpeedEffect
+    public class Marked : GameActorEffect
     {
         public Marked() 
         {
@@ -25,11 +25,8 @@ namespace BotsMod
                 AppliesDeathTint = true,
                 DeathTintColor = new Color32(48, 48, 48, 255),
                 duration = 10,
-                SpeedMultiplier = 0.7f,
-                CooldownMultiplier = 1.5f,
                 PlaysVFXOnActor = true,
                 AppliesOutlineTint = false,
-                OnlyAffectPlayerWhenGrounded = false,
                 chainedTo = new List<AIActor>(),
                 OutlineTintColor = Color.white,
                 resistanceType = EffectResistanceType.None

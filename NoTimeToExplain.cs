@@ -77,7 +77,7 @@ namespace BotsMod
 			FakePrefab.MarkAsFakePrefab(projectile.gameObject);
 			UnityEngine.Object.DontDestroyOnLoad(projectile);
 			gun.DefaultModule.projectiles[0] = projectile;
-			projectile.transform.parent = gun.barrelOffset;
+			//projectile.transform.parent = gun.barrelOffset;
 			//projectile.baseData.damage *= 1.2f;
 			//projectile.baseData.speed *= 0.7f;
 			///	projectile.SetProjectileSpriteRight("locrtfsf_projectile_001", 7, 7, null, null);

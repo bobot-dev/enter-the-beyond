@@ -23,6 +23,7 @@ namespace BotsMod
 		{
 			var atlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;
 			atlas.AddNewItemToAtlas(GungeonAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/UI/heart_full_purple_001.png"), fullSoulHeartName);
+			atlas.AddNewItemToAtlas(GungeonAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/UI/shade_armour.png"), "shade_armour");
 		}
 
 		public static void OnSoulHeartLost(PlayerController player)

@@ -61,18 +61,44 @@ namespace CustomCharacters
                     ToolsGAPI.Print("Built prefab for: " + data.name);
             }
         }*/
-        
-        public static void BuildCharacter(string filePath, bool hasAltSkin, Vector3 altSwapperPos, bool removeFoyerExtras, bool paradoxUsesSprites, bool useGlow, Color emissiveColor, float emissiveColorPower, float emissivePower, int metaCost = 0, bool hasCustomPast = false, string customPast = "")
-        {
 
+        public static void SetupCustomAnimation(string character, string animation, int fps, tk2dSpriteAnimationClip.WrapMode wrapMode, int loopStart = 0)
+        {
+            character = character.ToLower();
+            BotsModule.Log(CharacterBuilder.storedCharacters.GetFirst().Key);
+            if (CharacterBuilder.storedCharacters.ContainsKey(character) && CharacterBuilder.storedCharacters[character].Second.GetComponent<PlayerController>().spriteAnimator != null)
+            {
+                var library = CharacterBuilder.storedCharacters[character].Second.GetComponent<PlayerController>().spriteAnimator.Library;
+                if (library.GetClipByName(animation) != null)
+                {
+                    library.GetClipByName(animation).fps = fps;
+                    library.GetClipByName(animation).wrapMode = wrapMode;
+                    if (wrapMode == tk2dSpriteAnimationClip.WrapMode.LoopSection)
+                    {
+                        library.GetClipByName(animation).loopStart = loopStart;
+                    }
+                } 
+                else
+                {
+                    ETGModConsole.Log($"No animation found under the name \"{animation}\"");
+                }
+                
+            }
+            else
+            {
+                ETGModConsole.Log($"No character found under the name \"{character}\" or tk2dSpriteAnimator is null");
+            }
+            
+        }
+
+        public static CustomCharacterData BuildCharacter(string filePath, bool hasAltSkin, Vector3 altSwapperPos, bool removeFoyerExtras, bool paradoxUsesSprites, bool useGlow, Color emissiveColor, float emissiveColorPower, float emissivePower, int metaCost = 0, bool hasCustomPast = false, string customPast = "")
+        {
+            ETGModConsole.Log(BotsModule.FilePath);
+            ETGModConsole.Log(BotsModule.ZipFilePath);
 
             var data = GetCharacterData(filePath);
 
-            GameObject obj = new GameObject("atlas object for " + data.nameShort);
-            obj.SetActive(false);
-            FakePrefab.MarkAsFakePrefab(obj);
-            UnityEngine.Object.DontDestroyOnLoad(obj);
-
+            BotsModule.Log(data.nameInternal);
             data.atlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;//obj.GetOrAddComponent<dfAtlas>();
 
 
@@ -91,7 +117,11 @@ namespace CustomCharacters
                 ToolsGAPI.PrintException(e);
             }
             if (success)
+            {
                 ToolsGAPI.Print("Built prefab for: " + data.name);
+                return data;
+            }
+            return null;
         }
 
         //Finds sprite folders, sprites, and characterdata.txt (and parses it)
@@ -99,113 +129,161 @@ namespace CustomCharacters
         {
             //LoadDirectories();
             //LoadZips();
-        }
+        }        
 
         private static CustomCharacterData GetCharacterData(string filePath)
         {
 
+            filePath = filePath.Replace("/", ".").Replace("\\", ".");
+
             ToolsGAPI.StartTimer("Loading data for " + Path.GetFileName(filePath));
             ToolsGAPI.Print("");
             ToolsGAPI.Print("--Loading " + Path.GetFileName(filePath) + "--", "0000FF");
-            string customCharacterDir = Path.Combine(CharacterDirectory, filePath);
-            string dataFilePath = Path.Combine(customCharacterDir, "characterdata.txt");
-            if (!File.Exists(dataFilePath))
+            //string customCharacterDir = Path.Combine(CharacterDirectory, filePath).Replace("/", ".").Replace("\\", ".");
+            string dataFilePath = Path.Combine(filePath, "characterdata.txt").Replace("/", ".").Replace("\\", ".");
+
+
+            var assembly = Assembly.GetCallingAssembly();
+            var lines = new string[0];
+
+            using (Stream stream = assembly.GetManifestResourceStream(dataFilePath))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                var linesList = new List<string>();
+                string line = null;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    linesList.Add(line);
+                }
+                //ToolsGAPI.PrintError(linesList.Count().ToString());
+                lines = linesList.ToArray();
+            }
+
+
+
+            if (lines.Count() <= 0)
             {
                 ToolsGAPI.PrintError($"No \"{DataFile}\" file found for " + Path.GetFileName(filePath));
                 return null;
             }
+            
 
-            var lines = GungeonAPI.ResourceExtractor.GetLinesFromFile(dataFilePath);
+            //var lines = GungeonAPI.ResourceExtractor.GetLinesFromFile(dataFilePath);
             var data = ParseCharacterData(lines);
 
-            string spritesDir = Path.Combine(customCharacterDir, "sprites");
-            if (Directory.Exists(spritesDir))
+            string spritesDir = Path.Combine(filePath, "sprites").Replace("/", ".").Replace("\\", ".");
+            string newSpritesDir = Path.Combine(filePath, "newspritesetup").Replace("/", ".").Replace("\\", ".");
+
+            string[] resources = GungeonAPI.ResourceExtractor.GetResourceNames();
+            
+            for (int i = 0; i < resources.Length; i++)
             {
-                ToolsGAPI.Print("Found: Sprites folder");
-                data.sprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(spritesDir);
+                if (resources[i].Contains(filePath))
+                {
+
+                    if (resources[i].StartsWith(spritesDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.sprites == null)
+                    {
+                        ToolsGAPI.PrintError("Found: Sprites folder");
+                        data.sprites = GungeonAPI.ResourceExtractor.GetTexturesFromResource(spritesDir);
+                    }
+
+                    string altSpritesDir = Path.Combine(filePath, "alt_sprites").Replace("/", ".").Replace("\\", ".");
+
+                    if (resources[i].StartsWith(altSpritesDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.altSprites == null)
+                    {
+                        ToolsGAPI.PrintError("Found: Alt Sprites folder");
+                        data.altSprites = GungeonAPI.ResourceExtractor.GetTexturesFromResource(altSpritesDir);
+                    }
+
+                    if (resources[i].StartsWith(newSpritesDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(data.pathForSprites))
+                    {
+                        ToolsGAPI.PrintError("Found: New Sprites folder");
+                        data.pathForSprites = newSpritesDir;
+                    }
+
+                }
             }
 
-            string altSpritesDir = Path.Combine(customCharacterDir, "alt_sprites");
-            if (Directory.Exists(altSpritesDir))
+
+            ToolsGAPI.PrintError("new sprites");
+
+            ToolsGAPI.PrintError("alt sprites");
+
+            string foyerDir = Path.Combine(filePath, "foyercard").Replace("/", ".").Replace("\\", ".");
+            if (resources.Contains(foyerDir))
             {
-                ToolsGAPI.Print("Found: Alt Sprites folder");
-                data.altSprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(altSpritesDir);
+                ToolsGAPI.PrintError("Found: Foyer card folder");
+                data.foyerCardSprites = GungeonAPI.ResourceExtractor.GetTexturesFromResource(foyerDir);
             }
+            ToolsGAPI.PrintError("foyer card sprites");
 
-            string foyerDir = Path.Combine(customCharacterDir, "foyercard");
-            if (Directory.Exists(foyerDir))
+            string loadoutDir = Path.Combine(filePath, "loadoutsprites").Replace("/", ".").Replace("\\", ".");
+            if (resources.Contains(foyerDir))
             {
-                ToolsGAPI.Print("Found: Foyer card folder");
-                data.foyerCardSprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(foyerDir);
+                ToolsGAPI.PrintError("Found: Loadout card folder");
+                data.loadoutSprites = GungeonAPI.ResourceExtractor.GetTexturesFromResource(loadoutDir);
             }
-
-
-            string loadoutDir = Path.Combine(customCharacterDir, "loadoutsprites");
-            if (Directory.Exists(foyerDir))
-            {
-                ToolsGAPI.Print("Found: Loadout card folder");
-                data.loadoutSprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(loadoutDir);
-            }
-
-            List<Texture2D> miscTextures = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(customCharacterDir);
+            ToolsGAPI.PrintError("loadout sprites");
+            List<Texture2D> miscTextures = GungeonAPI.ResourceExtractor.GetTexturesFromResource(filePath);
             foreach (var tex in miscTextures)
             {
                 string name = tex.name.ToLower();
                 if (name.Equals("icon"))
                 {
-                    ToolsGAPI.Print("Found: Icon ");
+                    ToolsGAPI.PrintError("Found: Icon ");
                     data.minimapIcon = tex;
                 }
-                if (name.Equals("bosscard"))
+                if (name.Contains("bosscard_"))
                 {
-                    ToolsGAPI.Print("Found: Bosscard");
-                    data.bossCard = tex;
+                    ToolsGAPI.PrintError("Found: Bosscard");
+                    //BotsModule.Log(name.ToLower().Replace("bosscard_", "").Replace("0", ""));
+                    data.bossCard.Add(tex);
                 }
                 if (name.Equals("playersheet"))
                 {
-                    ToolsGAPI.Print("Found: Playersheet");
+                    ToolsGAPI.PrintError("Found: Playersheet");
                     data.playerSheet = tex;
                 }
                 if (name.Equals("facecard"))
                 {
-                    ToolsGAPI.Print("Found: Facecard");
+                    ToolsGAPI.PrintError("Found: Facecard");
                     data.faceCard = tex;
                 }
                 if (name.Equals("win_pic_junkan"))
                 {
-                    ToolsGAPI.Print("Found: Junkan Win Pic");
+                    ToolsGAPI.PrintError("Found: Junkan Win Pic");
                     data.junkanWinPic = tex;
                 }
                 if (name.Equals("win_pic"))
                 {
-                    ToolsGAPI.Print("Found: Past Win Pic");
+                    ToolsGAPI.PrintError("Found: Past Win Pic");
                     data.pastWinPic = tex;
                 }
 
                 if (name.Equals("alt_skin_obj_sprite_001"))
                 {
-                    ToolsGAPI.Print("Found: alt_skin_obj_sprite_001");
+                    ToolsGAPI.PrintError("Found: alt_skin_obj_sprite_001");
                     data.altObjSprite1 = tex;
                 }
                 if (name.Equals("alt_skin_obj_sprite_002"))
                 {
-                    ToolsGAPI.Print("Found: alt_skin_obj_sprite_002");
+                    ToolsGAPI.PrintError("Found: alt_skin_obj_sprite_002");
                     data.altObjSprite2 = tex;
                 }
 
 
             }
+            ToolsGAPI.PrintError("other sprites");
+            string punchoutDir = Path.Combine(filePath, "punchout/").Replace("/", ".").Replace("\\", ".");
 
-            string punchoutDir = Path.Combine(customCharacterDir, "punchout/");
-
-            string punchoutSpritesDir = Path.Combine(punchoutDir, "sprites");
-            if (Directory.Exists(punchoutSpritesDir))
+            string punchoutSpritesDir = Path.Combine(punchoutDir, "sprites").Replace("/", ".").Replace("\\", ".");
+            if (resources.Contains(punchoutSpritesDir))
             {
                 ToolsGAPI.Print("Found: Punchout Sprites folder");
                 data.punchoutSprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(punchoutSpritesDir);
             }
 
-            if (Directory.Exists(punchoutDir))
+            if (resources.Contains(punchoutDir))
             {
                 data.punchoutFaceCards = new List<Texture2D>();
                 var punchoutSprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(punchoutDir);
@@ -224,165 +302,7 @@ namespace CustomCharacters
 
             return data;
             
-        }
-
-        private static void LoadZips()
-        {
-            var zipFiles = Directory.GetFiles(CharacterDirectory, "*.zip", SearchOption.TopDirectoryOnly);
-            ToolsGAPI.Print("# of character zip files found: " + zipFiles.Length);
-            foreach (string zipFilePath in zipFiles)
-            {
-                string fileName = Path.GetFileName(zipFilePath);
-                ToolsGAPI.StartTimer("Loading data for " + fileName);
-                try
-                {
-                    ToolsGAPI.Print("");
-                    ToolsGAPI.Print("--Loading " + fileName + "--", "0000FF");
-
-                    using (var zip = ZipFile.Read(zipFilePath))
-                    {
-                        foreach (var entry in zip)
-                        {
-                            if (string.Equals(Path.GetFileName(entry.FileName), DataFile, StringComparison.OrdinalIgnoreCase))
-                            {
-                                var ccd = ProcessCharacteryEntry(zip, entry);
-                                if (ccd != null)
-                                {
-                                    characterData.Add(ccd);
-                                    ToolsGAPI.Print($"Loaded {ccd.name} from {fileName}");
-                                }
-                            }
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    ToolsGAPI.Print($"Error loading character zip: {e}");
-                }
-                finally
-                {
-                    ToolsGAPI.StopTimerAndReport("Loading data for " + fileName);
-                }
-            }
-        }
-
-        private static CustomCharacterData ProcessCharacteryEntry(ZipFile zipFile, ZipEntry dataFileEntry)
-        {
-            var lines = dataFileEntry.ReadAllLines();
-            var data = ParseCharacterData(lines);
-
-            string customCharacterDir = Path.GetDirectoryName(dataFileEntry.FileName);
-            string customCharacterDirFilter = customCharacterDir + "/";
-
-            var directories = new Dictionary<string, List<Texture2D>>()
-            {
-                { customCharacterDir, null },
-                { $"{customCharacterDir}/sprites", null },
-                { $"{customCharacterDir}/loadoutsprites", null },
-                { $"{customCharacterDir}/foyercard", null },
-                { $"{customCharacterDir}/punchout", null },
-                { $"{customCharacterDir}/punchout/sprites", null }
-            };
-
-            foreach (var entry in zipFile)
-            {
-                if (!entry.FileName.StartsWith(customCharacterDirFilter, StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                if (!entry.FileName.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                byte[] textureData = entry.ReadAllBytes();
-                string fileName = Path.GetFileName(entry.FileName);
-                string resourceName = fileName.Substring(0, fileName.Length - 4);
-                Texture2D texture = GungeonAPI.ResourceExtractor.BytesToTexture(textureData, resourceName);
-
-                string directoryName = Path.GetDirectoryName(entry.FileName);
-                if (directories.TryGetValue(directoryName, out var list))
-                {
-                    if (list == null)
-                    {
-                        list = new List<Texture2D>();
-                        directories[directoryName] = list;
-                    }
-
-                    list.Add(texture);
-                }
-                else
-                {
-                    ToolsGAPI.Print($"Skipped loading {entry.FileName} in {zipFile.Name}");
-                }
-            }
-
-            List<Texture2D> textures;
-            if (directories.TryGetValue($"{customCharacterDir}/sprites", out textures) && textures != null)
-            {
-                ToolsGAPI.Print("Found: Sprites folder");
-                data.sprites = textures;
-            }
-
-            if (directories.TryGetValue($"{customCharacterDir}/loadoutsprites", out textures) && textures != null)
-            {
-                ToolsGAPI.Print("Found: Loadout Sprites folder");
-                data.loadoutSprites = textures;
-            }
-
-            if (directories.TryGetValue($"{customCharacterDir}/foyercard", out textures) && textures != null)
-            {
-                ToolsGAPI.Print("Found: Foyer card folder");
-                data.foyerCardSprites = textures;
-            }
-
-            if (directories.TryGetValue(customCharacterDir, out textures) && textures != null)
-            {
-                foreach (var tex in textures)
-                {
-                    string name = tex.name.ToLower();
-                    if (name.Equals("icon"))
-                    {
-                        ToolsGAPI.Print("Found: Icon ");
-                        data.minimapIcon = tex;
-                    }
-                    if (name.Equals("bosscard"))
-                    {
-                        ToolsGAPI.Print("Found: Bosscard");
-                        data.bossCard = tex;
-                    }
-                    if (name.Equals("playersheet"))
-                    {
-                        ToolsGAPI.Print("Found: Playersheet");
-                        data.playerSheet = tex;
-                    }
-                    if (name.Equals("facecard"))
-                    {
-                        ToolsGAPI.Print("Found: Facecard");
-                        data.faceCard = tex;
-                    }
-                }
-            }
-
-            if (directories.TryGetValue($"{customCharacterDir}/punchout/sprites", out textures) && textures != null)
-            {
-                ToolsGAPI.Print("Found: Punchout Sprites folder");
-                data.punchoutSprites = textures;
-            }
-
-            if (directories.TryGetValue($"{customCharacterDir}/punchout", out textures) && textures != null)
-            {
-                data.punchoutFaceCards = new List<Texture2D>();
-                foreach (var tex in textures)
-                {
-                    string name = tex.name.ToLower();
-                    if (name.Contains("facecard1") || name.Contains("facecard2") || name.Contains("facecard3"))
-                    {
-                        data.punchoutFaceCards.Add(tex);
-                        ToolsGAPI.Print("Found: Punchout facecard " + tex.name);
-                    }
-                }
-            }
-
-            return data;
-        }
+        }       
 
         //Main parse loop
         public static CustomCharacterData ParseCharacterData(string[] lines)

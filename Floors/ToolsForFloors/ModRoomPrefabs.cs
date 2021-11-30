@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NpcApi;
+using Dungeonator;
+using UnityEngine;
 
 namespace BotsMod
 {
@@ -30,11 +32,63 @@ namespace BotsMod
 
             Mod_Entrance_Room.category = PrototypeDungeonRoom.RoomCategory.ENTRANCE;
 
-
+            EnterTheBeyond = RoomFactory.BuildFromResource("BotsMod/rooms/RoomUsedToGetToBeyond.room");
+            DungeonPrerequisite[] array = new DungeonPrerequisite[0];
+            //Vector2 vector = new Vector2((float)(protoroom.Width / 2) + offset.x, (float)(protoroom.Height / 2) + offset.y);
+            var vector = new Vector2(5, 6);
+            EnterTheBeyond.placedObjectPositions.Add(vector);
+            EnterTheBeyond.placedObjects.Add(new PrototypePlacedObjectData
+            {
+                contentsBasePosition = vector,
+                fieldData = new List<PrototypePlacedObjectFieldData>(),
+                instancePrerequisites = array,
+                linkedTriggerAreaIDs = new List<int>(),
+                placeableContents = new DungeonPlaceable
+                {
+                    width = 2,
+                    height = 2,
+                    respectsEncounterableDifferentiator = true,
+                    variantTiers = new List<DungeonPlaceableVariant>
+                    {
+                        new DungeonPlaceableVariant
+                        {
+                            percentChance = 1f,
+                            nonDatabasePlaceable = BeyondPrefabs.beyondEnterance,
+                            prerequisites = array,
+                            materialRequirements = new DungeonPlaceableRoomMaterialRequirement[0]
+                        }
+                    }
+                }
+            });
+            InitRooms();
 
             Mod_Entrance_Room_Past = RoomFactory.BuildFromResource("BotsMod/rooms/Past/LostPastRoom1.room");
             Mod_Entrance_Room_Past.category = PrototypeDungeonRoom.RoomCategory.ENTRANCE;
 
+            Mod_Entrance_Room_Past.placedObjectPositions.Add(vector);
+            Mod_Entrance_Room_Past.placedObjects.Add(new PrototypePlacedObjectData
+            {
+                contentsBasePosition = vector,
+                fieldData = new List<PrototypePlacedObjectFieldData>(),
+                instancePrerequisites = array,
+                linkedTriggerAreaIDs = new List<int>(),
+                placeableContents = new DungeonPlaceable
+                {
+                    width = 2,
+                    height = 2,
+                    respectsEncounterableDifferentiator = true,
+                    variantTiers = new List<DungeonPlaceableVariant>
+                    {
+                        new DungeonPlaceableVariant
+                        {
+                            percentChance = 1f,
+                            nonDatabasePlaceable = BeyondPrefabs.pastControllerObject,
+                            prerequisites = array,
+                            materialRequirements = new DungeonPlaceableRoomMaterialRequirement[0]
+                        }
+                    }
+                }
+            });
 
             List<PrototypeDungeonRoom> m_feyondRooms = new List<PrototypeDungeonRoom>();
 
@@ -105,6 +159,77 @@ namespace BotsMod
 
             //foreach (PrototypeRoomExit exit in Mod_Boss.exitData.exits) { exit.exitType = PrototypeRoomExit.ExitType.ENTRANCE_ONLY; }
             //    RoomBuilder.AddExitToRoom(Mod_Boss, new Vector2(26, 37), DungeonData.Direction.NORTH, PrototypeRoomExit.ExitType.EXIT_ONLY, PrototypeRoomExit.ExitGroup.B);
+
+
+
+        }
+
+        public static ProceduralFlowModifierData GenerateNewMrocData(PrototypeDungeonRoom RequiredRoom)
+        {
+            string name = RequiredRoom.name.ToString();
+            if (RequiredRoom.name.ToString() == null)
+            {
+                name = "BeyondEffigyRoomThingPleaseWork";
+            }
+            ProceduralFlowModifierData PrayerRoomMines = new ProceduralFlowModifierData()
+            {
+                annotation = name,
+                
+                DEBUG_FORCE_SPAWN = true,
+                OncePerRun = false,
+                placementRules = new List<ProceduralFlowModifierData.FlowModifierPlacementType>()
+                {
+                    ProceduralFlowModifierData.FlowModifierPlacementType.END_OF_CHAIN
+                },
+                roomTable = null,
+                exactRoom = RequiredRoom,
+                IsWarpWing = false,
+                RequiresMasteryToken = false,
+                chanceToLock = 0,
+                selectionWeight = 1,
+                chanceToSpawn = 100,
+                RequiredValidPlaceable = null,
+                prerequisites = new DungeonPrerequisite[]
+                {
+                    new DungeonGenToolbox.AdvancedDungeonPrerequisite
+                    {
+                       prerequisiteType = DungeonPrerequisite.PrerequisiteType.NUMBER_PASTS_COMPLETED,
+                       comparisonValue = 0,
+                    }
+                },
+                CanBeForcedSecret = false,
+                RandomNodeChildMinDistanceFromEntrance = 0,
+                exactSecondaryRoom = null,
+                framedCombatNodes = 0,
+
+            };
+            return PrayerRoomMines;
+        }
+
+        public static void InitRooms()
+        {
+            SharedInjectionData injector = ScriptableObject.CreateInstance<SharedInjectionData>();
+            injector.UseInvalidWeightAsNoInjection = true;
+            
+            injector.PreventInjectionOfFailedPrerequisites = false;
+            injector.IsNPCCell = false;
+            injector.IgnoreUnmetPrerequisiteEntries = false;
+            injector.OnlyOne = false;
+            injector.ChanceToSpawnOne = 1f;
+            injector.AttachedInjectionData = new List<SharedInjectionData>();
+            injector.InjectionData = new List<ProceduralFlowModifierData>
+            {
+                GenerateNewMrocData(ModRoomPrefabs.EnterTheBeyond),
+            };
+            injector.name = "beyond entrace stuff";
+
+            SharedInjectionData BaseInjection = FloorHooks.GetOrLoadByName_Orig("base_catacombs").PatternSettings.flows[0].sharedInjectionData[1];
+            if (BaseInjection.AttachedInjectionData == null)
+            {
+                BaseInjection.AttachedInjectionData = new List<SharedInjectionData>();
+            }
+            BaseInjection.AttachedInjectionData.Add(injector);
+
         }
 
         public static WeightedRoom GenerateWeightedRoom(PrototypeDungeonRoom Room, float Weight = 1, bool LimitedCopies = true, int MaxCopies = 1, DungeonPrerequisite[] AdditionalPrerequisites = null)
@@ -119,6 +244,8 @@ namespace BotsMod
         public static PrototypeDungeonRoom Mod_Exit_Room;
 
         public static PrototypeDungeonRoom Mod_Shop_Room;
+
+        public static PrototypeDungeonRoom EnterTheBeyond;
 
         public static PrototypeDungeonRoom[] Mod_Rooms;
         public static PrototypeDungeonRoom Mod_Boss;
