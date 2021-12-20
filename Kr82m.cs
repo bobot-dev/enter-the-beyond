@@ -55,12 +55,13 @@ namespace BotsMod
 			FakePrefab.MarkAsFakePrefab(projectile.gameObject);
 			UnityEngine.Object.DontDestroyOnLoad(projectile);
 			gun.DefaultModule.projectiles[0] = projectile;
+			gun.DefaultModule.angleVariance = 4;
 
 			projectile.baseData.damage = 7f;
 			projectile.baseData.speed = 23f;
 			projectile.baseData.range = 1000f;
 			projectile.baseData.force = 9f;
-			projectile.angularVelocity = 4f;
+			//projectile.angularVelocityVariance = 4f;
 
 			projectile.PenetratesInternalWalls = true;
 

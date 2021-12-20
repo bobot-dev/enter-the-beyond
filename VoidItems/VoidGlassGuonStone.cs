@@ -39,7 +39,7 @@ namespace BotsMod
             FakePrefab.MarkAsFakePrefab(prefab);
             prefab.SetActive(false);
 
-            spriteIds.Add("Glass", SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/GuonShards/crystal_guon_stone_orbital", ETGMod.Databases.Items.ProjectileCollection));
+            spriteIds.Add("Glass", SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/GuonShards/crystal_guon_stone_orbital", ETGMod.Databases.Items.ProjectileCollection, "crystal_guon_stone_orbital"));
             var sprite = prefab.AddComponent<tk2dSprite>();
 
             sprite.SetSprite(ETGMod.Databases.Items.ProjectileCollection, spriteIds["Glass"]);

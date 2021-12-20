@@ -31,26 +31,84 @@ namespace BotsMod
 			Tools.BeyondItems.Add(item.PickupObjectId);
 
 		}
+		CustomHologramDoer hologramDoer;
+		public override void Pickup(PlayerController player)
+        {
+			hologramDoer = player.gameObject.GetOrAddComponent<CustomHologramDoer>();
+
+			base.Pickup(player);
+        }
+
+        public override void Update()
+        {
+			if (LastOwner != null && LastOwner.CurrentItem == this)
+            {
+				foreach (DebrisObject debrisObject in StaticReferenceManager.AllDebris.ToArray())
+				{
+
+					PickupObject pickupObject = debrisObject.GetComponent<PickupObject>();
+					Gun componentInChildren = debrisObject.GetComponentInChildren<Gun>();
+
+					bool flag2 = pickupObject == null && componentInChildren == null;
+					if (!flag2)
+					{
+						bool flag3 = pickupObject == null && componentInChildren != null;
+						if (flag3)
+						{
+							pickupObject = componentInChildren;
+						}
+						hologramDoer.ShowSpinDownHologram(pickupObject.PickupObjectId, pickupObject.gameObject);
 
 
-		protected override void DoEffect(PlayerController user)
+					}
+
+					
+				}
+				
+			}
+            base.Update();
+        }
+
+        protected override void DoEffect(PlayerController user)
 		{
 			AkSoundEngine.PostEvent("Play_CHR_dice_voice_01", user.gameObject);
 
 			RerollItemsOnGround();
 		}
 
-		List<int> excludedInputIds = new List<int>
+		public static List<int> excludedInputIds = new List<int>
 		{
 			73,
 			74,
+			78,
 			85,
 			68,
 			67,
+			120,
+			137,
+			224,
+			735,
+			297,
+			600,
 		};
-		List<int> excludedOutputIds = new List<int>();
+		public static List<int> excludedOutputIds = new List<int>
+		{
+			296,
+			418,
+			429,
+			497,
 
-		private int SpinDownID(int id)
+			752,
+			753,
+			754,
+			486,
+			735,
+
+			501,
+			502,
+		};
+
+		public static int SpinDownID(int id)
 		{
 			int newId = id - 1;
 
@@ -59,13 +117,14 @@ namespace BotsMod
 			{
 				var num = 0;
 
-				BotsModule.Log($"Id {num}: {newId}");
+				//BotsModule.Log($"Id {num}: {newId}");
 
 
 				num++;
 
 
-				if (PickupObjectDatabase.GetById(newId) != null && PickupObjectDatabase.GetById(newId).PrerequisitesMet())
+				if (PickupObjectDatabase.GetById(newId) != null && PickupObjectDatabase.GetById(newId).PrerequisitesMet() && PickupObjectDatabase.GetById(newId).quality != ItemQuality.EXCLUDED && PickupObjectDatabase.GetById(newId).quality != ItemQuality.COMMON
+					&& !excludedOutputIds.Contains(newId))
 				{
 					return newId;
 				} 

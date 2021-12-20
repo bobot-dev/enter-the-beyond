@@ -1,4 +1,5 @@
-﻿using Gungeon;
+﻿using Dungeonator;
+using Gungeon;
 using HutongGames.PlayMaker.Actions;
 using ItemAPI;
 using System;
@@ -21,7 +22,7 @@ namespace BotsMod
             var item = obj.AddComponent<LightningRounds>();
             ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
             string shortDesc = "Truly Shocking";
-            string longDesc = "bullets have a chance to spawn chain lightning";
+            string longDesc = "bullets have a chance to chain lightning to nearby enemies";
             ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
             item.quality = ItemQuality.A;
 
@@ -33,7 +34,7 @@ namespace BotsMod
 
 		protected override void Update()
 		{
-			PlayerController player = GameManager.Instance.PrimaryPlayer;
+			PlayerController player = this.Owner;
 			if (player && this.extantLink == null && LinkVFXPrefab != null)
 			{
 				tk2dTiledSprite component = SpawnManager.SpawnVFX(this.LinkVFXPrefab, false).GetComponent<tk2dTiledSprite>();
@@ -41,11 +42,13 @@ namespace BotsMod
 			}
 			else if (player && this.extantLink != null)
 			{
-				foreach(AIActor enemy in player.CurrentRoom.GetActiveEnemies(Dungeonator.RoomHandler.ActiveEnemyType.All))
+				var badGuys = player.CurrentRoom?.GetActiveEnemies(Dungeonator.RoomHandler.ActiveEnemyType.All);
+				if (badGuys != null);
+				foreach (AIActor enemy in badGuys)
 				{
-					if (enemy.GetComponent<NotReallyADebuff>() != null && badThingSpapiWillProbablyYellAtMeFor != null)
+					if (!enemy.healthHaver.IsDead && enemy.GetComponent<NotReallyADebuff>() != null && startpos != null && extantLink != null)
 					{
-						UpdateLink(enemy, this.extantLink, badThingSpapiWillProbablyYellAtMeFor);
+						UpdateLink(enemy, this.extantLink, startpos);
 					}
 				}
 				
@@ -134,23 +137,24 @@ namespace BotsMod
 		//5/10 = rr(0, 10) < 4
 		private void Bullet_OnDestruction(Projectile obj)
 		{
-			badThingSpapiWillProbablyYellAtMeFor = obj.specRigidbody.UnitCenter;
+			startpos = obj.specRigidbody.UnitCenter;
 			
 			//this.Owner.CurrentRoom.ApplyActionToNearbyEnemies(hitRigidbody.UnitCenter, 5f, delegate (AIActor enemy, float dist)
 			int limit = 5;
 			int range = 10;
-			if (this.Owner.CurrentRoom != null)
-			{
+			//if (this.Owner.CurrentRoom != null)
+			//{
 				if (this.Owner.PlayerHasActiveSynergy("Full Circuit"))
 				{
-					limit *= 2;
+					limit = 8;
 					range = 15;
 				}
 				List<AIActor> ignoreList = new List<AIActor>();
-				ApplyActionToNearbyEnemiesWithALimit(obj.specRigidbody.UnitCenter, range, limit, this.Owner.CurrentRoom.GetActiveEnemies(Dungeonator.RoomHandler.ActiveEnemyType.All), delegate (AIActor enemy, float dist)
+				ChainLightningToTarget(obj.specRigidbody.UnitCenter, 4, range, ignoreList, limit);
+				/*ApplyActionToNearbyEnemiesWithALimit(obj.specRigidbody.UnitCenter, range, limit, this.Owner.CurrentRoom.GetActiveEnemies(Dungeonator.RoomHandler.ActiveEnemyType.All), delegate (AIActor enemy, float dist)
 				{
 
-					if (enemy && enemy.healthHaver)
+					if (enemy && enemy.healthHaver && !ignoreList.Contains(enemy))
 					{
 
 						var linkVFXPrefab = CustomLightning.lightningVFX;
@@ -163,7 +167,7 @@ namespace BotsMod
 						enemy.gameObject.AddComponent<NotReallyADebuff>();
 						enemy.healthHaver.ApplyDamage(4, Vector2.zero, string.Empty, CoreDamageTypes.Electric, DamageCategory.Normal, false, null, false);
 						ignoreList.Add(enemy);
-						StartCoroutine(doTimerMagic(component.gameObject));
+						ETGMod.StartGlobalCoroutine(doTimerMagic(component.gameObject));
 						if (enemy.specRigidbody)
                         {
 							ApplyActionToNearbyEnemiesWithALimit(enemy.specRigidbody.UnitCenter, range / 2, limit / 2, this.Owner.CurrentRoom.GetActiveEnemies(Dungeonator.RoomHandler.ActiveEnemyType.All), delegate (AIActor enemy2, float dist2)
@@ -186,16 +190,42 @@ namespace BotsMod
 
 							});
 						}
-						
-
-						
-
 					}
-
-
-				});
-			}
+				});*/
+			//}
 		}
+
+		void ChainLightningToTarget(Vector2 pos, float damage, float range, List<AIActor> ignoreList, int limit)
+        {
+			var room = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(pos.ToIntVector2());
+			if (damage <= 0.5f || range <= 0 || room == null)
+            {
+				return;
+            }
+			
+			float distance = 0;
+			var enemy = room.GetNearestEnemy(pos, out distance, ignoreList, true, true);
+			if (distance <= range && enemy != null)
+            {
+				var linkVFXPrefab = CustomLightning.lightningVFX;//Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX also works
+
+				tk2dTiledSprite component = SpawnManager.SpawnVFX(linkVFXPrefab, false).GetComponent<tk2dTiledSprite>();
+				this.extantLink = component;
+				ignoreList.Add(enemy);
+				UpdateLink(enemy, component, pos);
+				enemy.gameObject.AddComponent<NotReallyADebuff>();
+				enemy.healthHaver.ApplyDamage(damage, Vector2.zero, string.Empty, CoreDamageTypes.Electric, DamageCategory.Normal, false, null, false);		
+
+				
+				StartCoroutine(doTimerMagic(component.gameObject, delay));
+				
+
+				ChainLightningToTarget((enemy.sprite != null ? enemy.sprite.WorldCenter : (Vector2)enemy.transform.position), damage, range, ignoreList, limit - 1);
+
+				//enemy.RegisterOverrideColor(new Color32(132, 3, 252, 255), "test");
+				//ETGModConsole.Log(pos.ToString());
+			}
+        }
 
 
 		private void UpdateLink(AIActor target, tk2dTiledSprite m_extantLink, Vector2 landedPoint)
@@ -248,15 +278,17 @@ namespace BotsMod
 		}
 
 
-		private static IEnumerator doTimerMagic(GameObject lightning)
+		private static IEnumerator doTimerMagic(GameObject lightning, float delay)
 		{
-			yield return new WaitForSeconds(0.25f);
+			yield return new WaitForSeconds(delay);
+
+			
 			SpawnManager.Despawn(lightning);
 			yield break;
 		}
-
+		public float delay = 0.25f;
 		private tk2dTiledSprite extantLink;
-		Vector2 badThingSpapiWillProbablyYellAtMeFor;
+		Vector2 startpos;
 		Color lightningColour = new Color(1.066f, 0, 1.686f);
 		GameObject LinkVFXPrefab;
 

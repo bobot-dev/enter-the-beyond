@@ -102,6 +102,35 @@ namespace BotsMod
 			Tools.DefaultPoopulonGoop = EnemyDatabase.GetOrLoadByGuid("116d09c26e624bca8cca09fc69c714b3").GetComponent<GoopDoer>().goopDefinition;
 		}
 
+		public static AIActor GetNearestEnemy(this RoomHandler room, Vector2 position, out float nearestDistance, List<AIActor> excludedActors, bool includeBosses = true, bool excludeDying = false)
+		{
+			AIActor result = null;
+			nearestDistance = float.MaxValue;
+
+			var activeEnemies = room.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+
+			if (activeEnemies == null)
+			{
+				return null;
+			}
+			for (int i = 0; i < activeEnemies.Count; i++)
+			{
+				if (includeBosses || !activeEnemies[i].healthHaver.IsBoss)
+				{
+					if (!excludeDying || !activeEnemies[i].healthHaver.IsDead)
+					{
+						float num = Vector2.Distance(position, activeEnemies[i].CenterPosition);
+						if (num < nearestDistance && !excludedActors.Contains(activeEnemies[i]))
+						{
+							nearestDistance = num;
+							result = activeEnemies[i];
+						}
+					}
+				}
+			}
+			return result;
+		}
+
 		public static Projectile SetupProjectile(int id)
         {
 			Projectile proj = UnityEngine.Object.Instantiate<Projectile>((PickupObjectDatabase.GetById(id) as Gun).DefaultModule.projectiles[0]);
@@ -120,6 +149,37 @@ namespace BotsMod
 			UnityEngine.Object.DontDestroyOnLoad(proj);
 
 			return proj;
+		}
+
+
+		public static List<Transform> GetChildren(this Transform transform)
+		{
+			List<Transform> children = new List<Transform>();
+			foreach (Transform c in transform)
+			{
+				children.Add(c);
+			}
+			return children;
+		}
+
+		public static List<GameObject> GetChildObjects(this Transform transform)
+		{
+			List<GameObject> children = new List<GameObject>();
+			foreach (Transform c in transform)
+			{
+				children.Add(c.gameObject);
+			}
+			return children;
+		}
+		public static bool HasModdedItem(this PlayerController player, string id)
+		{
+
+			var item = ETGMod.Databases.Items.GetModItemByName(id);//ETGMod.Databases.Items[id];// 
+			if (item != null)
+			{
+				return (player.HasPickupID(item.PickupObjectId));
+			}
+			return false;
 		}
 
 		public static void UpdateLink(DebrisObject targetPos, tk2dTiledSprite m_extantLink, DebrisObject landedPoint)
@@ -726,8 +786,8 @@ namespace BotsMod
 				trailObject.transform.parent = projectile.transform;
 				//trailObject.transform.localPosition = new Vector3(-2.548388f, -0.06926762f, -0.06926762f);
 				trailObject.SetActive(true);
-
-				int spriteID = SpriteBuilder.AddSpriteToCollection(animationPaths[0], ETGMod.Databases.Items.ProjectileCollection);
+				var split = animationPaths[0].Split('/');
+				int spriteID = SpriteBuilder.AddSpriteToCollection(animationPaths[0], ETGMod.Databases.Items.ProjectileCollection, split.Last());
 				tk2dTiledSprite tiledSprite = trailObject.GetOrAddComponent<tk2dTiledSprite>();
 				TrailController trailController = trailObject.GetOrAddComponent<TrailController>();
 
@@ -793,8 +853,9 @@ namespace BotsMod
 					List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
 					foreach (string path in spritePaths)
 					{
+						split = path.Split('/');
 						tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
-						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection, split.Last());
 						tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
 						frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
 						frameDef.colliderVertices = def.colliderVertices;
@@ -813,8 +874,9 @@ namespace BotsMod
 					List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
 					foreach (string path in spritePaths)
 					{
+						split = path.Split('/');
 						tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
-						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection, split.Last());
 						tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
 						frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
 						frameDef.colliderVertices = def.colliderVertices;
@@ -832,8 +894,9 @@ namespace BotsMod
 					List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
 					foreach (string path in spritePaths)
 					{
+						split = path.Split('/');
 						tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
-						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection, split.Last());
 						tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
 						frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
 						frameDef.colliderVertices = def.colliderVertices;
@@ -852,6 +915,12 @@ namespace BotsMod
 			{
 				ETGModConsole.Log(e.ToString());
 			}
+		}
+
+		public static bool IsStarterItem(this PlayerController player, int id)
+        {
+			return player.startingActiveItemIds.Contains(id) || player.startingAlternateGunIds.Contains(id) || player.startingGunIds.Contains(id) || player.startingPassiveItemIds.Contains(id);
+
 		}
 
 		public static GameObject MakeLine(string spritePath, Vector2 colliderDimensions, Vector2 colliderOffsets)
@@ -939,7 +1008,7 @@ namespace BotsMod
 				float convertedOffsetX = colliderOffsets.x / 16f;
 				float convertedOffsetY = colliderOffsets.y / 16f;
 
-				int spriteID = SpriteBuilder.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection);
+				int spriteID = SpriteBuilder.AddSpriteToCollection(spritePath, ETGMod.Databases.Items.ProjectileCollection, spritePath.Split('/').Last());
 				tk2dTiledSprite tiledSprite = projectile.gameObject.GetOrAddComponent<tk2dTiledSprite>();
 
 				//BotsModule.Log("beam 1");
@@ -971,7 +1040,7 @@ namespace BotsMod
 					foreach (string path in spritePaths)
 					{
 						tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
-						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+						int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection, path.Split('/').Last());
 						tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
 						frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleLeft);
 						frameDef.colliderVertices = def.colliderVertices;
@@ -1036,7 +1105,7 @@ namespace BotsMod
 			foreach (string path in spritePaths)
 			{
 				tk2dSpriteCollectionData collection = ETGMod.Databases.Items.ProjectileCollection;
-				int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection);
+				int frameSpriteId = SpriteBuilder.AddSpriteToCollection(path, collection, path.Split('/').Last());
 				tk2dSpriteDefinition frameDef = collection.spriteDefinitions[frameSpriteId];
 				frameDef.ConstructOffsetsFromAnchor(tk2dBaseSprite.Anchor.MiddleCenter);
 				if (overrideVertices != null)

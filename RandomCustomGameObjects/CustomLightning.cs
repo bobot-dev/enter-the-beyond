@@ -15,9 +15,7 @@ namespace BotsMod
 
         public static void Init()
         {
-            var lightningObj = new GameObject("VFX_PurpleChainLightning");
-            FakePrefab.MarkAsFakePrefab(lightningObj);
-            lightningObj.SetActive(false);
+            var lightningObj = PrefabAPI.PrefabBuilder.BuildObject("VFX_PurpleChainLightning");
 
             List<string> animationPaths = new List<string>()
             {
@@ -33,9 +31,9 @@ namespace BotsMod
                 "BotsMod/sprites/Lightning/purple_lightning_beam_middle_010",
             };
 
-            int spriteID = SpriteBuilder.AddSpriteToCollection(animationPaths[0], ETGMod.Databases.Items.ProjectileCollection);
+            int spriteID = SpriteBuilder.AddSpriteToCollection(animationPaths[0], ETGMod.Databases.Items.ProjectileCollection, animationPaths[0].Split('/').Last());
             tk2dTiledSprite tiledSprite = lightningObj.GetOrAddComponent<tk2dTiledSprite>();
-            TrailController trailController = lightningObj.GetOrAddComponent<TrailController>();
+            //TrailController trailController = lightningObj.GetOrAddComponent<TrailController>();
 
             tk2dSpriteAnimator animator = lightningObj.GetOrAddComponent<tk2dSpriteAnimator>();
 
@@ -59,7 +57,7 @@ namespace BotsMod
             foreach (var frame in clip.frames)
             {
                 frame.spriteCollection = ETGMod.Databases.Items.ProjectileCollection;
-                frame.spriteId = SpriteBuilder.AddSpriteToCollection(animationPaths[i], frame.spriteCollection);
+                frame.spriteId = SpriteBuilder.AddSpriteToCollection(animationPaths[i], frame.spriteCollection, animationPaths[i].Split('/').Last());
 
                 i++;
             }

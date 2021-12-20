@@ -51,6 +51,7 @@ namespace BotsMod
 				var partObj = UnityEngine.Object.Instantiate(Tools.BotsAssetBundle.LoadAsset<GameObject>("ParticleSystemObj 1"));
 
 				partObj.transform.position = target.sprite.WorldCenter;
+				//partObj.transform.position = target.transform.position;
 				partObj.transform.parent = target.transform;
 
 				//partObj.transform.localScale /= 2;

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
+using Dungeonator;
 using Gungeon;
 using GungeonAPI;
 using ItemAPI;
 using LiveRecolor;
+using MonoMod.RuntimeDetour;
 using MultiplayerBasicExample;
 using UnityEngine;
 
@@ -187,7 +190,18 @@ namespace BotsMod
 			wand.AddSpellToWand(gun, avalableSpells[hnym]);
 
 			wand.ChangeWandProperties(gun);
+
+
+			Hook hook = new Hook(typeof(PlayerController).GetMethod("orig_Start", BindingFlags.Public | BindingFlags.Instance), typeof(Wand).GetMethod("SetupWandUi"));
+
 		}
+		public static void SetupWandUi(Action<PlayerController> action, PlayerController player)
+		{
+			action(player);
+			//GUIhandler handler = player.gameObject.AddComponent<GUIhandler>();
+			//handler.enabled = true;
+		}
+
 
 		public override void OnInitializedWithOwner(GameActor actor)
 		{

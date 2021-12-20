@@ -38,6 +38,7 @@ namespace BotsMod
 			gun.DefaultModule.cooldownTime = 0.07f;
 			gun.InfiniteAmmo = false;
 			gun.DefaultModule.numberOfShotsInClip = 20;
+			gun.DefaultModule.angleVariance = 6;
 
 			gun.SetBaseMaxAmmo(500);
 			//gun.gunHandedness = GunHandedness.TwoHanded;
@@ -60,7 +61,7 @@ namespace BotsMod
 			projectile.baseData.speed = 23f;
 			projectile.baseData.range = 20f;
 			projectile.baseData.force = 8f;
-			projectile.angularVelocity = 6f;
+			//projectile.angularVelocityVariance = 6f;
 
 			projectile.PenetratesInternalWalls = true;
 

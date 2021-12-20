@@ -640,7 +640,7 @@ namespace BotsMod
 
 
 
-			var chest = Chest.Spawn(BotsModule.KeyChest, (GameManager.Instance.PrimaryPlayer.CenterPosition + new Vector2(1f, 0f)).ToIntVector2(VectorConversions.Round));
+			var chest = Chest.Spawn(Commands.KeyChest, (GameManager.Instance.PrimaryPlayer.CenterPosition + new Vector2(1f, 0f)).ToIntVector2(VectorConversions.Round));
 			//var chest = Chest.Spawn(GameManager.Instance.RewardManager.B_Chest, new IntVector2((int)user.sprite.WorldCenter.x, (int)user.sprite.WorldCenter.y), user.CurrentRoom, false);
 
 			//chest.lootTable.canDropMultipleItems = true;

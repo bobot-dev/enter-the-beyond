@@ -61,10 +61,77 @@ namespace CustomCharacters
                     ToolsGAPI.Print("Built prefab for: " + data.name);
             }
         }*/
+        public static void AddPhase(string character, CharacterSelectIdlePhase phase)
+        {
+            character = character.ToLower();
+            BotsModule.Log(CharacterBuilder.storedCharacters.GetFirst().Key);
+            if (CharacterBuilder.storedCharacters.ContainsKey(character))
+            {
+                var arraysSuckBalls = CharacterBuilder.storedCharacters[character].First.idleDoer.phases.ToList();
+
+                arraysSuckBalls.Add(phase);
+
+                CharacterBuilder.storedCharacters[character].First.idleDoer.phases = arraysSuckBalls.ToArray();
+            }
+            else
+            {
+                ETGModConsole.Log($"No character found under the name \"{character}\" or tk2dSpriteAnimator is null");
+            }
+        }
+
+        public static void AddFoyerObject(string character, GameObject obj, Vector2 offset)
+        {
+            character = character.ToLower();
+            BotsModule.Log(CharacterBuilder.storedCharacters.GetFirst().Key);
+            if (CharacterBuilder.storedCharacters.ContainsKey(character))
+            {
+                CharacterBuilder.storedCharacters[character].First.randomFoyerBullshitNNAskedFor.Add(new Tuple<GameObject, Vector2>(obj, offset));
+            }
+            else
+            {
+                ETGModConsole.Log($"No character found under the name \"{character}\" or tk2dSpriteAnimator is null");
+            }
+        }
+
+
+        public static void SetupCustomBreachAnimation(string character, string animation, int fps, tk2dSpriteAnimationClip.WrapMode wrapMode, int loopStart = 0, float maxFidgetDuration = 0, float minFidgetDuration = 0)
+        {
+            character = character.ToLower();
+            BotsModule.Log(CharacterBuilder.storedCharacters.GetFirst().Key);
+            if (CharacterBuilder.storedCharacters.ContainsKey(character) && CharacterBuilder.storedCharacters[character].Second.GetComponent<PlayerController>().spriteAnimator != null)
+            {
+                var library = CharacterBuilder.storedCharacters[character].Second.GetComponent<PlayerController>().spriteAnimator.Library;
+                if (library.GetClipByName(animation) != null)
+                {
+                    library.GetClipByName(animation).fps = fps;
+                    library.GetClipByName(animation).wrapMode = wrapMode;
+                    if (wrapMode == tk2dSpriteAnimationClip.WrapMode.LoopSection)
+                    {
+                        library.GetClipByName(animation).loopStart = loopStart;
+                    }
+                    if (wrapMode == tk2dSpriteAnimationClip.WrapMode.LoopFidget)
+                    {
+                        library.GetClipByName(animation).maxFidgetDuration = maxFidgetDuration;
+                        library.GetClipByName(animation).minFidgetDuration = minFidgetDuration;
+                    }
+                }
+                else
+                {
+                    ETGModConsole.Log($"No animation found under the name \"{animation}\"");
+                }
+            }
+            else
+            {
+                ETGModConsole.Log($"No character found under the name \"{character}\" or tk2dSpriteAnimator is null");
+            }
+
+        }
+
 
         public static void SetupCustomAnimation(string character, string animation, int fps, tk2dSpriteAnimationClip.WrapMode wrapMode, int loopStart = 0)
         {
-            character = character.ToLower();
+            SetupCustomBreachAnimation(character, animation, fps, wrapMode, loopStart);
+            /*character = character.ToLower();
             BotsModule.Log(CharacterBuilder.storedCharacters.GetFirst().Key);
             if (CharacterBuilder.storedCharacters.ContainsKey(character) && CharacterBuilder.storedCharacters[character].Second.GetComponent<PlayerController>().spriteAnimator != null)
             {
@@ -87,8 +154,8 @@ namespace CustomCharacters
             else
             {
                 ETGModConsole.Log($"No character found under the name \"{character}\" or tk2dSpriteAnimator is null");
-            }
-            
+            }*/
+
         }
 
         public static CustomCharacterData BuildCharacter(string filePath, bool hasAltSkin, Vector3 altSwapperPos, bool removeFoyerExtras, bool paradoxUsesSprites, bool useGlow, Color emissiveColor, float emissiveColorPower, float emissivePower, int metaCost = 0, bool hasCustomPast = false, string customPast = "")
@@ -97,6 +164,19 @@ namespace CustomCharacters
             ETGModConsole.Log(BotsModule.ZipFilePath);
 
             var data = GetCharacterData(filePath);
+
+            data.idleDoer = new CharacterSelectIdleDoer
+            {
+                onSelectedAnimation = "select_choose",
+                coreIdleAnimation = "select_idle",
+                idleMax = 10,
+                idleMin = 4,
+                EeveeTex = null,
+                IsEevee = false,
+                AnimationLibraries = new tk2dSpriteAnimation[0],
+                phases = new CharacterSelectIdlePhase[0],
+
+            };
 
             BotsModule.Log(data.nameInternal);
             data.atlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;//obj.GetOrAddComponent<dfAtlas>();
@@ -173,6 +253,7 @@ namespace CustomCharacters
 
             string spritesDir = Path.Combine(filePath, "sprites").Replace("/", ".").Replace("\\", ".");
             string newSpritesDir = Path.Combine(filePath, "newspritesetup").Replace("/", ".").Replace("\\", ".");
+            string newAltSpritesDir = Path.Combine(filePath, "newaltspritesetup").Replace("/", ".").Replace("\\", ".");
 
             string[] resources = GungeonAPI.ResourceExtractor.GetResourceNames();
             
@@ -201,6 +282,30 @@ namespace CustomCharacters
                         data.pathForSprites = newSpritesDir;
                     }
 
+                    if (resources[i].StartsWith(newAltSpritesDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(data.pathForAltSprites))
+                    {
+                        ToolsGAPI.PrintError("Found: New Sprites folder");
+                        data.pathForAltSprites = newAltSpritesDir;
+                    }
+
+                    string foyerDir = Path.Combine(filePath, "foyercard").Replace("/", ".").Replace("\\", ".");
+                    if (resources[i].StartsWith(foyerDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.foyerCardSprites == null)
+                    {
+                        ToolsGAPI.PrintError("Found: Foyer card folder");
+                        data.foyerCardSprites = GungeonAPI.ResourceExtractor.GetTexturesFromResource(foyerDir);
+                    }
+                   
+
+                    string loadoutDir = Path.Combine(filePath, "loadoutsprites").Replace("/", ".").Replace("\\", ".");
+                    if (resources[i].StartsWith(loadoutDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.loadoutSprites == null)
+                    {
+                        ToolsGAPI.PrintError("Found: Loadout card folder");
+
+                        data.loadoutSprites = GungeonAPI.ResourceExtractor.GetTexturesFromResource(loadoutDir);
+
+                        ToolsGAPI.PrintError(data.loadoutSprites.Count.ToString());
+                    }
+
                 }
             }
 
@@ -208,21 +313,8 @@ namespace CustomCharacters
             ToolsGAPI.PrintError("new sprites");
 
             ToolsGAPI.PrintError("alt sprites");
-
-            string foyerDir = Path.Combine(filePath, "foyercard").Replace("/", ".").Replace("\\", ".");
-            if (resources.Contains(foyerDir))
-            {
-                ToolsGAPI.PrintError("Found: Foyer card folder");
-                data.foyerCardSprites = GungeonAPI.ResourceExtractor.GetTexturesFromResource(foyerDir);
-            }
             ToolsGAPI.PrintError("foyer card sprites");
 
-            string loadoutDir = Path.Combine(filePath, "loadoutsprites").Replace("/", ".").Replace("\\", ".");
-            if (resources.Contains(foyerDir))
-            {
-                ToolsGAPI.PrintError("Found: Loadout card folder");
-                data.loadoutSprites = GungeonAPI.ResourceExtractor.GetTexturesFromResource(loadoutDir);
-            }
             ToolsGAPI.PrintError("loadout sprites");
             List<Texture2D> miscTextures = GungeonAPI.ResourceExtractor.GetTexturesFromResource(filePath);
             foreach (var tex in miscTextures)

@@ -10,6 +10,7 @@ using Object = UnityEngine.Object;
 using IEnumerator = System.Collections.IEnumerator;
 using GungeonAPI;
 using BotsMod;
+using ItemAPI;
 
 namespace CustomCharacters
 {
@@ -131,6 +132,11 @@ namespace CustomCharacters
 					typeof(Hooks).GetMethod("AddPrefabHook", BindingFlags.Static | BindingFlags.Public)
 				);
 
+				Hook ClearOverheadElementHook = new Hook(
+					typeof(FoyerCharacterSelectFlag).GetMethod("ClearOverheadElement", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("ClearOverheadElementHook", BindingFlags.Static | BindingFlags.Public)
+				);
+
 				BotsModule.Log("hooks done");
 			}
 			catch (Exception e)
@@ -139,20 +145,41 @@ namespace CustomCharacters
             }
         }
 
+		public static void ClearOverheadElementHook(Action<FoyerCharacterSelectFlag> orig, FoyerCharacterSelectFlag self)
+		{
+			FieldInfo _extantOverheadUIElement = typeof(FoyerCharacterSelectFlag).GetField("m_extantOverheadUIElement", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			if ((_extantOverheadUIElement.GetValue(self) as dfControl) != null && FakePrefab.IsFakePrefab((_extantOverheadUIElement.GetValue(self) as dfControl).gameObject))
+			{
+				(_extantOverheadUIElement.GetValue(self) as dfControl).gameObject.SetActive(false);
+				//UnityEngine.Object.Destroy((_extantOverheadUIElement.GetValue(self) as dfControl).gameObject);
+				_extantOverheadUIElement.SetValue(self, null);
+			} 
+			else
+            {
+				orig(self);
+            }
+		}
+
 		public static dfControl AddPrefabHook(dfGUIManager self,GameObject prefab)
 		{
+
+			Debug.LogWarning(self);
+			Debug.LogWarning(prefab);
+
 			if (prefab.GetComponent<dfControl>() == null)
 			{
 				Debug.LogWarning("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
 				throw new InvalidCastException();
 			}
 			GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(prefab);
+			//GameObject gameObject = FakePrefab.Clone(prefab);
 			gameObject.transform.parent = self.transform;
 			gameObject.layer = self.gameObject.layer;
 
 			foreach(var comp in gameObject.GetComponents<Component>())
             {
-				Debug.LogWarning(comp.ToString());
+				//ETGModConsole.Log(comp.ToString());
             }
 
 			dfControl component = gameObject?.GetComponent<dfControl>();
@@ -870,6 +897,7 @@ namespace CustomCharacters
 			foreach(var character in sortedByXCustom)
 			{
 				sortedByX.Add(character);
+				//self.OnPlayerCharacterChanged = character.OnSelectedCharacterCallback;
 			}
 
 			return sortedByX;

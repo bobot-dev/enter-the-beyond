@@ -82,7 +82,7 @@ namespace LiveRecolor
         void Update()
         {
             //toggles the ui. taken directly from kyle. if player presses interact button for more than 5 seconds gui will pop up
-            if (!BraveInput.HasInstanceForPlayer(m_player.PlayerIDX)) { return; }
+            if (!BraveInput.HasInstanceForPlayer(m_player.PlayerIDX) && GameManager.Instance.PrimaryPlayer != null && GameManager.Instance.PrimaryPlayer.HasPickupID(BotsItemIds.Wand)) { return; }
             if (Key(GungeonActions.GungeonActionType.Interact) && KeyTime(GungeonActions.GungeonActionType.Interact) > .5f && !locked)
             {
                 Toggle();

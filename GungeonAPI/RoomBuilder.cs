@@ -10,9 +10,9 @@ namespace GungeonAPI
 	class RoomBuilder
 	{
 
-        public static void GenerateRoomLayoutFromPNG(PrototypeDungeonRoom room, string filePath, PrototypeRoomPitEntry.PitBorderType PitBorderType = PrototypeRoomPitEntry.PitBorderType.FLAT, CoreDamageTypes DamageCellsType = CoreDamageTypes.None)
+        public static void GenerateRoomLayoutFromPNG(PrototypeDungeonRoom room, Texture2D m_TextureFromResource, PrototypeRoomPitEntry.PitBorderType PitBorderType = PrototypeRoomPitEntry.PitBorderType.FLAT, CoreDamageTypes DamageCellsType = CoreDamageTypes.None)
         {
-            Texture2D m_TextureFromResource = ResourceExtractor.GetTextureFromResource(filePath);
+            // = ResourceExtractor.GetTextureFromResource(filePath);
 
             float DamageToPlayersPerTick = 0;
             float DamageToEnemiesPerTick = 0;
@@ -38,17 +38,17 @@ namespace GungeonAPI
                 return;
             }
 
-            Color WhitePixel = new Color32(255, 255, 255, 255); // Wall Cell
+            Color WhitePixel = new Color32(127, 127, 127, 255);//new Color32(255, 255, 255, 255); // Wall Cell
             Color PinkPixel = new Color32(255, 0, 255, 255); // Diagonal Wall Cell (North East)
             Color YellowPixel = new Color32(255, 255, 0, 255); // Diagonal Wall Cell (North West)
             Color HalfPinkPixel = new Color32(127, 0, 127, 255); // Diagonal Wall Cell (South East)
             Color HalfYellowPixel = new Color32(127, 127, 0, 255); // Diagonal Wall Cell (South West)
 
-            Color BluePixel = new Color32(0, 0, 255, 255); // Floor Cell
+            Color BluePixel = Color.white;//new Color32(0, 0, 255, 255); // Floor Cell
 
             Color BlueHalfGreenPixel = new Color32(0, 127, 255, 255); // Floor Cell (Ice Override)
             Color HalfBluePixel = new Color32(0, 0, 127, 255); // Floor Cell (Water Override)
-            Color HalfRedPixel = new Color32(0, 0, 127, 255); // Floor Cell (Carpet Override)
+            Color HalfRedPixel = new Color32(127, 0, 0, 255); // Floor Cell (Carpet Override)
             Color GreenHalfRBPixel = new Color32(127, 255, 127, 255); // Floor Cell (Grass Override)
             Color HalfWhitePixel = new Color32(127, 127, 127, 255); // Floor Cell (Bone Override)
             Color OrangePixel = new Color32(255, 127, 0, 255); // Floor Cell (Flesh Override)
@@ -56,7 +56,7 @@ namespace GungeonAPI
 
             Color GreenPixel = new Color32(0, 255, 0, 255); // Damage Floor Cell
 
-            Color RedPixel = new Color32(255, 0, 0, 255); // Pit Cell
+            Color RedPixel = Color.black;//new Color32(255, 0, 0, 255); // Pit Cell
 
             int width = room.Width;
             int height = room.Height;
@@ -111,11 +111,8 @@ namespace GungeonAPI
                             cellType = CellType.PIT;
                             m_Pits.Add(new Vector2(X, Y));
                         }
-                        else if (m_Pixel.Value == BluePixel | m_Pixel.Value == GreenPixel |
-                          m_Pixel.Value == BlueHalfGreenPixel | m_Pixel.Value == HalfBluePixel |
-                          m_Pixel.Value == HalfRedPixel | m_Pixel.Value == GreenHalfRBPixel |
-                          m_Pixel.Value == HalfWhitePixel | m_Pixel.Value == OrangePixel |
-                          m_Pixel.Value == RedHalfGBPixel)
+                        else if (m_Pixel.Value == BluePixel | m_Pixel.Value == GreenPixel | m_Pixel.Value == BlueHalfGreenPixel | m_Pixel.Value == HalfBluePixel | m_Pixel.Value == HalfRedPixel | m_Pixel.Value == GreenHalfRBPixel | m_Pixel.Value == HalfWhitePixel | m_Pixel.Value == OrangePixel | 
+                            m_Pixel.Value == RedHalfGBPixel)
                         {
                             cellType = CellType.FLOOR;
                             if (m_Pixel.Value == GreenPixel)

@@ -33,10 +33,14 @@ namespace ItemAPI
         /// Marks an object as a fake prefab.
         /// </summary>
         /// <param name="obj">GameObject to add to the list.</param>
-        public static void MarkAsFakePrefab(GameObject obj)
+        public static void MarkAsFakePrefab(GameObject obj, bool dol = false)
         {
             ExistingFakePrefabs.Add(obj);
-            DontDestroyOnLoad(obj);
+            if (!dol)
+            {
+                DontDestroyOnLoad(obj);
+            }
+            
         }
 
         /// <summary>
@@ -46,6 +50,9 @@ namespace ItemAPI
         /// <param name="obj">GameObject to clone.</param>
         public static GameObject Clone(GameObject obj)
         {
+
+            //return UnityEngine.Object.Instantiate(PrefabAPI.PrefabBuilder.Clone(obj));
+
             var already_fake = IsFakePrefab(obj);
 
             var was_active = obj.activeSelf;
@@ -91,8 +98,8 @@ namespace ItemAPI
                     (new_o as CustomShopController).customCanBuy = (o as CustomShopController).customCanBuy;
                     (new_o as CustomShopController).customPrice = (o as CustomShopController).customPrice;
                     (new_o as CustomShopController).removeCurrency = (o as CustomShopController).removeCurrency;
-                    (new_o as GameObject).GetComponent<CustomShopController>().OnSteal = (o as GameObject).GetComponent<CustomShopController>().OnSteal;
-                    (new_o as GameObject).GetComponent<CustomShopController>().OnPurchase = (o as GameObject).GetComponent<CustomShopController>().OnPurchase;
+                    (new_o as CustomShopController).OnSteal = (o as GameObject).GetComponent<CustomShopController>().OnSteal;
+                    (new_o as CustomShopController).OnPurchase = (o as GameObject).GetComponent<CustomShopController>().OnPurchase;
                     //(new_o as CustomShopController).customCurrencyAtlas = (o as CustomShopController).customCurrencyAtlas;
                 }
                 

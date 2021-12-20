@@ -9,6 +9,7 @@ using ETGGUI.Inspector;
 using GungeonAPI;
 using BotsMod;
 using System.Collections;
+using ItemAPI;
 
 namespace AmmonomiconAPI
 {
@@ -48,6 +49,19 @@ namespace AmmonomiconAPI
 					typeof(AmmonomiconHooks).GetMethod("CheckLanguageFontsHook", BindingFlags.Static | BindingFlags.NonPublic));
 				BotsModule.Log("AH: checkLanguageFontsHook Setup", "#03fc0b");
 
+				var LoadPageUIAtPathHook = new Hook(
+					typeof(AmmonomiconController).GetMethod("LoadPageUIAtPath", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(AmmonomiconHooks).GetMethod("LoadPageUIAtPathHook", BindingFlags.Static | BindingFlags.NonPublic));
+				BotsModule.Log("AH: LoadPageUIAtPathHook Setup", "#03fc0b");
+				var UpdateEncounterStateHook = new Hook(
+					typeof(AmmonomiconPokedexEntry).GetMethod("UpdateEncounterState", BindingFlags.Instance | BindingFlags.Public),
+					typeof(AmmonomiconHooks).GetMethod("UpdateEncounterStateHook", BindingFlags.Static | BindingFlags.Public));
+				BotsModule.Log("AH: UpdateEncounterStateHook Setup", "#03fc0b");
+				return;
+				var SetEncounterStateHook = new Hook(
+					typeof(AmmonomiconPokedexEntry).GetMethod("SetEncounterState", BindingFlags.Instance | BindingFlags.Public),
+					typeof(AmmonomiconHooks).GetMethod("SetEncounterStateHook", BindingFlags.Static | BindingFlags.Public));
+				BotsModule.Log("AH: SetEncounterStateHook Setup", "#03fc0b");
 			}
 			catch (Exception arg)
 			{
@@ -56,7 +70,125 @@ namespace AmmonomiconAPI
 			}
 		}
 
-		public static void UpdateOnBecameActiveHook(Action<AmmonomiconPageRenderer> orig, AmmonomiconPageRenderer self)
+		public static void SetEncounterStateHook(AmmonomiconPokedexEntry self, AmmonomiconPokedexEntry.EncounterState st)
+		{
+			FieldInfo _childSprite = typeof(AmmonomiconPokedexEntry).GetField("m_childSprite", BindingFlags.NonPublic | BindingFlags.Instance);
+			
+			if (self.IsEquipmentPage)
+			{
+				return;
+			}
+			if (!self.ForceEncounterState)
+			{
+				self.encounterState = st;
+			}
+			
+			(_childSprite.GetValue(self) as tk2dClippedSprite).usesOverrideMaterial = true;
+			(_childSprite.GetValue(self) as tk2dClippedSprite).renderer.material.shader = ShaderCache.Acquire("Brave/AmmonomiconSpriteListShader");
+			(_childSprite.GetValue(self) as tk2dClippedSprite).renderer.material.DisableKeyword("BRIGHTNESS_CLAMP_ON");
+			(_childSprite.GetValue(self) as tk2dClippedSprite).renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
+			(_childSprite.GetValue(self) as tk2dClippedSprite).renderer.material.SetFloat("_SpriteScale", (_childSprite.GetValue(self) as tk2dClippedSprite).scale.x);
+			(_childSprite.GetValue(self) as tk2dClippedSprite).renderer.material.SetFloat("_Saturation", 1f);
+			(_childSprite.GetValue(self) as tk2dClippedSprite).renderer.material.SetColor("_OverrideColor", new Color(0.4f, 0.4f, 0.4f, 0f));
+			(_childSprite.GetValue(self) as tk2dClippedSprite).renderer.enabled = true;
+			self.questionMarkSprite.IsVisible = false;
+		}
+
+
+		public static void UpdateEncounterStateHook(AmmonomiconPokedexEntry self)
+		{
+			//Tools.Log("forcefully set encounter state", "#eb1313");
+			self.SetEncounterState(AmmonomiconPokedexEntry.EncounterState.ENCOUNTERED);
+		}
+
+		public delegate TResult Func<T1, T2, T3, T4, T5, TResult>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+
+		private static AmmonomiconPageRenderer LoadPageUIAtPathHook(Func<AmmonomiconController, string, AmmonomiconPageRenderer.PageType, bool, bool, AmmonomiconPageRenderer> orig, AmmonomiconController self, string path, AmmonomiconPageRenderer.PageType pageType, bool isPreCache = false, bool isVictory = false)
+		{
+
+			foreach (var page in Ammonomicon.customPages)
+			{
+				Tools.Log(page.Key, "#eb1313");
+			}
+
+			FieldInfo _extantPageMap = typeof(AmmonomiconController).GetField("m_extantPageMap", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _AmmonomiconBase = typeof(AmmonomiconController).GetField("m_AmmonomiconBase", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _offsets = typeof(AmmonomiconController).GetField("m_offsets", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _offsetInUse = typeof(AmmonomiconController).GetField("m_offsetInUse", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _LowerRenderTargetPrefab = typeof(AmmonomiconController).GetField("m_LowerRenderTargetPrefab", BindingFlags.NonPublic | BindingFlags.Instance);
+
+			if (Ammonomicon.customPages.ContainsKey(path))
+            {
+				AmmonomiconPageRenderer ammonomiconPageRenderer;
+				if ((_extantPageMap.GetValue(self) as Dictionary<AmmonomiconPageRenderer.PageType, AmmonomiconPageRenderer>).ContainsKey(pageType))
+				{
+					ammonomiconPageRenderer = (_extantPageMap.GetValue(self) as Dictionary<AmmonomiconPageRenderer.PageType, AmmonomiconPageRenderer>)[pageType];
+					if (pageType == AmmonomiconPageRenderer.PageType.DEATH_LEFT || pageType == AmmonomiconPageRenderer.PageType.DEATH_RIGHT)
+					{
+						AmmonomiconDeathPageController component = ammonomiconPageRenderer.transform.parent.GetComponent<AmmonomiconDeathPageController>();
+						component.isVictoryPage = isVictory;
+					}
+					Tools.Log("fff", "#eb1313");
+					ammonomiconPageRenderer.EnableRendering();
+					ammonomiconPageRenderer.DoRefreshData();
+					Tools.Log("hhh", "#eb1313");
+				}
+				else
+				{
+					Tools.Log("1", "#eb1313");
+					GameObject gameObject = (GameObject)UnityEngine.Object.Instantiate(Ammonomicon.customPages[path]); //(GameObject)UnityEngine.Object.Instantiate(BraveResources.Load(path, ".prefab"));
+					ammonomiconPageRenderer = gameObject.GetComponentInChildren<AmmonomiconPageRenderer>();
+					dfGUIManager component2 = (_AmmonomiconBase.GetValue(self) as GameObject).GetComponent<dfGUIManager>();
+					GameObject gameObject2 = UnityEngine.Object.Instantiate<GameObject>((_LowerRenderTargetPrefab.GetValue(self) as MeshRenderer).gameObject);
+					gameObject2.transform.parent = component2.transform.Find("Core");
+					gameObject2.transform.localPosition = Vector3.zero;
+					gameObject2.layer = LayerMask.NameToLayer("SecondaryGUI");
+					MeshRenderer component3 = gameObject2.GetComponent<MeshRenderer>();
+					Tools.Log("2", "#eb1313");
+					if (isVictory)
+					{
+						AmmonomiconDeathPageController component4 = ammonomiconPageRenderer.transform.parent.GetComponent<AmmonomiconDeathPageController>();
+						component4.isVictoryPage = true;
+					}
+					ammonomiconPageRenderer.Initialize(component3);
+					ammonomiconPageRenderer.EnableRendering();
+					Tools.Log("3", "#eb1313");
+					//List<bool>
+
+					for (int i = 0; i < (_offsetInUse.GetValue(self) as List<bool>).Count; i++)
+					{
+						if (!(_offsetInUse.GetValue(self) as List<bool>)[i])
+						{
+							(_offsetInUse.GetValue(self) as List<bool>)[i] = true;
+							gameObject.transform.position = (_offsets.GetValue(self) as List<Vector3>)[i];
+							ammonomiconPageRenderer.offsetIndex = i;
+							break;
+						}
+					}
+					Tools.Log("4", "#eb1313");
+					(_extantPageMap.GetValue(self) as Dictionary<AmmonomiconPageRenderer.PageType, AmmonomiconPageRenderer>).Add(pageType, ammonomiconPageRenderer);
+					if (isPreCache)
+					{
+						ammonomiconPageRenderer.Disable(isPreCache);
+					}
+					else
+					{
+						ammonomiconPageRenderer.transform.parent.parent = (_AmmonomiconBase.GetValue(self) as GameObject).transform.parent;
+					}
+					Tools.Log("5", "#eb1313");
+				}
+				return ammonomiconPageRenderer;
+			} 
+			else
+            {
+				return orig(self, path, pageType, isPreCache, isVictory);
+			}
+			
+		}
+
+		
+        #region a
+        public static void UpdateOnBecameActiveHook(Action<AmmonomiconPageRenderer> orig, AmmonomiconPageRenderer self)
 		{
 			self.ForceUpdateLanguageFonts();
 			if (AmmonomiconController.Instance.ImpendingLeftPageRenderer == null || AmmonomiconController.Instance.ImpendingLeftPageRenderer.LastFocusTarget == null)
@@ -219,7 +351,8 @@ namespace AmmonomiconAPI
 					break;
 
 				case (AmmonomiconPageRenderer.PageType)CustomEnums.CustomPageType.MODS_LEFT:
-					self.InitializeItemsPageLeft();
+					Ammonomicon.InitializeItemsPageLeft(self);
+					//self.InitializeItemsPageLeft();
 					//InitializeModsPageLeft(self);
 					break;
 
@@ -281,64 +414,74 @@ namespace AmmonomiconAPI
 			component.Height = component3.Height;
 			component3.Height = component.Height;
 		}
-
-		public static void OpenHook(Action<AmmonomiconInstanceManager> orig, AmmonomiconInstanceManager self)
+#endregion
+        public static void OpenHook(Action<AmmonomiconInstanceManager> orig, AmmonomiconInstanceManager self)
 		{
 			try
 			{
-				List<AmmonomiconBookmarkController> ammonomiconBookmarks = new List<AmmonomiconBookmarkController>();
+				//Ammonomicon.BuildBookmark("Mods", "BotsMod/sprites/wip", "BotsMod/sprites/wip");
+				List<AmmonomiconBookmarkController> ammonomiconBookmarks = self.bookmarks.ToList();
 
-				//var tabController = Ammonomicon.BuildBookmark("bookmark_bosses_hover_001", "bookmark_bosses_select_hover_001", AmmonomiconPageRenderer.PageType.BOSSES_RIGHT, AmmonomiconPageRenderer.PageType.BOSSES_LEFT);
-
-				foreach (var bookmark in self.bookmarks)
+				foreach (var bookmark in Ammonomicon.customBookmarks)
 				{
-					Tools.Log(bookmark.gameObject.name);
-					//if (bookmark.gameObject.name == "Death")
-					//{
-					//	deathBookmark = bookmark;
-					//}
-					//else
-					//{
-					ammonomiconBookmarks.Add(bookmark);
-					//}
-
-
+					
+					if (!ammonomiconBookmarks.Contains(bookmark))
+                    {
+						Tools.Log(bookmark.gameObject.name);
+						ammonomiconBookmarks.Insert(ammonomiconBookmarks.Count - 2, bookmark);
+					}
 				}
+
+				
+				
 				Tools.Log("8");
-				var dumbObj = UnityEngine.Object.Instantiate(ammonomiconBookmarks[2].gameObject);
+				var dumbObj = FakePrefab.Clone(self.bookmarks[ammonomiconBookmarks.Count - 1].gameObject);
 
 
 				AmmonomiconBookmarkController tabController2 = dumbObj.GetComponent<AmmonomiconBookmarkController>();
 
 				Tools.Log("9");
-				dumbObj.transform.parent = ammonomiconBookmarks[2].gameObject.transform.parent;
-				dumbObj.transform.position = ammonomiconBookmarks[2].gameObject.transform.position;
+				dumbObj.transform.parent = self.bookmarks[2].gameObject.transform.parent;
+				dumbObj.transform.position = self.bookmarks[2].gameObject.transform.position;
 				dumbObj.transform.localPosition = new Vector3(0, -1.2f, 0);
 
 				tabController2.gameObject.name = "Mods";
-				//tabController2.DeselectSelectedSpriteName = "bookmark_bosses_select_hover_001";
-				//tabController2.SelectSpriteName = "bookmark_enemies_hover_001";
-				tabController2.TargetNewPageLeft = "Global Prefabs/Ammonomicon Pages/Test Page Left";
-				tabController2.TargetNewPageRight = "Global Prefabs/Ammonomicon Pages/Test Page Right";
+				//1967693681992645534
+				tabController2.DeselectSelectedSpriteName = "bookmark_beyond_select_hover_001";
+				tabController2.SelectSpriteName = "bookmark_beyond_hover_001";
+
+				FieldInfo _sprites = typeof(dfAnimationClip).GetField("sprites", BindingFlags.NonPublic | BindingFlags.Instance);
+
+				var beyondClipObj = new GameObject("AmmonomiconBookmarkBeyondHover");
+				FakePrefab.MarkAsFakePrefab(beyondClipObj);
+				var beyondClip = beyondClipObj.AddComponent<dfAnimationClip>();
+				beyondClip.Atlas = self.bookmarks[2].AppearClip.Atlas;
+
+				_sprites.SetValue(beyondClip, new List<string> { "bookmark_beyond_001", "bookmark_beyond_002", "bookmark_beyond_003", "bookmark_beyond_004" });
+
+				var beyondClipObj2 = new GameObject("AmmonomiconBookmarkBeyondSelectHover");
+				FakePrefab.MarkAsFakePrefab(beyondClipObj2);
+				var beyondClip2 = beyondClipObj.AddComponent<dfAnimationClip>();
+				beyondClip2.Atlas = self.bookmarks[2].AppearClip.Atlas;
+
+				_sprites.SetValue(beyondClip2, new List<string> { "bookmark_beyond_select_001", "bookmark_beyond_select_002", "bookmark_beyond_select_003" });
+
+				tabController2.TargetNewPageLeft = "Global Prefabs/Ammonomicon Pages/Beyond Page Left";
+				tabController2.TargetNewPageRight = "Global Prefabs/Ammonomicon Pages/Info Page Right";
 				tabController2.RightPageType = (AmmonomiconPageRenderer.PageType)CustomEnums.CustomPageType.MODS_RIGHT;
 				//tabController2.RightPageType = AmmonomiconPageRenderer.PageType.ITEMS_RIGHT;
 				tabController2.LeftPageType = (AmmonomiconPageRenderer.PageType)CustomEnums.CustomPageType.MODS_LEFT;
 				//tabController2.LeftPageType = AmmonomiconPageRenderer.PageType.ITEMS_LEFT;
-				//tabController2.AppearClip = ammonomiconBookmarks[2].AppearClip;
-				//tabController2.SelectClip = ammonomiconBookmarks[2].SelectClip;
+				tabController2.AppearClip = beyondClip;
+				tabController2.SelectClip = beyondClip2;
 				Tools.Log("9.5");
-				FieldInfo m_sprite = typeof(AmmonomiconBookmarkController).GetField("m_sprite", BindingFlags.NonPublic | BindingFlags.Instance);
-				//var thing = m_sprite.GetValue(ammonomiconBookmarks[2]);
-				m_sprite.SetValue(tabController2, m_sprite.GetValue(ammonomiconBookmarks[2]));
-
+				
+				/*FieldInfo m_sprite = typeof(AmmonomiconBookmarkController).GetField("m_sprite", BindingFlags.NonPublic | BindingFlags.Instance);
+				m_sprite.SetValue(tabController2, m_sprite.GetValue(self.bookmarks[2]) as dfButton);
+				
 				FieldInfo m_animator = typeof(AmmonomiconBookmarkController).GetField("m_animator", BindingFlags.NonPublic | BindingFlags.Instance);
-				//var thing2 = m_animator.GetValue(ammonomiconBookmarks[2]);
-				m_animator.SetValue(tabController2, m_animator.GetValue(ammonomiconBookmarks[2]));
-
-				FieldInfo m_isCurrentPage = typeof(AmmonomiconBookmarkController).GetField("m_isCurrentPage", BindingFlags.NonPublic | BindingFlags.Instance);
-				//var thing3 = m_isCurrentPage.GetValue(ammonomiconBookmarks[2]);
-				m_isCurrentPage.SetValue(tabController2, m_isCurrentPage.GetValue(ammonomiconBookmarks[2]));
-
+				m_animator.SetValue(tabController2, m_animator.GetValue(self.bookmarks[2]) as dfSpriteAnimation);
+				*/
 				Tools.Log("10");
 
 				if (dumbObj.GetComponent<dfButton>() == null)
@@ -346,86 +489,31 @@ namespace AmmonomiconAPI
 					Tools.Log("dfButton nulled :(");
 				}
 
-				ammonomiconBookmarks.Insert(3, tabController2);
+				dumbObj.GetComponent<dfButton>().BackgroundSprite = "bookmark_beyond_004";
+
+				ammonomiconBookmarks.Insert(ammonomiconBookmarks.Count - 1, tabController2);
 
 				//ammonomiconBookmarks.Add(deathBookmark);
 
 				Tools.Log("11");
 				//self.bookmarks = ammonomiconBookmarks.ToArray();
-				self.bookmarks[2] = tabController2;
+
 				Tools.Log("12");
-				/*Tools.Log("=========Start========");
 
-				foreach (var bookmark in self.bookmarks)
-				{
-
-					var texture = bookmark.AppearClip.Atlas.Texture;
-					foreach (var item in bookmark.AppearClip.Atlas.Items)
-					{
-						int x = (int)item.region.x;
-						int y = (int)item.region.y;
-						int width = (int)item.region.width;
-						int height = (int)item.region.height;
-
-						Color[] pix = texture.GetPixels(x, y, width, height);
-						Texture2D destTex = new Texture2D(width, height);
-						destTex.SetPixels(pix);
-						destTex.Apply();
-						ToolsGAPI.ExportTexture(destTex, "BotsDUMPsprites", item.name);
-
-					}
-					
-
-					if (false != false)//bookmark.gameObject != null)
-					{
-						Tools.Log(bookmark.gameObject.name);
-						foreach (var comp in bookmark.gameObject.GetComponents<Component>())
-						{
-							if (comp != null)
-							{
-								Tools.Log($"======={comp} Start=======");
-								PropertyInfo[] properties = comp.GetType().GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
-								var _Crawled = new List<string>();
-								foreach (PropertyInfo propertyInfo in properties)
-								{
-									string text = propertyInfo.DeclaringType.FullName + "::" + propertyInfo.Name;
-									if (!GenericComponentInspector.PropertyBlacklist.Contains(text) && !_Crawled.Contains(text) && propertyInfo.MemberType != MemberTypes.Method && propertyInfo.GetIndexParameters().Length == 0 && propertyInfo.CanRead)// && propertyInfo.CanWrite)
-									{
-										_Crawled.Add(propertyInfo.Name);
-										try
-										{
-											object value = ReflectionHelper.GetValue(propertyInfo, comp);
-
-											Tools.Log("	" + propertyInfo.Name + ": " + value.ToStringIfNoString());
-										}
-										catch (Exception message)
-										{
-											Tools.Log("GenericComponentInspector: Blacklisting " + text);//, Tools.LOCKED_CHARACTOR_COLOR);
-											Tools.Log(message.ToString());//, Tools.LOCKED_CHARACTOR_COLOR);
-											GenericComponentInspector.PropertyBlacklist.Add(text);
-										}
-									}
-								}
-
-								Tools.Log($"========{comp} End========");
-							}
-
-
-
-						}
-						Tools.Log($"======End for {bookmark.gameObject.name}=====");
-					}
-
-				}
-				Tools.Log("=========End========");*/
-
-				dumbObj.SetActive(false);
-				//ItemAPI.FakePrefab.MarkAsFakePrefab(dumbObj);
-
+				dumbObj.SetActive(true);
+				//ItemAPI.FakePrefab.MarkAsFakePrefab(dumbObj);*/
+				self.bookmarks = ammonomiconBookmarks.ToArray();
 				Tools.Log("13");
 
+			
+
 				orig(self);
+				foreach (Transform bookmark in tabController2.transform.parent)
+				{
+					Tools.Log(bookmark.gameObject.name);
+				}
 			}
+
 			catch (Exception e)
 			{
 				Tools.Log("Ammonomicon broken :(", "#eb1313");
