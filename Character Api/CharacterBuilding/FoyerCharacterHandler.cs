@@ -36,21 +36,7 @@ namespace CustomCharacters
             //    Tools.Print(GameManager.Instance.PrimaryPlayer.transform.position, "55AAFF", true);
             //});
 
-            Hook overheadElemAppearHook = new Hook(
-                typeof(TalkDoerLite).GetMethod("CreateOverheadUI", BindingFlags.Instance | BindingFlags.NonPublic),
-                typeof(FoyerCharacterHandler).GetMethod("CreateOverheadUI")
-            );
-        }
-
-        public static void CreateOverheadUI(Action<TalkDoerLite> orig, TalkDoerLite self)
-        {
-            bool wasActive = self.OverheadUIElementOnPreInteract != null && self.OverheadUIElementOnPreInteract.activeSelf;
-
-            self.OverheadUIElementOnPreInteract.SetActive(true);
-            orig(self);
-            if (!wasActive)
-                self.OverheadUIElementOnPreInteract.SetActive(false);
-            Tools.Print("Did overhead swippity swap");
+     
         }
 
         public static List<FoyerCharacterSelectFlag> AddCustomCharactersToFoyer(List<FoyerCharacterSelectFlag> sortedByX)
@@ -74,7 +60,7 @@ namespace CustomCharacters
                     //This makes it so you can hover over them before choosing a character
                     //sortedByX.Insert(6, selectCharacter); 
                     sortedByX.Insert(6, selectCharacter);
-                    selectCharacter.OverheadElement.SetActive(true);
+                    //selectCharacter.OverheadElement.SetActive(true);
                     list.Add(selectCharacter);
                 }
                 catch (Exception e)
@@ -137,6 +123,7 @@ namespace CustomCharacters
 
             //Create new object
             FoyerCharacterSelectFlag selectFlag = GameObject.Instantiate(selectFlagPrefab).GetComponent<FoyerCharacterSelectFlag>();
+            FakePrefab.MarkAsFakePrefab(selectFlag.gameObject, true);
             selectFlag.transform.position = foyerPositions[customCharacter.First.characterID];
             selectFlag.CharacterPrefabPath = characterPath;
             selectFlag.name = "NPC_FoyerCharacter_" + customCharacter.First.nameShort;
@@ -149,8 +136,50 @@ namespace CustomCharacters
             var td = selectFlag.talkDoer;
 
             //Setup overhead card
+            if (!string.IsNullOrEmpty(customCharacter.First.pathForSprites))
+            {
+                var idleDoer = selectFlag.gameObject.GetComponent<CharacterSelectIdleDoer>();
+
+                idleDoer.AnimationLibraries = customCharacter.First.idleDoer.AnimationLibraries;
+                idleDoer.coreIdleAnimation = customCharacter.First.idleDoer.coreIdleAnimation;
+                idleDoer.onSelectedAnimation = customCharacter.First.idleDoer.onSelectedAnimation;
+                idleDoer.EeveeTex = customCharacter.First.idleDoer.EeveeTex;
+                idleDoer.idleMax = customCharacter.First.idleDoer.idleMax;
+                idleDoer.idleMin = customCharacter.First.idleDoer.idleMin;
+                idleDoer.IsEevee = customCharacter.First.idleDoer.IsEevee;
+                idleDoer.phases = customCharacter.First.idleDoer.phases;
+            }
+
+            
+            
+
+            if (customCharacter.First.removeFoyerExtras)
+            {
+                foreach (var child in selectFlag.gameObject.transform)
+                {
+                    //wow look i did a peta and killed a dog for no reason
+                    if (((Transform)child).gameObject.name == "Doggy")
+                    {
+                        UnityEngine.Object.DestroyImmediate(((Transform)child).gameObject);
+                    }
+                }
+                foreach (var phase in selectFlag.gameObject.GetComponent<CharacterSelectIdleDoer>().phases)
+                {
+                    phase.vfxTrigger = CharacterSelectIdlePhase.VFXPhaseTrigger.NONE;
+                    phase.endVFXSpriteAnimator = null;
+                }
+            }
+
+            foreach (var thing in customCharacter.First.randomFoyerBullshitNNAskedFor)
+            {
+                UnityEngine.Object.Instantiate<GameObject>(thing.First, selectFlag.transform).transform.localPosition = thing.Second;
+            }
+
             CreateOverheadCard(selectFlag, customCharacter.First);
+            //FakePrefab.MarkAsFakePrefab(selectFlag.OverheadElement);
+            ETGModConsole.Log(selectFlag.OverheadElement.ToString());
             td.OverheadUIElementOnPreInteract = selectFlag.OverheadElement;
+            //FakePrefab.MarkAsFakePrefab(td.OverheadUIElementOnPreInteract);
             Tools.Print("    Made Overhead Card");
 
             //Change the effect of talking to the character
@@ -294,32 +323,35 @@ namespace CustomCharacters
         {
             try
             {
+
+                if (selectCharacter.OverheadElement == null)
+                {
+                    ETGModConsole.Log($"CHR_{data.nameShort}Panel is null");
+                    return;
+                }
+
+                if (selectCharacter.OverheadElement?.name == $"CHR_{data.nameShort}Panel")
+                {
+                    ETGModConsole.Log($"CHR_{data.nameShort}Panel already exists");
+                    return;
+                }
+
                 //Create new card instance
                 selectCharacter.ClearOverheadElement();
-                selectCharacter.OverheadElement = FakePrefab.Clone(selectCharacter.OverheadElement);
-                selectCharacter.OverheadElement.SetActive(true);
+                var theCauseOfMySuffering = FakePrefab.Clone(selectCharacter.OverheadElement.GetComponentInChildren<CharacterSelectFacecardIdleDoer>().gameObject);
+                selectCharacter.OverheadElement = PrefabAPI.PrefabBuilder.Clone(selectCharacter.OverheadElement);
+                //selectCharacter.OverheadElement.SetActive(true);
+                selectCharacter.OverheadElement.name = $"CHR_{data.nameShort}Panel";
                 selectCharacter.OverheadElement.GetComponent<FoyerInfoPanelController>().followTransform = selectCharacter.transform;
+                //selectCharacter.OverheadElement.AddComponent<BotsMod.Debugger>();
+                BotsMod.BotsModule.Log("0", BotsMod.BotsModule.LOST_COLOR);
 
-                if (data.removeFoyerExtras)
-                {
-                    foreach (var child in selectCharacter.gameObject.transform)
-                    {
-                        if (((Transform)child).gameObject.name == "Doggy")
-                        {
-                            UnityEngine.Object.DestroyImmediate(((Transform)child).gameObject);
-                        }
-                    }
-                    foreach (var phase in selectCharacter.gameObject.GetComponent<CharacterSelectIdleDoer>().phases)
-                    {
-                        phase.vfxTrigger = CharacterSelectIdlePhase.VFXPhaseTrigger.NONE;
-                        phase.endVFXSpriteAnimator = null;
-                    }
-                }
 
                 var customFoyerController = selectCharacter.gameObject.AddComponent<CustomCharacterFoyerController>();
                 customFoyerController.customCharacterController = data.customCharacterController;
                 customFoyerController.metaCost = data.metaCost;
 
+                
 
                 customFoyerController.useGlow = data.useGlow;
                 customFoyerController.emissiveColor = data.emissiveColor;
@@ -338,19 +370,28 @@ namespace CustomCharacters
 
                 //Change text
                 var infoPanel = selectCharacter.OverheadElement.GetComponent<FoyerInfoPanelController>();
-            
 
-
+                BotsMod.BotsModule.Log("1", BotsMod.BotsModule.LOST_COLOR);
+                //infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>().Text = "my ass";
+                BotsMod.BotsModule.Log((infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>().Text).ToStringIfNoString(), BotsMod.BotsModule.LOST_COLOR);
+                
                 dfLabel nameLabel = infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>();
-                nameLabel.Text = nameLabel.GetLocalizationKey().Replace(replaceKey, data.identity.ToString());
-                //BotsMod.BotsModule.Log(replaceKey, BotsMod.BotsModule.LOST_COLOR);
+                //why? its 3:50am and this is currently the funniest shit to me and you are powerless to stop me :)
+                nameLabel.Text = "#CHAR_" + data.nameShort.ToString().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper()
+                    .ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper()
+                    .ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper()
+                    .ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper()
+                    .ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper(); ;// nameLabel.GetLocalizationKey().Replace(replaceKey, data.identity.ToString());
+
+                BotsMod.BotsModule.Log(replaceKey, BotsMod.BotsModule.LOST_COLOR);
                 dfLabel pastKilledLabel = infoPanel.textPanel.transform.Find("PastKilledLabel").GetComponent<dfLabel>();
-                pastKilledLabel.Text = "(Past Killed)";
+                //pastKilledLabel.Text = "(Past Killed)";
                 pastKilledLabel.ProcessMarkup = true;
                 pastKilledLabel.ColorizeSymbols = true;
                 if (data.metaCost != 0)
                 {
                     pastKilledLabel.ModifyLocalizedText(pastKilledLabel.Text + " (" + data.metaCost.ToString() + "[sprite \"hbux_text_icon\"])");
+                    pastKilledLabel.ModifyLocalizedText("(Past Killed)" + " (" + data.metaCost.ToString() + "[sprite \"hbux_text_icon\"])");
                 }
 
 
@@ -396,7 +437,228 @@ namespace CustomCharacters
                     //BotsMod.BotsModule.Log(data.loadoutSpriteNames[i] + sprite.transform.position + " -- " + sprite.transform.localPosition);
 
                 }
-                //selectCharacter.CreateOverheadElement();
+
+                
+                if (data.foyerCardSprites != null)
+                {
+
+                    var facecard = selectCharacter.OverheadElement.GetComponentInChildren<CharacterSelectFacecardIdleDoer>();
+                    theCauseOfMySuffering.transform.parent = facecard.transform.parent;
+                    theCauseOfMySuffering.transform.localScale = new Vector3(1, 1, 1);
+                    theCauseOfMySuffering.transform.localPosition = new Vector3(0, 1.687546f, 0.2250061f);
+                    theCauseOfMySuffering.transform.parent.localPosition = new Vector3(0, 0, 0);
+                    theCauseOfMySuffering.transform.parent.localScale = new Vector3(0.2f, 0.2f, 1);
+                    theCauseOfMySuffering.transform.parent.localScale = new Vector3(0.1975309f, 0.1975309f, 1);
+                    //theCauseOfMySuffering.transform.localScale = Vector3.one;
+                    //facecard.gameObject.SetActive(false);
+                    facecard.transform.parent = null;
+                    UnityEngine.Object.Destroy(facecard.gameObject);
+                    facecard = theCauseOfMySuffering.GetComponent<CharacterSelectFacecardIdleDoer>();
+                    facecard.gameObject.AddComponent<BotsMod.Debugger>();
+                    facecard.gameObject.name = data.nameShort + " Sprite FaceCard";
+                    //facecard.RegenerateCache();
+                    
+
+                    ETGModConsole.Log($"foyer cards arent null. {facecard.gameObject.transform.parent.position}");
+                    ETGModConsole.Log($"foyer cards arent null. {facecard.gameObject.activeSelf}");
+
+                    var orig = facecard.sprite.Collection;
+
+                    var idleAnimName = $"{data.nameShort}_facecard_idle";
+                    var appearAnimName = $"{data.nameShort}_facecard_appear";
+
+                    List<int> idleAnimIds = new List<int>();
+                    List<int> appearAnimIds = new List<int>();
+
+                    List<int> toCopyAppearAnimIds = new List<int>
+                    {
+                        230,
+                        231,
+                        232,
+                        233,
+                        234,
+                        235,
+                        236,
+                        237,
+                        238,
+                        239,
+                        240,
+                    };
+                    List<int> toCopyIdleAnimIds = new List<int>
+                    {
+                        241,
+                        242,
+                        243,
+                        244,
+                    };
+
+                    foreach (var sprite in data.foyerCardSprites)
+                    {
+                        if (sprite.name.ToLower().Contains("appear"))
+                        {
+                            appearAnimIds.Add(SpriteHandler.AddSpriteToCollectionWithAnchor(sprite, orig, tk2dBaseSprite.Anchor.LowerCenter, $"{data.nameShort}_{sprite.name}"));
+                            
+                        }
+                        else if (sprite.name.ToLower().Contains("idle"))
+                        {
+                            idleAnimIds.Add(SpriteHandler.AddSpriteToCollectionWithAnchor(sprite, orig, tk2dBaseSprite.Anchor.LowerCenter, $"{data.nameShort}_{sprite.name}"));
+                        }
+                        ETGModConsole.Log(sprite.name);
+                    }
+                    /*
+                    orig.spriteDefinitions[appearAnimIds[0]].position0 = new Vector3(-0.3f, 0, 0);
+                    orig.spriteDefinitions[appearAnimIds[0]].position1 = new Vector3(0.3f, 0, 0);
+                    orig.spriteDefinitions[appearAnimIds[0]].position2 = new Vector3(-0.3f, 2.4f, 0);
+                    orig.spriteDefinitions[appearAnimIds[0]].position3 = new Vector3(0.3f, 2.4f, 0);
+
+                    orig.spriteDefinitions[appearAnimIds[1]].position0 = new Vector3(-0.9f, 0.1f, 0);
+                    orig.spriteDefinitions[appearAnimIds[1]].position1 = new Vector3(0.8f, 0.1f, 0);
+                    orig.spriteDefinitions[appearAnimIds[1]].position2 = new Vector3(-0.9f, 2.4f, 0);
+                    orig.spriteDefinitions[appearAnimIds[1]].position3 = new Vector3(0.8f, 2.4f, 0);
+
+                    orig.spriteDefinitions[appearAnimIds[2]].position0 = new Vector3(-1.2f, 0.1f, 0);
+                    orig.spriteDefinitions[appearAnimIds[2]].position1 = new Vector3(1.2f, 0.1f, 0);
+                    orig.spriteDefinitions[appearAnimIds[2]].position2 = new Vector3(-1.2f, 2.5f, 0);
+                    orig.spriteDefinitions[appearAnimIds[2]].position3 = new Vector3(1.2f, 2.5f, 0);
+
+                    orig.spriteDefinitions[appearAnimIds[3]].position0 = new Vector3(-0.9f, 0.2f, 0);
+                    orig.spriteDefinitions[appearAnimIds[3]].position1 = new Vector3(0.8f, 0.2f, 0);
+                    orig.spriteDefinitions[appearAnimIds[3]].position2 = new Vector3(-0.9f, 2.6f, 0);
+                    orig.spriteDefinitions[appearAnimIds[3]].position3 = new Vector3(0.8f, 2.6f, 0);
+
+                    orig.spriteDefinitions[appearAnimIds[4]].position0 = new Vector3(-0.3f, 0.3f, 0);
+                    orig.spriteDefinitions[appearAnimIds[4]].position1 = new Vector3(0.3f, 0.3f, 0);
+                    orig.spriteDefinitions[appearAnimIds[4]].position2 = new Vector3(-0.3f, 2.6f, 0);
+                    orig.spriteDefinitions[appearAnimIds[4]].position3 = new Vector3(0.3f, 2.6f, 0);
+
+                    orig.spriteDefinitions[appearAnimIds[5]].position0 = new Vector3(-0.9f, 0.3f, 0);
+                    orig.spriteDefinitions[appearAnimIds[5]].position1 = new Vector3(0.8f, 0.3f, 0);
+                    orig.spriteDefinitions[appearAnimIds[5]].position2 = new Vector3(-0.9f, 2.6f, 0);
+                    orig.spriteDefinitions[appearAnimIds[5]].position3 = new Vector3(0.8f, 2.6f, 0);
+
+                    orig.spriteDefinitions[appearAnimIds[6]].position0 = new Vector3(-1.2f, 0.3f, 0);
+                    orig.spriteDefinitions[appearAnimIds[6]].position1 = new Vector3(1.2f, 0.3f, 0);
+                    orig.spriteDefinitions[appearAnimIds[6]].position2 = new Vector3(-1.2f, 2.6f, 0);
+                    orig.spriteDefinitions[appearAnimIds[6]].position3 = new Vector3(1.2f, 2.6f, 0);
+
+                    orig.spriteDefinitions[appearAnimIds[7]].position0 = new Vector3(-0.9f, 0.2f, 0);
+                    orig.spriteDefinitions[appearAnimIds[7]].position1 = new Vector3(0.8f, 0.2f, 0);
+                    orig.spriteDefinitions[appearAnimIds[7]].position2 = new Vector3(-0.9f, 2.6f, 0);
+                    orig.spriteDefinitions[appearAnimIds[7]].position3 = new Vector3(0.8f, 2.6f, 0);
+
+                    orig.spriteDefinitions[appearAnimIds[8]].position0 = new Vector3(-0.3f, 0.2f, 0);
+                    orig.spriteDefinitions[appearAnimIds[8]].position1 = new Vector3(0.3f, 0.2f, 0);
+                    orig.spriteDefinitions[appearAnimIds[8]].position2 = new Vector3(-0.3f, 2.6f, 0);
+                    orig.spriteDefinitions[appearAnimIds[8]].position3 = new Vector3(0.3f, 2.6f, 0);
+
+                    orig.spriteDefinitions[appearAnimIds[9]].position0 = new Vector3(-0.9f, 0.1f, 0);
+                    orig.spriteDefinitions[appearAnimIds[9]].position1 = new Vector3(0.8f, 0.1f, 0);
+                    orig.spriteDefinitions[appearAnimIds[9]].position2 = new Vector3(-0.9f, 2.5f, 0);
+                    orig.spriteDefinitions[appearAnimIds[9]].position3 = new Vector3(0.8f, 2.5f, 0);
+
+                    orig.spriteDefinitions[appearAnimIds[10]].position0 = new Vector3(-1.2f, 0.1f, 0);
+                    orig.spriteDefinitions[appearAnimIds[10]].position1 = new Vector3(1.2f, 0.1f, 0);
+                    orig.spriteDefinitions[appearAnimIds[10]].position2 = new Vector3(-1.2f, 2.4f, 0);
+                    orig.spriteDefinitions[appearAnimIds[10]].position3 = new Vector3(1.2f, 2.4f, 0);
+                    
+                    for(int i = 11; i < appearAnimIds.Count; i++)
+                    {
+                        orig.spriteDefinitions[appearAnimIds[i]].position0 = new Vector3(-1.2f, 0.1f, 0);
+                        orig.spriteDefinitions[appearAnimIds[i]].position1 = new Vector3(1.2f, 0.1f, 0);
+                        orig.spriteDefinitions[appearAnimIds[i]].position2 = new Vector3(-1.2f, 2.4f, 0);
+                        orig.spriteDefinitions[appearAnimIds[i]].position3 = new Vector3(1.2f, 2.4f, 0);
+                    }
+
+                    for (int i = 5; i < idleAnimIds.Count; i++)
+                    {
+                        orig.spriteDefinitions[idleAnimIds[i]].position0 = new Vector3(-1.2f, 0.1f, 0);
+                        orig.spriteDefinitions[idleAnimIds[i]].position1 = new Vector3(1.2f, 0.1f, 0);
+                        orig.spriteDefinitions[idleAnimIds[i]].position2 = new Vector3(-1.2f, 2.4f, 0);
+                        orig.spriteDefinitions[idleAnimIds[i]].position3 = new Vector3(1.2f, 2.4f, 0);
+                    }
+
+                    var mat = new Material(orig.spriteDefinitions[0].material);*/
+                    for (int i = 0; i < appearAnimIds.Count; i++)
+                    {
+                        orig.spriteDefinitions[appearAnimIds[i]].position0 = orig.spriteDefinitions[toCopyAppearAnimIds[i]] == null ? orig.spriteDefinitions[toCopyAppearAnimIds[10]].position0 : orig.spriteDefinitions[toCopyAppearAnimIds[i]].position0;
+                        orig.spriteDefinitions[appearAnimIds[i]].position1 = orig.spriteDefinitions[toCopyAppearAnimIds[i]] == null ? orig.spriteDefinitions[toCopyAppearAnimIds[10]].position1 : orig.spriteDefinitions[toCopyAppearAnimIds[i]].position1;
+                        orig.spriteDefinitions[appearAnimIds[i]].position2 = orig.spriteDefinitions[toCopyAppearAnimIds[i]] == null ? orig.spriteDefinitions[toCopyAppearAnimIds[10]].position2 : orig.spriteDefinitions[toCopyAppearAnimIds[i]].position2;
+                        orig.spriteDefinitions[appearAnimIds[i]].position3 = orig.spriteDefinitions[toCopyAppearAnimIds[i]] == null ? orig.spriteDefinitions[toCopyAppearAnimIds[10]].position3 : orig.spriteDefinitions[toCopyAppearAnimIds[i]].position3;
+
+                        /*
+                        var safeForLaterName = orig.spriteDefinitions[appearAnimIds[i]].name;
+                        var safeForLaterBoundsDataCenter = orig.spriteDefinitions[appearAnimIds[i]].boundsDataCenter;
+                        var safeForLaterBoundsDataExtents = orig.spriteDefinitions[appearAnimIds[i]].boundsDataExtents;
+                        var safeForLaterUntrimmedBoundsDataCenter = orig.spriteDefinitions[appearAnimIds[i]].untrimmedBoundsDataCenter;
+                        var safeForLaterUntrimmedBoundsDataExtents = orig.spriteDefinitions[appearAnimIds[i]].untrimmedBoundsDataExtents;
+                        var safeForLaterUv = orig.spriteDefinitions[appearAnimIds[i]].uvs;
+
+                        
+
+                        def.name = safeForLaterName;
+                        def.boundsDataCenter = safeForLaterBoundsDataCenter;
+                        def.boundsDataExtents = safeForLaterBoundsDataExtents;
+                        def.untrimmedBoundsDataCenter = safeForLaterUntrimmedBoundsDataCenter;
+                        def.untrimmedBoundsDataExtents = safeForLaterUntrimmedBoundsDataExtents;
+                        def.uvs = safeForLaterUv;
+
+                        orig.spriteDefinitions[appearAnimIds[i]] = def;*/
+                    }
+
+                    for (int i = 0; i < idleAnimIds.Count; i++)
+                    {
+
+                        orig.spriteDefinitions[idleAnimIds[i]].position0 = orig.spriteDefinitions[toCopyIdleAnimIds[i]] == null ? orig.spriteDefinitions[toCopyIdleAnimIds[10]].position0 : orig.spriteDefinitions[toCopyIdleAnimIds[i]].position0;
+                        orig.spriteDefinitions[idleAnimIds[i]].position1 = orig.spriteDefinitions[toCopyIdleAnimIds[i]] == null ? orig.spriteDefinitions[toCopyIdleAnimIds[10]].position1 : orig.spriteDefinitions[toCopyIdleAnimIds[i]].position1;
+                        orig.spriteDefinitions[idleAnimIds[i]].position2 = orig.spriteDefinitions[toCopyIdleAnimIds[i]] == null ? orig.spriteDefinitions[toCopyIdleAnimIds[10]].position2 : orig.spriteDefinitions[toCopyIdleAnimIds[i]].position2;
+                        orig.spriteDefinitions[idleAnimIds[i]].position3 = orig.spriteDefinitions[toCopyIdleAnimIds[i]] == null ? orig.spriteDefinitions[toCopyIdleAnimIds[10]].position3 : orig.spriteDefinitions[toCopyIdleAnimIds[i]].position3;
+
+                        /*
+                        var safeForLaterName = orig.spriteDefinitions[idleAnimIds[i]].name;
+                        var safeForLaterBoundsDataCenter = orig.spriteDefinitions[idleAnimIds[i]].boundsDataCenter;
+                        var safeForLaterBoundsDataExtents = orig.spriteDefinitions[idleAnimIds[i]].boundsDataExtents;
+                        var safeForLaterUntrimmedBoundsDataCenter = orig.spriteDefinitions[idleAnimIds[i]].untrimmedBoundsDataCenter;
+                        var safeForLaterUntrimmedBoundsDataExtents = orig.spriteDefinitions[idleAnimIds[i]].untrimmedBoundsDataExtents;
+                        var safeForLaterUv = orig.spriteDefinitions[idleAnimIds[i]].uvs;
+
+                       
+
+                        def.name = safeForLaterName;
+                        def.boundsDataCenter = safeForLaterBoundsDataCenter;
+                        def.boundsDataExtents = safeForLaterBoundsDataExtents;
+                        def.untrimmedBoundsDataCenter = safeForLaterUntrimmedBoundsDataCenter;
+                        def.untrimmedBoundsDataExtents = safeForLaterUntrimmedBoundsDataExtents;
+                        def.uvs = safeForLaterUv;
+
+                        orig.spriteDefinitions[idleAnimIds[i]] = def;*/
+                    }
+
+
+                    foreach (var def in orig.spriteDefinitions)
+                    {
+                        if (def.name.ToLower().Contains("appear") || def.name.ToLower().Contains("idle"))
+                        {
+                            //ETGModConsole.Log($"{def.name} [{orig.GetSpriteIdByName(def.name)}]: {def.position0} - {def.position1} - {def.position2} - {def.position3}");
+                        }
+                    }
+                    facecard.gameObject.SetActive(true);
+                    facecard.spriteAnimator = facecard.gameObject.GetComponent<tk2dSpriteAnimator>();
+
+                    SpriteBuilder.AddAnimation(facecard.spriteAnimator, orig, idleAnimIds, idleAnimName, tk2dSpriteAnimationClip.WrapMode.Loop, 4);
+                    var name = SpriteBuilder.AddAnimation(facecard.spriteAnimator, orig, appearAnimIds, appearAnimName, tk2dSpriteAnimationClip.WrapMode.Once, 17);
+
+                    facecard.spriteAnimator.DefaultClipId = facecard.spriteAnimator.Library.GetClipIdByName(appearAnimName);
+
+                    foreach(var anim in facecard.spriteAnimator.Library.clips)
+                    {
+                        ETGModConsole.Log($"{anim.name}: {anim.frames.Length}");
+                    }
+
+                    facecard.appearAnimation = appearAnimName;
+                    facecard.coreIdleAnimation = idleAnimName;
+                }
+
+                    //selectCharacter.CreateOverheadElement();
 
             }
 
@@ -448,10 +710,9 @@ namespace CustomCharacters
             */
 
             //Swap out face sprites
-            if (data.foyerCardSprites != null)
-            {
-                var facecard = selectCharacter.OverheadElement.GetComponentInChildren<CharacterSelectFacecardIdleDoer>();
-                var orig = facecard.sprite.Collection;
+ 
+
+                /*
                 var copyCollection = GameObject.Instantiate(orig);
 
                 tk2dSpriteDefinition[] copyDefinitions = new tk2dSpriteDefinition[orig.spriteDefinitions.Length];
@@ -489,15 +750,14 @@ namespace CustomCharacters
 					var def = copyCollection.spriteDefinitions[i];
 					Console.WriteLine(def.name);
 					if (!def.name.Contains("facecard")) continue;
-
-					Console.WriteLine("FACECARD");
+                    Console.WriteLine("FACECARD");
 					Console.WriteLine($"{def.material.mainTexture.width} {def.material.mainTexture.height} {def.uvs[0].x},{def.uvs[0].y} {def.uvs[1].x},{def.uvs[1].y} {def.uvs[2].x},{def.uvs[2].y} {def.uvs[3].x},{def.uvs[3].y} ");
 
 
-				}
-                
-            }
-            selectCharacter.OverheadElement.SetActive(false);
+				}*/
+
+            
+            //selectCharacter.OverheadElement.SetActive(false);
         }
 
         private static void OnPlayerCharacterChanged(PlayerController player, FoyerCharacterSelectFlag selectCharacter, string characterPath)

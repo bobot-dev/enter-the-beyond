@@ -42,10 +42,12 @@ namespace CustomCharacters
             { "death", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
             { "death_coop", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 16) },
             { "death_shot", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
+
             { "dodge", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
             { "dodge_bw", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
             { "dodge_left", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
             { "dodge_left_bw", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
+
             { "doorway", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 10) },
             { "ghost_idle_back", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 4) },
             { "ghost_idle_back_left", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 4) },
@@ -105,11 +107,12 @@ namespace CustomCharacters
             { "spinfall", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 16) },
             { "spit_out", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 12) },
 
-            { "tablekick_down", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
-            { "tablekick_down_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
-            { "tablekick_right", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
-            { "tablekick_right_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
-            { "tablekick_up", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
+            { "tablekick_down", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 8) },
+            { "tablekick_down_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 8) },
+            { "tablekick_right", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 8) },
+            { "tablekick_right_hand", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 8) },
+            { "tablekick_up", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 8) },
+
             { "timefall", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
         };
 
@@ -121,7 +124,7 @@ namespace CustomCharacters
             if (data.bossCard != null)
                 HandleBossCards(player, data);
 
-            if ((data.altSprites != null || data.altPlayerSheet != null) && string.IsNullOrEmpty(data.pathForSprites))
+            if ((data.altSprites != null || data.altPlayerSheet != null) && string.IsNullOrEmpty(data.pathForAltSprites))
                 HandleAltAnimations(player, data);
 
 
@@ -129,7 +132,10 @@ namespace CustomCharacters
                 HandleAnimations(player, data);
 
             if (!string.IsNullOrEmpty(data.pathForSprites))
-                SetupLitterallyEverything(player, data, data.pathForSprites);
+                SetupLitterallyEverything(player, data, data.pathForSprites, false);
+
+            if (!string.IsNullOrEmpty(data.pathForAltSprites))
+                SetupLitterallyEverything(player, data, data.pathForAltSprites, true);
 
 
             //face card stuff
@@ -402,18 +408,18 @@ namespace CustomCharacters
         static Dictionary<string, object> rooms;
 
 
-        public static void SetupLitterallyEverything(PlayerController player, CustomCharacterData data, string path)
+        public static void SetupLitterallyEverything(PlayerController player, CustomCharacterData data, string path, bool alt)
         {
             //BotsModule.Log(path);
 
             //
             List<string> anims = new List<string>();
 
-            GameObject libaryObject = new GameObject((data.nameShort + "Animator").Replace(" ", "_"));
+            GameObject libaryObject = new GameObject((data.nameShort + "Animator").Replace(" ", "_") + (alt ? "_alt" : ""));
 
             FakePrefab.MarkAsFakePrefab(libaryObject);
 
-            data.collection = SpriteBuilder.ConstructCollection(libaryObject, (data.nameShort + "CustomCollection").Replace(" ", "_"));
+            data.collection = SpriteBuilder.ConstructCollection(libaryObject, (data.nameShort + "CustomCollection").Replace(" ", "_") + (alt ? "_alt" : ""));
             
             //UnityEngine.Object.DontDestroyOnLoad(data.collection);
             data.animator = libaryObject.GetOrAddComponent<tk2dSpriteAnimator>();
@@ -426,9 +432,22 @@ namespace CustomCharacters
                 {
                     anims.Add(splitPath[splitPath.Count() - 3]);
 
+                    var dirName = "";
 
+                    if (splitPath[splitPath.Count() - 4] == "custom")
+                    {
+                        dirName = "custom";
+                    }
+                    else if (splitPath[splitPath.Count() - 4] == "breach_idles")
+                    {
+                        dirName = "breach_idles";
+                    }
+                    else
+                    {
+                        dirName = splitPath[splitPath.Count() - 3];
+                    }
+                    //var dirName = splitPath[splitPath.Count() - 4] == "custom" ? "custom" : splitPath[splitPath.Count() - 3];//(file.Replace(path, ""));//.Replace(".", "");
 
-                    var dirName = splitPath[splitPath.Count() - 4] == "custom" ? "custom" : splitPath[splitPath.Count() - 3];//(file.Replace(path, ""));//.Replace(".", "");
                     //BotsModule.Log($"{file} -=- {dirName}");
                     var animName = data.nameShort + "_" + dirName;
                     List<Texture2D> textures = new List<Texture2D>();
@@ -450,7 +469,7 @@ namespace CustomCharacters
                         animName = data.nameShort + "_" + customDirName;
                         textures = GungeonAPI.ResourceExtractor.GetTexturesFromResource($"{path}.{dirName}.{customDirName}");
 
-                        for (int i = 1; i < textures.Count; i++)
+                        for (int i = 0; i < textures.Count; i++)
                         {
                             spriteIds.Add(AddSpriteToCollection(textures[i], data.collection, animName + i.ToString()));
                         }
@@ -461,9 +480,24 @@ namespace CustomCharacters
 
                         //}
                     }
-                    else if (dirName == "breach_idles")
+                    else if (dirName.Contains("breach_idles"))
                     {
-                        continue;
+                        //continue;
+
+                        var customDirName = splitPath[splitPath.Count() - 3];
+                        BotsModule.Log($"Custom breach animation found \"{customDirName}\"");
+                        animName = data.nameShort + "_" + customDirName;
+                        textures = GungeonAPI.ResourceExtractor.GetTexturesFromResource($"{path}.{dirName}.{customDirName}");
+
+                        for (int i = 0; i < textures.Count; i++)
+                        {
+                            spriteIds.Add(AddSpriteToCollection(textures[i], data.collection, animName + i.ToString()));
+                        }
+                        if (textures.Count > 0)
+                        {
+                            SpriteBuilder.AddAnimation(data.animator, data.collection, spriteIds, customDirName, tk2dSpriteAnimationClip.WrapMode.Loop, 8);
+                        }
+                        /*
                         foreach (var customDir in Directory.GetDirectories(file))
                         {
                             var customDirName = customDir.Replace(file, "").Replace(".", "");
@@ -480,31 +514,58 @@ namespace CustomCharacters
                                 SpriteBuilder.AddAnimation(data.animator, data.collection, spriteIds, customDirName, tk2dSpriteAnimationClip.WrapMode.Loop, 8);
                             }
 
-                        }
+                        }*/
                     }
                     else
                     {
-                        if ((dirName.EndsWith("_hand") || dirName.EndsWith("_twohands")) && file.Contains("cc_sprite_placeholder"))//textures.Count <= 0)
+                        if (((dirName.EndsWith("_hand") || dirName.EndsWith("_twohands"))) && file.Contains("cc_sprite_placeholder"))//textures.Count <= 0)
                         {
-                            BotsModule.Log($"hands located! lethal force engaged against {dirName}");
+                            //BotsModule.Log($"hands located! lethal force engaged against {dirName}");
                             textures = GungeonAPI.ResourceExtractor.GetTexturesFromResource((path + "." + dirName).Replace("_twohands", "").Replace("_hand", ""));
                         }
                         if (textures.Count > 0)
                         {
-                            BotsModule.Log(textures.Count.ToString());
-                            for (int i = 1; i < textures.Count; i++)
+                            
+                            for (int i = 0; i < textures.Count; i++)
                             {
                                 spriteIds.Add(AddSpriteToCollection(textures[i], data.collection, animName + i.ToString()));
                             }
+                            //BotsModule.Log($"{dirName}: {textures.Count}/{spriteIds.Count}");
+
                             if (playerAnimInfo.ContainsKey(dirName.Replace("_armorless", "")))
                             {
                                 //BotsModule.Log(spriteIds.Count.ToString());
 
-                                SpriteBuilder.AddAnimation(data.animator, data.collection, spriteIds, dirName, playerAnimInfo[dirName.Replace("_armorless", "")].First, playerAnimInfo[dirName.Replace("_armorless", "")].Second);
+                                var anim = SpriteBuilder.AddAnimation(data.animator, data.collection, spriteIds, dirName, playerAnimInfo[dirName.Replace("_armorless", "")].First, playerAnimInfo[dirName.Replace("_armorless", "")].Second);
+
+                                if (dirName.Contains("dodge"))
+                                {
+                                    for(int i = 0; i <= (anim.frames.Length/2); i++)
+                                    {
+                                        anim.frames[i].invulnerableFrame = true;
+                                        anim.frames[i].groundedFrame = false;
+                                    }
+                                }
+
+                                if (dirName.Contains("tablekick"))
+                                {
+                                    for (int i = 0; i < (anim.frames.Length); i++)
+                                    {
+                                        anim.frames[i].invulnerableFrame = true;
+                                    }
+                                }
+
+                                if (dirName.Contains("slide"))
+                                {
+                                    for (int i = 0; i < (anim.frames.Length); i++)
+                                    {
+                                        anim.frames[i].invulnerableFrame = true;
+                                    }
+                                }
                             }
                             else
                             {
-                                BotsModule.Log($"well well well {dirName} has decided its special and can do whatever the fuck it wants but its wrong so im throwing it into containment");
+                                BotsModule.Log($"well well well {dirName} has decided its special and can do whatever the fuck it wants, so im throwing it into containment");
                             }
                         }
                         else
@@ -514,16 +575,23 @@ namespace CustomCharacters
                     }
                 }
             }
-            player.spriteAnimator.Library = data.animator.Library;
+            if (alt)
+            {
+                player.AlternateCostumeLibrary = data.animator.Library;              
+            }
+            else
+            {
+                player.spriteAnimator.Library = data.animator.Library;
 
-            player.sprite.Collection = data.collection;
+                player.sprite.Collection = data.collection;
+            }
 
             //ToolsGAPI.ExportTexture(TextureStitcher.GetReadable(data.collection.textures[0]), "SpriteDump/balls", data.nameShort + UnityEngine.Random.Range(1, 10000));
 
-            foreach (var anim in data.animator.Library.clips)
-            {
-                //BotsModule.Log($"Name: {anim.name} - Fps: {anim.fps} - Frame Count: {anim.frames.Count()} - Loop Mode: {anim.wrapMode}");
-            }
+            //foreach (var anim in data.animator.Library.clips)
+            //{
+            //    BotsModule.Log($"Name: {anim.name} - Fps: {anim.fps} - Frame Count: {anim.frames.Count()} - Loop Mode: {anim.wrapMode}");
+            //}
 
         }
 
@@ -545,6 +613,77 @@ namespace CustomCharacters
 
 
             return AddSpriteToCollection(definition, collection);
+        }
+
+        /// <summary>
+        /// Adds a sprite (from a texture) to a collection
+        /// </summary>
+        /// <returns>The spriteID of the defintion in the collection</returns>
+        public static int AddSpriteToCollectionWithAnchor(Texture2D texture, tk2dSpriteCollectionData collection, tk2dBaseSprite.Anchor anchor, string name = "")
+        {
+            var definition = ConstructDefinition(texture); //Generate definition
+            if (string.IsNullOrEmpty(name))
+            {
+                definition.name = texture.name; //naming the definition is actually extremely important 
+            }
+            else
+            {
+                definition.name = name; //naming the definition is actually extremely important 
+            }
+            definition.ConstructOffsetsFromAnchor(anchor);
+
+            return AddSpriteToCollection(definition, collection);
+        }
+
+        public static void ConstructOffsetsFromAnchor(this tk2dSpriteDefinition def, tk2dBaseSprite.Anchor anchor, Vector2? scale = null, bool fixesScale = false, bool changesCollider = true)
+        {
+            if (!scale.HasValue)
+            {
+                scale = new Vector2?(def.position3);
+            }
+            if (fixesScale)
+            {
+                Vector2 fixedScale = scale.Value - def.position0.XY();
+                scale = new Vector2?(fixedScale);
+            }
+            float xOffset = 0;
+            if (anchor == tk2dBaseSprite.Anchor.LowerCenter || anchor == tk2dBaseSprite.Anchor.MiddleCenter || anchor == tk2dBaseSprite.Anchor.UpperCenter)
+            {
+                xOffset = -(scale.Value.x / 2f);
+            }
+            else if (anchor == tk2dBaseSprite.Anchor.LowerRight || anchor == tk2dBaseSprite.Anchor.MiddleRight || anchor == tk2dBaseSprite.Anchor.UpperRight)
+            {
+                xOffset = -scale.Value.x;
+            }
+            float yOffset = 0;
+            if (anchor == tk2dBaseSprite.Anchor.MiddleLeft || anchor == tk2dBaseSprite.Anchor.MiddleCenter || anchor == tk2dBaseSprite.Anchor.MiddleLeft)
+            {
+                yOffset = -(scale.Value.y / 2f);
+            }
+            else if (anchor == tk2dBaseSprite.Anchor.UpperLeft || anchor == tk2dBaseSprite.Anchor.UpperCenter || anchor == tk2dBaseSprite.Anchor.UpperRight)
+            {
+                yOffset = -scale.Value.y;
+            }
+            def.MakeOffset(new Vector2(xOffset, yOffset), changesCollider);
+        }
+
+
+        public static void MakeOffset(this tk2dSpriteDefinition def, Vector2 offset, bool changesCollider = false)
+        {
+            float xOffset = offset.x;
+            float yOffset = offset.y;
+            def.position0 += new Vector3(xOffset, yOffset, 0);
+            def.position1 += new Vector3(xOffset, yOffset, 0);
+            def.position2 += new Vector3(xOffset, yOffset, 0);
+            def.position3 += new Vector3(xOffset, yOffset, 0);
+            def.boundsDataCenter += new Vector3(xOffset, yOffset, 0);
+            def.boundsDataExtents += new Vector3(xOffset, yOffset, 0);
+            def.untrimmedBoundsDataCenter += new Vector3(xOffset, yOffset, 0);
+            def.untrimmedBoundsDataExtents += new Vector3(xOffset, yOffset, 0);
+            if (def.colliderVertices != null && def.colliderVertices.Length > 0 && changesCollider)
+            {
+                def.colliderVertices[0] += new Vector3(xOffset, yOffset, 0);
+            }
         }
 
         /// <summary>
@@ -763,6 +902,11 @@ namespace CustomCharacters
 
                 for (int i = 0; i < clip.frames.Length; i++)
                 {
+                    if (clip.frames[i].invulnerableFrame)
+                    {
+                        BotsModule.Log($"{clip.name} {i}: {clip.frames[i].invulnerableFrame}");
+                    }
+
                     clip.frames[i].spriteCollection = copyCollection;
                 }
             }
@@ -900,7 +1044,6 @@ namespace CustomCharacters
 
 
             data.AlternateCostumeLibrary = player.AlternateCostumeLibrary;
-            BotsModule.LostAltSkinAnimator = player.AlternateCostumeLibrary;
 
             copyCollection.name = player.OverrideDisplayName + "_alt";
 

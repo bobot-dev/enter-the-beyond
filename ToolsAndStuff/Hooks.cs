@@ -168,7 +168,7 @@ namespace BotsMod
 					typeof(OnActiveItemUsedSynergyProcessor).GetMethod("HandlePreDrop", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("HandlePreDropHook", BindingFlags.Static | BindingFlags.NonPublic));
 
-				BotsModule.Log("pre unfix hook2");*/
+				BotsModule.Log("pre unfix hook2");
 				var HandleActivationStatusChangedHook = new Hook(
 					typeof(OnActiveItemUsedSynergyProcessor).GetMethod("HandleActivationStatusChanged", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("HandleActivationStatusChangedHook", BindingFlags.Static | BindingFlags.NonPublic));
@@ -224,10 +224,10 @@ namespace BotsMod
 				var IsValidHook = new Hook(
 					typeof(GunFormeData).GetMethod("IsValid", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("IsValidHook", BindingFlags.Static | BindingFlags.Public));
-				
+
 				var UpdatePlayerConsumablesHook = new Hook(
 					typeof(GameUIRoot).GetMethod("UpdatePlayerConsumables", BindingFlags.Instance | BindingFlags.Public),
-					typeof(Hooks).GetMethod("UpdatePlayerConsumablesHook", BindingFlags.Static | BindingFlags.Public));
+					typeof(Hooks).GetMethod("UpdatePlayerConsumablesHook", BindingFlags.Static | BindingFlags.Public));*/
 
 				/*var UpdateAnimationNamesselfdOnSacksHook = new Hook(
 					typeof(SackKnightController).GetMethod("UpdateAnimationNamesselfdOnSacks", BindingFlags.Instance | BindingFlags.NonPublic),
@@ -258,7 +258,7 @@ namespace BotsMod
 					typeof(Hooks).GetMethod("TheresNoFuckingWayThisWorks", BindingFlags.Static | BindingFlags.NonPublic));
 
 
-				/*var TriggerSilencerHook = new Hook(
+				var TriggerSilencerHook = new Hook(
 					typeof(SilencerInstance).GetMethod("TriggerSilencer", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("TriggerSilencerHook", BindingFlags.Static | BindingFlags.Public));
 
@@ -266,6 +266,7 @@ namespace BotsMod
 					typeof(GameUIBlankController).GetMethod("UpdateBlanks", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("UpdateBlanksHook", BindingFlags.Static | BindingFlags.Public));
 				BotsModule.Log("aaa");
+				/*
 				var ProcessHeartSpriteModificationsHook = new Hook(
 					typeof(GameUIHeartController).GetMethod("ProcessHeartSpriteModifications", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("ProcessHeartSpriteModificationsHook", BindingFlags.Static | BindingFlags.NonPublic));
@@ -275,20 +276,27 @@ namespace BotsMod
 					typeof(HealthHaver).GetMethod("ApplyDamageDirectional", BindingFlags.NonPublic | BindingFlags.Instance),
 					typeof(Hooks).GetMethod("ApplyDamageDirectionalHook", BindingFlags.Static | BindingFlags.Public));
 
-
+				
 				var LocalTimeScaleHook = new Hook(
 				   typeof(Projectile).GetProperty("LocalTimeScale", BindingFlags.Instance | BindingFlags.NonPublic).GetGetMethod(),
 				   typeof(Hooks).GetMethod("LocalTimeScaleHook", BindingFlags.Static | BindingFlags.Public));
 				*/
-				//var InitSGUI = new Hook(
-				//   typeof(SGUIIMBackend).GetMethod("Init", BindingFlags.Instance | BindingFlags.Public),
-				//   typeof(Hooks).GetMethod("InitSGUI", BindingFlags.Static | BindingFlags.Public));
+				//new Hook(typeof(Projectile).GetProperty("LocalTimeScale", BindingFlags.Instance | BindingFlags.NonPublic).GetGetMethod(), typeof(Hooks).GetMethod("LocalTimeScaleHook"));
 
 				//var BraveLogHook = new Hook(
 				//typeof(BraveUtility).GetMethod("Log", BindingFlags.Static | BindingFlags.Public),
 				//typeof(Hooks).GetMethod("BraveLogHook", BindingFlags.Static | BindingFlags.Public));
 
-				BotsModule.Log("hooks set up hopefully");
+
+				var CheckSourceInKnockbacksHook = new Hook(
+					typeof(KnockbackDoer).GetMethod("CheckSourceInKnockbacks", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("CheckSourceInKnockbacksHook", BindingFlags.Static | BindingFlags.NonPublic));
+
+				/*var RegisterConnectedRoomHook = new Hook(
+					typeof(RoomHandler).GetMethod("RegisterConnectedRoom", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("RegisterConnectedRoomHook", BindingFlags.Static | BindingFlags.Public)); */
+
+				 BotsModule.Log("hooks set up hopefully");
 
 			}
 			catch (Exception arg)
@@ -299,25 +307,50 @@ namespace BotsMod
 			}
 		}
 
+		public static void RegisterConnectedRoomHook(RoomHandler self, RoomHandler other, RuntimeRoomExitData usedExit)
+		{
+			usedExit.oneWayDoor = true;
+			usedExit.isLockedDoor = false;
+			self.area.instanceUsedExits.Add(usedExit.referencedExit);
+			self.area.exitToLocalDataMap.Add(usedExit.referencedExit, usedExit);
+			self.connectedRooms.Add(other);
+			self.connectedRoomsByExit.Add(usedExit.referencedExit, other);
+		}
 
-		public static void InitSGUI(Action<SGUIIMBackend> orig, SGUIIMBackend self)
+		private static bool CheckSourceInKnockbacksHook(KnockbackDoer self, GameObject source)
 		{
 
-			FieldInfo initialized = typeof(SGUIIMBackend).GetField("Initialized", BindingFlags.Public | BindingFlags.Instance);
+			FieldInfo _activeKnockbacks = typeof(KnockbackDoer).GetField("m_activeKnockbacks", BindingFlags.NonPublic | BindingFlags.Instance);
 
-			if (self.Font == null)
+			if (source == null)
 			{
-				//if (SGUIIMBackend.GetFont != null)
-				//{
-				//	GUI.skin.font = SGUIIMBackend.GetFont(self);
-				//}
-				self.Font = GUI.skin.font;
-				GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-				GUI.skin.textField.alignment = TextAnchor.MiddleLeft;
-				GUI.skin.verticalScrollbar.fixedWidth = 0f;
-				GUI.skin.verticalScrollbarThumb.fixedWidth = 0f;
+				return false;
 			}
-			initialized.SetValue(self, true);
+
+			
+			if ((_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>) == null)
+			{
+				BotsModule.Log($"_activeKnockbacks nulled", "#91ff00");
+			}
+
+			for (int i = 0; i < (_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>).Count; i++)
+			{
+				if ((_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>)[i] == null)
+				{
+					BotsModule.Log($"_activeKnockbacks {i} nulled", "#91ff00");
+				}
+				BotsModule.Log((_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>)[i].sourceObject.ToString(), "#91ff00");
+				if ((_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>)[i].sourceObject == null)
+                {
+					BotsModule.Log("_activeKnockbacks sourceObject nulled", "#91ff00");
+				}
+
+				if ((_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>)[i].sourceObject == source)
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 
@@ -327,13 +360,13 @@ namespace BotsMod
 			BotsModule.Log("Brave Log: " + s, ColorUtility.ToHtmlStringRGB(c));
 		}
 
-		public static void LocalTimeScaleHook(Func<Projectile, float> orig, Projectile self)
+		public static float LocalTimeScaleHook(Func<Projectile, float> orig, Projectile self)
 		{
 			if (self.gameObject?.GetComponent<DarkArtsSlowDown>()?.overrideTimeScale != 1)
 			{
-				//self.gameObject.GetComponent<DarkArtsSlowDown>().overrideTimeScale;
-			}			
-			orig(self);
+				return self.gameObject.GetComponent<DarkArtsSlowDown>().overrideTimeScale;
+			}
+			return orig(self);
 		}
 
 		private static void ProcessHeartSpriteModificationsHook(Action<GameUIHeartController, PlayerController> orig, GameUIHeartController self, PlayerController associatedPlayer)
@@ -594,7 +627,7 @@ namespace BotsMod
 			GameObject silencerVFX, float distIntensity, float distRadius, float pushForce, float pushRadius, float knockbackForce, float knockbackRadius, float additionalTimeAtMaxRadius, PlayerController user, bool breaksWalls = true, bool skipBreakables = false)
 		{
 			BotsMod.BotsModule.Log("blank triggered");
-			if (user.HasPickupID(BotsItemIds.VoidAmmolet))
+			if (user != null && user.HasPickupID(BotsItemIds.VoidAmmolet))
 			{
 				BotsMod.BotsModule.Log("spawning shards");
 
@@ -621,7 +654,7 @@ namespace BotsMod
 					GameObject obj = UnityEngine.Object.Instantiate<GameObject>(silencerVFX, centerPoint.ToVector3ZUp(centerPoint.y), Quaternion.identity);
 					UnityEngine.Object.Destroy(obj, 1f);
 				}
-				VoidAmmolet.VoidBlank(user, centerPoint.ToVector3ZUp(centerPoint.y));
+				VoidAmmolet.VoidBlank(user, centerPoint.ToVector3ZUp(centerPoint.y), (int)maxRadius, self.ForceNoDamage);
 			}
 			else
 			{
@@ -631,8 +664,8 @@ namespace BotsMod
 		}
 
 		#region custom ui hooks (mostly broken)
-		static dfLabel p_playerArmourLabel;
-		static dfSprite p_playerArmourSprite;
+		//public static dfLabel p_playerArmourLabel;
+		//public static dfSprite p_playerArmourSprite;
 
 		public static void UpdateBlanksHook(Action<GameUIBlankController, int> orig, GameUIBlankController self, int numBlanks)
 		{
@@ -640,7 +673,7 @@ namespace BotsMod
 
 			foreach(var blank in self.extantBlanks)
             {
-				if(GameManager.Instance.PrimaryPlayer != null && GameManager.Instance.PrimaryPlayer.HasPickupID(BotsItemIds.VoidAmmolet))
+				if(GameManager.Instance?.PrimaryPlayer != null && GameManager.Instance.PrimaryPlayer.HasPassiveItem(BotsItemIds.VoidAmmolet))
                 {
 					blank.SpriteName = "void_blank";
 				} 
@@ -651,113 +684,121 @@ namespace BotsMod
 				//BotsModule.Log(blank.SpriteName);
             }
 		}
-		
+
 		public static void UpdatePlayerConsumablesHook(GameUIRoot self, PlayerConsumables playerConsumables)
 		{
-			Debug.LogWarning("0");
+			ETGModConsole.Log("0");
 			FieldInfo _playerCoinSprite = typeof(GameUIRoot).GetField("p_playerCoinSprite", BindingFlags.NonPublic | BindingFlags.Instance);
-			if (p_playerArmourLabel == null)
+			//GameObject pannel = null;
+			if (UiTesting.p_playerArmourLabel == null)
 			{
-				
-				p_playerArmourLabel = FakePrefab.Clone(self.p_playerCoinLabel.gameObject).GetComponent<dfLabel>();
-				p_playerArmourLabel.transform.parent = self.p_playerCoinLabel.transform.parent;
+				/*UiTesting.pannel = PrefabAPI.PrefabBuilder.Clone(self.p_playerKeyLabel.transform.parent.gameObject);
+				p_playerArmourLabel = pannel.transform.Find("KeyLabel").gameObject.GetComponent<dfLabel>();
+				p_playerArmourLabel.name = "ArmourLabel";
+				pannel.name = "ArmourPannel";
+				p_playerArmourLabel.transform.parent = pannel.transform;
 				if (!p_playerArmourLabel.gameObject.activeSelf)
-                {
+				{
 					p_playerArmourLabel.gameObject.SetActive(true);
-					Debug.LogWarning("activated p_playerArmourLabel");
-					Debug.LogWarning(self.p_playerCoinLabel.transform.parent.ToString());
-				}
-			}
-			Debug.LogWarning("1");
-			if (p_playerArmourSprite == null)
-			{
-				Debug.LogWarning("1.5");
+					ETGModConsole.Log("activated p_playerArmourLabel");
 
-
-				//UI Root/CoinPanel/CoinSprite
-
-				foreach(var child in self.gameObject.transform)
-                {
-					Debug.LogError(child.ToString());
-				}
-
-				var fuckhead = self.p_playerCoinLabel.transform.parent.Find("CoinSprite").gameObject; //Tools.shared_auto_001.LoadAsset<GameObject>("CoinSprite");//Tools.ReflectionHelpers.ReflectGetField<dfSprite>(typeof(GameUIRoot), "p_playerCoinSprite", self);
-				fuckhead.transform.parent = self.p_playerCoinLabel.transform.parent;
-				Debug.LogWarning("1.55");
-				if (fuckhead == null)
-				{
-					Debug.LogWarning("fuck fuck fuck fuck");
-				}
-				/*if ((_playerCoinSprite.GetValue(self)) == null)
-				{
-					Debug.LogWarning("fuck fuck fuck fuck2 ");
-				}
-				if ((_playerCoinSprite.GetValue(self) as dfSprite).gameObject == null)
-				{
-					Debug.LogWarning("fuck fuck fuck fuck3 ");
 				}*/
-				
-				var obj = FakePrefab.Clone(fuckhead);
-				Debug.LogWarning("1.6");
-				
-
-				p_playerArmourSprite = obj.GetComponent<dfSprite>();
-				p_playerArmourSprite.SpriteName = "heart_shield_full_001";
-
-				if (!p_playerArmourSprite.gameObject.activeSelf)
-				{
-					p_playerArmourSprite.gameObject.SetActive(true);
-					Debug.LogWarning("activated p_playerArmourSprite");
-				}
+				ETGModConsole.Log(self.p_playerKeyLabel.transform.parent.ToString());
+				ETGModConsole.Log("was null... shit");
 			}
-			Debug.LogWarning("2");
+			if (UiTesting.pannel == null)
+            {
+				UiTesting.pannel = UiTesting.p_playerArmourLabel.transform.parent.gameObject;
+
+			}
+
+			if (UiTesting.pannel?.transform.parent != null && UiTesting.pannel?.transform.parent != self.transform)
+            {
+				UiTesting.pannel.transform.parent = self.transform;
+
+			}
+
+			ETGModConsole.Log("1");
+			if (UiTesting.p_playerArmourSprite == null)
+			{
+				ETGModConsole.Log("was null... shit 2");
+			}
+			ETGModConsole.Log("2");
 			self.p_playerCoinLabel.Text = IntToStringSansGarbage.GetStringForInt(playerConsumables.Currency);
 			self.p_playerKeyLabel.Text = IntToStringSansGarbage.GetStringForInt(playerConsumables.KeyBullets);
-			if (p_playerArmourLabel != null)
-            {
-				p_playerArmourLabel.Text = IntToStringSansGarbage.GetStringForInt(10);
-			}
-			Debug.LogWarning("3");
+			UiTesting.p_playerArmourLabel.Text = IntToStringSansGarbage.GetStringForInt(10);
+			ETGModConsole.Log("3");
 
 			typeof(GameUIRoot).GetMethod("UpdateSpecialKeys", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { playerConsumables });
-			Debug.LogWarning("3.5");
+			ETGModConsole.Log("3.5");
+
+			if(UiTesting.p_playerArmourLabel == null)
+            {
+				ETGModConsole.Log("p_playerArmourLabel");
+			}
+			if (UiTesting.p_playerArmourLabel.Parent == null)
+			{
+				ETGModConsole.Log("p_playerArmourLabel.Parent");
+			}
+			
+			if (UiTesting.p_playerArmourLabel.Parent.Parent == null)
+			{
+				ETGModConsole.Log("p_playerArmourLabel.Parent.Parent");
+				
+			}
+			ETGModConsole.Log("4.05");
 			if (GameManager.Instance.PrimaryPlayer != null && GameManager.Instance.PrimaryPlayer.Blanks == 0)
 			{
+				ETGModConsole.Log("4.15");
+				//ETGModConsole.Log(self.p_playerCoinLabel.Parent.Parent.ToString());
 				self.p_playerCoinLabel.Parent.Parent.RelativePosition = self.p_playerCoinLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y);
+				ETGModConsole.Log("4.1");
 				self.p_playerKeyLabel.Parent.Parent.RelativePosition = self.p_playerKeyLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y);
-				p_playerArmourLabel.Parent.Parent.RelativePosition = p_playerArmourLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y) + new Vector3(10, 0, 0);
+				ETGModConsole.Log("4.2");
+				UiTesting.p_playerArmourLabel.Parent.Parent.RelativePosition = UiTesting.p_playerArmourLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y) + new Vector3(10, 0, 0);
+				ETGModConsole.Log("4.3");
 			}
 			else
 			{
+				ETGModConsole.Log("4.35");
+				//ETGModConsole.Log(self.p_playerCoinLabel.Parent.Parent.ToString());
+				if (self.p_playerCoinLabel.Parent.Parent == null)
+                {
+					ETGModConsole.Log("AAAAAAAAAAAAAAAAA");
+				}
+
 				self.p_playerCoinLabel.Parent.Parent.RelativePosition = self.p_playerCoinLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y + self.blankControllers[0].Panel.Height - 9f);
+				ETGModConsole.Log("4.4");
 				self.p_playerKeyLabel.Parent.Parent.RelativePosition = self.p_playerKeyLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y + self.blankControllers[0].Panel.Height - 9f);
-				p_playerArmourLabel.Parent.Parent.RelativePosition = p_playerArmourLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y + self.blankControllers[0].Panel.Height - 9f) + new Vector3(10, 0, 0);
+				ETGModConsole.Log("4.5");
+				UiTesting.p_playerArmourLabel.Parent.Parent.RelativePosition = UiTesting.p_playerArmourLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y + self.blankControllers[0].Panel.Height - 9f)   + new Vector3(10, 0, 0);
+				ETGModConsole.Log("4.6");
 			}
-			Debug.LogWarning("4");
+			ETGModConsole.Log("4");
 			if (GameManager.Instance.CurrentLevelOverrideState == GameManager.LevelOverrideState.FOYER)
 			{
 				int num = Mathf.RoundToInt(GameStatsManager.Instance.GetPlayerStatValue(TrackedStats.META_CURRENCY));
 				if (num > 0)
 				{
 					self.p_playerCoinLabel.Text = IntToStringSansGarbage.GetStringForInt(num);
-					if ((_playerCoinSprite.GetValue(self) as dfLabel) == null)
+					if ((_playerCoinSprite.GetValue(self) as dfSprite) == null)
 					{
 						_playerCoinSprite.SetValue(self, self.p_playerCoinLabel.Parent.GetComponentInChildren<dfSprite>());
 					}
 					(_playerCoinSprite.GetValue(self) as dfSprite).SpriteName = "hbux_text_icon";
-					(_playerCoinSprite.GetValue(self) as dfLabel).Size = (_playerCoinSprite.GetValue(self) as dfSprite).SpriteInfo.sizeInPixels * 3f;
+					(_playerCoinSprite.GetValue(self) as dfSprite).Size = (_playerCoinSprite.GetValue(self) as dfSprite).SpriteInfo.sizeInPixels * 3f;
 				}
 				else
 				{
-					if ((_playerCoinSprite.GetValue(self) as dfLabel) == null)
+					if ((_playerCoinSprite.GetValue(self) as dfSprite) == null)
 					{
 						_playerCoinSprite.SetValue(self, self.p_playerCoinLabel.Parent.GetComponentInChildren<dfSprite>());
 					}
 					self.p_playerCoinLabel.IsVisible = false;
-					(_playerCoinSprite.GetValue(self) as dfLabel).IsVisible = false;
+					(_playerCoinSprite.GetValue(self) as dfSprite).IsVisible = false;
 				}
 			}
-			Debug.LogWarning("5");
+			ETGModConsole.Log("5");
 		}
 
 

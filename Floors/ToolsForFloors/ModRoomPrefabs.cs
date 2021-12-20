@@ -23,8 +23,8 @@ namespace BotsMod
             // Mod_Exit_Room = RoomFactory.BuildFromResource("Mod/Resources/ModRooms/floorExit.room");
 
             Mod_Entrance_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Entrance2.room");
-           
-            Mod_Exit_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Exit.room");
+
+            
 
             Mod_Shop_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Shop2.room");
             ItsDaFuckinShopApi.RegisterShopRoom(BotsModule.shop.gameObject, Mod_Shop_Room, new UnityEngine.Vector2(5f, 12f));

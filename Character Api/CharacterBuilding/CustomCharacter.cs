@@ -15,7 +15,7 @@ namespace CustomCharacters
         public PlayableCharacters baseCharacter = PlayableCharacters.Pilot;
         public PlayableCharacters identity;
         public CustomDungeonFlags unlockFlag;
-        public string name, nameShort, nickname, nameInternal, pathForSprites;
+        public string name, nameShort, nickname, nameInternal, pathForSprites, pathForAltSprites;
         public Dictionary<PlayerStats.StatType, float> stats;
         public List<Texture2D> sprites, altSprites, foyerCardSprites, punchoutSprites, punchoutFaceCards, loadoutSprites;
         public List<string> loadoutSpriteNames = new List<string>();
@@ -35,6 +35,7 @@ namespace CustomCharacters
         public CustomCharacterController customCharacterController;
 
         public Vector3 skinSwapperPos;
+        public Vector3 foyerPos;
 
         public tk2dSpriteAnimation altLibary;
         public tk2dSpriteAnimation libary;
@@ -45,16 +46,15 @@ namespace CustomCharacters
         public tk2dSpriteAnimator altAnimator;
         public tk2dSpriteAnimator animator;
 
-        public tk2dSpriteAnimator armouredAltAnimator;
-        public tk2dSpriteAnimator armouredAnimator;
-
         public tk2dSpriteCollectionData collection;
         public tk2dSpriteCollectionData altCollection;
 
         public tk2dSpriteCollectionData armouredCollection;
         public tk2dSpriteCollectionData armouredAltCollection;
 
-        
+        public CharacterSelectIdleDoer idleDoer;
+
+        public List<Tuple<GameObject, Vector2>> randomFoyerBullshitNNAskedFor = new List<Tuple<GameObject, Vector2>>();
     }
 
     public class CustomCharacter : MonoBehaviour

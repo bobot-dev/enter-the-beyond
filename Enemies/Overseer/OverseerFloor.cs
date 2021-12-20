@@ -138,7 +138,7 @@ namespace BotsMod
 
 				BotsModule.Strings.Enemies.Set("#THE_OVERSEER", "Overseer");
 				BotsModule.Strings.Enemies.Set("#BOT_????", "???");
-				BotsModule.Strings.Enemies.Set("#BOT_SUBTITLE", "He sees all...");
+				BotsModule.Strings.Enemies.Set("#BOT_SUBTITLE", "All Seeing Eye");
 				BotsModule.Strings.Enemies.Set("#BOT_QUOTE", "ahhhh");
 				enemy.aiActor.healthHaver.overrideBossName = "#THE_OVERSEER";
 				enemy.aiActor.OverrideDisplayName = "#THE_OVERSEER";
@@ -246,7 +246,7 @@ namespace BotsMod
 
 
 
-				enemy.aiActor.healthHaver.SetHealthMaximum(800, null, false);
+				//enemy.aiActor.healthHaver.SetHealthMaximum(800, null, false);
 				enemy.aiActor.specRigidbody.PixelColliders.Clear();
 				enemy.aiActor.specRigidbody.PixelColliders.Add(new PixelCollider
 

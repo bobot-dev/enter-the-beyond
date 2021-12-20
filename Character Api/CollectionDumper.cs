@@ -20,6 +20,8 @@ namespace CustomCharacters
             int width, height, minX, minY, maxX, maxY, w, h;
             Vector2[] uvs;
             Color[] pixels;
+
+
             for (int i = 0; i < collection.spriteDefinitions.Length; i++)
             {
                 def = collection.spriteDefinitions[i];
@@ -69,59 +71,53 @@ namespace CustomCharacters
                 }
                 output.name = def.name;
                 BotsModule.Log(output.name, BotsModule.TEXT_COLOR);
-                ToolsGAPI.ExportTexture(output, "SpriteDump/" + collectionName);
+                ToolsGAPI.ExportTexture(output, "SpriteDump/" + collectionName.Replace("/", "-").Replace("\\", "-"));
 
 
 
             }
         }
-        /*
-        public static void DumpdfAtlas(dfAtlas collection)
+        
+        public static void DumpdfAtlas(dfAtlas atlas)
         {
-            string collectionName = string.IsNullOrEmpty(collection.name) ? collection.gameObject.name + "_Collection" : collection.name;
+            string collectionName = atlas.name;
 
-            dfAtlas.ItemInfo def;
             string defName;
-            Material material = collection.Material;
             Texture2D texture, output;
             int width, height, minX, minY, maxX, maxY, w, h;
-            Vector2[] uvs;
             Color[] pixels;
-            for (int i = 0; i < collection.Items.Count; i++)
+
+            
+            var itemSizes = atlas.GetPixelRegions();
+
+            for (int i = 0; i < itemSizes.Count; i++)
             {
-                def = collection.Items[i];
+                var def = atlas.Items[i];
                 if (def == null) continue;
 
 
                 defName = string.IsNullOrEmpty(def.name) ? collectionName + "_" + i : def.name;
                 
-                if (material == null || material.mainTexture == null)
-                {
-                    ToolsGAPI.PrintError($"Failed to dump {defName} in {collectionName}: No valid material");
-                    continue;
-                }
-
-                texture = (Texture2D)material.mainTexture.GetReadable();
+               
+                texture = (Texture2D)atlas.Texture.GetReadable();
                 width = texture.width;
                 height = texture.height;
 
-                uvs = def.uvs;
-                if (def.uvs == null || def.uvs.Length < 4)
-                {
-                    ToolsGAPI.PrintError($"Failed to dump {defName} in {collectionName}: Invalid UV's");
-                    continue;
-                }
-
-                minX = Mathf.RoundToInt(uvs[0].x * width);
-                minY = Mathf.RoundToInt(uvs[0].y * height);
-                maxX = Mathf.RoundToInt(uvs[3].x * width);
-                maxY = Mathf.RoundToInt(uvs[3].y * height);
+               
+               
+                minX = itemSizes[i].xMin;
+                minY = itemSizes[i].yMin;
+                maxX = itemSizes[i].xMax;
+                maxY = itemSizes[i].yMax;
 
                 w = maxX - minX;
                 h = maxY - minY;
+
+               
                 if (w <= 0 || h <= 0)
                 {
-                    ToolsGAPI.ExportTexture(new Texture2D(1, 1) { name = defName });
+                    BotsModule.Log($"[{defName}]: is to small. minX: {minX}, minY: {minY}, maxX: {maxX}, maxY: {maxY}", BotsModule.TEXT_COLOR);
+                    //ToolsGAPI.ExportTexture(new Texture2D(1, 1) { name = defName });
                     continue;
                 };
 
@@ -132,12 +128,12 @@ namespace CustomCharacters
                 output.Apply();
                 output.name = def.name;
                 BotsModule.Log(output.name, BotsModule.TEXT_COLOR);
-                ToolsGAPI.ExportTexture(output, "SpriteDump/" + collectionName);
+                ToolsGAPI.ExportTexture(output, "SpriteDump/df/" + collectionName);
 
 
 
             }
-        }*/
+        }
     }
 
 }

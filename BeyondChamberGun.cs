@@ -56,7 +56,7 @@ namespace BotsMod
 			projectile.shouldRotate = true;
 
 			projectile.baseData.damage = 15;
-			projectile.angularVelocity = 0;
+			//projectile.angularVelocityVariance = 0;
 
 			projectile.AnimateProjectile(new List<string>{ "beyond_chamber_gun_projectile_001", "beyond_chamber_gun_projectile_002", "beyond_chamber_gun_projectile_003", "beyond_chamber_gun_projectile_004", "beyond_chamber_gun_projectile_005" }, 12, tk2dSpriteAnimationClip.WrapMode.LoopSection, 3, 
 				new List<IntVector2> { new IntVector2(8, 4), new IntVector2(15, 4), new IntVector2(22, 4), new IntVector2(29, 4), new IntVector2(29, 4) }, Tools.ConstructListOfSameValues(false, 5), Tools.ConstructListOfSameValues(tk2dBaseSprite.Anchor.MiddleCenter, 5),
@@ -103,6 +103,7 @@ namespace BotsMod
 			FakePrefab.MarkAsFakePrefab(projectile.gameObject);
 			UnityEngine.Object.DontDestroyOnLoad(projectile);
 			gun.DefaultModule.projectiles[0] = projectile;
+			gun.DefaultModule.angleVariance = 0;
 
 			MeshRenderer component = gun.GetComponent<MeshRenderer>();
 			if (!component)

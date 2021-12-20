@@ -185,9 +185,18 @@ namespace BotsMod
 
 			coin.AddComponent<CoinController>();
 
+
+
 			coinPrefab = coin;
 
-
+			gun.associatedItemChanceMods = new LootModData[]
+			{
+				new LootModData
+				{
+					AssociatedPickupId = 1,
+					DropRateMultiplier = 10
+				}
+			};
 		}
 
 

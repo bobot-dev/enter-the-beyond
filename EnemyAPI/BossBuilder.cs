@@ -183,7 +183,7 @@ namespace ItemAPI
             List<int> indices = new List<int>();
             for (int i = 0; i < resources.Length; i++)
             {
-                if (resources[i].StartsWith(spriteDirectory.Replace('/', '.'), StringComparison.OrdinalIgnoreCase))
+                if (resources[i].StartsWith(spriteDirectory.Replace('/', '.') + ".", StringComparison.OrdinalIgnoreCase))
                 {
                     indices.Add(SpriteBuilder.AddSpriteToCollection(resources[i], collection));
                 }

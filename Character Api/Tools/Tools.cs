@@ -124,8 +124,6 @@ namespace GungeonAPI
             Vector2Int point = new Vector2Int(0, 0);
             int pointIndex = -1;
             List<RectInt> rects = atlas.GetPixelRegions();
-            float x = 0;
-            float y = 0;
 
             
             while (true)

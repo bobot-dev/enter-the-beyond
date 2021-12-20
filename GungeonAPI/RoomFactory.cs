@@ -29,6 +29,7 @@ namespace GungeonAPI
             public string normalSubCategory;
             public string specialSubCategory;
             public string bossSubCategory;
+            public string musicState;
             public Vector2[] enemyPositions;
             public string[] enemyGUIDs;
             public Vector2[] placeablePositions;
@@ -38,7 +39,10 @@ namespace GungeonAPI
             public string[] exitDirections;
             public string[] floors;
             public float weight;
+            public int visualSubtypes;
             public bool isSpecialRoom;
+            public bool isDarkRoom;
+            public string[] waveTriggers;
             public bool randomizeEnemyPositions, doFloorDecoration, doWallDecoration, doLighting;
             [NonSerialized]
             public PrototypeDungeonRoom room;
@@ -51,6 +55,11 @@ namespace GungeonAPI
             if (defineFullPath) { RoomPath = roomPath; }
             Texture2D texture = ResourceExtractor.GetTextureFromResource(RoomPath);
             RoomData roomData = ExtractRoomDataFromResource(RoomPath);
+            if (roomData.waveTriggers == null)
+            {
+                roomData.waveTriggers = new string[0];
+            }
+            //ETGModConsole.Log("visualSubtypes: " + roomData.visualSubtypes.ToString());
             return Build(texture, roomData, setRoomCategory, autoAssignToFloor, assignDecorationSettings, roomData.weight);
         }
 
@@ -63,6 +72,18 @@ namespace GungeonAPI
                 room.OnBeforeSerialize();
                 room.OnAfterDeserialize();
                 room.UpdatePrecalculatedData();
+
+                if (room.roomEvents == null)
+                {
+                    room.roomEvents = new List<RoomEventDefinition>();                    
+                }
+                //Tools.PrintError($"{room.name}: isDarkRoom = {roomData.isDarkRoom}");
+                if (roomData.isDarkRoom)
+                {
+                    room.roomEvents.Add(new RoomEventDefinition(RoomEventTriggerCondition.ON_ENTER_WITH_ENEMIES, RoomEventTriggerAction.BECOME_TERRIFYING_AND_DARK));
+                    room.roomEvents.Add(new RoomEventDefinition(RoomEventTriggerCondition.ON_ENEMIES_CLEARED, RoomEventTriggerAction.END_TERRIFYING_AND_DARK));
+                }
+
                 return room;
             }
             catch (Exception e)
@@ -91,14 +112,35 @@ namespace GungeonAPI
                 AddExit(room, new Vector2(room.Width, room.Height / 2), DungeonData.Direction.EAST);
                 AddExit(room, new Vector2(0, room.Height / 2), DungeonData.Direction.WEST);
             }
+            ETGModConsole.Log("aaaa");
+            if (roomData.musicState == "NONE")
+            {
+                room.UseCustomMusicSwitch = false;
+            }
+            else if (!string.IsNullOrEmpty(roomData.musicState))
+            {
+                room.UseCustomMusicSwitch = true;
+                room.OverrideMusicState = GetRoomMusicState(roomData.musicState);
+            }
 
-            // Tools.Print("Adding Enemies...");
+            
             if (roomData.enemyPositions != null)
             {
-                for (int i = 0; i < roomData.enemyPositions.Length; i++)
+                if (roomData.waveTriggers != null && roomData.waveTriggers.Length > 0)
                 {
-                    AddEnemyToRoom(room, roomData.enemyPositions[i], roomData.enemyGUIDs[i], roomData.enemyReinforcementLayers[i], roomData.randomizeEnemyPositions);
+                    for (int i = 0; i < roomData.enemyPositions.Length; i++)
+                    {
+                        AddEnemyToRoom(room, roomData.enemyPositions[i], roomData.enemyGUIDs[i], roomData.waveTriggers[i], roomData.enemyReinforcementLayers[i], roomData.randomizeEnemyPositions);
+                    }
+                } 
+                else 
+                {
+                    for (int i = 0; i < roomData.enemyPositions.Length; i++)
+                    {
+                        AddEnemyToRoom(room, roomData.enemyPositions[i], roomData.enemyGUIDs[i], "", roomData.enemyReinforcementLayers[i], roomData.randomizeEnemyPositions);
+                    }
                 }
+                
             }
 
             // Tools.Print("Adding Objects...");
@@ -146,6 +188,8 @@ namespace GungeonAPI
                     ExpandPrefabs.CustomRoomTable2.includedRooms.elements.Add(ExpandRoomPrefabs.GenerateWeightedRoom(room, Weight.Value));*/
                 }
             }
+            ETGModConsole.Log(roomData.visualSubtypes.ToString());
+            room.overrideRoomVisualType = -1;//roomData.visualSubtypes;
 
             if (assignDecorationProperties)
             {
@@ -218,6 +262,10 @@ namespace GungeonAPI
         {
             return (PrototypeDungeonRoom.RoomSpecialSubCategory)Enum.Parse(typeof(PrototypeDungeonRoom.RoomSpecialSubCategory), val.ToUpper());
         }
+        public static DungeonFloorMusicController.DungeonMusicState GetRoomMusicState(string val)
+        {
+            return (DungeonFloorMusicController.DungeonMusicState)Enum.Parse(typeof(DungeonFloorMusicController.DungeonMusicState), val.ToUpper());
+        }
 
         public static RoomData ExtractRoomDataFromFile(string path)
         {
@@ -227,11 +275,10 @@ namespace GungeonAPI
 
         public static RoomData ExtractRoomDataFromResource(string path)
         {
-            path = path.Replace("/", ".");
-            path = path.Replace("\\", ".");
             string data = ResourceExtractor.BytesToString(ResourceExtractor.ExtractEmbeddedResource((path)));
             return ExtractRoomData(data);
         }
+
 
         public static RoomData ExtractRoomData(string data)
         {
@@ -259,6 +306,9 @@ namespace GungeonAPI
                 }
             }
             room.name = texture.name;
+
+            //RoomBuilder.GenerateRoomLayoutFromPNG(room, texture);
+
             return room;
         }
 
@@ -346,6 +396,26 @@ namespace GungeonAPI
             }
         }
 
+        public static PrototypeDungeonRoom GetRoomFromBundles(string assetPath)
+        {
+            if (BeyondPrefabs.shared_auto_001.LoadAsset<PrototypeDungeonRoom>(assetPath))
+            {
+                return BeyondPrefabs.shared_auto_001.LoadAsset<PrototypeDungeonRoom>(assetPath);
+            }
+            else if (BeyondPrefabs.shared_auto_002.LoadAsset<PrototypeDungeonRoom>(assetPath))
+            {
+                return BeyondPrefabs.shared_auto_002.LoadAsset<PrototypeDungeonRoom>(assetPath);
+            }
+            else if (BeyondPrefabs.braveResources.LoadAsset<PrototypeDungeonRoom>(assetPath))
+            {
+                return BeyondPrefabs.braveResources.LoadAsset<PrototypeDungeonRoom>(assetPath);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
         public static GameObject GetGameObjectFromBundles(string assetPath)
         {
             if (BeyondPrefabs.shared_auto_001.LoadAsset<GameObject>(assetPath))
@@ -386,7 +456,7 @@ namespace GungeonAPI
             }
         }
 
-        public static void AddEnemyToRoom(PrototypeDungeonRoom room, Vector2 location, string guid, int layer, bool shuffle)
+        public static void AddEnemyToRoom(PrototypeDungeonRoom room, Vector2 location, string guid, string trigger, int layer, bool shuffle)
         {
             DungeonPlaceable placeableContents = ScriptableObject.CreateInstance<DungeonPlaceable>();
             placeableContents.width = 1;
@@ -397,7 +467,7 @@ namespace GungeonAPI
                     percentChance = 1,
                     prerequisites = new DungeonPrerequisite[0],
                     enemyPlaceableGuid = guid,
-                    materialRequirements= new DungeonPlaceableRoomMaterialRequirement[0],
+                    materialRequirements= new DungeonPlaceableRoomMaterialRequirement[0],                    
                 }
             };
 
@@ -412,7 +482,15 @@ namespace GungeonAPI
 
             if (layer > 0)
             {
-                AddObjectDataToReinforcementLayer(room, objectData, layer - 1, location, shuffle);
+                if (string.IsNullOrEmpty(trigger))
+                {
+                    AddObjectDataToReinforcementLayer(room, objectData, layer - 1, location, shuffle);
+                } 
+                else
+                {
+                    AddObjectDataToReinforcementLayer(room, objectData, layer - 1, location, shuffle, Tools.GetEnumValue<RoomEventTriggerCondition>(trigger));
+                }
+               
             }
             else
             {
@@ -423,7 +501,6 @@ namespace GungeonAPI
             if (!room.roomEvents.Contains(sealOnEnterWithEnemies)) { room.roomEvents.Add(sealOnEnterWithEnemies); }
             if (!room.roomEvents.Contains(unsealOnRoomClear)) { room.roomEvents.Add(unsealOnRoomClear); }
         }
-
         public static void AddObjectDataToReinforcementLayer(PrototypeDungeonRoom room, PrototypePlacedObjectData objectData, int layer, Vector2 location, bool shuffle)
         {
             if (room.additionalObjectLayers.Count <= layer)
@@ -435,7 +512,31 @@ namespace GungeonAPI
                         layerIsReinforcementLayer = true,
                         placedObjects = new List<PrototypePlacedObjectData>(),
                         placedObjectBasePositions = new List<Vector2>(),
-                        shuffle = shuffle
+                        shuffle = shuffle,
+
+                    };
+                    room.additionalObjectLayers.Add(newLayer);
+                }
+            }
+            room.additionalObjectLayers[layer].placedObjects.Add(objectData);
+            room.additionalObjectLayers[layer].placedObjectBasePositions.Add(location);
+        }
+
+
+        public static void AddObjectDataToReinforcementLayer(PrototypeDungeonRoom room, PrototypePlacedObjectData objectData, int layer, Vector2 location, bool shuffle, RoomEventTriggerCondition trigger)
+        {
+            if (room.additionalObjectLayers.Count <= layer)
+            {
+                for (int i = room.additionalObjectLayers.Count; i <= layer; i++)
+                {
+                    PrototypeRoomObjectLayer newLayer = new PrototypeRoomObjectLayer
+                    {
+                        layerIsReinforcementLayer = true,
+                        placedObjects = new List<PrototypePlacedObjectData>(),
+                        placedObjectBasePositions = new List<Vector2>(),
+                        shuffle = shuffle,
+                        reinforcementTriggerCondition = trigger,
+
                     };
                     room.additionalObjectLayers.Add(newLayer);
                 }
@@ -448,7 +549,37 @@ namespace GungeonAPI
         {
             try
             {
-                if (GetGameObjectFromBundles(assetPath) != null)
+                if (assetPath == "Challenge_Shrine")
+                {
+                    if (GetRoomFromBundles("ChallengeShrine_Gungeon_002") != null)
+                    {
+                        
+                        DungeonPrerequisite[] array = new DungeonPrerequisite[0];
+                        room.placedObjectPositions.Add(location);
+                        DungeonPlaceable dungeonPlaceable = ScriptableObject.CreateInstance<DungeonPlaceable>();
+                        dungeonPlaceable.width = 2;
+                        dungeonPlaceable.height = 2;
+                        dungeonPlaceable.respectsEncounterableDifferentiator = true;
+                        dungeonPlaceable.variantTiers = new List<DungeonPlaceableVariant> {
+                        new DungeonPlaceableVariant {
+                            percentChance = 1f,
+                            nonDatabasePlaceable = GetRoomFromBundles("ChallengeShrine_Gungeon_002").placedObjects[0].nonenemyBehaviour.gameObject,
+                            prerequisites = array,
+                            materialRequirements = new DungeonPlaceableRoomMaterialRequirement[0]
+                        }
+                    };
+                        room.placedObjects.Add(new PrototypePlacedObjectData
+                        {
+                            contentsBasePosition = location,
+                            fieldData = new List<PrototypePlacedObjectFieldData>(),
+                            instancePrerequisites = array,
+                            linkedTriggerAreaIDs = new List<int>(),
+                            placeableContents = dungeonPlaceable
+                        });
+                        return;
+                    }
+                }
+                else if (GetGameObjectFromBundles(assetPath) != null)
                 {
                     DungeonPrerequisite[] array = new DungeonPrerequisite[0];
                     room.placedObjectPositions.Add(location);

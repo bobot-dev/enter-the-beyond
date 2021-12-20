@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ItemAPI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +41,40 @@ namespace BotsMod
 
         
 
+    }
+
+    public class Debugger : MonoBehaviour
+    {
+        private void Start()
+        {
+            //this.transform.parent.localScale = new Vector3(0.2f, 0.2f, 1);
+            ETGModConsole.Log($"{this.gameObject.transform.parent}: parent");
+            ETGModConsole.Log($"{this.gameObject.name}: has been created");
+        }
+
+        private void OnDisable()
+        {
+            ETGModConsole.Log($"{this.gameObject.name}: is now disabled");
+        }
+
+        private void OnEnable()
+        {
+            ETGModConsole.Log($"{this.gameObject.name}: is now no longer disabled");
+        }
+        
+        private void Awake()
+        {
+            ETGModConsole.Log($"{this.gameObject.name}: has awoken... RUN!!");
+        }
+
+        private void OnDestroy()
+        {
+
+            var clone = FakePrefab.Clone(this.gameObject);
+            clone.transform.parent = this.gameObject.transform.parent;
+            
+            ETGModConsole.Log($"{this.gameObject.name}: has been destroyed");
+        }
     }
 
     public class EmmisiveBeams : MonoBehaviour
