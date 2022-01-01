@@ -30,7 +30,7 @@ public class ZenithGun : GunBehaviour
         gun.DefaultModule.cooldownTime = 0.06f;
         gun.DefaultModule.numberOfShotsInClip = -1;
         gun.SetBaseMaxAmmo(300);
-
+        //
         gun.quality = PickupObject.ItemQuality.S;
         gun.encounterTrackable.EncounterGuid = "'xilucvvvvvvvvvvvvvvvvvvhriorjboiuhbnribb  hjk gbjhfg bf f dkfjnsdkjvdfiuvd' -spcreat, 2020";
 

@@ -224,6 +224,8 @@ namespace BotsMod
                 //SpecialDungeon2CozFuckYou.Init();
                 //RichPresenceItem.Register();
 
+                CarpetBurn.Init();
+
                 BeyondScout.Init();
                 DeadEye.Init();
                 Orb.Init();
@@ -526,6 +528,8 @@ namespace BotsMod
                 Loader.SetupCustomBreachAnimation(name, "float", 12, tk2dSpriteAnimationClip.WrapMode.Once);
                 Loader.SetupCustomBreachAnimation(name, "float_hold", 5, tk2dSpriteAnimationClip.WrapMode.Loop);
                 Loader.SetupCustomBreachAnimation(name, "float_out", 14, tk2dSpriteAnimationClip.WrapMode.Once);
+                Loader.SetupCustomBreachAnimation(name, "select_idle", 14, tk2dSpriteAnimationClip.WrapMode.LoopFidget, );
+                //Loader.GetAnimation(name, "item_get").fps = 14;
 
                 //Loader.AddFoyerObject(name, SpriteBuilder.SpriteFromResource("BotsMod/sprites/marker.png"), new Vector2(0.25f, 0));
 

@@ -16,7 +16,11 @@ public static class CustomSparkDoer
 				break;
 			case CustomSparkDoer.SparksType.PINK_FIRE:
 				particleSystem = CustomSparkDoer.m_pinkFireParticles;
-				break;		
+				break;
+
+			case CustomSparkDoer.SparksType.ELECTRIC_FIRE:
+				particleSystem = CustomSparkDoer.m_blueFireParticles;
+				break;
 		}
 		if (particleSystem == null)
 		{
@@ -111,9 +115,15 @@ public static class CustomSparkDoer
 			case CustomSparkDoer.SparksType.SPARKS_ADDITIVE_DEFAULT:
 				CustomSparkDoer.m_particles = ((GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/SparkSystem"), Vector3.zero, Quaternion.identity)).GetComponent<ParticleSystem>();
 				return CustomSparkDoer.m_particles;
+
 			case CustomSparkDoer.SparksType.PINK_FIRE:
 				CustomSparkDoer.m_pinkFireParticles = FakePrefab.Clone(CustomFire.pinkFire).GetComponent<ParticleSystem>();
-				return CustomSparkDoer.m_particles;
+				return CustomSparkDoer.m_pinkFireParticles;
+
+			case CustomSparkDoer.SparksType.ELECTRIC_FIRE:
+				CustomSparkDoer.m_blueFireParticles = FakePrefab.Clone(CustomFire.blueFire).GetComponent<ParticleSystem>();
+				return CustomSparkDoer.m_blueFireParticles;
+
 			default:
 				return CustomSparkDoer.m_particles;
 		}
@@ -123,11 +133,13 @@ public static class CustomSparkDoer
 	{
 		CustomSparkDoer.m_particles = null;
 		CustomSparkDoer.m_pinkFireParticles = null;
+		CustomSparkDoer.m_blueFireParticles = null;
 	}
 
 	private static ParticleSystem m_particles;
 
 	private static ParticleSystem m_pinkFireParticles;
+	private static ParticleSystem m_blueFireParticles;
 	public enum EmitRegionStyle
 	{
 		RANDOM,
@@ -138,6 +150,7 @@ public static class CustomSparkDoer
 	{
 		SPARKS_ADDITIVE_DEFAULT,
 
-		PINK_FIRE
+		PINK_FIRE,
+		ELECTRIC_FIRE
 	}
 }

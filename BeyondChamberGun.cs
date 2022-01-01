@@ -32,7 +32,7 @@ namespace BotsMod
 			//gun.barrelOffset.transform.localPosition = new Vector3(0, -0.3125f, 0f);
 			gun.barrelOffset.transform.localPosition = new Vector3(1.0625f, 0.5f, 0f);
 
-			SpriteBuilder.SpriteFromResource("BotsMod/sprites/Debug/c", gun.barrelOffset.transform.gameObject);
+			//SpriteBuilder.SpriteFromResource("BotsMod/sprites/Debug/c", gun.barrelOffset.transform.gameObject);
 
 			gun.DefaultModule.cooldownTime = 0.1f;
 			gun.InfiniteAmmo = false;

@@ -35,12 +35,12 @@ namespace BotsMod
 		protected override void Update()
 		{
 			PlayerController player = this.Owner;
-			if (player && this.extantLink == null && LinkVFXPrefab != null)
+			if (player && extantLink == null && LinkVFXPrefab != null)
 			{
 				tk2dTiledSprite component = SpawnManager.SpawnVFX(this.LinkVFXPrefab, false).GetComponent<tk2dTiledSprite>();
-				this.extantLink = component;
+				extantLink = component;
 			}
-			else if (player && this.extantLink != null)
+			else if (player && extantLink != null)
 			{
 				var badGuys = player.CurrentRoom?.GetActiveEnemies(Dungeonator.RoomHandler.ActiveEnemyType.All);
 				if (badGuys != null);
@@ -48,12 +48,12 @@ namespace BotsMod
 				{
 					if (!enemy.healthHaver.IsDead && enemy.GetComponent<NotReallyADebuff>() != null && startpos != null && extantLink != null)
 					{
-						UpdateLink(enemy, this.extantLink, startpos);
+						UpdateLink(enemy, extantLink, startpos);
 					}
 				}
 				
 			}
-			else if (extantLink != null)// || actor == null)
+			else if (extantLink != null)// || actor == nullthis.extantLink)
 			{
 				SpawnManager.Despawn(extantLink.gameObject);
 				extantLink = null;
@@ -141,13 +141,13 @@ namespace BotsMod
 			
 			//this.Owner.CurrentRoom.ApplyActionToNearbyEnemies(hitRigidbody.UnitCenter, 5f, delegate (AIActor enemy, float dist)
 			int limit = 5;
-			int range = 10;
+			int range = 8;
 			//if (this.Owner.CurrentRoom != null)
 			//{
 				if (this.Owner.PlayerHasActiveSynergy("Full Circuit"))
 				{
 					limit = 8;
-					range = 15;
+				range = 12;
 				}
 				List<AIActor> ignoreList = new List<AIActor>();
 				ChainLightningToTarget(obj.specRigidbody.UnitCenter, 4, range, ignoreList, limit);
@@ -195,7 +195,7 @@ namespace BotsMod
 			//}
 		}
 
-		void ChainLightningToTarget(Vector2 pos, float damage, float range, List<AIActor> ignoreList, int limit)
+		public static void ChainLightningToTarget(Vector2 pos, float damage, float range, List<AIActor> ignoreList, int limit, bool purple = true)
         {
 			var room = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(pos.ToIntVector2());
 			if (damage <= 0.5f || range <= 0 || room == null)
@@ -207,17 +207,19 @@ namespace BotsMod
 			var enemy = room.GetNearestEnemy(pos, out distance, ignoreList, true, true);
 			if (distance <= range && enemy != null)
             {
-				var linkVFXPrefab = CustomLightning.lightningVFX;//Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX also works
+				var linkVFXPrefab = (purple ? CustomLightning.lightningVFX : Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX);
+
+				ETGModConsole.Log($"{(purple ? "purple" : "blue")}");
 
 				tk2dTiledSprite component = SpawnManager.SpawnVFX(linkVFXPrefab, false).GetComponent<tk2dTiledSprite>();
-				this.extantLink = component;
+				extantLink = component;
 				ignoreList.Add(enemy);
 				UpdateLink(enemy, component, pos);
 				enemy.gameObject.AddComponent<NotReallyADebuff>();
 				enemy.healthHaver.ApplyDamage(damage, Vector2.zero, string.Empty, CoreDamageTypes.Electric, DamageCategory.Normal, false, null, false);		
 
 				
-				StartCoroutine(doTimerMagic(component.gameObject, delay));
+				GameManager.Instance.StartCoroutine(doTimerMagic(component.gameObject, delay));
 				
 
 				ChainLightningToTarget((enemy.sprite != null ? enemy.sprite.WorldCenter : (Vector2)enemy.transform.position), damage, range, ignoreList, limit - 1);
@@ -228,7 +230,7 @@ namespace BotsMod
         }
 
 
-		private void UpdateLink(AIActor target, tk2dTiledSprite m_extantLink, Vector2 landedPoint)
+		private static void UpdateLink(AIActor target, tk2dTiledSprite m_extantLink, Vector2 landedPoint)
 		{
 			//SpeculativeRigidbody specRigidbody = target.specRigidbody;
 			//SpeculativeRigidbody speculativeRigidbody = specRigidbody;
@@ -286,8 +288,8 @@ namespace BotsMod
 			SpawnManager.Despawn(lightning);
 			yield break;
 		}
-		public float delay = 0.25f;
-		private tk2dTiledSprite extantLink;
+		public static float delay = 0.25f;
+		private static tk2dTiledSprite extantLink;
 		Vector2 startpos;
 		Color lightningColour = new Color(1.066f, 0, 1.686f);
 		GameObject LinkVFXPrefab;

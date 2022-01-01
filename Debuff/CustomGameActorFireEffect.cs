@@ -69,7 +69,6 @@ public class CustomGameActorFireEffect : GameActorHealthEffect
 		//}
 	}
 
-	// Token: 0x06004C9E RID: 19614 RVA: 0x001C2D40 File Offset: 0x001C0F40
 	public override void EffectTick(GameActor actor, RuntimeGameActorEffectData effectData)
 	{
 		base.EffectTick(actor, effectData);
@@ -96,6 +95,14 @@ public class CustomGameActorFireEffect : GameActorHealthEffect
 			this.m_particleTimer += BraveTime.DeltaTime * (float)num2;
 			if (this.m_particleTimer > 1f)
 			{
+				if(UnityEngine.Random.value <= 0.1f)
+                {
+					List<AIActor> ignoreList = new List<AIActor>();
+					BotsMod.LightningRounds.ChainLightningToTarget(actor.specRigidbody.UnitCenter, 4, 5, ignoreList, 3, false);
+
+				}
+
+
 				int num3 = Mathf.FloorToInt(this.m_particleTimer);
 				Vector2 vector = actor.specRigidbody.HitboxPixelCollider.UnitBottomLeft;
 				Vector2 vector2 = actor.specRigidbody.HitboxPixelCollider.UnitTopRight;
@@ -108,7 +115,7 @@ public class CustomGameActorFireEffect : GameActorHealthEffect
 				vector += Vector2.Min(a * 0.15f, new Vector2(0.25f, 0.25f));
 				vector2 -= Vector2.Min(a * 0.15f, new Vector2(0.25f, 0.25f));
 				vector2.y -= Mathf.Min(a.y * 0.1f, 0.1f);
-				CustomSparkDoer.DoRandomParticleBurst(num3, vector, vector2, Vector3.zero, 0f, 0f, null, null, null, CustomSparkDoer.SparksType.PINK_FIRE);
+				CustomSparkDoer.DoRandomParticleBurst(num3, vector, vector2, Vector3.zero, 0f, 0f, null, null, null, CustomSparkDoer.SparksType.ELECTRIC_FIRE);
 				this.m_particleTimer -= Mathf.Floor(this.m_particleTimer);
 			}
 		}

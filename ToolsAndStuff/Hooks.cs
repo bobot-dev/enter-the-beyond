@@ -306,6 +306,59 @@ namespace BotsMod
 
 			}
 		}
+		/*
+		public override void EffectTick(GameActorFireEffect self, GameActor actor, RuntimeGameActorEffectData effectData)
+		{
+			self.EffectTick(actor, effectData);
+			if (GameManager.Options.ShaderQuality == GameOptions.GenericHighMedLowOption.HIGH && effectData.actor && effectData.actor.specRigidbody.HitboxPixelCollider != null)
+			{
+				Vector2 unitBottomLeft = effectData.actor.specRigidbody.HitboxPixelCollider.UnitBottomLeft;
+				Vector2 unitTopRight = effectData.actor.specRigidbody.HitboxPixelCollider.UnitTopRight;
+				self.m_emberCounter += 30f * BraveTime.DeltaTime;
+				if (self.m_emberCounter > 1f)
+				{
+					int num = Mathf.FloorToInt(self.m_emberCounter);
+					self.m_emberCounter -= (float)num;
+					GlobalSparksDoer.DoRandomParticleBurst(num, unitBottomLeft, unitTopRight, new Vector3(1f, 1f, 0f), 120f, 0.75f, null, null, null, GlobalSparksDoer.SparksType.EMBERS_SWIRLING);
+				}
+			}
+			if (actor && actor.specRigidbody)
+			{
+				Vector2 unitDimensions = actor.specRigidbody.HitboxPixelCollider.UnitDimensions;
+				Vector2 a = unitDimensions / 2f;
+				int num2 = Mathf.RoundToInt((float)self.flameNumPerSquareUnit * 0.5f * Mathf.Min(30f, Mathf.Min(new float[]
+				{
+				unitDimensions.x * unitDimensions.y
+				})));
+				self.m_particleTimer += BraveTime.DeltaTime * (float)num2;
+				if (self.m_particleTimer > 1f)
+				{
+					int num3 = Mathf.FloorToInt(self.m_particleTimer);
+					Vector2 vector = actor.specRigidbody.HitboxPixelCollider.UnitBottomLeft;
+					Vector2 vector2 = actor.specRigidbody.HitboxPixelCollider.UnitTopRight;
+					PixelCollider pixelCollider = actor.specRigidbody.GetPixelCollider(ColliderType.Ground);
+					if (pixelCollider != null && pixelCollider.ColliderGenerationMode == PixelCollider.PixelColliderGeneration.Manual)
+					{
+						vector = Vector2.Min(vector, pixelCollider.UnitBottomLeft);
+						vector2 = Vector2.Max(vector2, pixelCollider.UnitTopRight);
+					}
+					vector += Vector2.Min(a * 0.15f, new Vector2(0.25f, 0.25f));
+					vector2 -= Vector2.Min(a * 0.15f, new Vector2(0.25f, 0.25f));
+					vector2.y -= Mathf.Min(a.y * 0.1f, 0.1f);
+					GlobalSparksDoer.DoRandomParticleBurst(num3, vector, vector2, Vector3.zero, 0f, 0f, null, null, null, (!self.IsGreenFire) ? GlobalSparksDoer.SparksType.STRAIGHT_UP_FIRE : GlobalSparksDoer.SparksType.STRAIGHT_UP_GREEN_FIRE);
+					self.m_particleTimer -= Mathf.Floor(self.m_particleTimer);
+				}
+			}
+			if (actor.IsGone)
+			{
+				effectData.elapsed = 10000f;
+			}
+			if ((actor.IsFalling || actor.IsGone) && effectData.vfxObjects != null && effectData.vfxObjects.Count > 0)
+			{
+				GameActorFireEffect.DestroyFlames(effectData);
+			}
+		}
+		*/
 
 		public static void RegisterConnectedRoomHook(RoomHandler self, RoomHandler other, RuntimeRoomExitData usedExit)
 		{

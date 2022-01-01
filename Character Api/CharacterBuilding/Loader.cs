@@ -79,10 +79,27 @@ namespace CustomCharacters
             }
         }
 
+        public static tk2dSpriteAnimationClip GetAnimation(string character, string animation)
+        {
+            character = character.ToLower();
+            if (CharacterBuilder.storedCharacters.ContainsKey(character))
+            {
+                var library = CharacterBuilder.storedCharacters[character].Second.GetComponent<PlayerController>().spriteAnimator.Library;
+                if (library.GetClipByName(animation) != null)
+                {
+                    return library.GetClipByName(animation);
+                }
+            }
+            else
+            {
+                ETGModConsole.Log($"No character found under the name \"{character}\" or tk2dSpriteAnimator is null");
+            }
+            return null;
+        }
+
         public static void AddFoyerObject(string character, GameObject obj, Vector2 offset)
         {
             character = character.ToLower();
-            BotsModule.Log(CharacterBuilder.storedCharacters.GetFirst().Key);
             if (CharacterBuilder.storedCharacters.ContainsKey(character))
             {
                 CharacterBuilder.storedCharacters[character].First.randomFoyerBullshitNNAskedFor.Add(new Tuple<GameObject, Vector2>(obj, offset));

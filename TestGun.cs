@@ -35,10 +35,7 @@ namespace BotsMod
 			
 			Gun other = PickupObjectDatabase.GetById(86) as Gun;
 			gun.AddProjectileModuleFrom(other, true, false);
-			gun.AddProjectileModuleFrom(other, true, false);
-			gun.AddProjectileModuleFrom(other, true, false);
-			gun.AddProjectileModuleFrom(other, true, false);
-			gun.AddProjectileModuleFrom(other, true, false);
+			gun.AddProjectileModuleFrom(other, true, false);			
 			gun.SetBaseMaxAmmo(27616);
 			gun.InfiniteAmmo = true;
 
@@ -69,11 +66,39 @@ namespace BotsMod
 
 			Projectile projectile = Tools.SetupProjectile(86);
 			//projectile.transform.parent = gun.barrelOffset;
-			projectile.baseData.damage = 9f;
-			projectile.baseData.speed = 20;
-			projectile.baseData.force = 15f;
-			projectile.baseData.range = 1600000f;
+			projectile.baseData.damage = 0f;
+			projectile.baseData.speed = 15;
+			projectile.baseData.force = 0f;
+			projectile.baseData.range = 8;
+
+			var pierceProjModifier = projectile.gameObject.AddComponent<PierceProjModifier>();
+
+			pierceProjModifier.penetration = int.MaxValue;
+			pierceProjModifier.penetratesBreakables = true;
+			pierceProjModifier.BeastModeLevel = PierceProjModifier.BeastModeStatus.NOT_BEAST_MODE;
+
+			//var dieBirds = projectile.gameObject.AddComponent<AntiAirProjectile>();
+
+			//dieBirds.AngularVelocity = 180;
+			//dieBirds.HomingRadius = 2;
+
+			var laser = projectile.gameObject.AddComponent<St4keProj>();
+
+			//laser.BackLinkProjectile = null;
+			//laser.damageCooldown = 1;
+			//laser.damagePerHit = 9;
+			//laser.damageTypes = CoreDamageTypes.None;
+			laser.LinkVFXPrefab = FakePrefab.Clone((GameObject)BraveResources.Load("Global VFX/VFX_LaserSight", ".prefab"));//(PickupObjectDatabase.GetById(298) as ComplexProjectileModifier).ChainLightningVFX;
+			laser.LinkVFXPrefab.SetActive(false);
+
 			gun.DefaultModule.projectiles[0] = projectile;
+			gun.DefaultModule.angleVariance = 0;
+			gun.DefaultModule.positionOffset = new Vector3(0f, 1.4f, 0f);
+
+			gun.Volley.projectiles[1].projectiles[0] = projectile;
+			gun.Volley.projectiles[1].positionOffset = new Vector3(0f, -1.4f, 0f);
+			gun.Volley.projectiles[1].angleVariance = 0;
+
 			/*List<string> BeamAnimPaths = new List<string>()
 			{
 				"BotsMod/sprites/beam/OtherWorldlyFury/otherworldly_fury_beam_middle_001",
@@ -122,7 +147,7 @@ namespace BotsMod
 			beamComp.gameObject.GetOrAddComponent<EmmisiveBeams>().EmissiveColorPower = 7;
 			beamComp.gameObject.GetOrAddComponent<EmmisiveBeams>().EmissivePower = 42;*/
 
-			foreach(var module in gun.Volley.projectiles)
+			/*foreach(var module in gun.Volley.projectiles)
             {
 				module.ammoCost = 1;
 
@@ -160,7 +185,7 @@ namespace BotsMod
 
 
 				}
-			};
+			};*/
 
 
 
