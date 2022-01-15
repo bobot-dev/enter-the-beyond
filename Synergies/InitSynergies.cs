@@ -17,6 +17,8 @@ namespace BotsMod
 
             CustomSynergies.Add("Overheat", new List<string> { "bot:nail_minigun" }, new List<string> { "hot_lead", "flame_hand", "phoenix", "copper_ammolet", "gungeon_pepper" }, false);
 
+            CustomSynergies.Add("whypls", new List<string> { "bot:test_gun" }, new List<string> { "hot_lead", "flame_hand", "phoenix", "copper_ammolet", "gungeon_pepper" }, false);
+
             /*AdvancedTransformGunSynergyProcessor advancedTransformGunSynergyProcessor = (PickupObjectDatabase.GetById(Game.Items["bot:hells_revolver"].PickupObjectId) as Gun).gameObject.AddComponent<AdvancedTransformGunSy/*nergyProcessor>();
             advancedTransformGunSynergyProcessor.NonSynergyGunId = Game.Items["bot:hells_revolver"].PickupObjectId;
             advancedTransformGunSynergyProcessor.SynergyGunId = Game.Items["bot:hells_revolver+the_marksman"].PickupObjectId;

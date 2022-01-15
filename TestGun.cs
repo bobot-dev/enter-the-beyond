@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Gungeon;
 using GungeonAPI;
 using ItemAPI;
@@ -13,11 +14,21 @@ namespace BotsMod
 	{
 		private bool HasReloaded;
 
-
 		private static Gun lostSidearm;
+
+
+		//private async Task<Leaderboard?> FetchLeaderboard(int difficulty, bool precise)
+		//{
+			//Leaderboard? leaderboard = await SteamUserStats.FindLeaderboardAsync("Cyber Grind Wave Violent");
+			//return leaderboard;
+		//}
 
 		public static void Add()
 		{
+
+			//SteamClient.Init(1229490, true);
+
+			
 
 			Gun gun2 = PickupObjectDatabase.GetById(221) as Gun;
 			Gun gun3 = PickupObjectDatabase.GetById(99) as Gun;
@@ -38,6 +49,8 @@ namespace BotsMod
 			gun.AddProjectileModuleFrom(other, true, false);			
 			gun.SetBaseMaxAmmo(27616);
 			gun.InfiniteAmmo = true;
+
+			
 
 
 			gun.StarterGunForAchievement = true;

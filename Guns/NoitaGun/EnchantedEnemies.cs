@@ -39,7 +39,7 @@ namespace BotsMod
 
 				Material material = target.sprite.renderer.material;
 
-				var mat = new Material(Tools.AHHH.LoadAsset<Shader>("Chained"));
+				var mat = new Material(BeyondPrefabs.AHHH.LoadAsset<Shader>("Chained"));
 				mat.SetTexture("_MainTex", material.mainTexture);
 				mat.SetTexture("_Gradient", ResourceExtractor.GetTextureFromResource("BotsMod/sprites/gradient.png"));
 
@@ -48,7 +48,7 @@ namespace BotsMod
 
 				target.behaviorSpeculator.CooldownScale *= 0.2f;
 
-				var partObj = UnityEngine.Object.Instantiate(Tools.BotsAssetBundle.LoadAsset<GameObject>("ParticleSystemObj 1"));
+				var partObj = UnityEngine.Object.Instantiate(BeyondPrefabs.BotsAssetBundle.LoadAsset<GameObject>("ParticleSystemObj 1"));
 
 				partObj.transform.position = target.sprite.WorldCenter;
 				//partObj.transform.position = target.transform.position;

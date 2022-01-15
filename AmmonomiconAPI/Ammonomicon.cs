@@ -2,7 +2,6 @@
 using BotsMod;
 using CustomCharacters;
 using ItemAPI;
-using NpcApi;
 using System;
 using System.Collections;
 using System.Collections.Generic;

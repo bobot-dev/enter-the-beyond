@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-using GungeonAPI;
-using BotsMod;
+
+
 
 namespace CustomCharacters
 {
@@ -32,7 +32,7 @@ namespace CustomCharacters
                 material = def.material == null ? def.materialInst : def.material;
                 if (material == null || material.mainTexture == null)
                 {
-                    ToolsGAPI.PrintError($"Failed to dump {defName} in {collectionName}: No valid material");
+                    ToolsCharApi.PrintError($"Failed to dump {defName} in {collectionName}: No valid material");
                     continue;
                 }
 
@@ -43,7 +43,7 @@ namespace CustomCharacters
                 uvs = def.uvs;
                 if (def.uvs == null || def.uvs.Length < 4)
                 {
-                    ToolsGAPI.PrintError($"Failed to dump {defName} in {collectionName}: Invalid UV's");
+                    ToolsCharApi.PrintError($"Failed to dump {defName} in {collectionName}: Invalid UV's");
                     continue;
                 }
 
@@ -56,7 +56,7 @@ namespace CustomCharacters
                 h = maxY - minY;
                 if (w <= 0 || h <= 0)
                 {
-                    ToolsGAPI.ExportTexture(new Texture2D(1, 1) { name = defName });
+                    ToolsCharApi.ExportTexture(new Texture2D(1, 1) { name = defName });
                     continue;
                 };
 
@@ -70,8 +70,7 @@ namespace CustomCharacters
                     output = output.Rotated().Flipped();
                 }
                 output.name = def.name;
-                BotsModule.Log(output.name, BotsModule.TEXT_COLOR);
-                ToolsGAPI.ExportTexture(output, "SpriteDump/" + collectionName.Replace("/", "-").Replace("\\", "-"));
+                ToolsCharApi.ExportTexture(output, "SpriteDump/" + collectionName.Replace("/", "-").Replace("\\", "-"));
 
 
 
@@ -116,8 +115,8 @@ namespace CustomCharacters
                
                 if (w <= 0 || h <= 0)
                 {
-                    BotsModule.Log($"[{defName}]: is to small. minX: {minX}, minY: {minY}, maxX: {maxX}, maxY: {maxY}", BotsModule.TEXT_COLOR);
-                    //ToolsGAPI.ExportTexture(new Texture2D(1, 1) { name = defName });
+                    ToolsCharApi.PrintError<string>($"[{defName}]: is to small. minX: {minX}, minY: {minY}, maxX: {maxX}, maxY: {maxY}");
+                    //ToolsCharApi.ExportTexture(new Texture2D(1, 1) { name = defName });
                     continue;
                 };
 
@@ -127,8 +126,6 @@ namespace CustomCharacters
                 output.SetPixels(pixels);
                 output.Apply();
                 output.name = def.name;
-                BotsModule.Log(output.name, BotsModule.TEXT_COLOR);
-                ToolsGAPI.ExportTexture(output, "SpriteDump/df/" + collectionName);
 
 
 

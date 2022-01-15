@@ -10,7 +10,7 @@ namespace PrefabAPI
     {
         public long m_PathID;
         public int[] version;
-        public ClassIDType type;
+        public EditorClassIDType type;
         public SerializedType serializedType;
         public uint byteSize;
 

@@ -19,6 +19,7 @@ namespace BotsMod
 		public static GameObject lostFigurePlaceable;
 		public static GameObject beyondEnterance;
 		public static GameObject pastControllerObject;
+		public static GameObject laserCutterParticles;
 
 		public static PlayerHandController basicBeyondHands;
 
@@ -54,8 +55,21 @@ namespace BotsMod
 
 		public static Texture2D ENV_Tileset_Beyond;
 
+		public static AssetBundle AHHH;
+		public static AssetBundle fucktilesets;
+		public static AssetBundle EtbAssetBundle;
+		public static AssetBundle BotsAssetBundle;
+
 		public static void InitCustomPrefabs()
 		{
+
+
+			AHHH = BotsModule.LoadAssetBundleFromLiterallyAnywhere("coolshader");
+			fucktilesets = BotsModule.LoadAssetBundleFromLiterallyAnywhere("fucktilesets");
+			EtbAssetBundle = BotsModule.LoadAssetBundleFromLiterallyAnywhere("enterthebeyond");
+			BotsAssetBundle = BotsModule.LoadAssetBundleFromLiterallyAnywhere("botsassetbundle");
+
+
 			ModAssets = AssetBundleLoader.LoadAssetBundleFromLiterallyAnywhere("modassets");
 
 			//ENV_Tileset_Beyond = ModAssets.LoadAsset<Texture2D>("ENV_Tileset_Beyond");
@@ -218,6 +232,9 @@ namespace BotsMod
 			secretFloorInteractable.overridePitIndex = null;
 			secretFloorInteractable.targetTileset = (GlobalDungeonData.ValidTilesets)CustomValidTilesets.BEYOND;
 			secretFloorInteractable.worldLocks = null;
+
+			laserCutterParticles = BeyondPrefabs.AHHH.LoadAsset<GameObject>("LaserCutterSystem");
+			laserCutterParticles.AddComponent<PlayParticleSystemDuringBossIntro>();
 		}
 	}
 }

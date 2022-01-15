@@ -24,7 +24,7 @@ namespace PrefabAPI
         }
     }
 
-    public sealed class EditorAssetBundle : NamedObject
+    public sealed class EditorAssetBundle : EditorNamedObject
     {
         public PPtr<EditorObject>[] m_PreloadTable;
         public KeyValuePair<string, AssetInfo>[] m_Container;

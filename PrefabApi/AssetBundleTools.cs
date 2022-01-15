@@ -4,14 +4,35 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.IO;
+using UnityEngine;
 
 namespace PrefabAPI
 {
     public static class AssetBundleTools
     {
-        public static ClassIDType GetClassFromType<T>() where T : EditorObject
+        public static EditorClassIDType GetClassFromType<T>() where T : EditorObject
         {
             return GetClassFromType(typeof(T));
+        }
+
+        public static List<Transform> GetChildren(this Transform transform)
+        {
+            List<Transform> children = new List<Transform>();
+            foreach(Transform c in transform)
+            {
+                children.Add(c);
+            }
+            return children;
+        }
+
+        public static List<GameObject> GetChildObjects(this Transform transform)
+        {
+            List<GameObject> children = new List<GameObject>();
+            foreach (Transform c in transform)
+            {
+                children.Add(c.gameObject);
+            }
+            return children;
         }
 
         public static string ToStringBetter<T>(this IEnumerable<T> enumerable)
@@ -31,17 +52,17 @@ namespace PrefabAPI
             return s;
         }
 
-        public static ClassIDType GetClassFromType(Type t)
+        public static EditorClassIDType GetClassFromType(Type t)
         {
             if (t == typeof(EditorAssetBundle))
-                return ClassIDType.AssetBundle;
+                return EditorClassIDType.AssetBundle;
             else if (t == typeof(EditorGameObject))
-                return ClassIDType.GameObject;
+                return EditorClassIDType.GameObject;
             else if (t == typeof(EditorTextAsset))
-                return ClassIDType.TextAsset;
+                return EditorClassIDType.TextAsset;
             else if (t == typeof(EditorTransform))
-                return ClassIDType.Transform;
-            return ClassIDType.Object;
+                return EditorClassIDType.Transform;
+            return EditorClassIDType.Object;
         }
 
         public static List<FieldInfo> GetFieldsOfType<T>(this object anything, BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)

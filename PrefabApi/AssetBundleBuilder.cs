@@ -46,18 +46,18 @@ namespace PrefabAPI
 
                     //assets metadata
                     subwriter.Write("2017.4.40f1".ToBytesPlusNull()); //unity version
-                    subwriter.Write((int)BuildTarget.StandaloneWindows64); //target platform
+                    subwriter.Write((int)EditorBuildTarget.StandaloneWindows64); //target platform
                     subwriter.Write(true); //enable type tree
 
                     //assets types
-                    List<ClassIDType> types = new List<ClassIDType>
+                    List<EditorClassIDType> types = new List<EditorClassIDType>
                     {
-                        ClassIDType.GameObject,
-                        ClassIDType.AssetBundle,
-                        ClassIDType.Transform
+                        EditorClassIDType.GameObject,
+                        EditorClassIDType.AssetBundle,
+                        EditorClassIDType.Transform
                     };
                     subwriter.Write(types.Count); //type count
-                    foreach (ClassIDType type in types)
+                    foreach (EditorClassIDType type in types)
                     {
                         subwriter.Write(SerializedTypeStorage.GetTypeBytes(type));
                     }
@@ -225,7 +225,7 @@ namespace PrefabAPI
                             preloads.Add(PPtr<EditorObject>.CreatePPtr(obj, objects, -1));
                             AssetInfo assetinf = new AssetInfo() { asset = PPtr<EditorObject>.CreatePPtr(obj, objects, -1), preloadIndex = index, preloadSize = 1 };
                             string name = "UnnamedObject_";
-                            if (obj is NamedObject namedobj)
+                            if (obj is EditorNamedObject namedobj)
                             {
                                 name = namedobj.m_Name;
                             }
@@ -377,7 +377,7 @@ namespace PrefabAPI
                         subwriter.Write((long)bundle[0]);
                         subwriter.Write((uint)bundle[1]);
                         subwriter.Write((uint)bundle[2]);
-                        subwriter.Write(types.IndexOf((ClassIDType)bundle[4]));
+                        subwriter.Write(types.IndexOf((EditorClassIDType)bundle[4]));
                     }
 
 
@@ -417,7 +417,7 @@ namespace PrefabAPI
                     long directory1Size = bytesToLZMACompress.Count;
                     subwriter.Write(directory1Size); //size (size of the first half of lzma decompressed bytes) (TODO)
                     subwriter.Write(4u); //flags (whattttttttttttttttttttttttttttttttttttttttt)
-                    subwriter.WriteStringToNull("CAB-" + Guid.NewGuid().ToString()); //name (i don't understand)
+                    subwriter.WriteStringToNull("CAB-" + Guid.NewGuid().ToString() + "-" + PrefabBuilder.builtObjects); //name (i don't understand)
                     //directory info 1
                     //subwriter.Write(directory1Size); //offset (size of dir1)
                     //subwriter.Write((long)0); //size (size of the second half of lzma decompressed bytes) (TODO)

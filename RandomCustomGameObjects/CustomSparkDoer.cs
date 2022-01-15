@@ -21,6 +21,10 @@ public static class CustomSparkDoer
 			case CustomSparkDoer.SparksType.ELECTRIC_FIRE:
 				particleSystem = CustomSparkDoer.m_blueFireParticles;
 				break;
+
+			case CustomSparkDoer.SparksType.LASER_CUTTER:
+				particleSystem = CustomSparkDoer.m_laserCutterParticles;
+				break;
 		}
 		if (particleSystem == null)
 		{
@@ -124,6 +128,12 @@ public static class CustomSparkDoer
 				CustomSparkDoer.m_blueFireParticles = FakePrefab.Clone(CustomFire.blueFire).GetComponent<ParticleSystem>();
 				return CustomSparkDoer.m_blueFireParticles;
 
+
+			case CustomSparkDoer.SparksType.LASER_CUTTER:
+				
+				CustomSparkDoer.m_laserCutterParticles = ((GameObject)UnityEngine.Object.Instantiate(BeyondPrefabs.laserCutterParticles, Vector3.zero, Quaternion.identity)).GetComponent<ParticleSystem>();
+				return CustomSparkDoer.m_laserCutterParticles;
+
 			default:
 				return CustomSparkDoer.m_particles;
 		}
@@ -140,6 +150,8 @@ public static class CustomSparkDoer
 
 	private static ParticleSystem m_pinkFireParticles;
 	private static ParticleSystem m_blueFireParticles;
+
+	private static ParticleSystem m_laserCutterParticles;
 	public enum EmitRegionStyle
 	{
 		RANDOM,
@@ -151,6 +163,8 @@ public static class CustomSparkDoer
 		SPARKS_ADDITIVE_DEFAULT,
 
 		PINK_FIRE,
-		ELECTRIC_FIRE
+		ELECTRIC_FIRE,
+
+		LASER_CUTTER
 	}
 }

@@ -10,19 +10,176 @@ using UnityEngine;
 using Dungeonator;
 using MonoMod.RuntimeDetour;
 
-namespace GungeonAPI
+namespace CustomCharacters
 {
     //Utility methods
-    public static class ToolsGAPI
+    public static class ToolsCharApi
     {
         public static bool verbose = false;
         private static string defaultLog = Path.Combine(ETGMod.ResourcesDirectory, "customCharacterLog.txt");
-        public static string modID = "CC";
+        public static string modID = "CharApi";
 
         private static Dictionary<string, float> timers = new Dictionary<string, float>();
+        private static string[] BundlePrereqs;
 
+        public static byte[] ExtractEmbeddedResource(string filePath)
+        {
+            filePath = filePath.Replace("/", ".");
+            filePath = filePath.Replace("\\", ".");
+            Assembly callingAssembly = Assembly.GetCallingAssembly();
+            byte[] result;
+            using (Stream manifestResourceStream = callingAssembly.GetManifestResourceStream(filePath))
+            {
+                bool flag = manifestResourceStream == null;
+                if (flag)
+                {
+                    result = null;
+                }
+                else
+                {
+                    byte[] array = new byte[manifestResourceStream.Length];
+                    manifestResourceStream.Read(array, 0, array.Length);
+                    result = array;
+                }
+            }
+            return result;
+        }
 
+        public static Texture2D Rotated(this Texture2D texture, bool clockwise = false)
+        {
+            Color32[] original = texture.GetPixels32();
+            Color32[] rotated = new Color32[original.Length];
+            int w = texture.width;
+            int h = texture.height;
 
+            int iRotated, iOriginal;
+
+            for (int j = 0; j < h; ++j)
+            {
+                for (int i = 0; i < w; ++i)
+                {
+                    iRotated = (i + 1) * h - j - 1;
+                    iOriginal = clockwise ? original.Length - 1 - (j * w + i) : j * w + i;
+                    rotated[iRotated] = original[iOriginal];
+                }
+            }
+
+            Texture2D rotatedTexture = new Texture2D(h, w);
+            rotatedTexture.SetPixels32(rotated);
+            rotatedTexture.Apply();
+            return rotatedTexture;
+        }
+
+        public static Texture2D Flipped(this Texture2D texture, bool horizontal = true)
+        {
+            int w = texture.width;
+            int h = texture.height;
+
+            Texture2D output = new Texture2D(w, h);
+            for (int i = 0; i < w; i++)
+            {
+                for (int j = 0; j < h; j++)
+                {
+                    output.SetPixel(i, j, texture.GetPixel(w - i - 1, j));
+                }
+            }
+            output.Apply();
+            return output;
+        }
+
+        public static List<Texture2D> GetTexturesFromResource(string resourceName)
+        {
+            string[] resources = ToolsCharApi.GetResourceNames();
+            List<Texture2D> result = new List<Texture2D>();
+
+            for (int i = 0; i < resources.Length; i++)
+            {
+                if (resources[i].StartsWith(resourceName.Replace('/', '.') + ".", StringComparison.OrdinalIgnoreCase))
+                {
+                    //Tools.PrintError<string>(resourceName, "FF0000");
+                    result.Add(GetTextureFromResource(resources[i]));
+                }
+            }
+
+            if (result.Count == 0)
+            {
+                ToolsCharApi.PrintError<string>("No bytes found in " + resourceName, "FF0000");
+                result = null;
+            }
+
+            return result;
+        }
+
+        public static Texture2D GetTextureFromResource(string resourceName)
+        {
+            byte[] array = ExtractEmbeddedResource(resourceName);
+            bool flag = array == null;
+            Texture2D result;
+            if (flag)
+            {
+                ToolsCharApi.PrintError<string>("No bytes found in " + resourceName, "FF0000");
+                result = null;
+            }
+            else
+            {
+                Texture2D texture2D = new Texture2D(1, 1, TextureFormat.RGBAFloat, false);
+                texture2D.LoadImage(array);
+                texture2D.filterMode = FilterMode.Point;
+                string text = resourceName.Substring(0, resourceName.LastIndexOf('.'));
+                bool flag2 = text.LastIndexOf('.') >= 0;
+                if (flag2)
+                {
+                    text = text.Substring(text.LastIndexOf('.') + 1);
+                }
+                texture2D.name = text;
+                result = texture2D;
+            }
+            return result;
+        }
+
+        public static string[] GetResourceNames()
+        {
+            Assembly callingAssembly = Assembly.GetCallingAssembly();
+            string[] manifestResourceNames = callingAssembly.GetManifestResourceNames();
+            bool flag = manifestResourceNames == null;
+            string[] result;
+            if (flag)
+            {
+                ETGModConsole.Log("No manifest resources found.", false);
+                result = null;
+            }
+            else
+            {
+                result = manifestResourceNames;
+            }
+            return result;
+        }
+
+        
+
+        public static T LoadAssetFromAnywhere<T>(string path) where T : UnityEngine.Object
+        {
+            if (BundlePrereqs == null)
+            {
+                Init();
+            }
+            T obj = null;
+            foreach (string name in BundlePrereqs)
+            {
+                try
+                {
+                    obj = ResourceManager.LoadAssetBundle(name).LoadAsset<T>(path);
+                }
+                catch
+                {
+                }
+                if (obj != null)
+                {
+                    break;
+                }
+            }
+            return obj;
+        }
 
 
         /// <summary>
@@ -104,16 +261,16 @@ namespace GungeonAPI
 
 
 
-        
+
         /// <summary>
-		/// Gets the first empty space in <paramref name="atlas"/> that has at least the size of <paramref name="pixelScale"/>.
-		/// </summary>
-		/// <param name="atlas">The <see cref="dfAtlas"/> to find the empty space in.</param>
-		/// <param name="pixelScale">The required size of the empty space.</param>
-		/// <returns>The rect of the empty space divided by the atlas texture's size.</returns>
-		public static Rect FindFirstValidEmptySpace(this dfAtlas atlas, IntVector2 pixelScale)
+        /// Gets the first empty space in <paramref name="atlas"/> that has at least the size of <paramref name="pixelScale"/>.
+        /// </summary>
+        /// <param name="atlas">The <see cref="dfAtlas"/> to find the empty space in.</param>
+        /// <param name="pixelScale">The required size of the empty space.</param>
+        /// <returns>The rect of the empty space divided by the atlas texture's size.</returns>
+        public static Rect FindFirstValidEmptySpace(this dfAtlas atlas, IntVector2 pixelScale)
         {
-            
+
 
 
 
@@ -125,13 +282,13 @@ namespace GungeonAPI
             int pointIndex = -1;
             List<RectInt> rects = atlas.GetPixelRegions();
 
-            
+
             while (true)
             {
                 bool shouldContinue = false;
                 foreach (RectInt rint in rects)
                 {
-                    
+
                     if (rint.DoseOverlap(new RectInt(point, pixelScale.ToVector2Int())))
                     {
                         shouldContinue = true;
@@ -240,7 +397,7 @@ namespace GungeonAPI
             {
                 Color[][] pixels = new Color[Math.Min(tex.width, width)][];
 
-                
+
                 for (int x = 0; x < Math.Min(tex.width, width); x++)
                 {
                     for (int y = 0; y < Math.Min(tex.height, height); y++)
@@ -283,7 +440,7 @@ namespace GungeonAPI
                         }
                     }
                 }
-                
+
                 for (int x = 0; x < tex.width; x++)
                 {
                     for (int y = 0; y < tex.height; y++)
@@ -315,6 +472,43 @@ namespace GungeonAPI
 
         public static void Init()
         {
+            if (BundlePrereqs == null) 
+            {
+                BundlePrereqs = new string[]
+                {
+                    "brave_resources_001",
+                    "dungeon_scene_001",
+                    "encounters_base_001",
+                    "enemies_base_001",
+                    "flows_base_001",
+                    "foyer_001",
+                    "foyer_002",
+                    "foyer_003",
+                    "shared_auto_001",
+                    "shared_auto_002",
+                    "shared_base_001",
+                    "dungeons/base_bullethell",
+                    "dungeons/base_castle",
+                    "dungeons/base_catacombs",
+                    "dungeons/base_cathedral",
+                    "dungeons/base_forge",
+                    "dungeons/base_foyer",
+                    "dungeons/base_gungeon",
+                    "dungeons/base_mines",
+                    "dungeons/base_nakatomi",
+                    "dungeons/base_resourcefulrat",
+                    "dungeons/base_sewer",
+                    "dungeons/base_tutorial",
+                    "dungeons/finalscenario_bullet",
+                    "dungeons/finalscenario_convict",
+                    "dungeons/finalscenario_coop",
+                    "dungeons/finalscenario_guide",
+                    "dungeons/finalscenario_pilot",
+                    "dungeons/finalscenario_robot",
+                    "dungeons/finalscenario_soldier"
+                };  
+            }
+
             if (File.Exists(defaultLog)) File.Delete(defaultLog);
         }
 
@@ -492,13 +686,13 @@ namespace GungeonAPI
             string key = name.ToLower();
             if (!timers.ContainsKey(key))
             {
-                ToolsGAPI.PrintError($"Could not stop timer {name}, no such timer exists");
+                ToolsCharApi.PrintError($"Could not stop timer {name}, no such timer exists");
                 return;
             }
             float timerStart = timers[key];
             int elapsed = (int)((Time.realtimeSinceStartup - timerStart) * 1000);
             timers.Remove(key);
-            ToolsGAPI.Print($"{name} finished in " + elapsed + "ms");
+            ToolsCharApi.Print($"{name} finished in " + elapsed + "ms");
         }
     }
 }

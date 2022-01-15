@@ -9,7 +9,7 @@ using UnityEngine;
 using MonoMod.RuntimeDetour;
 using ChangeCoopMode = HutongGames.PlayMaker.Actions.ChangeCoopMode;
 using InputDevice = InControl.InputDevice;
-using GungeonAPI;
+
 
 
 namespace CustomCharacters
@@ -19,41 +19,14 @@ namespace CustomCharacters
     class CharacterSwitcher
     {
         private static FieldInfo m_instances = typeof(BraveInput).GetField("m_instances", BindingFlags.NonPublic | BindingFlags.Static);
-        private static string prefabPath;
-
-        public static void Init()
-        {
-			return; // stubbed
-            //ETGModConsole.Commands.AddUnit("character2", SwitchSecondaryCharacter);
-            //ETGModConsole.Commands.AddUnit("braveInput", (s) =>
-            //{
-            //    var braveInstances = (Dictionary<int, BraveInput>)m_instances.GetValue(null);
-            //    foreach (var instance in braveInstances)
-            //    {
-            //        Tools.Print(instance.Key + ": " + instance.Value, "FFFF00");
-            //    }
-
-            //    var pls = GameManager.Instance.AllPlayers;
-            //    for (int i = 0; i < pls.Length; i++)
-            //    {
-            //        var player = pls[i];
-            //        Tools.Print($"Player {i}: " + player.name + ": " + player.PlayerIDX, "00FFFF");
-            //    }
-
-            //    List<PlayerController> list = new List<PlayerController>(UnityEngine.Object.FindObjectsOfType<PlayerController>());
-            //    for (int j = 0; j < list.Count; j++)
-            //    {
-            //        Tools.Print(list[j], "FF00FF");
-            //    }
-            //});
-        }
+        private static string prefabPath;       
 
         public static void SwitchSecondaryCharacter(string[] args)
         {
             if (args == null || args.Length < 1) return;
             if (!GameManager.Instance.SecondaryPlayer)
             {
-                ToolsGAPI.PrintError("You need to enter co-op mode before using the character2 command");
+                ToolsCharApi.PrintError("You need to enter co-op mode before using the character2 command");
                 return;
             }
 
@@ -61,7 +34,7 @@ namespace CustomCharacters
             var prefab = (GameObject)BraveResources.Load(prefabPath, ".prefab");
             if (prefab == null)
             {
-                ToolsGAPI.Print("Failed getting prefab for " + args[0]);
+                ToolsCharApi.Print("Failed getting prefab for " + args[0]);
                 return;
             }
             GameManager.Instance.StartCoroutine(HandleCharacterChange());
@@ -109,7 +82,7 @@ namespace CustomCharacters
 
             //Reset
             GameManager.Instance.RefreshAllPlayers();
-            ToolsGAPI.Print("Character swapped", "FFFFFF", true);
+            ToolsCharApi.Print("Character swapped", "FFFFFF", true);
             yield break;
         }
 

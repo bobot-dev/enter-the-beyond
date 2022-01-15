@@ -38,7 +38,7 @@ namespace BotsMod
 				AIActor aIActor = EnemyDatabase.GetOrLoadByGuid("5f3abc2d561b4b9c9e72b879c6f10c7e");
 				prefab = EnemyBuilder.BuildPrefab("TheOrb", guid, "BotsMod/sprites/Enemies/Orb/the_orb_001", new IntVector2(0, 0), new IntVector2(8, 9), true);
 
-				var orb = UnityEngine.Object.Instantiate<GameObject>(Tools.AHHH.LoadAsset<GameObject>("Spike"), prefab.transform);
+				var orb = UnityEngine.Object.Instantiate<GameObject>(BeyondPrefabs.AHHH.LoadAsset<GameObject>("Spike"), prefab.transform);
 				orb.AddComponent<MakeObjSpin>();
 
 

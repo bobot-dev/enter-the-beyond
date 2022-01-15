@@ -18,6 +18,7 @@ namespace SaveAPI
         {
             this.m_flags = new HashSet<CustomDungeonFlags>(new CustomDungeonFlagsComparer());
             this.m_characterStats = new Dictionary<PlayableCharacters, AdvancedGameStats>(new PlayableCharactersComparer());
+            this.m_customCharacterStats = new Dictionary<CustomCharacters.CustomPlayableCharacters, GameStats>(new CustomCharacters.CustomPlayableCharactersComparer());
             this.m_numCharacters = -1;
             this.cachedHuntIndex = -1;
         }
@@ -638,6 +639,7 @@ namespace SaveAPI
         public string midGameSaveGuid;
         [fsProperty]
         public Dictionary<PlayableCharacters, AdvancedGameStats> m_characterStats;
+        public Dictionary<CustomCharacters.CustomPlayableCharacters, GameStats> m_customCharacterStats;
         private AdvancedGameStats m_sessionStats;
         private AdvancedGameStats m_savedSessionStats;
         private PlayableCharacters m_sessionCharacter;

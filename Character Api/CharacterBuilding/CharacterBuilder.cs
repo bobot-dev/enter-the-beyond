@@ -6,8 +6,7 @@ using System.Text;
 using UnityEngine;
 
 using ItemAPI;
-using BotsMod;
-using GungeonAPI;
+using System.Collections;
 
 namespace CustomCharacters
 {
@@ -21,57 +20,93 @@ namespace CustomCharacters
         //public static Dictionary<string, tk2dSpriteCollectionData> storedCollections = new Dictionary<string, tk2dSpriteCollectionData>();
         public static List<Gun> guns = new List<Gun>();
 
-        public static void BuildCharacter(CustomCharacterData data, bool hasAltSkin, bool paradoxUsesSprites, bool removeFoyerExtras, bool hasCustomPast, string customPast, int metaCost, bool useGlow, Color emissiveColor, float emissiveColorPower, float emissivePower)
+
+        
+
+        public static void BuildCharacter(CustomCharacterData data, bool hasAltSkin, bool paradoxUsesSprites, bool removeFoyerExtras, bool hasArmourlessAnimations = false, bool usesArmourNotHealth = false, bool hasCustomPast = false, string customPast = "", int metaCost = 0, bool useGlow = false,
+            GlowMatDoer glowVars = null, GlowMatDoer altGlowVars = null)
         {
             var basePrefab = GetPlayerPrefab(data.baseCharacter);
             if (basePrefab == null)
             {
-                ToolsGAPI.PrintError("Could not find prefab for: " + data.baseCharacter.ToString());
+                ToolsCharApi.PrintError("Could not find prefab for: " + data.baseCharacter.ToString());
                 return;
             }
 
-            ToolsGAPI.Print("");
-            ToolsGAPI.Print("--Building Character: " + data.nameShort + "--", "0000FF");
+            ToolsCharApi.Print("");
+            ToolsCharApi.Print("--Building Character: " + data.nameShort + "--", "0000FF");
             
             PlayerController playerController;
             GameObject gameObject = GameObject.Instantiate(basePrefab);
 
             playerController = gameObject.GetComponent<PlayerController>();
-            playerController.gameObject.AddComponent<CustomCharacter>().data = data;
+            var customCharacter = gameObject.AddComponent<CustomCharacter>();
+
+            customCharacter.data = data;
             data.characterID = storedCharacters.Count;
 
+            playerController.AllowZeroHealthState = usesArmourNotHealth;
+            playerController.ForceZeroHealthState = usesArmourNotHealth;
 
-            
+            playerController.hasArmorlessAnimations = hasArmourlessAnimations;
+
+
+
+
 
             GameObject.DontDestroyOnLoad(gameObject);
 
             CustomizeCharacter(playerController, data, paradoxUsesSprites);
 
-            basePrefab = null;
-            storedCharacters.Add(data.nameInternal.ToLower(), new Tuple<CustomCharacterData, GameObject>(data, gameObject));
-            //BotsModule.Log("nameInternal: " + data.nameInternal, BotsModule.TEXT_COLOR);
-            var character = gameObject.AddComponent<CustomCharacterController>();   
-            
-            character.data = data;
-            character.past = customPast;
-            character.hasPast = hasCustomPast;
-            character.metaCost = metaCost;
-
-            character.useGlow = useGlow;
-            character.emissiveColor = emissiveColor;
-            character.emissiveColorPower = emissiveColorPower;
-            character.emissivePower = emissivePower;
-
             data.useGlow = useGlow;
-            data.emissiveColor = emissiveColor;
-            data.emissiveColorPower = emissiveColorPower;
-            data.emissivePower = emissivePower;
+            data.emissiveColor = glowVars.emissiveColor;
+            data.emissiveColorPower = glowVars.emissiveColorPower;
+            data.emissivePower = glowVars.emissivePower;
 
             data.removeFoyerExtras = removeFoyerExtras;
             data.metaCost = metaCost;
-            data.customCharacterController = character;
+
+            if (useGlow)
+            {
+                var material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+                material.DisableKeyword("BRIGHTNESS_CLAMP_ON");
+                material.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
+                material.SetTexture("_MainTexture", material.GetTexture("_MainTex"));
+                material.SetColor("_EmissiveColor", glowVars.emissiveColor);
+                material.SetFloat("_EmissiveColorPower", glowVars.emissiveColorPower);
+                material.SetFloat("_EmissivePower", glowVars.emissivePower);
+
+                data.glowMaterial = material;
+            }
+
+            if (useGlow && hasAltSkin)
+            {
+                var material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+                material.DisableKeyword("BRIGHTNESS_CLAMP_ON");
+                material.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
+                material.SetTexture("_MainTexture", material.GetTexture("_MainTex"));
+                material.SetColor("_EmissiveColor", altGlowVars.emissiveColor);
+                material.SetFloat("_EmissiveColorPower", altGlowVars.emissiveColorPower);
+                material.SetFloat("_EmissivePower", altGlowVars.emissivePower);
+
+                data.altGlowMaterial = material;
+            }
+
+            data.normalMaterial = new Material(ShaderCache.Acquire("Brave/PlayerShader"));
 
 
+
+
+
+            basePrefab = null;
+            storedCharacters.Add(data.nameInternal.ToLower(), new Tuple<CustomCharacterData, GameObject>(data, gameObject));
+            //BotsModule.Log("nameInternal: " + data.nameInternal, BotsModule.TEXT_COLOR);
+
+            customCharacter.past = customPast;
+            customCharacter.hasPast = hasCustomPast;
+            
+
+           
             gameObject.SetActive(false);
             FakePrefab.MarkAsFakePrefab(gameObject);
         }
@@ -80,9 +115,9 @@ namespace CustomCharacters
         {
             HandleStrings(player, data);
 
-            ToolsGAPI.StartTimer("    Sprite Handling");
+            ToolsCharApi.StartTimer("    Sprite Handling");
             SpriteHandler.HandleSprites(player, data);
-            ToolsGAPI.StopTimerAndReport("    Sprite Handling");
+            ToolsCharApi.StopTimerAndReport("    Sprite Handling");
 
             if (data.loadout != null)
                 HandleLoadout(player, data.loadout, data.altGun);
@@ -94,7 +129,7 @@ namespace CustomCharacters
             player.healthHaver.Armor = (int)data.armor;
 
 
-            player.characterIdentity = (PlayableCharacters)CustomPlayableCharacters.Custom;
+            player.characterIdentity = (PlayableCharacters)data.identity;
 
 
             //AkSoundEngine.switch
@@ -181,12 +216,12 @@ namespace CustomCharacters
 
             if (loadout == null)
             {
-                ToolsGAPI.PrintError("loadout is null :((((((((");
+                ToolsCharApi.PrintError("loadout is null :((((((((");
             }
 
             if (altGun == null)
             {
-                ToolsGAPI.PrintError("altGun is null :((((((((");
+                ToolsCharApi.PrintError("altGun is null :((((((((");
             }
 
             StripPlayer(player);
@@ -208,7 +243,7 @@ namespace CustomCharacters
                 }
                 else
                 {
-                    ToolsGAPI.PrintError("Is this even an item? It has no passive, active or gun component! " + item.EncounterNameOrDisplayName);
+                    ToolsCharApi.PrintError("Is this even an item? It has no passive, active or gun component! " + item.EncounterNameOrDisplayName);
                 }
             }
 
@@ -224,7 +259,7 @@ namespace CustomCharacters
                 }
                 else
                 {
-                    ToolsGAPI.PrintError("Is this even an gun? It has no gun component! " + item.EncounterNameOrDisplayName);
+                    ToolsCharApi.PrintError("Is this even an gun? It has no gun component! " + item.EncounterNameOrDisplayName);
                 }
             }
         }

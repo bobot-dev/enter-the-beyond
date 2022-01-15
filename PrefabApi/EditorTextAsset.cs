@@ -7,7 +7,7 @@ using System.Text;
 
 namespace PrefabAPI
 {
-    public sealed class EditorTextAsset : NamedObject
+    public sealed class EditorTextAsset : EditorNamedObject
     {
         public byte[] m_Script;
 

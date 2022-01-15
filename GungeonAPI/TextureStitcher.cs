@@ -143,7 +143,7 @@ namespace GungeonAPI
 
             return output;
         }
-
+        /*
         public static Texture2D Rotated(this Texture2D texture, bool clockwise = false)
         {
             Color32[] original = texture.GetPixels32();
@@ -184,7 +184,7 @@ namespace GungeonAPI
             }
             output.Apply();
             return output;
-        }
+        }*/
 
     }
 }

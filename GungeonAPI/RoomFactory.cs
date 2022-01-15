@@ -38,6 +38,10 @@ namespace GungeonAPI
             public Vector2[] exitPositions;
             public string[] exitDirections;
             public string[] floors;
+
+            public Vector2[] nodePositions;
+            public string[] nodeGUIDsIguess;
+
             public float weight;
             public int visualSubtypes;
             public bool isSpecialRoom;
@@ -454,6 +458,11 @@ namespace GungeonAPI
             {
                 return null;
             }
+        }
+
+        public static void AddNodeToRoom(PrototypeDungeonRoom room, Vector2 location)
+        {
+            //room.
         }
 
         public static void AddEnemyToRoom(PrototypeDungeonRoom room, Vector2 location, string guid, string trigger, int layer, bool shuffle)

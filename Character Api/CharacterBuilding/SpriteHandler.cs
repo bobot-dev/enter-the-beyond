@@ -3,8 +3,8 @@ using System.Linq;
 using System.Reflection;
 
 using UnityEngine;
-using GungeonAPI;
-using BotsMod;
+
+
 using System;
 using ItemAPI;
 using System.IO;
@@ -34,6 +34,7 @@ namespace CustomCharacters
         private static Dictionary<string, Material[]> usedMaterialDictionary = new Dictionary<string, Material[]>();
 
         //sorry not sorry
+        //ive decied to name them steve
         static Dictionary<string, Tuple<tk2dSpriteAnimationClip.WrapMode, int>> playerAnimInfo = new Dictionary<string, Tuple<tk2dSpriteAnimationClip.WrapMode, int>>
         {
             { "this one dose nothing im just putting it here to say im really really sorry you have to look at this code", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Once, 0) },
@@ -115,7 +116,48 @@ namespace CustomCharacters
 
             { "timefall", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
         };
+        #region aaaa
 
+        public static tk2dSpriteAnimationClip AddAnimation(tk2dSpriteAnimator animator, tk2dSpriteCollectionData collection, List<int> spriteIDs,
+            string clipName, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, float fps = 15)
+        {
+            ////BotsMod.BotsModule.Log("a1");
+            if (animator.Library == null)
+            {
+                animator.Library = animator.gameObject.AddComponent<tk2dSpriteAnimation>();
+                animator.Library.clips = new tk2dSpriteAnimationClip[0];
+                animator.Library.enabled = true;
+
+            }
+            ////BotsMod.BotsModule.Log("a2");
+            List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+            for (int i = 0; i < spriteIDs.Count; i++)
+            {
+                ////BotsMod.BotsModule.Log("a2.25");
+                tk2dSpriteDefinition sprite = collection.spriteDefinitions[spriteIDs[i]];
+                if (sprite.Valid)
+                {
+                    ////BotsMod.BotsModule.Log("a2.5");
+                    frames.Add(new tk2dSpriteAnimationFrame()
+                    {
+                        spriteCollection = collection,
+                        spriteId = spriteIDs[i]
+                    });
+                }
+            }
+            ////BotsMod.BotsModule.Log("a3");
+            var clip = new tk2dSpriteAnimationClip()
+            {
+                name = clipName,
+                fps = fps,
+                wrapMode = wrapMode,
+            };
+            Array.Resize(ref animator.Library.clips, animator.Library.clips.Length + 1);
+            animator.Library.clips[animator.Library.clips.Length - 1] = clip;
+
+            clip.frames = frames.ToArray();
+            return clip;
+        }
         public static void HandleSprites(PlayerController player, CustomCharacterData data)
         {
             if (data.minimapIcon != null)
@@ -139,7 +181,7 @@ namespace CustomCharacters
 
 
             //face card stuff
-            uiAtlas = data.atlas;//GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;
+            uiAtlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;
             if (data.faceCard != null)
                 HandleFacecards(player, data);
 
@@ -149,8 +191,15 @@ namespace CustomCharacters
 
             if (data.loadoutSprites != null)
                 HandleLoudoutSprites(player, data);
-            else
-                ToolsGAPI.Print("        loadout sprites is null.", "FFBB00");
+
+            if (data.coopDeathScreenIcon != null)
+            {
+                ETGModConsole.Log($"\"coop_page_death_{data.nameShort}_001\" added");
+                ToolsCharApi.LoadAssetFromAnywhere<GameObject>("Ammonomicon Atlas").GetComponent<dfAtlas>().AddNewItemToAtlas(data.coopDeathScreenIcon, $"coop_page_death_{data.nameShort}_001");
+            }
+                
+
+
         }
         private static tk2dSpriteCollectionData itemCollection = PickupObjectDatabase.GetByEncounterName("singularity").sprite.Collection;
         /// <summary>
@@ -188,7 +237,7 @@ namespace CustomCharacters
                 
                 data.loadoutSpriteNames.Add(data.loadoutSprites[i].name.Replace(" ", "_"));
             }
-            ToolsGAPI.ExportTexture(uiAtlas.Texture, "SpriteDump/" + "atlasthingo");
+            ToolsCharApi.ExportTexture(uiAtlas.Texture, "SpriteDump/" + "atlasthingo");
         }
 
         /// <summary>
@@ -299,7 +348,7 @@ namespace CustomCharacters
                 }
             }
 
-            //ToolsGAPI.ExportTexture(sprite, "SpriteDump/" + "OutlineTest");
+            //ToolsCharApi.ExportTexture(sprite, "SpriteDump/" + "OutlineTest");
 
             // Color[] pix = sprite.GetPixels(x, y, width, height);
             //Texture2D destTex = new Texture2D(width, height);
@@ -376,37 +425,7 @@ namespace CustomCharacters
             return tex.Resize(width, height);
         }
 
-        static string[] multiHandAnimNames = new string[]
-        {
-            "idle_backward_hand",
-            "idle_backward_twohands",
-
-            "idle_bw_hand",
-            "idle_bw_twohands",
-
-            "idle_forward_hand",
-            "idle_forward_twohands",
-
-            "idle_hand",
-            "idle_twohands",
-
-            "run_down_hand",
-            "run_down_twohands",
-
-            "run_right_bw_hand",
-            "run_right_bw_twohands",
-
-            "run_right_hand",
-            "run_right_twohands",
-
-            "run_up_hand",
-            "run_up_twohands",
-
-            "tablekick_down_hand",
-            "tablekick_right_hand"
-        };
-        static Dictionary<string, object> rooms;
-
+        
 
         public static void SetupLitterallyEverything(PlayerController player, CustomCharacterData data, string path, bool alt)
         {
@@ -420,11 +439,15 @@ namespace CustomCharacters
             FakePrefab.MarkAsFakePrefab(libaryObject);
 
             data.collection = SpriteBuilder.ConstructCollection(libaryObject, (data.nameShort + "CustomCollection").Replace(" ", "_") + (alt ? "_alt" : ""));
-            
-            //UnityEngine.Object.DontDestroyOnLoad(data.collection);
-            data.animator = libaryObject.GetOrAddComponent<tk2dSpriteAnimator>();
 
-            foreach (var file in GungeonAPI.ResourceExtractor.GetResourceNames())
+            //UnityEngine.Object.DontDestroyOnLoad(data.collection);
+            data.animator = player.gameObject.transform.Find("PlayerSprite").gameObject.GetOrAddComponent<tk2dSpriteAnimator>();
+            data.animator.Library = libaryObject.AddComponent<tk2dSpriteAnimation>();
+            data.animator.Library.clips = new tk2dSpriteAnimationClip[0];
+            data.animator.Library.enabled = true;
+
+
+            foreach (var file in ToolsCharApi.GetResourceNames())
             {
                 var splitPath = file.Split('.');
 
@@ -455,7 +478,7 @@ namespace CustomCharacters
 
                     if (!file.Contains("cc_sprite_placeholder"))
                     {
-                        textures = GungeonAPI.ResourceExtractor.GetTexturesFromResource($"{path}.{dirName}");
+                        textures = ToolsCharApi.GetTexturesFromResource($"{path}.{dirName}");
                     }
 
                     if (dirName.Contains("custom"))
@@ -463,11 +486,11 @@ namespace CustomCharacters
                         //continue;
                         //foreach (var customDir in Directory.GetDirectories(file))
                         //{
-                            //var customDirName = customDir.Replace(file, "").Replace(".", "");
+                        //var customDirName = customDir.Replace(file, "").Replace(".", "");
                         var customDirName = splitPath[splitPath.Count() - 3];
-                        BotsModule.Log($"Custom animation found \"{customDirName}\"");
+                        //BotsModule.Log($"Custom animation found \"{customDirName}\"");
                         animName = data.nameShort + "_" + customDirName;
-                        textures = GungeonAPI.ResourceExtractor.GetTexturesFromResource($"{path}.{dirName}.{customDirName}");
+                        textures = ToolsCharApi.GetTexturesFromResource($"{path}.{dirName}.{customDirName}");
 
                         for (int i = 0; i < textures.Count; i++)
                         {
@@ -475,7 +498,7 @@ namespace CustomCharacters
                         }
                         if (textures.Count > 0)
                         {
-                            SpriteBuilder.AddAnimation(data.animator, data.collection, spriteIds, customDirName, tk2dSpriteAnimationClip.WrapMode.Loop, 8);
+                            SpriteHandler.AddAnimation(data.animator, data.collection, spriteIds, customDirName, tk2dSpriteAnimationClip.WrapMode.Loop, 8);
                         }
 
                         //}
@@ -485,9 +508,9 @@ namespace CustomCharacters
                         //continue;
 
                         var customDirName = splitPath[splitPath.Count() - 3];
-                        BotsModule.Log($"Custom breach animation found \"{customDirName}\"");
+                        //BotsModule.Log($"Custom breach animation found \"{customDirName}\"");
                         animName = data.nameShort + "_" + customDirName;
-                        textures = GungeonAPI.ResourceExtractor.GetTexturesFromResource($"{path}.{dirName}.{customDirName}");
+                        textures = ToolsCharApi.GetTexturesFromResource($"{path}.{dirName}.{customDirName}");
 
                         for (int i = 0; i < textures.Count; i++)
                         {
@@ -495,7 +518,7 @@ namespace CustomCharacters
                         }
                         if (textures.Count > 0)
                         {
-                            SpriteBuilder.AddAnimation(data.animator, data.collection, spriteIds, customDirName, tk2dSpriteAnimationClip.WrapMode.Loop, 8);
+                            SpriteHandler.AddAnimation(data.animator, data.collection, spriteIds, customDirName, tk2dSpriteAnimationClip.WrapMode.Loop, 8);
                         }
                         /*
                         foreach (var customDir in Directory.GetDirectories(file))
@@ -503,7 +526,7 @@ namespace CustomCharacters
                             var customDirName = customDir.Replace(file, "").Replace(".", "");
                             BotsModule.Log($"Breach Idle animation found \"{customDirName}\"");
                             animName = data.nameShort + "_" + customDirName;
-                            textures = GungeonAPI.ResourceExtractor.GetTexturesFromResource(customDir);
+                            textures = ToolsCharApi.GetTexturesFromResource(customDir);
 
                             for (int i = 1; i < textures.Count; i++)
                             {
@@ -511,7 +534,7 @@ namespace CustomCharacters
                             }
                             if (textures.Count > 0)
                             {
-                                SpriteBuilder.AddAnimation(data.animator, data.collection, spriteIds, customDirName, tk2dSpriteAnimationClip.WrapMode.Loop, 8);
+                                SpriteHandler.AddAnimation(data.animator, data.collection, spriteIds, customDirName, tk2dSpriteAnimationClip.WrapMode.Loop, 8);
                             }
 
                         }*/
@@ -521,11 +544,16 @@ namespace CustomCharacters
                         if (((dirName.EndsWith("_hand") || dirName.EndsWith("_twohands"))) && file.Contains("cc_sprite_placeholder"))//textures.Count <= 0)
                         {
                             //BotsModule.Log($"hands located! lethal force engaged against {dirName}");
-                            textures = GungeonAPI.ResourceExtractor.GetTexturesFromResource((path + "." + dirName).Replace("_twohands", "").Replace("_hand", ""));
+                            textures = ToolsCharApi.GetTexturesFromResource((path + "." + dirName).Replace("_twohands", "").Replace("_hand", ""));
+                        }
+                        if (dirName.EndsWith("death_coop") && file.Contains("cc_sprite_placeholder"))//textures.Count <= 0)
+                        {
+                            //BotsModule.Log($"hands located! lethal force engaged against {dirName}");
+                            textures = ToolsCharApi.GetTexturesFromResource((path + "." + dirName).Replace("_coop", ""));
                         }
                         if (textures.Count > 0)
                         {
-                            
+
                             for (int i = 0; i < textures.Count; i++)
                             {
                                 spriteIds.Add(AddSpriteToCollection(textures[i], data.collection, animName + i.ToString()));
@@ -536,11 +564,65 @@ namespace CustomCharacters
                             {
                                 //BotsModule.Log(spriteIds.Count.ToString());
 
-                                var anim = SpriteBuilder.AddAnimation(data.animator, data.collection, spriteIds, dirName, playerAnimInfo[dirName.Replace("_armorless", "")].First, playerAnimInfo[dirName.Replace("_armorless", "")].Second);
+                                var anim = SpriteHandler.AddAnimation(data.animator, data.collection, spriteIds, dirName, playerAnimInfo[dirName.Replace("_armorless", "")].First, playerAnimInfo[dirName.Replace("_armorless", "")].Second);
+
+                                #endregion
+                                for (int i = 0; i <= anim.frames.Length; i++)
+                                {
+                                    if (anim.name.StartsWith("run_"))
+                                    {
+                                        if (i == 2 || i == 5)
+                                        {
+                                            anim.frames[i].eventAudio = "Play_FS";
+                                        }
+                                    }
+                                    if (anim.name == "pitfall" || anim.name == "pitfall_down")
+                                    {
+                                        if (i == 0)
+                                        {
+                                            anim.frames[i].eventAudio = "Play_Fall";
+                                        }
+                                    }
+                                    if (anim.name == "pitfall_return")
+                                    {
+                                        if (i == 0)
+                                        {
+                                            anim.frames[i].eventAudio = "Play_Respawn";
+                                        }
+                                    }
+
+                                    if (anim.name.StartsWith("dodge"))
+                                    {
+                                        if (i == 0)
+                                        {
+                                            anim.frames[i].eventAudio = "Play_Leap";
+                                        }
+                                        if (i == 5)
+                                        {
+                                            anim.frames[i].eventAudio = "Play_Roll";
+                                        }
+                                    }
+
+                                    if (anim.name == "doorway")
+                                    {
+                                        if (i == 0)
+                                        {
+                                            anim.frames[i].eventAudio = "Play_CHR_boot_stairs_01";
+                                        }
+                                    }
+
+                                    if (anim.name == "pet")
+                                    {
+                                        if (i == 0)
+                                        {
+                                            anim.frames[i].eventAudio = "Play_CHR_fool_voice_01";
+                                        }
+                                    }
+                                }
 
                                 if (dirName.Contains("dodge"))
                                 {
-                                    for(int i = 0; i <= (anim.frames.Length/2); i++)
+                                    for (int i = 0; i <= (anim.frames.Length / 2); i++)
                                     {
                                         anim.frames[i].invulnerableFrame = true;
                                         anim.frames[i].groundedFrame = false;
@@ -565,28 +647,47 @@ namespace CustomCharacters
                             }
                             else
                             {
-                                BotsModule.Log($"well well well {dirName} has decided its special and can do whatever the fuck it wants, so im throwing it into containment");
+                                ETGModConsole.Log($"No Anim data found for \"{dirName}\"! please double check animation folder names");
                             }
                         }
                         else
                         {
-                            BotsModule.Log($"No sprites found in {dirName} please make sure youve actually put sprites in that folder");
+                            ETGModConsole.Log($"No sprites found in {dirName} please make sure youve actually put sprites in that folder");
                         }
+                    }
+                }
+                else if (splitPath[splitPath.Count() - 2] == "hand_001")
+                {
+                    var texture = ToolsCharApi.GetTextureFromResource($"{path}.hand_001.png");
+                    var id = AddSpriteToCollection(texture, data.collection, "hand");
+                    data.collection.spriteDefinitions[id].position0 = new Vector3(-0.125f, -0.125f, 0);
+                    data.collection.spriteDefinitions[id].position1 = new Vector3(0.125f, -0.125f, 0);
+                    data.collection.spriteDefinitions[id].position2 = new Vector3(-0.125f, 0.125f, 0);
+                    data.collection.spriteDefinitions[id].position3 = new Vector3(0.125f, 0.125f, 0);
+                    if (!alt)
+                    {
+                        player.primaryHand.sprite.Collection = data.collection;
+                        player.secondaryHand.sprite.Collection = data.collection;
+
+                        player.primaryHand.sprite.SetSprite(id);
+                        player.secondaryHand.sprite.SetSprite(id);
                     }
                 }
             }
             if (alt)
             {
-                player.AlternateCostumeLibrary = data.animator.Library;              
+                player.AlternateCostumeLibrary = data.animator.Library;
             }
             else
             {
                 player.spriteAnimator.Library = data.animator.Library;
 
                 player.sprite.Collection = data.collection;
+
+                //ToolsCharApi.ExportTexture(data.collection.spriteDefinitions[0].material.mainTexture, "SpriteDump/", data.nameShort);
             }
 
-            //ToolsGAPI.ExportTexture(TextureStitcher.GetReadable(data.collection.textures[0]), "SpriteDump/balls", data.nameShort + UnityEngine.Random.Range(1, 10000));
+            //ToolsCharApi.ExportTexture(TextureStitcher.GetReadable(data.collection.textures[0]), "SpriteDump/balls", data.nameShort + UnityEngine.Random.Range(1, 10000));
 
             //foreach (var anim in data.animator.Library.clips)
             //{
@@ -594,6 +695,7 @@ namespace CustomCharacters
             //}
 
         }
+
 
         /// <summary>
         /// Adds a sprite (from a texture) to a collection
@@ -715,29 +817,18 @@ namespace CustomCharacters
 
 
 
-            for (int i = 0; i < orig.materials.Length; i++)
-            {
-                if (orig.materials[i] == null)
-                {
-                    BotsModule.Log("material is null: " + i);
-                }
-                else
-                {
-                    BotsModule.Log($"{orig.materials[i]} - {orig.materials[i].shader}");
-                }
-                
-            }
+            
             tk2dSpriteDefinition[] copyDefinitions = new tk2dSpriteDefinition[orig.spriteDefinitions.Length];
             for (int i = 0; i < copyCollection.spriteDefinitions.Length; i++)
             {
                 copyDefinitions[i] = orig.spriteDefinitions[i].Copy();
             }
             copyCollection.spriteDefinitions = copyDefinitions;
-            //ToolsGAPI.ExportTexture(TextureStitcher.GetReadable(copyCollection.textures[0]), "SpriteDump/balls", TextureStitcher.GetReadable(copyCollection.textures[0]).name + UnityEngine.Random.Range(1, 10000));
+            //ToolsCharApi.ExportTexture(TextureStitcher.GetReadable(copyCollection.textures[0]), "SpriteDump/balls", TextureStitcher.GetReadable(copyCollection.textures[0]).name + UnityEngine.Random.Range(1, 10000));
             
             if (data.playerSheet != null)
             {
-                ToolsGAPI.Print("        Using sprite sheet replacement.", "FFBB00");
+                ToolsCharApi.Print("        Using sprite sheet replacement.", "FFBB00");
                 var materialsToCopy = orig.materials;
                 copyCollection.materials = new Material[orig.materials.Length];
                 for (int i = 0; i < copyCollection.materials.Length; i++)
@@ -791,7 +882,7 @@ namespace CustomCharacters
                     }
                 }*/
 
-                ToolsGAPI.Print("        Using individual sprite replacement.", "FFBB00");
+                ToolsCharApi.Print("        Using individual sprite replacement.", "FFBB00");
                 bool notSlinger = data.baseCharacter != PlayableCharacters.Gunslinger;
 
                 RuntimeAtlasPage page = new RuntimeAtlasPage();
@@ -833,7 +924,7 @@ namespace CustomCharacters
                         }
                         else
                         {
-                            BotsModule.Log("god fucking damn it", "#fa0000");
+                            //ETGModConsole.Log("god fucking damn it", "#fa0000");
                             def.ReplaceTexture(tex);
                         }
                     }
@@ -843,7 +934,7 @@ namespace CustomCharacters
 
 
                 page.Apply();
-                ToolsGAPI.ExportTexture(TextureStitcher.GetReadable(page.Texture), "SpriteDump/balls", TextureStitcher.GetReadable(copyCollection.textures[0]).name + UnityEngine.Random.Range(1, 10000));
+                //ToolsCharApi.ExportTexture(TextureStitcher.GetReadable(page.Texture), "SpriteDump/balls", TextureStitcher.GetReadable(copyCollection.textures[0]).name + UnityEngine.Random.Range(1, 10000));
 
                 var materialsToCopy = orig.materials;
                 copyCollection.materials = new Material[orig.materials.Length];
@@ -883,7 +974,7 @@ namespace CustomCharacters
             }
             else
             {
-                ToolsGAPI.Print("        Not replacing sprites.", "FFFF00");
+                ToolsCharApi.Print("        Not replacing sprites.", "FFFF00");
             }
 
             
@@ -897,14 +988,14 @@ namespace CustomCharacters
             {
                 if(clip.fps != 12)
                 {
-                    BotsModule.Log($"{clip.name}: {clip.fps}");
+                    //BotsModule.Log($"{clip.name}: {clip.fps}");
                 }
 
                 for (int i = 0; i < clip.frames.Length; i++)
                 {
                     if (clip.frames[i].invulnerableFrame)
                     {
-                        BotsModule.Log($"{clip.name} {i}: {clip.frames[i].invulnerableFrame}");
+                        //BotsModule.Log($"{clip.name} {i}: {clip.frames[i].invulnerableFrame}");
                     }
 
                     clip.frames[i].spriteCollection = copyCollection;
@@ -912,14 +1003,14 @@ namespace CustomCharacters
             }
             foreach (var sdef in copyCollection.materials)
             {
-                BotsModule.Log("Norm: " + sdef.mainTexture.ToString());
-                BotsModule.Log("Norm: " + sdef.ToString());
+                //BotsModule.Log("Norm: " + sdef.mainTexture.ToString());
+                //BotsModule.Log("Norm: " + sdef.ToString());
             }
 
             foreach (var sdef in copyCollection.materialInsts)
             {
-                BotsModule.Log("Inst: " + sdef.mainTexture.ToString());
-                BotsModule.Log("Inst: " + sdef.ToString());
+               // BotsModule.Log("Inst: " + sdef.mainTexture.ToString());
+                //BotsModule.Log("Inst: " + sdef.ToString());
             }
 
             copyCollection.name = player.OverrideDisplayName;
@@ -931,12 +1022,17 @@ namespace CustomCharacters
 
         public static void HandleAltAnimations(PlayerController player, CustomCharacterData data)
         {
-
-            var sharedAssets1 = ResourceManager.LoadAssetBundle("shared_auto_001");
-            var guide_Swap = sharedAssets1.LoadAsset<GameObject>("Guide_Swap");
+            tk2dSpriteCollectionData orig = null;
+            if (player.AlternateCostumeLibrary?.clips[0]?.frames[0]?.spriteCollection != null)
+            {
+                orig = player.AlternateCostumeLibrary.clips[0].frames[0].spriteCollection;
+            }
+            else
+            {
+                orig = player.sprite.Collection;
+            }
             
-
-            tk2dSpriteCollectionData orig = guide_Swap.GetComponent<tk2dSpriteCollectionData>();
+            
 
             var copyCollection = GameObject.Instantiate(orig);
             GameObject.DontDestroyOnLoad(copyCollection);
@@ -952,7 +1048,7 @@ namespace CustomCharacters
 
             if (data.altPlayerSheet != null)
             {
-                ToolsGAPI.Print("        Using sprite sheet replacement.", "FFBB00");
+                ToolsCharApi.Print("        Using sprite sheet replacement.", "FFBB00");
                 var materialsToCopy = orig.materials;
                 copyCollection.materials = new Material[orig.materials.Length];
                 for (int i = 0; i < copyCollection.materials.Length; i++)
@@ -980,8 +1076,8 @@ namespace CustomCharacters
             
             else if (data.altSprites != null)
             {
-                BotsModule.Log("altSprites arent null thank god!");
-                ToolsGAPI.Print("        Using individual sprite replacement.", "FFBB00");
+                //BotsModule.Log("altSprites arent null thank god!");
+                ToolsCharApi.Print("        Using individual sprite replacement.", "FFBB00");
                 bool notSlinger = data.baseCharacter != PlayableCharacters.Gunslinger;
 
                 RuntimeAtlasPage page = new RuntimeAtlasPage();
@@ -1023,14 +1119,14 @@ namespace CustomCharacters
                         //BotsModule.Log("def copy shit done thank god!");
                     }
                 }
-                BotsModule.Log("pre applying def shit idfk! thank god!");
+                //BotsModule.Log("pre applying def shit idfk! thank god!");
                 page.Apply();
             }
             else
             {
-                ToolsGAPI.Print("        Not replacing sprites.", "FFFF00");
+                ToolsCharApi.Print("        Not replacing sprites.", "FFFF00");
             }
-            BotsModule.Log("balls wide... thank god!");
+            //BotsModule.Log("balls wide... thank god!");
             player.AlternateCostumeLibrary = GameObject.Instantiate(player.AlternateCostumeLibrary);
             GameObject.DontDestroyOnLoad(player.AlternateCostumeLibrary);
 
@@ -1101,7 +1197,7 @@ namespace CustomCharacters
             }
             else
             {
-                ToolsGAPI.Print("Minimap icon for " + iconName + " already found, not generating a new one");
+                ToolsCharApi.Print("Minimap icon for " + iconName + " already found, not generating a new one");
             }
 
             //SetMinimapIconSpriteID(minimapSprite.spriteId, id);
@@ -1162,7 +1258,7 @@ namespace CustomCharacters
             var atlasTex = atlas.Texture;
             if (data.punchoutFaceCards != null)
             {
-                ToolsGAPI.Print("Adding punchout facecards");
+                ToolsCharApi.Print("Adding punchout facecards");
                 int count = Mathf.Min(data.punchoutFaceCards.Count, 3);
                 for (int i = 0; i < count; i++)
                 {
@@ -1180,7 +1276,7 @@ namespace CustomCharacters
 
         public static void HandlePunchoutAnimations(PunchoutPlayerController player, CustomCharacterData data)
         {
-            ToolsGAPI.Print("Replacing punchout sprites...");
+            ToolsCharApi.Print("Replacing punchout sprites...");
 
             var orig = player.sprite.Collection;
             var copyCollection = GameObject.Instantiate(orig);
@@ -1217,7 +1313,7 @@ namespace CustomCharacters
             copyCollection.name = data.nameShort + " Punchout Collection";
             //CharacterBuilder.storedCollections.Add(data.nameInternal, copyCollection);
             player.sprite.Collection = copyCollection;
-            ToolsGAPI.Print("Punchout sprites successfully replaced");
+            ToolsCharApi.Print("Punchout sprites successfully replaced");
         }
 
         public static void SetMinimapIconSpriteID(int key, int value)
@@ -1280,19 +1376,13 @@ namespace CustomCharacters
             {                 
                 copy.material = new Material(orig.material);
             }
-            else
-            {
-                BotsModule.Log("material is null thanknt god!");
-            }
+           
             if (orig.materialInst != null)
             {
                 
                 copy.materialInst = new Material(orig.materialInst);
             }
-            else
-            {
-                //BotsModule.Log("materialInst is null thanknt god!");
-            }
+            
 
 
             return copy;

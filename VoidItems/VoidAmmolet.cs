@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using NpcApi;
-using CustomCharacters;
 
 namespace BotsMod
 {
@@ -106,12 +105,12 @@ namespace BotsMod
 
                 var shard = proj.gameObject.GetOrAddComponent<BlankShardModifier>();
 
-                UnityEngine.Object.Instantiate(Tools.AHHH.LoadAsset<GameObject>("BlankShardTrail"), proj.transform);
+                UnityEngine.Object.Instantiate(BeyondPrefabs.AHHH.LoadAsset<GameObject>("BlankShardTrail"), proj.transform);
 
             }
             //CollectionDumper.DumpCollection(ETGMod.Databases.Items.ProjectileCollection);
 
-            //GungeonAPI.ToolsGAPI.ExportTexture(ETGMod.Databases.Items.ProjectileCollection.textures[0], "SpriteDump/ProjectileSprites");
+            //GungeonAPI.ToolsCharApi.ExportTexture(ETGMod.Databases.Items.ProjectileCollection.textures[0], "SpriteDump/ProjectileSprites");
             
 
 

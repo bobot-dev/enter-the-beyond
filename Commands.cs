@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using Steamworks;
 using Gungeon;
 using Pathfinding;
 using System.Collections;
@@ -154,18 +153,23 @@ namespace BotsMod
                 foreach (var clip in GameManager.Instance.PrimaryPlayer.spriteAnimator.Library.clips)
                 {
                     BotsModule.Log($"{clip.name} : {clip.wrapMode} [{clip.fps}] - [{clip.frames.Length}]", "#4dff00");
-                    /*for (int i = 0; i < clip.frames.Length; i++)
+                    for (int i = 0; i < clip.frames.Length; i++)
                     {
-                        if (clip.frames[i].invulnerableFrame)
-                        {
-                            BotsModule.Log($"{clip.name} {i}: invulnerableFrame", "#4dff00");
-                        }
+                        //if (clip.frames[i].invulnerableFrame)
+                        //{
+                        //    BotsModule.Log($"{clip.name} {i}: invulnerableFrame", "#4dff00");
+                        //}
+                        //
+                        //if (!clip.frames[i].groundedFrame)
+                        //{
+                        //    BotsModule.Log($"{clip.name} {i}: groundedFrame", "#ffc400");
+                        //}
 
-                        if (!clip.frames[i].groundedFrame)
+                        if (!string.IsNullOrEmpty(clip.frames[i].eventAudio))
                         {
-                            BotsModule.Log($"{clip.name} {i}: groundedFrame", "#ffc400");
+                            BotsModule.Log($"{clip.name} {i}: eventAudio: \"{clip.frames[i].eventAudio}\"", "#ffc400");
                         }
-                    }*/
+                    }
                 }
             });
 
@@ -326,9 +330,15 @@ namespace BotsMod
 
             });
 
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("setTimeScale", delegate (string[] args)
+            {
+                Time.timeScale = float.Parse(args[0]);
+
+            });
+
             ETGModConsole.Commands.GetGroup("bot").AddUnit("playanimation", delegate (string[] args)
             {
-                GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacterController>().overrideAnimation = args[0];
+                GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacter>().overrideAnimation = args[0];
                 GameManager.Instance.PrimaryPlayer.spriteAnimator.Play(args[0]);
 
             });
@@ -470,8 +480,8 @@ namespace BotsMod
             ETGModConsole.Commands.GetGroup("bot").AddUnit("past_kill", delegate (string[] args)
             {
 
-                GameStatsManager.Instance.SetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Custom, CharacterSpecificGungeonFlags.KILLED_PAST, true);
-                GameStatsManager.Instance.SetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Custom, CharacterSpecificGungeonFlags.KILLED_PAST_ALTERNATE_COSTUME, true);
+                GameStatsManager.Instance.SetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Lost, CharacterSpecificGungeonFlags.KILLED_PAST, true);
+                GameStatsManager.Instance.SetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Lost, CharacterSpecificGungeonFlags.KILLED_PAST_ALTERNATE_COSTUME, true);
             });
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("past_killnt", delegate (string[] args)
@@ -490,7 +500,7 @@ namespace BotsMod
             ETGModConsole.Commands.GetGroup("bot").AddUnit("model", delegate (string[] args)
             {
 
-                var obj = UnityEngine.Object.Instantiate(Tools.BotsAssetBundle.LoadAsset<GameObject>("TestModel"), GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, new Quaternion());
+                var obj = UnityEngine.Object.Instantiate(BeyondPrefabs.BotsAssetBundle.LoadAsset<GameObject>("TestModel"), GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, new Quaternion());
 
                 obj.transform.localScale = new Vector3(3, 5, 5);
 
@@ -508,7 +518,7 @@ namespace BotsMod
                     if (enemy && enemy.healthHaver)
                     {
 
-                        var partSystem = UnityEngine.Object.Instantiate(Tools.BotsAssetBundle.LoadAsset<GameObject>("ParticleSystemObj"));
+                        var partSystem = UnityEngine.Object.Instantiate(BeyondPrefabs.BotsAssetBundle.LoadAsset<GameObject>("ParticleSystemObj"));
                         partSystem.transform.position = enemy.sprite.WorldCenter;
                         partSystem.transform.parent = enemy.transform;
                         partSystem.GetComponent<ParticleSystem>().gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unpixelated"));
@@ -921,7 +931,7 @@ namespace BotsMod
                 UnityEngine.Object.DontDestroyOnLoad(asset);
 
                 UnityEngine.Object.Instantiate(asset, GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, Quaternion.identity);
-                //ToolsGAPI.Print($"Added {asset.name} to room.");
+                //ToolsCharApi.Print($"Added {asset.name} to room.");
 
 
                 GameObject dumbFuckingRodent = UnityEngine.Object.Instantiate(asset);
@@ -1117,8 +1127,8 @@ namespace BotsMod
                     BotsModule.Log($"{stat.Key}");
                 }
 
-                BotsModule.Log("Killed Past: " + GameStatsManager.Instance.GetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Custom, CharacterSpecificGungeonFlags.KILLED_PAST), BotsModule.LOST_COLOR);
-                BotsModule.Log("Killed Past Alt: " + GameStatsManager.Instance.GetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Custom, CharacterSpecificGungeonFlags.KILLED_PAST_ALTERNATE_COSTUME), BotsModule.LOST_COLOR);
+                BotsModule.Log("Killed Past: " + GameStatsManager.Instance.GetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Lost, CharacterSpecificGungeonFlags.KILLED_PAST), BotsModule.LOST_COLOR);
+                BotsModule.Log("Killed Past Alt: " + GameStatsManager.Instance.GetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Lost, CharacterSpecificGungeonFlags.KILLED_PAST_ALTERNATE_COSTUME), BotsModule.LOST_COLOR);
 
 
             });
@@ -1222,38 +1232,6 @@ namespace BotsMod
 
             });
 
-            ETGModConsole.Commands.GetGroup("bot").AddUnit("atlasDebug", delegate (string[] args)
-            {
-                testAtlas = AtlasTesting.CreateAtlasFromSelection(new string[] { "BotsMod/sprites/decay_texture.png", "BotsMod/sprites/ENV_Tileset_Beyond.png", "BotsMod/sprites/nebula.png", "BotsMod/sprites/title_words_beyond_001.png" }, "TestAtlas");
-                /*var uiAtlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;
-                for (int i = 0; i < 10; i++)
-                {
-
-                    var sprite = uiAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/Debug/1redpixel.png"), "RedPixel" + atlastesting);
-                    BotsModule.Log(atlastesting.ToString());
-                    atlastesting++;
-                }
-
-                ToolsGAPI.ExportTexture(uiAtlas.Texture, "SpriteDump/AtlasDegging");*/
-
-            });
-
-            ETGModConsole.Commands.GetGroup("bot").AddUnit("atlasAddDebug", delegate (string[] args)
-            {
-                AtlasTesting.AddTexture(testAtlas, new string[] { "BotsMod/sprites/TestBreachRoomTexture.png", "BotsMod/sprites/TestHeart.png", "BotsMod/sprites/SpinDownDice.png", "BotsMod/sprites/paradox_test.png" });
-                /*var uiAtlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;
-                for (int i = 0; i < 10; i++)
-                {
-
-                    var sprite = uiAtlas.AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/Debug/1redpixel.png"), "RedPixel" + atlastesting);
-                    BotsModule.Log(atlastesting.ToString());
-                    atlastesting++;
-                }
-
-                ToolsGAPI.ExportTexture(uiAtlas.Texture, "SpriteDump/AtlasDegging");*/
-
-            });
-
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("findfoyershit", delegate (string[] args)
             {
@@ -1285,7 +1263,7 @@ namespace BotsMod
                         }
                     }
                 }
-                BotsModule.Log("aaaa");
+                //BotsModule.Log("aaaa");
                 foreach (var node in GungeonAPI.OfficialFlows.GetDungeonPrefab("base_resourcefulrat").PatternSettings.flows[0].AllNodes)
                 {
                     if (node.overrideExactRoom != null && node.overrideExactRoom.placedObjects != null)
@@ -1307,141 +1285,7 @@ namespace BotsMod
 
 
 
-            ETGModConsole.Commands.GetGroup("bot").AddUnit("swapper", delegate (string[] args)
-            {
-                try
-                {
-
-                    var baseSwapper = FakePrefab.Clone(Foyer.Instance.transform.Find("Livery xform").Find("costume_guide").gameObject);
-                    var altSwapper = FakePrefab.Clone(Foyer.Instance.transform.Find("Livery xform").Find("costume_guide_alt").gameObject);
-
-
-                    var sprite = baseSwapper.GetComponent<tk2dSprite>();
-                    var altSprite = altSwapper.GetComponent<tk2dSprite>();
-
-                    baseSwapper.transform.parent = Foyer.Instance.transform.Find("Livery xform");
-                    altSwapper.transform.parent = Foyer.Instance.transform.Find("Livery xform");
-
-                    BotsModule.Log("objects set up");
-
-                    sprite.SetSprite(sprite.Collection, sprite.spriteId);
-                    altSprite.SetSprite(altSprite.Collection, altSprite.spriteId);
-
-
-
-                    altSwapper.name = "costume_lost_alt";
-
-                    baseSwapper.name = "costume_lost";
-
-                    BotsModule.Log("renamed");
-                    var characterCostumeSwapper = baseSwapper.GetComponent<CharacterCostumeSwapper>();
-                    BotsModule.Log("variables set0");
-                    characterCostumeSwapper.TargetCharacter = (PlayableCharacters)CustomPlayableCharacters.Custom;
-                    BotsModule.Log("variables set1");
-                    characterCostumeSwapper.AlternateCostumeSprite = altSprite;
-                    BotsModule.Log("variables set2");
-                    characterCostumeSwapper.CostumeSprite = sprite;
-                    BotsModule.Log("variables set3");
-                    characterCostumeSwapper.HasCustomTrigger = false;
-                    characterCostumeSwapper.CustomTriggerIsFlag = false;
-                    characterCostumeSwapper.TriggerFlag = GungeonFlags.NONE;
-                    characterCostumeSwapper.CustomTriggerIsSpecialReserve = false;
-                    BotsModule.Log("variables set4");
-                    characterCostumeSwapper.TargetLibrary = LostAltSkinAnimator;
-                    BotsModule.Log("variables set5");
-
-
-                    baseSwapper.gameObject.SetActive(true);
-                    altSwapper.gameObject.SetActive(true);
-                    BotsModule.Log("variables set6");
-                    baseSwapper.transform.position = GameManager.Instance.PrimaryPlayer.sprite.WorldCenter;
-                    altSwapper.transform.position = GameManager.Instance.PrimaryPlayer.sprite.WorldCenter;
-                    BotsModule.Log("variables set7");
-                    if (!RoomHandler.unassignedInteractableObjects.Contains(baseSwapper.GetComponent<IPlayerInteractable>()))
-                    {
-                        RoomHandler.unassignedInteractableObjects.Add(baseSwapper.GetComponent<IPlayerInteractable>());
-                    }
-                    BotsModule.Log("variables set8");
-                    if (!RoomHandler.unassignedInteractableObjects.Contains(altSwapper.GetComponent<IPlayerInteractable>()))
-                    {
-                        RoomHandler.unassignedInteractableObjects.Add(altSwapper.GetComponent<IPlayerInteractable>());
-                    }
-                    BotsModule.Log("variables set9");
-                    foreach (var interactable in RoomHandler.unassignedInteractableObjects)
-                    {
-                        if (interactable != null)
-                        {
-                            BotsModule.Log(interactable.ToString());
-                        }
-
-                    }
-
-                    BotsModule.Log("finished!");
-                    /*foreach (var dumbpeiceofshit in UnityEngine.Object.FindObjectsOfType<tk2dSprite>())
-                    {
-                        if (dumbpeiceofshit.gameObject.name.Contains("costume"))
-                        {
-                            /*if (dumbpeiceofshit.gameObject.name == "costume_guide_alt")
-                            {
-                                //altSwapper = FakePrefab.Clone(dumbpeiceofshit.gameObject);
-                                altSwapper = dumbpeiceofshit.gameObject;
-
-                                dumbpeiceofshit.SetSprite(altSprite.Collection, altSprite.spriteId);
-
-
-
-
-                                altSwapper.transform.position = GameManager.Instance.PrimaryPlayer.sprite.WorldCenter;
-
-                                BotsModule.Log($"{altSwapper.name}: {altSwapper.transform.position}");
-                                BotsModule.Log($"{dumbpeiceofshit.gameObject.name}: {dumbpeiceofshit.Collection.spriteDefinitions[dumbpeiceofshit.gameObject.GetComponent<tk2dSprite>().spriteId].name}");
-                            }*/
-
-
-                    /*if (dumbpeiceofshit.gameObject.name == "costume_guide")
-                    {
-                        //baseSwapper = FakePrefab.Clone(dumbpeiceofshit.gameObject);
-                        baseSwapper = dumbpeiceofshit.gameObject;
-
-
-                        dumbpeiceofshit.SetSprite(sprite.Collection, sprite.spriteId);
-
-                        baseSwapper.name = "costume_lost";
-                        var characterCostumeSwapper = baseSwapper.GetComponent<CharacterCostumeSwapper>();
-                        characterCostumeSwapper.TargetCharacter = (PlayableCharacters)CustomPlayableCharacters.Custom;
-                        //characterCostumeSwapper.AlternateCostumeSprite = altSwapper.GetComponent<tk2dSprite>();
-                        //characterCostumeSwapper.CostumeSprite = baseSwapper.GetComponent<tk2dSprite>();
-                        characterCostumeSwapper.TargetLibrary = GameManager.Instance.PrimaryPlayer.AlternateCostumeLibrary;
-
-
-                        baseSwapper.transform.position = GameManager.Instance.PrimaryPlayer.sprite.WorldCenter;
-
-                        //GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(UnityEngine.Object.Instantiate(swapper, new Vector3(16.4f, 25.1f, 25.6f), Quaternion.identity).GetComponent<IPlayerInteractable>());
-
-
-
-                        //GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(swapper.GetComponent<IPlayerInteractable>());
-
-                        BotsModule.Log($"{baseSwapper.name}: {baseSwapper.transform.position}");
-                        BotsModule.Log($"{dumbpeiceofshit.gameObject.name}: {dumbpeiceofshit.Collection.spriteDefinitions[dumbpeiceofshit.gameObject.GetComponent<tk2dSprite>().spriteId].name}");
-                    }
-
-
-                    //BotsModule.Log($"{dumbpeiceofshit.gameObject.name}: {dumbpeiceofshit.gameObject.transform.position}");
-                    //BotsModule.Log($"{dumbpeiceofshit.gameObject.name}: {dumbpeiceofshit.Collection.spriteDefinitions[dumbpeiceofshit.gameObject.GetComponent<tk2dSprite>().spriteId].name}");
-                }
-            }*/
-                }
-                catch (Exception e)
-                {
-                    BotsModule.Log("swapper broke", "#eb1313");
-                    BotsModule.Log(string.Format(e + ""), "#eb1313");
-                }
-            });
-
-
-            //$"<color={color}>{text}</color>"
-
+            
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("listitemchance", delegate (string[] args)
             {
@@ -1522,11 +1366,12 @@ namespace BotsMod
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("quickstartinfo", delegate (string[] args)
             {
+                GameManager.Options.LastPlayedCharacter = (PlayableCharacters)CustomPlayableCharacters.Lost;
                 BotsModule.Log(GameManager.Options.LastPlayedCharacter.ToString());
                 BotsModule.Log(GameManager.Options.PreferredQuickstartCharacter.ToString());
                 BotsModule.Log(GameManager.LastUsedPlayerPrefab.name);
 
-                BotsModule.Log(GameManager.PlayerPrefabForNewGame.GetComponent<PlayerController>().characterIdentity.ToString());
+                //BotsModule.Log(GameManager.PlayerPrefabForNewGame.GetComponent<PlayerController>().characterIdentity.ToString());
             });
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("docool", delegate (string[] args)
@@ -1534,18 +1379,28 @@ namespace BotsMod
                 GameManager.Instance.Dungeon.roomMaterialDefinitions[GameManager.Instance.PrimaryPlayer.CurrentRoom.RoomVisualSubtype] = BeyondPrefabs.shared_auto_002.LoadAsset<DungeonMaterial>("Boss_Cathedral_StainedGlass_Lights");
             });
 
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("exportFloorToPng", delegate (string[] args)
+            {
+                GungeonAPI.Tools.LogDungeonToPNGFile();
 
+            });
 
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("exportRoomToPng", delegate (string[] args)
+            {
+                GungeonAPI.Tools.LogRoomHandlerToPNGFile(GameManager.Instance.PrimaryPlayer.CurrentRoom);
+            });
+
+           
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("asset_bundle_objects", delegate (string[] args)
             {
                 ETGModConsole.Log("===================================");
-                foreach (string str in Tools.AHHH.GetAllAssetNames())
+                foreach (string str in BeyondPrefabs.AHHH.GetAllAssetNames())
                 {
-                    ETGModConsole.Log(Tools.AHHH.name + ": " + str);
+                    ETGModConsole.Log(BeyondPrefabs.AHHH.name + ": " + str);
                 }
                 ETGModConsole.Log("===================================");
-                var part = UnityEngine.Object.Instantiate<GameObject>(Tools.AHHH.LoadAsset<GameObject>("Cylinder"), GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, Quaternion.identity);
+                var part = UnityEngine.Object.Instantiate<GameObject>(BeyondPrefabs.AHHH.LoadAsset<GameObject>("Cylinder"), GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, Quaternion.identity);
 
                 if (part.layer != LayerMask.NameToLayer("Unpixelated"))
                 {

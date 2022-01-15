@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PrefabAPI
 {
-    public enum BuildTarget
+    public enum EditorBuildTarget
     {
         NoTarget = -2,
         DashboardWidget = 1,

@@ -1,7 +1,7 @@
 // official Class ID Reference: https://docs.unity3d.com/Manual/ClassIDReference.html
 namespace PrefabAPI
 {
-    public enum ClassIDType
+    public enum EditorClassIDType
     {
         UnknownType = -1,
         Object = 0,

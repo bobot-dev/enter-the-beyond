@@ -1,4 +1,5 @@
-﻿using Dungeonator;
+﻿using CustomCharacters;
+using Dungeonator;
 using GungeonAPI;
 using ItemAPI;
 using System;

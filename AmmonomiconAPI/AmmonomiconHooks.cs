@@ -24,44 +24,44 @@ namespace AmmonomiconAPI
 					typeof(AmmonomiconInstanceManager).GetMethod("Open", BindingFlags.Instance | BindingFlags.Public),
 					typeof(AmmonomiconHooks).GetMethod("OpenHook", BindingFlags.Static | BindingFlags.Public));
 
-				BotsModule.Log("AH: startHook Setup", "#03fc0b");
+				//BotsModule.Log("AH: startHook Setup", "#03fc0b");
 
 				var ammonomiconInitializeHook = new Hook(
 					typeof(AmmonomiconPageRenderer).GetMethod("Initialize", BindingFlags.Instance | BindingFlags.Public),
 					typeof(AmmonomiconHooks).GetMethod("AmmonomiconInitializeHook", BindingFlags.Static | BindingFlags.Public));
 
-				BotsModule.Log("AH: ammonomiconInitializeHook Setup", "#03fc0b");
+				//BotsModule.Log("AH: ammonomiconInitializeHook Setup", "#03fc0b");
 
 				var toggleHeaderImageHook = new Hook(
 					typeof(AmmonomiconPageRenderer).GetMethod("ToggleHeaderImage", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(AmmonomiconHooks).GetMethod("ToggleHeaderImageHook", BindingFlags.Static | BindingFlags.Public));
 
-				BotsModule.Log("AH: toggleHeaderImageHook Setup", "#03fc0b");
+				//BotsModule.Log("AH: toggleHeaderImageHook Setup", "#03fc0b");
 
 				var updateOnBecameActiveHook = new Hook(
 					typeof(AmmonomiconPageRenderer).GetMethod("UpdateOnBecameActive", BindingFlags.Instance | BindingFlags.Public),
 					typeof(AmmonomiconHooks).GetMethod("UpdateOnBecameActiveHook", BindingFlags.Static | BindingFlags.Public));
-				BotsModule.Log("AH: updateOnBecameActiveHook Setup", "#03fc0b");
+				//BotsModule.Log("AH: updateOnBecameActiveHook Setup", "#03fc0b");
 
 
 				var checkLanguageFontsHook = new Hook(
 					typeof(AmmonomiconPageRenderer).GetMethod("CheckLanguageFonts", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(AmmonomiconHooks).GetMethod("CheckLanguageFontsHook", BindingFlags.Static | BindingFlags.NonPublic));
-				BotsModule.Log("AH: checkLanguageFontsHook Setup", "#03fc0b");
+				//BotsModule.Log("AH: checkLanguageFontsHook Setup", "#03fc0b");
 
 				var LoadPageUIAtPathHook = new Hook(
 					typeof(AmmonomiconController).GetMethod("LoadPageUIAtPath", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(AmmonomiconHooks).GetMethod("LoadPageUIAtPathHook", BindingFlags.Static | BindingFlags.NonPublic));
-				BotsModule.Log("AH: LoadPageUIAtPathHook Setup", "#03fc0b");
+				//BotsModule.Log("AH: LoadPageUIAtPathHook Setup", "#03fc0b");
 				var UpdateEncounterStateHook = new Hook(
 					typeof(AmmonomiconPokedexEntry).GetMethod("UpdateEncounterState", BindingFlags.Instance | BindingFlags.Public),
 					typeof(AmmonomiconHooks).GetMethod("UpdateEncounterStateHook", BindingFlags.Static | BindingFlags.Public));
-				BotsModule.Log("AH: UpdateEncounterStateHook Setup", "#03fc0b");
+				//BotsModule.Log("AH: UpdateEncounterStateHook Setup", "#03fc0b");
 				return;
 				var SetEncounterStateHook = new Hook(
 					typeof(AmmonomiconPokedexEntry).GetMethod("SetEncounterState", BindingFlags.Instance | BindingFlags.Public),
 					typeof(AmmonomiconHooks).GetMethod("SetEncounterStateHook", BindingFlags.Static | BindingFlags.Public));
-				BotsModule.Log("AH: SetEncounterStateHook Setup", "#03fc0b");
+				//BotsModule.Log("AH: SetEncounterStateHook Setup", "#03fc0b");
 			}
 			catch (Exception arg)
 			{
@@ -108,7 +108,7 @@ namespace AmmonomiconAPI
 
 			foreach (var page in Ammonomicon.customPages)
 			{
-				Tools.Log(page.Key, "#eb1313");
+				//Tools.Log(page.Key, "#eb1313");
 			}
 
 			FieldInfo _extantPageMap = typeof(AmmonomiconController).GetField("m_extantPageMap", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -128,14 +128,14 @@ namespace AmmonomiconAPI
 						AmmonomiconDeathPageController component = ammonomiconPageRenderer.transform.parent.GetComponent<AmmonomiconDeathPageController>();
 						component.isVictoryPage = isVictory;
 					}
-					Tools.Log("fff", "#eb1313");
+					//Tools.Log("fff", "#eb1313");
 					ammonomiconPageRenderer.EnableRendering();
 					ammonomiconPageRenderer.DoRefreshData();
-					Tools.Log("hhh", "#eb1313");
+					//Tools.Log("hhh", "#eb1313");
 				}
 				else
 				{
-					Tools.Log("1", "#eb1313");
+					//Tools.Log("1", "#eb1313");
 					GameObject gameObject = (GameObject)UnityEngine.Object.Instantiate(Ammonomicon.customPages[path]); //(GameObject)UnityEngine.Object.Instantiate(BraveResources.Load(path, ".prefab"));
 					ammonomiconPageRenderer = gameObject.GetComponentInChildren<AmmonomiconPageRenderer>();
 					dfGUIManager component2 = (_AmmonomiconBase.GetValue(self) as GameObject).GetComponent<dfGUIManager>();
@@ -144,7 +144,7 @@ namespace AmmonomiconAPI
 					gameObject2.transform.localPosition = Vector3.zero;
 					gameObject2.layer = LayerMask.NameToLayer("SecondaryGUI");
 					MeshRenderer component3 = gameObject2.GetComponent<MeshRenderer>();
-					Tools.Log("2", "#eb1313");
+					//Tools.Log("2", "#eb1313");
 					if (isVictory)
 					{
 						AmmonomiconDeathPageController component4 = ammonomiconPageRenderer.transform.parent.GetComponent<AmmonomiconDeathPageController>();
@@ -152,7 +152,7 @@ namespace AmmonomiconAPI
 					}
 					ammonomiconPageRenderer.Initialize(component3);
 					ammonomiconPageRenderer.EnableRendering();
-					Tools.Log("3", "#eb1313");
+					//Tools.Log("3", "#eb1313");
 					//List<bool>
 
 					for (int i = 0; i < (_offsetInUse.GetValue(self) as List<bool>).Count; i++)
@@ -165,7 +165,7 @@ namespace AmmonomiconAPI
 							break;
 						}
 					}
-					Tools.Log("4", "#eb1313");
+					//Tools.Log("4", "#eb1313");
 					(_extantPageMap.GetValue(self) as Dictionary<AmmonomiconPageRenderer.PageType, AmmonomiconPageRenderer>).Add(pageType, ammonomiconPageRenderer);
 					if (isPreCache)
 					{
@@ -175,7 +175,7 @@ namespace AmmonomiconAPI
 					{
 						ammonomiconPageRenderer.transform.parent.parent = (_AmmonomiconBase.GetValue(self) as GameObject).transform.parent;
 					}
-					Tools.Log("5", "#eb1313");
+					//Tools.Log("5", "#eb1313");
 				}
 				return ammonomiconPageRenderer;
 			} 
@@ -427,20 +427,20 @@ namespace AmmonomiconAPI
 					
 					if (!ammonomiconBookmarks.Contains(bookmark))
                     {
-						Tools.Log(bookmark.gameObject.name);
+						//Tools.Log(bookmark.gameObject.name);
 						ammonomiconBookmarks.Insert(ammonomiconBookmarks.Count - 2, bookmark);
 					}
 				}
 
 				
 				
-				Tools.Log("8");
+				//Tools.Log("8");
 				var dumbObj = FakePrefab.Clone(self.bookmarks[ammonomiconBookmarks.Count - 1].gameObject);
 
 
 				AmmonomiconBookmarkController tabController2 = dumbObj.GetComponent<AmmonomiconBookmarkController>();
 
-				Tools.Log("9");
+				//Tools.Log("9");
 				dumbObj.transform.parent = self.bookmarks[2].gameObject.transform.parent;
 				dumbObj.transform.position = self.bookmarks[2].gameObject.transform.position;
 				dumbObj.transform.localPosition = new Vector3(0, -1.2f, 0);
@@ -474,7 +474,7 @@ namespace AmmonomiconAPI
 				//tabController2.LeftPageType = AmmonomiconPageRenderer.PageType.ITEMS_LEFT;
 				tabController2.AppearClip = beyondClip;
 				tabController2.SelectClip = beyondClip2;
-				Tools.Log("9.5");
+				//Tools.Log("9.5");
 				
 				/*FieldInfo m_sprite = typeof(AmmonomiconBookmarkController).GetField("m_sprite", BindingFlags.NonPublic | BindingFlags.Instance);
 				m_sprite.SetValue(tabController2, m_sprite.GetValue(self.bookmarks[2]) as dfButton);
@@ -482,7 +482,7 @@ namespace AmmonomiconAPI
 				FieldInfo m_animator = typeof(AmmonomiconBookmarkController).GetField("m_animator", BindingFlags.NonPublic | BindingFlags.Instance);
 				m_animator.SetValue(tabController2, m_animator.GetValue(self.bookmarks[2]) as dfSpriteAnimation);
 				*/
-				Tools.Log("10");
+				//Tools.Log("10");
 
 				if (dumbObj.GetComponent<dfButton>() == null)
 				{
@@ -495,22 +495,22 @@ namespace AmmonomiconAPI
 
 				//ammonomiconBookmarks.Add(deathBookmark);
 
-				Tools.Log("11");
+				//Tools.Log("11");
 				//self.bookmarks = ammonomiconBookmarks.ToArray();
 
-				Tools.Log("12");
+				//Tools.Log("12");
 
 				dumbObj.SetActive(true);
 				//ItemAPI.FakePrefab.MarkAsFakePrefab(dumbObj);*/
 				self.bookmarks = ammonomiconBookmarks.ToArray();
-				Tools.Log("13");
+				//Tools.Log("13");
 
 			
 
 				orig(self);
 				foreach (Transform bookmark in tabController2.transform.parent)
 				{
-					Tools.Log(bookmark.gameObject.name);
+					//Tools.Log(bookmark.gameObject.name);
 				}
 			}
 

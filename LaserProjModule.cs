@@ -56,21 +56,7 @@ namespace BotsMod
 		{
 			if (this.m_extantLink == null)
 			{
-				this.m_extantLink = SpawnManager.SpawnVFX(this.LinkVFXPrefab, false).GetComponent<tk2dTiledSprite>();
-				int num = -1;
-				if (this.DamagesPlayers && !this.m_hasSetBlackBullet)
-				{
-					this.m_hasSetBlackBullet = true;
-					Material material = this.m_extantLink.GetComponent<Renderer>().material;
-					material.SetFloat("_BlackBullet", 0.995f);
-					material.SetFloat("_EmissiveColorPower", 4.9f);
-				}
-				else if (!this.DamagesPlayers && PlayerController.AnyoneHasActiveBonusSynergy(CustomSynergyType.TESLA_UNBOUND, out num))
-				{
-					Material material2 = this.m_extantLink.GetComponent<Renderer>().material;
-					material2.SetFloat("_BlackBullet", 0.15f);
-					material2.SetFloat("_EmissiveColorPower", 0.1f);
-				}
+				this.m_extantLink = SpawnManager.SpawnVFX(this.LinkVFXPrefab, false).GetComponent<tk2dTiledSprite>();	
 			}
 			
 			this.m_frameLinkProjectile = targetProjectile;
@@ -87,6 +73,7 @@ namespace BotsMod
 			if (flag && this.UsesDispersalParticles)
 			{
 				this.DoDispersalParticles(unitCenter2, unitCenter);
+				
 			}
 		}
 
@@ -323,6 +310,9 @@ namespace BotsMod
 				lastFiredSt4keBullet = m_projectile;
 			}
 		}
+		[ColorUsage(true, true, 0, 8, 0.125f, 3)]
+		Color colour;
+
 		private void Update()
 		{
 			if (m_projectile && electricTarget && this.extantLink == null)
@@ -331,11 +321,13 @@ namespace BotsMod
 
 				component.usesOverrideMaterial = true;
 				component.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-				//component.sprite.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_ON");
+				component.sprite.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_ON");
 
 				component.renderer.material.SetFloat("_EmissivePower", 150);
 				component.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
-				Color laser = new Color32(92, 8, 140, 255);
+				//Color laser = new Color(92f, 9f, 140f, 1);
+				Color laser = new Color(0.36f, 0.03f, 0.54f, 1);
+				
 				component.renderer.material.SetColor("_OverrideColor", laser);
 				component.renderer.material.SetColor("_EmissiveColor", laser);
 
@@ -364,6 +356,7 @@ namespace BotsMod
 			m_extantLink.transform.rotation = Quaternion.Euler(0f, 0f, num);
 			m_extantLink.UpdateZDepth();
 			this.ApplyLinearDamage(unitCenter, unitCenter2);
+			CustomSparkDoer.DoRandomParticleBurst(UnityEngine.Random.Range(5, 15), unitCenter, unitCenter2, new Vector3(1f, 1f, 0f), 120f, 0.75f, null, null, null, CustomSparkDoer.SparksType.LASER_CUTTER);
 		}
 		private void ApplyLinearDamage(Vector2 p1, Vector2 p2)
 		{

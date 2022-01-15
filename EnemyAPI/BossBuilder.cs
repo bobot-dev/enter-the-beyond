@@ -146,7 +146,7 @@ namespace ItemAPI
             GameObject.DontDestroyOnLoad(prefab);
             FakePrefab.MarkAsFakePrefab(prefab);
             prefab.SetActive(false);
-
+            prefab.AddComponent<ObjectVisibilityManager>();
             return prefab;
         }
 

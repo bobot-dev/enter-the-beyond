@@ -1,5 +1,4 @@
-﻿using BotsMod;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -31,24 +30,20 @@ namespace PrefabAPI
             byte[] bundleBytes = AssetBundleBuilder.BuildBundleFile("runtimebundle" + m_bundlesBuilt);
             m_bundlesBuilt++;
             AssetBundle bundle = AssetBundle.LoadFromMemory(bundleBytes);
-            ETGModConsole.Log("bundle != null " + (bundle != null));
             m_assetBundles.Add(bundle);
-            ETGModConsole.Log("m_assetBundles != null " + (m_assetBundles != null));
             GameObject prefab = bundle.LoadAsset<GameObject>("object");
-            ETGModConsole.Log("prefab != null " + (prefab != null));
             prefab.name = name;
             builtObjects.Add(prefab);
-            ETGModConsole.Log("builtObjects != null " + (builtObjects != null));
             return prefab;
         }
 
         public static GameObject Clone(GameObject toClone)
         {
-            GameObject clone = BuildObject(toClone.name);// + " Clone");
+            GameObject clone = BuildObject(toClone.name + " Clone");
             Dictionary<Tuple<MemberInfo, object>, int> componentsInChildren = new Dictionary<Tuple<MemberInfo, object>, int>();
             Dictionary<Tuple<MemberInfo, object>, int> gameObjectsInChildren = new Dictionary<Tuple<MemberInfo, object>, int>();
             List<Tuple<MemberInfo, object>> gameObjects = new List<Tuple<MemberInfo, object>>();
-            foreach (UnityEngine.Component c in toClone.GetComponents<UnityEngine.Component>())
+            foreach (Component c in toClone.GetComponents<Component>())
             {
                 if (clone.GetComponent(c.GetType()) == null)
                 {
@@ -62,17 +57,17 @@ namespace PrefabAPI
                         {
                             object val = inf.GetValue(c, new object[0]);
                             bool overrideSet = false;
-                            if (val is UnityEngine.Component)
+                            if (val is Component)
                             {
-                                if (toClone.GetComponentsInChildren<UnityEngine.Component>().ToList().Contains(val as UnityEngine.Component))
+                                if (toClone.GetComponentsInChildren<Component>().ToList().Contains(val as Component))
                                 {
-                                    componentsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), toClone.GetComponentsInChildren<UnityEngine.Component>().ToList().IndexOf((val as UnityEngine.Component)));
+                                    componentsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), toClone.GetComponentsInChildren<Component>().ToList().IndexOf((val as Component)));
                                     overrideSet = true;
                                 }
                             }
                             else if (val is GameObject go)
                             {
-                                if (toClone.transform.GetChildObjects().Contains(val as GameObject))
+                                if(toClone.transform.GetChildObjects().Contains(val as GameObject))
                                 {
                                     gameObjectsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), toClone.transform.GetChildObjects().IndexOf(val as GameObject));
                                     overrideSet = true;
@@ -94,11 +89,11 @@ namespace PrefabAPI
                 {
                     object val = inf.GetValue(c);
                     bool overrideSet = false;
-                    if (val is UnityEngine.Component)
+                    if (val is Component)
                     {
-                        if (toClone.GetComponentsInChildren<UnityEngine.Component>().ToList().Contains(val as UnityEngine.Component))
+                        if (toClone.GetComponentsInChildren<Component>().ToList().Contains(val as Component))
                         {
-                            componentsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), toClone.GetComponentsInChildren<UnityEngine.Component>().ToList().IndexOf((val as UnityEngine.Component)));
+                            componentsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), toClone.GetComponentsInChildren<Component>().ToList().IndexOf((val as Component)));
                             overrideSet = true;
                         }
                     }
@@ -109,7 +104,7 @@ namespace PrefabAPI
                             gameObjectsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), toClone.transform.GetChildObjects().IndexOf(val as GameObject));
                             overrideSet = true;
                         }
-                        else if (go == toClone.gameObject)
+                        else if(go == toClone.gameObject)
                         {
                             gameObjects.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())));
                         }
@@ -129,11 +124,11 @@ namespace PrefabAPI
                             {
                                 object val = inf.GetValue(c, new object[0]);
                                 bool overrideSet = false;
-                                if (val is UnityEngine.Component)
+                                if (val is Component)
                                 {
-                                    if (toClone.GetComponentsInChildren<UnityEngine.Component>().ToList().Contains(val as UnityEngine.Component))
+                                    if (toClone.GetComponentsInChildren<Component>().ToList().Contains(val as Component))
                                     {
-                                        componentsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), toClone.GetComponentsInChildren<UnityEngine.Component>().ToList().IndexOf((val as UnityEngine.Component)));
+                                        componentsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), toClone.GetComponentsInChildren<Component>().ToList().IndexOf((val as Component)));
                                         overrideSet = true;
                                     }
                                 }
@@ -170,11 +165,11 @@ namespace PrefabAPI
                 childClone.transform.localRotation = child.localRotation;
                 childClone.transform.localScale = child.localScale;
             }
-            foreach (KeyValuePair<Tuple<MemberInfo, object>, int> kvp in componentsInChildren)
+            foreach(KeyValuePair<Tuple<MemberInfo, object>, int> kvp in componentsInChildren)
             {
                 MemberInfo mi = kvp.Key.First;
-                UnityEngine.Component c = clone.GetComponentsInChildren<UnityEngine.Component>()[kvp.Value];
-                if (mi is PropertyInfo)
+                Component c = clone.GetComponentsInChildren<Component>()[kvp.Value];
+                if(mi is PropertyInfo)
                 {
                     PropertyInfo pi = mi as PropertyInfo;
                     try
@@ -183,7 +178,7 @@ namespace PrefabAPI
                     }
                     catch { }
                 }
-                else if (mi is FieldInfo)
+                else if(mi is FieldInfo)
                 {
                     FieldInfo fi = mi as FieldInfo;
                     fi.SetValue(kvp.Key.Second, c);
@@ -208,7 +203,7 @@ namespace PrefabAPI
                     fi.SetValue(kvp.Key.Second, go);
                 }
             }
-            foreach (Tuple<MemberInfo, object> t in gameObjects)
+            foreach(Tuple<MemberInfo, object> t in gameObjects)
             {
                 MemberInfo mi = t.First;
                 GameObject go = clone;
@@ -230,15 +225,14 @@ namespace PrefabAPI
             return clone;
         }
 
-        private static GameObject CloneChild(GameObject toClone, GameObject ultimateParent, out Dictionary<Tuple<MemberInfo, object>, int> componentsInChildren, out Dictionary<Tuple<MemberInfo, object>, int> gameObjectsInChildren, out List<Tuple<MemberInfo,
+        private static GameObject CloneChild(GameObject toClone, GameObject ultimateParent, out Dictionary<Tuple<MemberInfo, object>, int> componentsInChildren, out Dictionary<Tuple<MemberInfo, object>, int> gameObjectsInChildren, out List<Tuple<MemberInfo, 
             object>> gameObjects)
         {
-            GameObject clone = BuildObject(toClone.name);// + " Clone");
-            clone.transform.parent = ultimateParent.transform;
+            GameObject clone = BuildObject(toClone.name + " Clone");
             componentsInChildren = new Dictionary<Tuple<MemberInfo, object>, int>();
             gameObjectsInChildren = new Dictionary<Tuple<MemberInfo, object>, int>();
             gameObjects = new List<Tuple<MemberInfo, object>>();
-            foreach (UnityEngine.Component c in toClone.GetComponents<UnityEngine.Component>())
+            foreach (Component c in toClone.GetComponents<Component>())
             {
                 if (clone.GetComponent(c.GetType()) == null)
                 {
@@ -252,11 +246,11 @@ namespace PrefabAPI
                         {
                             object val = inf.GetValue(c, new object[0]);
                             bool overrideSet = false;
-                            if (val is UnityEngine.Component)
+                            if (val is Component)
                             {
-                                if (ultimateParent.GetComponentsInChildren<UnityEngine.Component>().ToList().Contains(val as UnityEngine.Component))
+                                if (ultimateParent.GetComponentsInChildren<Component>().ToList().Contains(val as Component))
                                 {
-                                    componentsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), ultimateParent.GetComponentsInChildren<UnityEngine.Component>().ToList().IndexOf((val as UnityEngine.Component)));
+                                    componentsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), ultimateParent.GetComponentsInChildren<Component>().ToList().IndexOf((val as Component)));
                                     overrideSet = true;
                                 }
                             }
@@ -284,11 +278,11 @@ namespace PrefabAPI
                 {
                     object val = inf.GetValue(c);
                     bool overrideSet = false;
-                    if (val is UnityEngine.Component)
+                    if (val is Component)
                     {
-                        if (ultimateParent.GetComponentsInChildren<UnityEngine.Component>().ToList().Contains(val as UnityEngine.Component))
+                        if (ultimateParent.GetComponentsInChildren<Component>().ToList().Contains(val as Component))
                         {
-                            componentsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), ultimateParent.GetComponentsInChildren<UnityEngine.Component>().ToList().IndexOf((val as UnityEngine.Component)));
+                            componentsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), ultimateParent.GetComponentsInChildren<Component>().ToList().IndexOf((val as Component)));
                             overrideSet = true;
                         }
                     }
@@ -319,11 +313,11 @@ namespace PrefabAPI
                             {
                                 object val = inf.GetValue(c, new object[0]);
                                 bool overrideSet = false;
-                                if (val is UnityEngine.Component)
+                                if (val is Component)
                                 {
-                                    if (ultimateParent.GetComponentsInChildren<UnityEngine.Component>().ToList().Contains(val as UnityEngine.Component))
+                                    if (ultimateParent.GetComponentsInChildren<Component>().ToList().Contains(val as Component))
                                     {
-                                        componentsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), ultimateParent.GetComponentsInChildren<UnityEngine.Component>().ToList().IndexOf((val as UnityEngine.Component)));
+                                        componentsInChildren.Add(new Tuple<MemberInfo, object>(inf, clone.GetComponent(c.GetType())), ultimateParent.GetComponentsInChildren<Component>().ToList().IndexOf((val as Component)));
                                         overrideSet = true;
                                     }
                                 }

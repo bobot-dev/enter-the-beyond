@@ -277,7 +277,7 @@ namespace NpcApi
                 }
                 
 
-                //GungeonAPI.ToolsGAPI.AddNewItemToAtlas()
+                //GungeonAPI.ToolsCharApi.AddNewItemToAtlas()
 
                 shopObj.canBeRobbed = canBeRobbed;
 

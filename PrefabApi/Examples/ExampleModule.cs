@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using PrefabAPI;
+using Gungeon;
 
-namespace PrefabAPIExample
+namespace PrefabAPI
 {
     public class ExampleModule : ETGModule
     {
@@ -27,6 +28,13 @@ namespace PrefabAPIExample
                     }
                     UnityEngine.Object.Instantiate(go, GameManager.Instance.PrimaryPlayer.sprite.WorldBottomLeft, Quaternion.identity);
                 }
+            });
+            ETGModConsole.Commands.AddUnit("clone_bullet_kin", delegate (string[] args)
+            {
+                GameObject go = PrefabBuilder.Clone(Game.Enemies["bullet_kin"].gameObject);
+                go.AddComponent<UrBadAtTheGameComponent>();
+                ETGModConsole.Log("aiactor != null: " + (go.GetComponent<AIActor>() != null));
+                AIActor.Spawn(go.GetComponent<AIActor>(), GameManager.Instance.PrimaryPlayer.CurrentRoom.GetRandomAvailableCellDumb(), GameManager.Instance.PrimaryPlayer.CurrentRoom, false, AIActor.AwakenAnimationType.Default, true);
             });
         }
 

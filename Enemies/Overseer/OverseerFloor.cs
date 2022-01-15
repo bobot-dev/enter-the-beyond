@@ -128,8 +128,8 @@ namespace BotsMod
 				enemy.aiActor.specRigidbody.CollideWithOthers = true;
 				enemy.aiActor.specRigidbody.CollideWithTileMap = true;
 				enemy.aiActor.PreventFallingInPitsEver = true;
-				enemy.aiActor.healthHaver.ForceSetCurrentHealth(1500f);
-				enemy.aiActor.healthHaver.SetHealthMaximum(1500f);
+				enemy.aiActor.healthHaver.ForceSetCurrentHealth(1200f);
+				enemy.aiActor.healthHaver.SetHealthMaximum(1200f);
 				enemy.aiActor.CollisionKnockbackStrength = 2f;
 				enemy.aiActor.procedurallyOutlined = true;
 				enemy.aiActor.CanTargetPlayers = true;
@@ -155,7 +155,7 @@ namespace BotsMod
 				miniBossIntroDoer.specifyIntroAiAnimator = null;
 				miniBossIntroDoer.BossMusicEvent = "Play_MUS_Boss_Theme_Beholster";
 				miniBossIntroDoer.PreventBossMusic = false;
-				miniBossIntroDoer.InvisibleBeforeIntroAnim = true;
+				miniBossIntroDoer.InvisibleBeforeIntroAnim = false;
 				miniBossIntroDoer.preIntroAnim = string.Empty;
 				miniBossIntroDoer.preIntroDirectionalAnim = string.Empty;
 				miniBossIntroDoer.introAnim = "intro";
@@ -647,12 +647,12 @@ namespace BotsMod
 								#region dash1
 								new DashButGoodBehavior
 								{
-									dashDirection = DashButGoodBehavior.DashDirection.TowardTarget,
+									dashDirection = DashButGoodBehavior.DashDirection.KindaTowardTarget,
 									quantizeDirection = 0,
 									dashDistance = 15,
-									dashTime = 0.4f,
+									dashTime = 0.3f,
 									postDashSpeed = 0,
-									doubleDashChance = 0,
+									doubleDashChance = 0.3f,
 									avoidTarget = true,
 									ShootPoint = m_CachedGunAttachPoint,
 									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),									
@@ -698,7 +698,7 @@ namespace BotsMod
 									dashDirection = DashButGoodBehavior.DashDirection.Random,
 									quantizeDirection = 0,
 									dashDistance = 8,
-									dashTime = 0.4f,
+									dashTime = 0.3f,
 									postDashSpeed = 0,
 									doubleDashChance = 0,
 									avoidTarget = true,
@@ -741,12 +741,12 @@ namespace BotsMod
 								#region dash1
 								new DashButGoodBehavior
 								{
-									dashDirection = DashButGoodBehavior.DashDirection.TowardTarget,
+									dashDirection = DashButGoodBehavior.DashDirection.KindaTowardTarget,
 									quantizeDirection = 0,
 									dashDistance = 5,
-									dashTime = 0.4f,
+									dashTime = 0.3f,
 									postDashSpeed = 0,
-									doubleDashChance = 0,
+									doubleDashChance = 0.3f,
 									avoidTarget = true,
 									ShootPoint = m_CachedGunAttachPoint,
 									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
@@ -792,7 +792,7 @@ namespace BotsMod
 									dashDirection = DashButGoodBehavior.DashDirection.Random,
 									quantizeDirection = 0,
 									dashDistance = 8,
-									dashTime = 0.4f,
+									dashTime = 0.3f,
 									postDashSpeed = 0,
 									doubleDashChance = 0,
 									avoidTarget = true,
@@ -835,12 +835,12 @@ namespace BotsMod
 								#region dash1
 								new DashButGoodBehavior
 								{
-									dashDirection = DashButGoodBehavior.DashDirection.TowardTarget,
+									dashDirection = DashButGoodBehavior.DashDirection.KindaTowardTarget,
 									quantizeDirection = 0,
 									dashDistance = 5,
-									dashTime = 0.4f,
+									dashTime = 0.3f,
 									postDashSpeed = 0,
-									doubleDashChance = 0,
+									doubleDashChance = 0.3f,
 									avoidTarget = true,
 									ShootPoint = m_CachedGunAttachPoint,
 									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
@@ -886,7 +886,7 @@ namespace BotsMod
 									dashDirection = DashButGoodBehavior.DashDirection.Random,
 									quantizeDirection = 0,
 									dashDistance = 8,
-									dashTime = 0.4f,
+									dashTime = 0.3f,
 									postDashSpeed = 0,
 									doubleDashChance = 0,
 									avoidTarget = true,
@@ -929,12 +929,12 @@ namespace BotsMod
 								#region dash1
 								new DashButGoodBehavior
 								{
-									dashDirection = DashButGoodBehavior.DashDirection.TowardTarget,
+									dashDirection = DashButGoodBehavior.DashDirection.KindaTowardTarget,
 									quantizeDirection = 0,
 									dashDistance = 5,
-									dashTime = 0.4f,
+									dashTime = 0.3f,
 									postDashSpeed = 0,
-									doubleDashChance = 0,
+									doubleDashChance = 0.3f,
 									avoidTarget = true,
 									ShootPoint = m_CachedGunAttachPoint,
 									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
@@ -980,7 +980,7 @@ namespace BotsMod
 									dashDirection = DashButGoodBehavior.DashDirection.Random,
 									quantizeDirection = 0,
 									dashDistance = 8,
-									dashTime = 0.4f,
+									dashTime = 0.3f,
 									postDashSpeed = 0,
 									doubleDashChance = 0,
 									avoidTarget = true,
@@ -1328,7 +1328,7 @@ namespace BotsMod
 
 					new AttackBehaviorGroup.AttackGroupItem()
 					{
-						Probability = 0.01f,
+						Probability = 0.001f,
 						//Behavior = new DestroyBulletsBehavior
 						Behavior = new SPIIIIINBehavior
 						{
@@ -1563,8 +1563,8 @@ namespace BotsMod
 					//AkSoundEngine.PostEvent("Play_ENM_beholster_death_01", base.aiActor.gameObject);
 					//Chest chest2 = GameManager.Instance.RewardManager.SpawnTotallyRandomChest(spawnspot)rg;
 					//chest2.IsLocked = false;
-					LostPastController convictPastController = UnityEngine.Object.FindObjectOfType<LostPastController>();
-					convictPastController.OnBossKilled(base.transform);
+					//LostPastController convictPastController = UnityEngine.Object.FindObjectOfType<LostPastController>();
+					//convictPastController.OnBossKilled(base.transform);
 
 				};
 				base.healthHaver.healthHaver.OnDeath += (obj) =>

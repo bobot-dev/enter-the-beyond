@@ -6,11 +6,7 @@ using System.IO;
 
 using StatType = PlayerStats.StatType;
 using UnityEngine;
-using GungeonAPI;
-using Ionic.Zip;
 
-using BotsMod;
-using SaveAPI;
 using System.Reflection;
 using ItemAPI;
 
@@ -22,7 +18,6 @@ namespace CustomCharacters
      */
     public static class Loader
     {
-        public static string CharacterDirectory = BotsModule.characterFilePath;
         public static string DataFile = "characterdata.txt";
 
         public static List<CustomCharacterData> characterData = new List<CustomCharacterData>();
@@ -39,8 +34,8 @@ namespace CustomCharacters
             }
             catch (Exception e)
             {
-                ToolsGAPI.PrintError("Error creating custom character directory");
-                ToolsGAPI.PrintException(e);
+                ToolsCharApi.PrintError("Error creating custom character directory");
+                ToolsCharApi.PrintException(e);
             }
 
             LoadCharacterData();
@@ -54,17 +49,17 @@ namespace CustomCharacters
                 catch (Exception e)
                 {
                     success = false;
-                    ToolsGAPI.PrintError("An error occured while creating the character: " + data.name);
-                    ToolsGAPI.PrintException(e);
+                    ToolsCharApi.PrintError("An error occured while creating the character: " + data.name);
+                    ToolsCharApi.PrintException(e);
                 }
                 if (success)
-                    ToolsGAPI.Print("Built prefab for: " + data.name);
+                    ToolsCharApi.Print("Built prefab for: " + data.name);
             }
         }*/
         public static void AddPhase(string character, CharacterSelectIdlePhase phase)
         {
             character = character.ToLower();
-            BotsModule.Log(CharacterBuilder.storedCharacters.GetFirst().Key);
+            //BotsModule.Log(CharacterBuilder.storedCharacters.GetFirst().Key);
             if (CharacterBuilder.storedCharacters.ContainsKey(character))
             {
                 var arraysSuckBalls = CharacterBuilder.storedCharacters[character].First.idleDoer.phases.ToList();
@@ -114,7 +109,7 @@ namespace CustomCharacters
         public static void SetupCustomBreachAnimation(string character, string animation, int fps, tk2dSpriteAnimationClip.WrapMode wrapMode, int loopStart = 0, float maxFidgetDuration = 0, float minFidgetDuration = 0)
         {
             character = character.ToLower();
-            BotsModule.Log(CharacterBuilder.storedCharacters.GetFirst().Key);
+            //BotsModule.Log(CharacterBuilder.storedCharacters.GetFirst().Key);
             if (CharacterBuilder.storedCharacters.ContainsKey(character) && CharacterBuilder.storedCharacters[character].Second.GetComponent<PlayerController>().spriteAnimator != null)
             {
                 var library = CharacterBuilder.storedCharacters[character].Second.GetComponent<PlayerController>().spriteAnimator.Library;
@@ -175,13 +170,15 @@ namespace CustomCharacters
 
         }
 
-        public static CustomCharacterData BuildCharacter(string filePath, bool hasAltSkin, Vector3 altSwapperPos, bool removeFoyerExtras, bool paradoxUsesSprites, bool useGlow, Color emissiveColor, float emissiveColorPower, float emissivePower, int metaCost = 0, bool hasCustomPast = false, string customPast = "")
+        public static CustomCharacterData BuildCharacter(string filePath, CustomPlayableCharacters identity, Vector3 foyerPos, bool hasAltSkin, Vector3 altSwapperPos, bool removeFoyerExtras = true, bool hasArmourlessAnimations = false, bool usesArmourNotHealth = false, bool paradoxUsesSprites = true,
+            bool useGlow = false, GlowMatDoer glowVars = null, GlowMatDoer altGlowVars = null,
+            int metaCost = 0, bool hasCustomPast = false, string customPast = "")
         {
-            ETGModConsole.Log(BotsModule.FilePath);
-            ETGModConsole.Log(BotsModule.ZipFilePath);
+            //ETGModConsole.Log(BotsModule.FilePath);
+            //ETGModConsole.Log(BotsModule.ZipFilePath);
 
             var data = GetCharacterData(filePath);
-
+            data.foyerPos = foyerPos;
             data.idleDoer = new CharacterSelectIdleDoer
             {
                 onSelectedAnimation = "select_choose",
@@ -195,27 +192,41 @@ namespace CustomCharacters
 
             };
 
-            BotsModule.Log(data.nameInternal);
-            data.atlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;//obj.GetOrAddComponent<dfAtlas>();
+            //BotsModule.Log(data.nameInternal);
+            //data.atlas = GameUIRoot.Instance.ConversationBar.portraitSprite.Atlas;//obj.GetOrAddComponent<dfAtlas>();
 
 
 
 
             data.skinSwapperPos = altSwapperPos;
+
+            data.identity = identity;
+
             bool success = true;
-            try
+
+            if (!CharApiHiveMind.AddNewCharacter(CharApi.prefix, (PlayableCharacters)identity))
             {
-                CharacterBuilder.BuildCharacter(data, hasAltSkin, paradoxUsesSprites, removeFoyerExtras, hasCustomPast, customPast, metaCost, useGlow, emissiveColor, emissiveColorPower, emissivePower);
-            }
-            catch (Exception e)
-            {
+                ToolsCharApi.PrintError($"Duplicate Character ID found!! Character building for {identity} has been stopped to avoid horribly breaking things!");
                 success = false;
-                ToolsGAPI.PrintError("An error occured while creating the character: " + data.name);
-                ToolsGAPI.PrintException(e);
+            } 
+            else
+            {
+                try
+                {
+                    CharacterBuilder.BuildCharacter(data, hasAltSkin, paradoxUsesSprites, removeFoyerExtras, hasArmourlessAnimations, usesArmourNotHealth, hasCustomPast, customPast, metaCost, useGlow, glowVars, altGlowVars);
+                }
+                catch (Exception e)
+                {
+                    success = false;
+                    ToolsCharApi.PrintError("An error occured while creating the character: " + data.name);
+                    ToolsCharApi.PrintException(e);
+                }
             }
+
+            
             if (success)
             {
-                ToolsGAPI.Print("Built prefab for: " + data.name);
+                ToolsCharApi.Print("Built prefab for: " + data.name);
                 return data;
             }
             return null;
@@ -233,9 +244,9 @@ namespace CustomCharacters
 
             filePath = filePath.Replace("/", ".").Replace("\\", ".");
 
-            ToolsGAPI.StartTimer("Loading data for " + Path.GetFileName(filePath));
-            ToolsGAPI.Print("");
-            ToolsGAPI.Print("--Loading " + Path.GetFileName(filePath) + "--", "0000FF");
+            ToolsCharApi.StartTimer("Loading data for " + Path.GetFileName(filePath));
+            ToolsCharApi.Print("");
+            ToolsCharApi.Print("--Loading " + Path.GetFileName(filePath) + "--", "0000FF");
             //string customCharacterDir = Path.Combine(CharacterDirectory, filePath).Replace("/", ".").Replace("\\", ".");
             string dataFilePath = Path.Combine(filePath, "characterdata.txt").Replace("/", ".").Replace("\\", ".");
 
@@ -252,7 +263,7 @@ namespace CustomCharacters
                 {
                     linesList.Add(line);
                 }
-                //ToolsGAPI.PrintError(linesList.Count().ToString());
+                //ToolsCharApi.PrintError(linesList.Count().ToString());
                 lines = linesList.ToArray();
             }
 
@@ -260,19 +271,19 @@ namespace CustomCharacters
 
             if (lines.Count() <= 0)
             {
-                ToolsGAPI.PrintError($"No \"{DataFile}\" file found for " + Path.GetFileName(filePath));
+                ToolsCharApi.PrintError($"No \"{DataFile}\" file found for " + Path.GetFileName(filePath));
                 return null;
             }
             
 
-            //var lines = GungeonAPI.ResourceExtractor.GetLinesFromFile(dataFilePath);
+            //var lines = ToolsCharApi.GetLinesFromFile(dataFilePath);
             var data = ParseCharacterData(lines);
 
             string spritesDir = Path.Combine(filePath, "sprites").Replace("/", ".").Replace("\\", ".");
             string newSpritesDir = Path.Combine(filePath, "newspritesetup").Replace("/", ".").Replace("\\", ".");
             string newAltSpritesDir = Path.Combine(filePath, "newaltspritesetup").Replace("/", ".").Replace("\\", ".");
 
-            string[] resources = GungeonAPI.ResourceExtractor.GetResourceNames();
+            string[] resources = ToolsCharApi.GetResourceNames();
             
             for (int i = 0; i < resources.Length; i++)
             {
@@ -281,133 +292,143 @@ namespace CustomCharacters
 
                     if (resources[i].StartsWith(spritesDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.sprites == null)
                     {
-                        ToolsGAPI.PrintError("Found: Sprites folder");
-                        data.sprites = GungeonAPI.ResourceExtractor.GetTexturesFromResource(spritesDir);
+                        //ToolsCharApi.PrintError("Found: Sprites folder");
+                        data.sprites = ToolsCharApi.GetTexturesFromResource(spritesDir);
                     }
 
                     string altSpritesDir = Path.Combine(filePath, "alt_sprites").Replace("/", ".").Replace("\\", ".");
 
                     if (resources[i].StartsWith(altSpritesDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.altSprites == null)
                     {
-                        ToolsGAPI.PrintError("Found: Alt Sprites folder");
-                        data.altSprites = GungeonAPI.ResourceExtractor.GetTexturesFromResource(altSpritesDir);
+                        //ToolsCharApi.PrintError("Found: Alt Sprites folder");
+                        data.altSprites = ToolsCharApi.GetTexturesFromResource(altSpritesDir);
                     }
 
                     if (resources[i].StartsWith(newSpritesDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(data.pathForSprites))
                     {
-                        ToolsGAPI.PrintError("Found: New Sprites folder");
+                        //ToolsCharApi.PrintError("Found: New Sprites folder");
                         data.pathForSprites = newSpritesDir;
                     }
 
                     if (resources[i].StartsWith(newAltSpritesDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && string.IsNullOrEmpty(data.pathForAltSprites))
                     {
-                        ToolsGAPI.PrintError("Found: New Sprites folder");
+                        //ToolsCharApi.PrintError("Found: New Sprites folder");
                         data.pathForAltSprites = newAltSpritesDir;
                     }
 
                     string foyerDir = Path.Combine(filePath, "foyercard").Replace("/", ".").Replace("\\", ".");
                     if (resources[i].StartsWith(foyerDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.foyerCardSprites == null)
                     {
-                        ToolsGAPI.PrintError("Found: Foyer card folder");
-                        data.foyerCardSprites = GungeonAPI.ResourceExtractor.GetTexturesFromResource(foyerDir);
+                        //ToolsCharApi.PrintError("Found: Foyer card folder");
+                        data.foyerCardSprites = ToolsCharApi.GetTexturesFromResource(foyerDir);
                     }
                    
 
                     string loadoutDir = Path.Combine(filePath, "loadoutsprites").Replace("/", ".").Replace("\\", ".");
                     if (resources[i].StartsWith(loadoutDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.loadoutSprites == null)
                     {
-                        ToolsGAPI.PrintError("Found: Loadout card folder");
+                        //ToolsCharApi.PrintError("Found: Loadout card folder");
 
-                        data.loadoutSprites = GungeonAPI.ResourceExtractor.GetTexturesFromResource(loadoutDir);
+                        data.loadoutSprites = ToolsCharApi.GetTexturesFromResource(loadoutDir);
 
-                        ToolsGAPI.PrintError(data.loadoutSprites.Count.ToString());
+                        //ToolsCharApi.PrintError(data.loadoutSprites.Count.ToString());
+                    }
+
+                    string punchoutDir = Path.Combine(filePath, "punchout").Replace("/", ".").Replace("\\", ".");
+
+                    string punchoutSpritesDir = Path.Combine(punchoutDir, "sprites").Replace("/", ".").Replace("\\", ".");
+                    
+                    if (resources[i].StartsWith(punchoutSpritesDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.punchoutSprites == null)
+                    {
+                        ToolsCharApi.Print("Found: Punchout Sprites folder");
+                        ETGModConsole.Log("Found: Punchout Sprites folder");
+                        data.punchoutSprites = ToolsCharApi.GetTexturesFromResource(punchoutSpritesDir);
+                    }
+
+                    if (resources[i].StartsWith(punchoutDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.punchoutFaceCards == null)
+                    {
+                        data.punchoutFaceCards = new List<Texture2D>();
+                        ETGModConsole.Log(punchoutDir);
+                        var punchoutSprites = ToolsCharApi.GetTexturesFromResource(punchoutDir);
+                        foreach (var tex in punchoutSprites)
+                        {
+                            string name = tex.name.ToLower();
+                            if (name.Contains("facecard1") || name.Contains("facecard2") || name.Contains("facecard3"))
+                            {
+                                data.punchoutFaceCards.Add(tex);
+                                ToolsCharApi.Print("Found: Punchout facecard " + tex.name);
+                            }
+                        }
                     }
 
                 }
             }
 
 
-            ToolsGAPI.PrintError("new sprites");
+            //ToolsCharApi.PrintError("new sprites");
 
-            ToolsGAPI.PrintError("alt sprites");
-            ToolsGAPI.PrintError("foyer card sprites");
+            //ToolsCharApi.PrintError("alt sprites");
+            //ToolsCharApi.PrintError("foyer card sprites");
 
-            ToolsGAPI.PrintError("loadout sprites");
-            List<Texture2D> miscTextures = GungeonAPI.ResourceExtractor.GetTexturesFromResource(filePath);
+            //ToolsCharApi.PrintError("loadout sprites");
+            List<Texture2D> miscTextures = ToolsCharApi.GetTexturesFromResource(filePath);
             foreach (var tex in miscTextures)
             {
                 string name = tex.name.ToLower();
                 if (name.Equals("icon"))
                 {
-                    ToolsGAPI.PrintError("Found: Icon ");
+                    //ToolsCharApi.PrintError("Found: Icon ");
                     data.minimapIcon = tex;
+                }
+                if (name.Equals("coop_page_death"))
+                {
+                    //ToolsCharApi.PrintError("Found: Icon ");
+                    data.coopDeathScreenIcon = tex;
                 }
                 if (name.Contains("bosscard_"))
                 {
-                    ToolsGAPI.PrintError("Found: Bosscard");
+                    //ToolsCharApi.PrintError("Found: Bosscard");
                     //BotsModule.Log(name.ToLower().Replace("bosscard_", "").Replace("0", ""));
                     data.bossCard.Add(tex);
                 }
                 if (name.Equals("playersheet"))
                 {
-                    ToolsGAPI.PrintError("Found: Playersheet");
+                    //ToolsCharApi.PrintError("Found: Playersheet");
                     data.playerSheet = tex;
                 }
                 if (name.Equals("facecard"))
                 {
-                    ToolsGAPI.PrintError("Found: Facecard");
+                    //ToolsCharApi.PrintError("Found: Facecard");
                     data.faceCard = tex;
                 }
                 if (name.Equals("win_pic_junkan"))
                 {
-                    ToolsGAPI.PrintError("Found: Junkan Win Pic");
+                    //ToolsCharApi.PrintError("Found: Junkan Win Pic");
                     data.junkanWinPic = tex;
                 }
                 if (name.Equals("win_pic"))
                 {
-                    ToolsGAPI.PrintError("Found: Past Win Pic");
+                    //ToolsCharApi.PrintError("Found: Past Win Pic");
                     data.pastWinPic = tex;
                 }
 
                 if (name.Equals("alt_skin_obj_sprite_001"))
                 {
-                    ToolsGAPI.PrintError("Found: alt_skin_obj_sprite_001");
+                    //ToolsCharApi.PrintError("Found: alt_skin_obj_sprite_001");
                     data.altObjSprite1 = tex;
                 }
                 if (name.Equals("alt_skin_obj_sprite_002"))
                 {
-                    ToolsGAPI.PrintError("Found: alt_skin_obj_sprite_002");
+                    //ToolsCharApi.PrintError("Found: alt_skin_obj_sprite_002");
                     data.altObjSprite2 = tex;
                 }
 
 
             }
-            ToolsGAPI.PrintError("other sprites");
-            string punchoutDir = Path.Combine(filePath, "punchout/").Replace("/", ".").Replace("\\", ".");
-
-            string punchoutSpritesDir = Path.Combine(punchoutDir, "sprites").Replace("/", ".").Replace("\\", ".");
-            if (resources.Contains(punchoutSpritesDir))
-            {
-                ToolsGAPI.Print("Found: Punchout Sprites folder");
-                data.punchoutSprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(punchoutSpritesDir);
-            }
-
-            if (resources.Contains(punchoutDir))
-            {
-                data.punchoutFaceCards = new List<Texture2D>();
-                var punchoutSprites = GungeonAPI.ResourceExtractor.GetTexturesFromDirectory(punchoutDir);
-                foreach (var tex in punchoutSprites)
-                {
-                    string name = tex.name.ToLower();
-                    if (name.Contains("facecard1") || name.Contains("facecard2") || name.Contains("facecard3"))
-                    {
-                        data.punchoutFaceCards.Add(tex);
-                        ToolsGAPI.Print("Found: Punchout facecard " + tex.name);
-                    }
-                }
-            }
+            //ToolsCharApi.PrintError("other sprites");
+           
                 
-            //ToolsGAPI.StopTimerAndReport("Loading data for " + Path.GetFileName(directories[i]));
+            //ToolsCharApi.StopTimerAndReport("Loading data for " + Path.GetFileName(directories[i]));
 
             return data;
             
@@ -435,7 +456,7 @@ namespace CustomCharacters
 
                 if (line.StartsWith("<altguns>"))
                 {
-                    ToolsGAPI.PrintError("alt guns found");
+                    //ToolsCharApi.PrintError("alt guns found");
                     data.altGun = GetAltguns(lines, i + 1, out i);
                     continue;
                 }
@@ -484,45 +505,23 @@ namespace CustomCharacters
                 {
                     data.nickname = value;
                     continue;
-                }
-                if (line.StartsWith("identity:"))
-                {
-                    data.identity = (PlayableCharacters)GetIdentityFromString(value);
-                    BotsModule.Log(data.identity + "", BotsModule.LOST_COLOR);
-                    continue;
-                }
+                }               
                 if (line.StartsWith("armor:"))
                 {
                     float floatValue;
                     if (!float.TryParse(value, out floatValue))
                     {
-                        ToolsGAPI.PrintError("Invalid armor value: " + line);
+                        ToolsCharApi.PrintError("Invalid armor value: " + line);
                         continue;
                     }
                     data.armor = floatValue;
                     continue;
                 }
 
-                ToolsGAPI.PrintError($"Line {i} in {DataFile} did not meet any expected criteria:");
-                ToolsGAPI.PrintRaw("----" + line, true);
+                ToolsCharApi.PrintError($"Line {i} in {DataFile} did not meet any expected criteria:");
+                ToolsCharApi.PrintRaw("----" + line, true);
             }
             return data;
-        }
-
-        public static CustomPlayableCharacters GetIdentityFromString(string characterName)
-        {
-            characterName = characterName.ToLower();
-            foreach (CustomPlayableCharacters character in Enum.GetValues(typeof(CustomPlayableCharacters)))
-            {
-                var name = character.ToString().ToLower().Replace("coop", "");
-                if (name.Equals(characterName))
-                {
-                    return character;
-                }
-            }
-
-            ToolsGAPI.Print("Failed to find character: " + characterName);
-            return CustomPlayableCharacters.Pilot;
         }
 
         //Character name aliasing
@@ -545,29 +544,11 @@ namespace CustomCharacters
             if (characterName.Equals("paradox"))
                 return PlayableCharacters.Eevee;
 
-            ToolsGAPI.Print("Failed to find character base: " + characterName);
+            ToolsCharApi.Print("Failed to find character base: " + characterName);
             return PlayableCharacters.Pilot;
         }
 
-        public static CustomDungeonFlags GetFlagFromString(string flagName)
-        {
-            //flagName = flagName.ToLower();
-            foreach (CustomDungeonFlags flag in Enum.GetValues(typeof(CustomDungeonFlags)))
-            {
-                var name = flag.ToString();
-                //BotsModule.Log(name + " / " + flagName, BotsModule.LOCKED_CHARACTOR_COLOR);
-                //BotsModule.Log("ahhh: " + name.Equals(flagName), BotsModule.LOCKED_CHARACTOR_COLOR);
-                if (name.Equals(flagName))
-                {
-                    BotsModule.Log("flag: " + flag, BotsModule.LOCKED_CHARACTOR_COLOR);
-                    return flag;
-
-                }
-            }
-
-            BotsModule.Log("Failed to find flag: " + flagName, BotsModule.LOCKED_CHARACTOR_COLOR);
-            return CustomDungeonFlags.NONE;
-        }
+        
 
         //Stats
         public static Dictionary<StatType, float> GetStats(string[] lines, int startIndex, out int endIndex)
@@ -588,7 +569,7 @@ namespace CustomCharacters
                 if (string.IsNullOrEmpty(args[0])) continue;
                 if (args.Length < 2)
                 {
-                    ToolsGAPI.PrintError("Invalid stat line: " + line);
+                    ToolsCharApi.PrintError("Invalid stat line: " + line);
                     continue;
                 }
 
@@ -605,7 +586,7 @@ namespace CustomCharacters
                 }
                 if (!foundStat)
                 {
-                    ToolsGAPI.PrintError("Unable to find stat: " + line);
+                    ToolsCharApi.PrintError("Unable to find stat: " + line);
                     continue;
                 }
 
@@ -613,13 +594,13 @@ namespace CustomCharacters
                 bool foundValue = float.TryParse(args[1].Trim(), out value);
                 if (!foundValue)
                 {
-                    ToolsGAPI.PrintError("Invalid stat value: " + line);
+                    ToolsCharApi.PrintError("Invalid stat value: " + line);
                     continue;
                 }
 
                 stats.Add(stat, value);
             }
-            ToolsGAPI.PrintError("Invalid stats setup, expecting '</stats>' but found none");
+            ToolsCharApi.PrintError("Invalid stats setup, expecting '</stats>' but found none");
             return new Dictionary<StatType, float>();
         }
 
@@ -628,7 +609,7 @@ namespace CustomCharacters
         {
             endIndex = startIndex;
 
-            ToolsGAPI.Print("Getting loadout...");
+            ToolsCharApi.Print("Getting loadout...");
             List<Tuple<PickupObject, bool>> items = new List<Tuple<PickupObject, bool>>();
 
             string line;
@@ -645,13 +626,13 @@ namespace CustomCharacters
 
                 if (!Gungeon.Game.Items.ContainsID(args[0]))
                 {
-                    ToolsGAPI.PrintError("Could not find item with ID: \"" + args[0] + "\"");
+                    ToolsCharApi.PrintError("Could not find item with ID: \"" + args[0] + "\"");
                     continue;
                 }
                 var item = Gungeon.Game.Items[args[0]];
                 if (item == null)
                 {
-                    ToolsGAPI.PrintError("Could not find item with ID: \"" + args[0] + "\"");
+                    ToolsCharApi.PrintError("Could not find item with ID: \"" + args[0] + "\"");
                     continue;
                 }
 
@@ -665,23 +646,23 @@ namespace CustomCharacters
                             CharacterBuilder.guns.Add(gun);
 
                         items.Add(new Tuple<PickupObject, bool>(item, true));
-                        ToolsGAPI.Print("    " + item.EncounterNameOrDisplayName + " (infinite)");
+                        ToolsCharApi.Print("    " + item.EncounterNameOrDisplayName + " (infinite)");
                         continue;
                     }
                     else
                     {
-                        ToolsGAPI.PrintError(item.EncounterNameOrDisplayName + " is not a gun, and therefore cannot be infinite");
+                        ToolsCharApi.PrintError(item.EncounterNameOrDisplayName + " is not a gun, and therefore cannot be infinite");
                     }
                 }
                 else
                 {
                     items.Add(new Tuple<PickupObject, bool>(item, false));
-                    ToolsGAPI.Print("    " + item.EncounterNameOrDisplayName);
+                    ToolsCharApi.Print("    " + item.EncounterNameOrDisplayName);
                 }
 
             }
 
-            ToolsGAPI.PrintError("Invalid loadout setup, expecting '</loadout>' but found none");
+            ToolsCharApi.PrintError("Invalid loadout setup, expecting '</loadout>' but found none");
             return new List<Tuple<PickupObject, bool>>();
         }
 
@@ -689,9 +670,9 @@ namespace CustomCharacters
         {
             endIndex = startIndex;
 
-            ToolsGAPI.Print("altguns loadout...");
+            ToolsCharApi.Print("altguns loadout...");
             List<Tuple<PickupObject, bool>> items = new List<Tuple<PickupObject, bool>>();
-            ToolsGAPI.PrintError("go fuck yourself");
+            //ToolsCharApi.PrintError("go fuck yourself");
             string line;
             string[] args;
             for (int i = startIndex; i < lines.Length; i++)
@@ -706,20 +687,20 @@ namespace CustomCharacters
 
                 if (!Gungeon.Game.Items.ContainsID(args[0]))
                 {
-                    ToolsGAPI.PrintError("Could not find item with ID: \"" + args[0] + "\"");
+                    ToolsCharApi.PrintError("Could not find item with ID: \"" + args[0] + "\"");
                     continue;
                 }
                 var item = Gungeon.Game.Items[args[0]];
                 if (item == null)
                 {
-                    ToolsGAPI.PrintError("Could not find item with ID: \"" + args[0] + "\"");
+                    ToolsCharApi.PrintError("Could not find item with ID: \"" + args[0] + "\"");
                     continue;
                 }
                 var gun = item.GetComponent<Gun>();
 
                 if (gun == null)
                 {
-                    ToolsGAPI.PrintError("\"" + args[0] + "\" isn't a gun...");
+                    ToolsCharApi.PrintError("\"" + args[0] + "\" isn't a gun...");
                     continue;
                 }
 
@@ -733,23 +714,23 @@ namespace CustomCharacters
                             CharacterBuilder.guns.Add(gun);
 
                         items.Add(new Tuple<PickupObject, bool>(item, true));
-                        ToolsGAPI.Print("    " + item.EncounterNameOrDisplayName + " (infinite)");
+                        ToolsCharApi.Print("    " + item.EncounterNameOrDisplayName + " (infinite)");
                         continue;
                     }
                     else
                     {
-                        ToolsGAPI.PrintError(item.EncounterNameOrDisplayName + " is not a gun, and therefore cannot be infinite");
+                        ToolsCharApi.PrintError(item.EncounterNameOrDisplayName + " is not a gun, and therefore cannot be infinite");
                     }
                 }
                 else
                 {
                     items.Add(new Tuple<PickupObject, bool>(item, false));
-                    ToolsGAPI.Print("    " + item.EncounterNameOrDisplayName);
+                    ToolsCharApi.Print("    " + item.EncounterNameOrDisplayName);
                 }
 
             }
 
-            ToolsGAPI.PrintError("Invalid loadout setup, expecting '</altguns>' but found none");
+            ToolsCharApi.PrintError("Invalid loadout setup, expecting '</altguns>' but found none");
             return new List<Tuple<PickupObject, bool>>();
         }
 

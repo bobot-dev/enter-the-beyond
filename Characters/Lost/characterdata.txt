@@ -5,8 +5,6 @@ base: guide
 name short: Lost
 name: The Lost
 
-identity: Lost
-
 nickname: found
 
 #Set starting armor

@@ -18,11 +18,7 @@ namespace BotsMod
 	public static class Tools //1
 	{
 		public static GameObject Mines_Cave_In;
-		public static GameObject Foyer_ElevatorChamber;
-		public static AssetBundle AHHH;
-		public static AssetBundle fucktilesets;
-		public static AssetBundle EtbAssetBundle;
-		public static AssetBundle BotsAssetBundle;
+		public static GameObject Foyer_ElevatorChamber;		
 		public static List<int> BeyondItems = new List<int>();
 
 
@@ -129,6 +125,38 @@ namespace BotsMod
 				}
 			}
 			return result;
+		}
+
+		public static PickupObject GetPickupObjectFromAnywhere(this GameObject obj)
+		{
+			
+			var po1 = obj.GetComponent<PickupObject>();
+			var po2 = obj.GetComponentInChildren<PickupObject>();
+			var po3 = obj.GetComponentInParent<PickupObject>();
+			if (po1 != null)
+			{
+				return po1;
+			}
+			else if(po2 != null)
+			{
+				return po2;
+			}
+			else if (po3 != null)
+			{
+				return po3;
+			}
+			return null;
+		}
+
+		public static Texture2D GenerateTexture2DFromRenderTexture(RenderTexture rTex)
+		{
+			Texture2D tex = new Texture2D(rTex.width, rTex.height, TextureFormat.RGB24, false);
+			var old_rt = RenderTexture.active;
+			RenderTexture.active = rTex;
+			tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
+			tex.Apply();
+			RenderTexture.active = old_rt;
+			return tex;
 		}
 
 		public static Projectile SetupProjectile(int id)

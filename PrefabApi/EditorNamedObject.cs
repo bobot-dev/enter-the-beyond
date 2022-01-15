@@ -6,11 +6,11 @@ using System.Text;
 
 namespace PrefabAPI
 {
-    public class NamedObject : EditorExtension
+    public class EditorNamedObject : EditorExtension
     {
         public string m_Name;
 
-        public NamedObject()
+        public EditorNamedObject()
         {
         }
 

@@ -9,9 +9,9 @@ using UnityEngine;
 using MonoMod.RuntimeDetour;
 using HutongCharacter = HutongGames.PlayMaker.Actions.ChangeToNewCharacter;
 
-using SaveAPI;
 using ItemAPI;
 using Dungeonator;
+using UnityEngine.SceneManagement;
 
 namespace CustomCharacters
 
@@ -20,14 +20,6 @@ namespace CustomCharacters
     {
         private static bool hasInitialized = false;
         private static FieldInfo m_isHighlighted = typeof(TalkDoerLite).GetField("m_isHighlighted", BindingFlags.NonPublic | BindingFlags.Instance);
-
-        private static Vector3[] foyerPositions =
-        {
-            new Vector3(15.8f, 26.6f, 27.1f),
-            new Vector3(31.7f, 27.3f, 27.8f),
-            new Vector3(28.9f, 62.8f, 63.3f),
-
-        };
 
         public static void Init()
         {
@@ -47,6 +39,8 @@ namespace CustomCharacters
                 hasInitialized = true;
             }
 
+
+
             List<FoyerCharacterSelectFlag> list = new List<FoyerCharacterSelectFlag>();
 
             foreach (var character in CharacterBuilder.storedCharacters)
@@ -55,13 +49,20 @@ namespace CustomCharacters
                 {
                     Tools.Print($"Adding {character.Key} to the breach.");
                     var identity = character.Value.First.baseCharacter;
-                   
+
                     var selectCharacter = AddCharacterToFoyer(character.Key, GetFlagFromIdentity(identity, sortedByX).gameObject);
-                    //This makes it so you can hover over them before choosing a character
-                    //sortedByX.Insert(6, selectCharacter); 
-                    sortedByX.Insert(6, selectCharacter);
-                    //selectCharacter.OverheadElement.SetActive(true);
-                    list.Add(selectCharacter);
+
+                    if (selectCharacter.PrerequisitesFulfilled())
+                    {
+                        
+                        sortedByX.Insert(6, selectCharacter);
+                        list.Add(selectCharacter);
+                        Foyer.Instance.OnPlayerCharacterChanged += selectCharacter.OnSelectedCharacterCallback;
+                    }
+                    else
+                    {
+                        UnityEngine.Object.Destroy(selectCharacter.gameObject);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -111,20 +112,20 @@ namespace CustomCharacters
             //    return null;
             //}
 
-
-            if (customCharacter.First.characterID >= foyerPositions.Length)
-            {
-                Tools.PrintError("Not enough room in the foyer for: " + customCharacter.First.nameShort);
-                Tools.PrintError("    Use the character command instead.");
-                Tools.PrintError("    Jeez, how many characters do you need?");
-                return null;
-            }
             Tools.Print("    Got custom character");
 
             //Create new object
+
+
+
             FoyerCharacterSelectFlag selectFlag = GameObject.Instantiate(selectFlagPrefab).GetComponent<FoyerCharacterSelectFlag>();
-            FakePrefab.MarkAsFakePrefab(selectFlag.gameObject, true);
-            selectFlag.transform.position = foyerPositions[customCharacter.First.characterID];
+
+            selectFlag.prerequisites = customCharacter.First.prerequisites;
+
+            FakePrefab.MarkAsFakePrefab(selectFlag.gameObject);
+            SceneManager.MoveGameObjectToScene(selectFlag.gameObject, SceneManager.GetActiveScene());
+
+            selectFlag.transform.position = customCharacter.First.foyerPos;
             selectFlag.CharacterPrefabPath = characterPath;
             selectFlag.name = "NPC_FoyerCharacter_" + customCharacter.First.nameShort;
             Tools.Print("    Made select flag");
@@ -134,6 +135,8 @@ namespace CustomCharacters
             Tools.Print("    Replaced sprites");
 
             var td = selectFlag.talkDoer;
+
+            
 
             //Setup overhead card
             if (!string.IsNullOrEmpty(customCharacter.First.pathForSprites))
@@ -148,10 +151,10 @@ namespace CustomCharacters
                 idleDoer.idleMin = customCharacter.First.idleDoer.idleMin;
                 idleDoer.IsEevee = customCharacter.First.idleDoer.IsEevee;
                 idleDoer.phases = customCharacter.First.idleDoer.phases;
+                
             }
 
-            
-            
+            selectFlag.gameObject.GetComponent<tk2dSpriteAnimator>().DefaultClipId = customCharacter.Second.GetComponent<PlayerController>().spriteAnimator.GetClipIdByName("select_idle");
 
             if (customCharacter.First.removeFoyerExtras)
             {
@@ -177,7 +180,7 @@ namespace CustomCharacters
 
             CreateOverheadCard(selectFlag, customCharacter.First);
             //FakePrefab.MarkAsFakePrefab(selectFlag.OverheadElement);
-            ETGModConsole.Log(selectFlag.OverheadElement.ToString());
+            //ETGModConsole.Log(selectFlag.OverheadElement.ToString());
             td.OverheadUIElementOnPreInteract = selectFlag.OverheadElement;
             //FakePrefab.MarkAsFakePrefab(td.OverheadUIElementOnPreInteract);
             Tools.Print("    Made Overhead Card");
@@ -213,20 +216,7 @@ namespace CustomCharacters
             return selectFlag;
         }
 
-        public static bool CheckUnlocked(CustomCharacterData data)
-        {
-            if (data.unlockFlag == CustomDungeonFlags.NONE)
-            {
-                return true;
-            }
-            if (!SaveAPIManager.GetFlag(data.unlockFlag))
-            {
-                BotsMod.BotsModule.Log($"The character {data.name} requires the flag {data.unlockFlag} to be unlocked", BotsMod.BotsModule.LOCKED_CHARACTOR_COLOR);
-            }
-
-            return SaveAPIManager.GetFlag(data.unlockFlag);
-        }
-
+        
         private static void HandleSprites(BraveBehaviour selectCharacter, BraveBehaviour player)
         {
 
@@ -238,7 +228,7 @@ namespace CustomCharacters
             selectCharacter.renderer.material = new Material(selectCharacter.renderer.material);
 
 
-            BotsMod.BotsModule.Log($"{selectCharacter.spriteAnimator.gameObject}");
+            //BotsMod.BotsModule.Log($"{selectCharacter.spriteAnimator.gameObject}");
             
             selectCharacter.sprite.ForceBuild();
             string coreIdleAnimation = selectCharacter.GetComponent<CharacterSelectIdleDoer>().coreIdleAnimation;
@@ -265,7 +255,7 @@ namespace CustomCharacters
 
             var characterCostumeSwapper = baseSwapper.GetComponent<CharacterCostumeSwapper>();
 
-            characterCostumeSwapper.TargetCharacter = (PlayableCharacters)CustomPlayableCharacters.Custom;
+            characterCostumeSwapper.TargetCharacter = (PlayableCharacters)data.identity;
 
             characterCostumeSwapper.AlternateCostumeSprite = altSprite;
 
@@ -296,7 +286,7 @@ namespace CustomCharacters
             altSwapper.transform.position = data.skinSwapperPos;
             
 
-            BotsMod.BotsModule.Log($"{baseSwapper.name}: {baseSwapper.transform.position}");
+            //BotsMod.BotsModule.Log($"{baseSwapper.name}: {baseSwapper.transform.position}");
 
             if (!RoomHandler.unassignedInteractableObjects.Contains(baseSwapper.GetComponent<IPlayerInteractable>()))
             {
@@ -344,11 +334,10 @@ namespace CustomCharacters
                 selectCharacter.OverheadElement.name = $"CHR_{data.nameShort}Panel";
                 selectCharacter.OverheadElement.GetComponent<FoyerInfoPanelController>().followTransform = selectCharacter.transform;
                 //selectCharacter.OverheadElement.AddComponent<BotsMod.Debugger>();
-                BotsMod.BotsModule.Log("0", BotsMod.BotsModule.LOST_COLOR);
+                //BotsMod.BotsModule.Log("0", BotsMod.BotsModule.LOST_COLOR);
 
 
                 var customFoyerController = selectCharacter.gameObject.AddComponent<CustomCharacterFoyerController>();
-                customFoyerController.customCharacterController = data.customCharacterController;
                 customFoyerController.metaCost = data.metaCost;
 
                 
@@ -357,7 +346,7 @@ namespace CustomCharacters
                 customFoyerController.emissiveColor = data.emissiveColor;
                 customFoyerController.emissiveColorPower = data.emissiveColorPower;
                 customFoyerController.emissivePower = data.emissivePower;
-                customFoyerController.emissiveThresholdSensitivity = data.emissiveThresholdSensitivity;
+                customFoyerController.data = data;
 
                 string replaceKey = data.baseCharacter.ToString().ToUpper();
                 if (data.baseCharacter == PlayableCharacters.Soldier)
@@ -371,9 +360,8 @@ namespace CustomCharacters
                 //Change text
                 var infoPanel = selectCharacter.OverheadElement.GetComponent<FoyerInfoPanelController>();
 
-                BotsMod.BotsModule.Log("1", BotsMod.BotsModule.LOST_COLOR);
                 //infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>().Text = "my ass";
-                BotsMod.BotsModule.Log((infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>().Text).ToStringIfNoString(), BotsMod.BotsModule.LOST_COLOR);
+                //BotsMod.BotsModule.Log((infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>().Text).ToStringIfNoString(), BotsMod.BotsModule.LOST_COLOR);
                 
                 dfLabel nameLabel = infoPanel.textPanel.transform.Find("NameLabel").GetComponent<dfLabel>();
                 //why? its 3:50am and this is currently the funniest shit to me and you are powerless to stop me :)
@@ -383,7 +371,7 @@ namespace CustomCharacters
                     .ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper()
                     .ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper().ToUpper(); ;// nameLabel.GetLocalizationKey().Replace(replaceKey, data.identity.ToString());
 
-                BotsMod.BotsModule.Log(replaceKey, BotsMod.BotsModule.LOST_COLOR);
+                //BotsMod.BotsModule.Log(replaceKey, BotsMod.BotsModule.LOST_COLOR);
                 dfLabel pastKilledLabel = infoPanel.textPanel.transform.Find("PastKilledLabel").GetComponent<dfLabel>();
                 //pastKilledLabel.Text = "(Past Killed)";
                 pastKilledLabel.ProcessMarkup = true;
@@ -454,7 +442,6 @@ namespace CustomCharacters
                     facecard.transform.parent = null;
                     UnityEngine.Object.Destroy(facecard.gameObject);
                     facecard = theCauseOfMySuffering.GetComponent<CharacterSelectFacecardIdleDoer>();
-                    facecard.gameObject.AddComponent<BotsMod.Debugger>();
                     facecard.gameObject.name = data.nameShort + " Sprite FaceCard";
                     //facecard.RegenerateCache();
                     
@@ -503,7 +490,7 @@ namespace CustomCharacters
                         {
                             idleAnimIds.Add(SpriteHandler.AddSpriteToCollectionWithAnchor(sprite, orig, tk2dBaseSprite.Anchor.LowerCenter, $"{data.nameShort}_{sprite.name}"));
                         }
-                        ETGModConsole.Log(sprite.name);
+                        //ETGModConsole.Log(sprite.name);
                     }
                     /*
                     orig.spriteDefinitions[appearAnimIds[0]].position0 = new Vector3(-0.3f, 0, 0);
@@ -651,7 +638,7 @@ namespace CustomCharacters
 
                     foreach(var anim in facecard.spriteAnimator.Library.clips)
                     {
-                        ETGModConsole.Log($"{anim.name}: {anim.frames.Length}");
+                        //ETGModConsole.Log($"{anim.name}: {anim.frames.Length}");
                     }
 
                     facecard.appearAnimation = appearAnimName;
@@ -664,7 +651,7 @@ namespace CustomCharacters
 
             catch (Exception e)
             {
-                BotsMod.BotsModule.Log("overhead thing broke: " + e, BotsMod.BotsModule.LOCKED_CHARACTOR_COLOR);
+                ETGModConsole.Log("overhead thing broke: " + e);
             }
             /*
             if (nameLabel.Text == "The Lost")

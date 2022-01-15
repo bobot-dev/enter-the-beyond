@@ -40,10 +40,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Desktop\dependencies\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\OneDrive\Desktop\dependencies\Assembly-CSharp-firstpass.dll</HintPath>
-    </Reference>
     <Reference Include="Assembly-CSharp.Base.mm, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Enter the Gungeon\EtG_Data\Managed\Assembly-CSharp.Base.mm.dll</HintPath>
@@ -72,6 +68,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Threading.Tasks.NET35, Version=3.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\System.Threading.Tasks.Unofficial.3.1\lib\net35\System.Threading.Tasks.NET35.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -124,6 +123,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionsPlus\MoreActions.cs" />
+    <Compile Include="Character Api\CharApiHiveMind.cs" />
+    <Compile Include="Character Api\CharApi.cs" />
+    <Compile Include="Character Api\SaveFileBullShit.cs" />
+    <Compile Include="Character Api\Tools\SaveFileHelper.cs" />
+    <Compile Include="BreachCutter.cs" />
+    <Compile Include="LeshysCamera.cs" />
     <Compile Include="Alternator.cs" />
     <Compile Include="AmmonomiconAPI\CharacterDatabase.cs" />
     <Compile Include="Audio\AudioResourceLoader.cs" />
@@ -133,7 +138,6 @@
     <Compile Include="BeyondUnlockShit\EffigyInteractableComp.cs" />
     <Compile Include="ChamberGun\BotsCustomChamberGun.cs" />
     <Compile Include="ChamberGun\AddItemsToChamberGunIndex.cs" />
-    <Compile Include="Character Api\Tools\AtlasTesting.cs" />
     <Compile Include="Character Api\Tools\TexturePacker.cs" />
     <Compile Include="ChargeLance.cs" />
     <Compile Include="ChainedBullets.cs" />
@@ -141,6 +145,7 @@
     <Compile Include="BeyondChamberGun.cs" />
     <Compile Include="CarpetBurn.cs" />
     <Compile Include="AntiAirProjectile.cs" />
+    <Compile Include="HpRespriter\HpRespriterController.cs" />
     <Compile Include="LaserProjModule.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="dfProgressBarIsShit.cs" />
@@ -151,24 +156,27 @@
     <Compile Include="Kr82m.cs" />
     <Compile Include="Enemies\Beyond\DeadEye.cs" />
     <Compile Include="FracturedRounds.cs" />
+    <Compile Include="NightmareNightmareNightmare\NoMoreFun.cs" />
     <Compile Include="Notifications\BeyondNotificaionHandler.cs" />
     <Compile Include="PrefabApi\AssetBundleBuilder.cs" />
     <Compile Include="PrefabApi\AssetBundleTools.cs" />
     <Compile Include="PrefabApi\BinaryWriterExtensions.cs" />
-    <Compile Include="PrefabApi\BuildTarget.cs" />
-    <Compile Include="PrefabApi\ClassIDType.cs" />
     <Compile Include="PrefabApi\CommonString.cs" />
-    <Compile Include="PrefabApi\Component.cs" />
     <Compile Include="PrefabApi\CRC.cs" />
     <Compile Include="PrefabApi\EditorAssetBundle.cs" />
+    <Compile Include="PrefabApi\EditorBuildTarget.cs" />
+    <Compile Include="PrefabApi\EditorClassIDType.cs" />
+    <Compile Include="PrefabApi\EditorComponent.cs" />
     <Compile Include="PrefabApi\EditorExtension.cs" />
     <Compile Include="PrefabApi\EditorGameObject.cs" />
+    <Compile Include="PrefabApi\EditorNamedObject.cs" />
     <Compile Include="PrefabApi\EditorObject.cs" />
     <Compile Include="PrefabApi\EditorPPtr.cs" />
     <Compile Include="PrefabApi\EditorTextAsset.cs" />
     <Compile Include="PrefabApi\EditorTransform.cs" />
     <Compile Include="PrefabApi\EndianBinaryWriter.cs" />
-    <Compile Include="PrefabApi\ExampleModule\ExampleModule.cs" />
+    <Compile Include="PrefabApi\Examples\ExampleModule.cs" />
+    <Compile Include="PrefabApi\Examples\UrBadAtTheGameComponent.cs" />
     <Compile Include="PrefabApi\ICoder.cs" />
     <Compile Include="PrefabApi\IMatchFinder.cs" />
     <Compile Include="PrefabApi\LZ4Codec.cs" />
@@ -186,7 +194,6 @@
     <Compile Include="PrefabApi\LzmaDecoder.cs" />
     <Compile Include="PrefabApi\LzmaEncoder.cs" />
     <Compile Include="PrefabApi\LzOutWindow.cs" />
-    <Compile Include="PrefabApi\NamedObject.cs" />
     <Compile Include="PrefabApi\PPtr.cs" />
     <Compile Include="PrefabApi\PrefabBuilder.cs" />
     <Compile Include="PrefabApi\RangeCoder.cs" />
@@ -240,8 +247,6 @@
     <Compile Include="AmmonomiconAPI\Ammonomicon.cs" />
     <Compile Include="AmmonomiconAPI\AmmonomiconHooks.cs" />
     <Compile Include="AmmonomiconAPI\Tools.cs" />
-    <Compile Include="Character Api\CharacterBuilding\CustomCharacterController.cs" />
-    <Compile Include="Character Api\Tools\Class1.cs" />
     <Compile Include="Character Api\Tools\Enums.cs" />
     <Compile Include="BotsProjectileMotionModule.cs" />
     <Compile Include="Class2.cs" />
@@ -331,9 +336,6 @@
     <Compile Include="ChamberGun\BotChamberGunProcessor.cs" />
     <Compile Include="Floors\BullShitNeededForCustomPasts.cs" />
     <Compile Include="Floors\LostPastController.cs" />
-    <Compile Include="Character Api\AltSkinSwapper\Class1.cs" />
-    <Compile Include="Character Api\AltSkinSwapper\InitGameObjects.cs" />
-    <Compile Include="Character Api\AltSkinSwapper\LostCharacterCostumeSwapper.cs" />
     <Compile Include="Character Api\CharacterBuilding\CharacterBuilder.cs" />
     <Compile Include="Character Api\CharacterBuilding\CustomCharacter.cs" />
     <Compile Include="Character Api\CharacterBuilding\FoyerCharacterHandler.cs" />
@@ -343,10 +345,9 @@
     <Compile Include="Character Api\CharacterSwitcher.cs" />
     <Compile Include="Character Api\CustomPlayableCharacters.cs" />
     <Compile Include="Character Api\CollectionDumper.cs" />
-    <Compile Include="Character Api\Tools\Hooks.cs" />
+    <Compile Include="Character Api\Tools\CharApiHooks.cs" />
     <Compile Include="Character Api\Tools\TextureStitcher.cs" />
     <Compile Include="Character Api\Tools\Tools.cs" />
-    <Compile Include="Character Api\Tools\ZipExtensions.cs" />
     <Compile Include="BotsCompanionFollowPlayerBehavior.cs" />
     <Compile Include="Chests\ChestInitStuff.cs" />
     <Compile Include="Class1.cs" />
@@ -1210,7 +1211,6 @@
     <EmbeddedResource Include="Characters\Lost\bosscard_005.png" />
     <EmbeddedResource Include="Characters\Lost\bosscard_006.png" />
     <EmbeddedResource Include="Characters\Lost\bosscard_007.png" />
-    <EmbeddedResource Include="Characters\Lost\bosscard_animated.gif" />
     <EmbeddedResource Include="Characters\Lost\characterdata.txt" />
     <EmbeddedResource Include="Characters\Lost\facecard.png" />
     <EmbeddedResource Include="Characters\Lost\icon.png" />
@@ -1542,9 +1542,11 @@
     <EmbeddedResource Include="Characters\Lost\newspritesetup\item_get\guide_item_get_008.png" />
     <EmbeddedResource Include="Characters\Lost\newspritesetup\item_get\guide_item_get_009.png" />
     <EmbeddedResource Include="Characters\Lost\newspritesetup\item_get\guide_item_get_010.png" />
+    <EmbeddedResource Include="Characters\Lost\coop_page_death.png" />
     <Content Include="Characters\Lost\newspritesetup\tablekick_down_hand\cc_sprite_placeholder.png" />
     <EmbeddedResource Include="sprites\beyond_portal_texture.png" />
     <EmbeddedResource Include="sprites\fire_blue_effect_ver1_sheet_11x4.png" />
+    <EmbeddedResource Include="sprites\curse_of_the_blind_sprite.png" />
     <Content Include="sprites\overseerf_Bosscard_001.png" />
     <EmbeddedResource Include="sprites\water_standard_base_001.png" />
   </ItemGroup>

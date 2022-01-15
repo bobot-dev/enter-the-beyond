@@ -19,8 +19,8 @@ namespace BotsMod
                 //the names of all of our rooms once we make them.
                 //"Beyond_Entrance2.room"
             };
-            // Mod_Entrance_Room = RoomFactory.BuildFromResource("Mod/Resources/ModRooms/floorEntrance.room");
-            // Mod_Exit_Room = RoomFactory.BuildFromResource("Mod/Resources/ModRooms/floorExit.room");
+            //Mod_Entrance_Room = RoomFactory.BuildFromResource("Mod/Resources/ModRooms/floorEntrance.room");
+            Mod_Exit_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Exit.room");
 
             Mod_Entrance_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Entrance2.room");
 
@@ -119,7 +119,7 @@ namespace BotsMod
             Mod_Boss.usesProceduralLighting = false;
             Mod_Boss.usesProceduralDecoration = false;
             Mod_Boss.rewardChestSpawnPosition = new IntVector2(25, 20); //Where the reward pedestal spawns, should be changed based on room size
-            Mod_Boss.overriddenTilesets = GlobalDungeonData.ValidTilesets.BELLYGEON;
+            //Mod_Boss.overriddenTilesets = GlobalDungeonData.ValidTilesets.BELLYGEON;
 
             Mod_Boss_Past = RoomFactory.BuildFromResource("BotsMod/rooms/Past/LostPastBossRoom.room");
             Mod_Boss_Past.category = PrototypeDungeonRoom.RoomCategory.BOSS;

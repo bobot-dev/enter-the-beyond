@@ -133,7 +133,7 @@ namespace BotsMod
 					output.SetPixels(pixels);
 					output.Apply();
 
-					ToolsGAPI.ExportTexture(output, "BotsDUMPsprites/RandomSprites", def.name);
+					ToolsCharApi.ExportTexture(output, "BotsDUMPsprites/RandomSprites", def.name);
 					if (def.flipped == tk2dSpriteDefinition.FlipMode.Tk2d)
 					{
 						output = output.Rotated().Flipped();
@@ -152,7 +152,7 @@ namespace BotsMod
 
 					//gun.sprite.renderer.material.SetTexture("_MainTex", output);
 
-					ToolsGAPI.ExportTexture(output, "BotsDUMPsprites/RandomSprites", i + " random");
+					ToolsCharApi.ExportTexture(output, "BotsDUMPsprites/RandomSprites", i + " random");
 
 					def.material.SetTexture("_MainTex", output);
 

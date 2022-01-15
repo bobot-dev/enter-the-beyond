@@ -57,7 +57,7 @@ namespace BotsMod
 
 				
 
-				Hook hook3 = new Hook(typeof(PlayerController).GetProperty("LocalShaderName", BindingFlags.Instance | BindingFlags.Public).GetGetMethod(), typeof(Hooks).GetMethod("LocalShaderNameGetHook"));
+				
 
 
 				//Hook setWinPicHook2 = new Hook(typeof(AmmonomiconDeathPageController).GetProperty("SetWinPic").GetGetMethod(), typeof(Hooks).GetMethod("SetWinPicHook"));
@@ -93,7 +93,7 @@ namespace BotsMod
 						m.GetGenericArguments().Length <= 2 &&
 						m.GetParameters().Length <= 2 &&
 						m.GetParameters()[0].ParameterType == typeof(string)),
-					typeof(Hooks).GetMethod("PostEventHook", BindingFlags.Static | BindingFlags.Public));*/
+					typeof(Hooks).GetMethod("PostEventHook", BindingFlags.Static | BindingFlags.Public));
 
 				//BotsModule.Log("ahhhhh 1", "#eb1313");
 				var dumbPainfulHook = new Hook(
@@ -3261,48 +3261,6 @@ namespace BotsMod
 		}
 
 
-		public static string LocalShaderNameGetHook(Func<PlayerController, string> orig, PlayerController self)
-		{
-			
-			bool flag = !GameOptions.SupportsStencil;
-			string result;
-			if (flag)
-			{
-				result = "Brave/PlayerShaderNoStencil";
-			}
-			else
-			{
-				bool flag2 = self.characterIdentity == (PlayableCharacters)CustomPlayableCharacters.Custom;
-				if (flag2)
-				{
-					if (self.IsUsingAlternateCostume)
-					{
-						Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
-						material.SetTexture("_MainTexture", self.sprite.renderer.material.GetTexture("_MainTex"));
-						material.SetColor("_EmissiveColor", new Color32(255, 69, 248, 255));
-						material.SetFloat("_EmissiveColorPower", 1.55f);
-						material.SetFloat("_EmissivePower", 55);
-						self.sprite.renderer.material = material;
-						result = material.shader.name;
-					}
-					else
-					{
-						Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
-						material.SetTexture("_MainTexture", self.sprite.renderer.material.GetTexture("_MainTex"));
-						material.SetColor("_EmissiveColor", new Color32(255, 0, 38, 255));
-						material.SetFloat("_EmissiveColorPower", 4.55f);
-						material.SetFloat("_EmissivePower", 55);
-						self.sprite.renderer.material = material;
-						result = material.shader.name;
-					}
-
-				}
-				else
-				{
-					result = orig(self);
-				}
-			}
-			return result;
-		}
+		
 	}
 }

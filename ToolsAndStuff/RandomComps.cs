@@ -42,7 +42,7 @@ namespace BotsMod
         
 
     }
-
+    /*
     public class Debugger : MonoBehaviour
     {
         private void Start()
@@ -76,7 +76,7 @@ namespace BotsMod
             ETGModConsole.Log($"{this.gameObject.name}: has been destroyed");
         }
     }
-
+    */
     public class EmmisiveBeams : MonoBehaviour
     {
         public EmmisiveBeams()

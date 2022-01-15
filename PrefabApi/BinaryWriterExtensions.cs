@@ -98,20 +98,12 @@ namespace PrefabAPI
             }
         }
 
-        public static void WriteAlignedString(this BinaryWriter write, string toWrite, int overrideAlignment = -1, bool verbose = false)
+        public static void WriteAlignedString(this BinaryWriter write, string toWrite, int overrideAlignment = -1)
         {
             var result = Encoding.UTF8.GetBytes(toWrite);
             write.Write(result.Length);
             write.Write(result);
-            if (verbose)
-            {
-                Console.WriteLine("before al: " + write.BaseStream.Position);
-            }
             write.AlignStream(overrideAlignment > 0 ? overrideAlignment : 4);
-            if (verbose)
-            {
-                Console.WriteLine("after al: " + write.BaseStream.Position);
-            }
         }
 
         public static void Insert(this BinaryWriter bw, byte[] bytes, long pos)

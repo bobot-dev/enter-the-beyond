@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 using UnityEngine;
-using GungeonAPI;
+
 
 
 namespace CustomCharacters
@@ -21,7 +21,7 @@ namespace CustomCharacters
 
             if (xIndex >= xCapacity || yIndex >= yCapacity)
             {
-                ToolsGAPI.PrintError("Not enough room left on the Facecard Atlas for this facecard!");
+                ToolsCharApi.PrintError("Not enough room left on the Facecard Atlas for this facecard!");
                 return Rect.zero;
             }
 

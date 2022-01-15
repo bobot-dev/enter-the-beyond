@@ -48,7 +48,7 @@ namespace BotsMod
 
 				orbPrefab.layer = 28;
 
-				var orb = UnityEngine.Object.Instantiate<GameObject>(Tools.AHHH.LoadAsset<GameObject>("Spike"), orbPrefab.transform);
+				var orb = UnityEngine.Object.Instantiate<GameObject>(BeyondPrefabs.AHHH.LoadAsset<GameObject>("Spike"), orbPrefab.transform);
 				orb.AddComponent<MakeObjSpin>();
 
 				
@@ -71,6 +71,8 @@ namespace BotsMod
 				enemy.aiActor.CollisionKnockbackStrength = 1f;
 				enemy.aiActor.procedurallyOutlined = true;
 				enemy.aiActor.CanTargetPlayers = true;
+
+				
 
 				//enemy.aiActor.MovementSpeed = 0f;
 
@@ -287,6 +289,32 @@ namespace BotsMod
 					new AttackBehaviorGroup.AttackGroupItem()
 					{
 						Probability = 1,
+						Behavior = new ShootBehavior
+						{
+
+
+							ShootPoint = m_CachedGunAttachPoint,
+							BulletScript = new CustomBulletScriptSelector(typeof(HomingScript)),
+							LeadAmount = 0f,
+							AttackCooldown = 1.2f,
+							TellAnimation = "",
+							FireAnimation = "",
+							RequiresLineOfSight = false,
+							Cooldown = 3f,
+
+							StopDuring = ShootBehavior.StopType.Attack,
+							Uninterruptible = true
+
+
+
+						},
+
+						NickName = "Homing",
+					},
+
+					new AttackBehaviorGroup.AttackGroupItem()
+					{
+						Probability = 1,
 						Behavior = new SummonEnemyViaWaveBehavior
 						{
 
@@ -340,6 +368,58 @@ namespace BotsMod
 			}
 		}
 
+		public class HomingScript : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
+		{
+			protected override IEnumerator Top() // This is just a simple example, but bullet scripts can do so much more.
+			{
+
+				if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
+				{
+					base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("6c43fddfd401456c916089fdd1c99b1c").bulletBank.GetBullet("sweep"));
+				}
+				for (int z = 0; z < 3; z++)
+				{
+					var num = UnityEngine.Random.Range(8, 10);
+					for (int i = 0; i < num; i++)
+					{
+
+						this.Fire(new Direction((360f / num) *i, DirectionType.Aim, -1f), new Speed(UnityEngine.Random.Range(5f, 8), SpeedType.Absolute), new Homing());
+						yield return this.Wait(2);
+					}
+					yield return this.Wait(16);
+				}
+				
+				yield break;
+			}
+		}
+
+		public class Homing : Bullet
+		{
+			public Homing() : base("sweep", false, false, false)
+			{
+
+			}
+			protected override IEnumerator Top()
+			{
+
+
+
+				for (int i = 0; i < 90; i++)
+				{
+					//ETGModConsole.Log("AAAAAAA");
+					float aim = this.GetAimDirection(1f, 16f);
+					float delta = BraveMathCollege.ClampAngle180(aim - this.Direction);
+					if (Mathf.Abs(delta) > 100f)
+					{
+						yield break;
+					}
+					this.Direction += Mathf.MoveTowards(0f, delta, 3f);
+					yield return this.Wait(1);
+				}
+				yield break;
+			}
+		}
+
 		public class OrbScript : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
 		{
 			protected override IEnumerator Top() // This is just a simple example, but bullet scripts can do so much more.
@@ -364,6 +444,7 @@ namespace BotsMod
 			{
 
 			}
+			
 		}
 
 		public class EnemyBehavior : BraveBehaviour
@@ -381,7 +462,8 @@ namespace BotsMod
 				
 				base.aiActor.healthHaver.OnPreDeath += (obj) =>
 				{
-					this.GetComponent<AIActor>()?.ParentRoom?.HandleRoomAction(RoomEventTriggerAction.END_TERRIFYING_AND_DARK);
+					base.aiActor.AdditionalSafeItemDrops.Add(PickupObjectDatabase.GetById(BotsItemIds.Relic1));
+					base.aiActor.ParentRoom?.HandleRoomAction(RoomEventTriggerAction.END_TERRIFYING_AND_DARK);
 				};
 				base.healthHaver.healthHaver.OnDeath += (obj) =>
 				{

@@ -4,22 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using GungeonAPI;
-using SaveAPI;
 
 
 namespace CustomCharacters
 {
+    [Serializable]
     public class CustomCharacterData
     {
+
         public PlayableCharacters baseCharacter = PlayableCharacters.Pilot;
-        public PlayableCharacters identity;
-        public CustomDungeonFlags unlockFlag;
+        public CustomPlayableCharacters identity;
         public string name, nameShort, nickname, nameInternal, pathForSprites, pathForAltSprites;
         public Dictionary<PlayerStats.StatType, float> stats;
         public List<Texture2D> sprites, altSprites, foyerCardSprites, punchoutSprites, punchoutFaceCards, loadoutSprites;
         public List<string> loadoutSpriteNames = new List<string>();
-        public Texture2D altPlayerSheet, playerSheet, minimapIcon, junkanWinPic, pastWinPic, altObjSprite1, altObjSprite2;
+        public Texture2D altPlayerSheet, playerSheet, minimapIcon, junkanWinPic, pastWinPic, altObjSprite1, altObjSprite2, coopDeathScreenIcon;
         public Texture2D faceCard;
         public List<Texture2D> bossCard = new List<Texture2D>();
         public List<Tuple<PickupObject, bool>> loadout, altGun;
@@ -29,40 +28,68 @@ namespace CustomCharacters
         public bool removeFoyerExtras;
         public bool useGlow;
         public Color emissiveColor;
-        public float emissiveColorPower, emissivePower, emissiveThresholdSensitivity;
-        public dfAtlas atlas;
+        public float emissiveColorPower, emissivePower;
 
-        public CustomCharacterController customCharacterController;
+        public Color altEmissiveColor;
+        public float altEmissiveColorPower, altEmissivePower;
+
+        public Func<PlayerController, float> coopBlankReplacement;
+
+        public Material glowMaterial, altGlowMaterial, normalMaterial;
+
+        //public CustomCharacterController customCharacterController;
 
         public Vector3 skinSwapperPos;
         public Vector3 foyerPos;
 
-        public tk2dSpriteAnimation altLibary;
-        public tk2dSpriteAnimation libary;
-
-        public tk2dSpriteAnimation armouredAltLibary;
-        public tk2dSpriteAnimation armouredLibary;
-
-        public tk2dSpriteAnimator altAnimator;
+        public DungeonPrerequisite[] prerequisites = new DungeonPrerequisite[0];
+        
+        public tk2dSpriteAnimation libary;      
         public tk2dSpriteAnimator animator;
-
         public tk2dSpriteCollectionData collection;
-        public tk2dSpriteCollectionData altCollection;
 
-        public tk2dSpriteCollectionData armouredCollection;
-        public tk2dSpriteCollectionData armouredAltCollection;
+        public tk2dSpriteAnimation altLibary;
+        public tk2dSpriteAnimator altAnimator;
+        public tk2dSpriteCollectionData altCollection;
 
         public CharacterSelectIdleDoer idleDoer;
 
         public List<Tuple<GameObject, Vector2>> randomFoyerBullshitNNAskedFor = new List<Tuple<GameObject, Vector2>>();
     }
 
+    class CustomCharacterFoyerController : MonoBehaviour
+    {
+        public int metaCost;
+        public bool useGlow;
+        public Color emissiveColor;
+        public float emissiveColorPower, emissivePower;
+        public CustomCharacterData data;
+
+    }
+
+    public class GlowMatDoer
+    {
+        public GlowMatDoer(Color emissiveColor, float emissiveColorPower, float emissivePower)
+        {
+            this.emissiveColor = emissiveColor;
+            this.emissiveColorPower = emissiveColorPower;
+            this.emissivePower = emissivePower;          
+        }
+        public Color emissiveColor;
+        public float emissiveColorPower, emissivePower;
+    }
+
     public class CustomCharacter : MonoBehaviour
     {
+        [SerializeField]
         public CustomCharacterData data;
         private bool checkedGuns = false;
-        private bool failedToFindData = false;
+        public bool failedToFindData = false;
         private List<int> infiniteGunIDs = new List<int>();
+       
+        public string past, overrideAnimation;
+        public bool hasPast;
+        
 
         void Start()
         {
@@ -74,7 +101,7 @@ namespace CustomCharacters
             }
         }
 
-        void GetData()
+        public bool GetData()
         {
             try
             {
@@ -88,8 +115,10 @@ namespace CustomCharacters
             catch
             {
                 failedToFindData = true;
+                return !failedToFindData;
             }
             if (data == null) failedToFindData = true;
+            return !failedToFindData;
         }
 
         public void StartInfiniteGunCheck()
@@ -101,14 +130,14 @@ namespace CustomCharacters
         {
             while (!checkedGuns)
             {
-                ToolsGAPI.Print("    Data check");
+                ToolsCharApi.Print("    Data check");
                 if (data == null)
                 {
-                    ToolsGAPI.PrintError("Couldn't find a character data object for this player!");
+                    ToolsCharApi.PrintError("Couldn't find a character data object for this player!");
                     yield return new WaitForSeconds(.1f);
                 }
 
-                ToolsGAPI.Print("    Loadout check");
+                ToolsCharApi.Print("    Loadout check");
                 var loadout = data.loadout;
                 if (loadout == null)
                 {
@@ -119,13 +148,13 @@ namespace CustomCharacters
                 var player = GetComponent<PlayerController>();
                 if (player?.inventory?.AllGuns == null)
                 {
-                    ToolsGAPI.PrintError("Player or inventory not found");
+                    ToolsCharApi.PrintError("Player or inventory not found");
                     yield return new WaitForSeconds(.1f);
                 }
-                ToolsGAPI.Print($"Doing infinite gun check on {player.name}");
+                ToolsCharApi.Print($"Doing infinite gun check on {player.name}");
 
                 this.infiniteGunIDs = GetInfiniteGunIDs();
-                ToolsGAPI.Print("    Gun check");
+                ToolsCharApi.Print("    Gun check");
                 foreach (var gun in player.inventory.AllGuns)
                 {
                     if (infiniteGunIDs.Contains(gun.PickupObjectId))
@@ -151,7 +180,7 @@ namespace CustomCharacters
                         gun.PersistsOnDeath = true;
                         gun.CanBeDropped = false;
                         gun.PreventStartingOwnerFromDropping = true;
-                        ToolsGAPI.Print($"        {gun.name} is infinite now.");
+                        ToolsCharApi.Print($"        {gun.name} is infinite now.");
                     }
                 }
                 checkedGuns = true;

@@ -98,6 +98,8 @@ namespace AmmonomiconAPI
             }
         }
 
+
+
         public static void PrintError<T>(T obj, string color = "FF0000")
         {
             ETGModConsole.Log($"<color=#{color}>[AmmonomiconAPI]: {obj.ToString()}</color>");
