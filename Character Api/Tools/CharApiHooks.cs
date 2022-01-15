@@ -184,6 +184,27 @@ namespace CustomCharacters
 			}
 		}
 
+		public static void Init(Action<PunchoutController> orig, PunchoutController self)
+		{
+
+			FieldInfo _isInitialized = typeof(PunchoutController).GetField("m_isInitialized", BindingFlags.NonPublic | BindingFlags.Instance);
+
+
+			if ((int)GameManager.Instance.PrimaryPlayer.characterIdentity > 10)
+            {
+				self.Player.SwapPlayer(new int?(6), false);
+				self.CoopCultist.gameObject.SetActive(GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER);
+				self.StartCoroutine(self.UiFadeInCR());
+				_isInitialized.SetValue(self, true);
+			}
+			else
+            {
+				orig(self);
+            }
+
+		}
+
+
 		private static string GetDeathPortraitNameHook(Func<AmmonomiconDeathPageController, string> orig, AmmonomiconDeathPageController self)
 		{
 			if ((int)GameManager.Instance.PrimaryPlayer.characterIdentity > 10 && GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacter>() != null)
