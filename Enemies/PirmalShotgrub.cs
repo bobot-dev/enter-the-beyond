@@ -152,7 +152,7 @@ namespace BotsMod
 						}
 				};
 
-				ETGModConsole.Log("3");
+				if (BotsModule.debugMode) ETGModConsole.Log("3");
 
 				bool flag3 = PrimalShotgrubCollection == null;
 				if (flag3)
@@ -232,7 +232,7 @@ namespace BotsMod
 
 				}
 
-				ETGModConsole.Log("4");
+				if (BotsModule.debugMode) ETGModConsole.Log("4");
 
 				var bs = prefab.GetComponent<BehaviorSpeculator>();
 				BehaviorSpeculator behaviorSpeculator = EnemyDatabase.GetOrLoadByGuid("044a9f39712f456597b9762893fbc19c").behaviorSpeculator;

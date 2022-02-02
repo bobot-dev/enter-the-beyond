@@ -111,6 +111,8 @@ namespace CustomCharacters
             FakePrefab.MarkAsFakePrefab(gameObject);
         }
 
+
+
         public static void CustomizeCharacter(PlayerController player, CustomCharacterData data, bool paradoxUsesSprites)
         {
             HandleStrings(player, data);
@@ -131,7 +133,7 @@ namespace CustomCharacters
 
             player.characterIdentity = (PlayableCharacters)data.identity;
 
-
+            player.OverridePlayerSwitchState = "Ninja";
             //AkSoundEngine.switch
 
             //AkSoundEngine.SetSwitch("CHR_Player", (player.OverridePlayerSwitchState == null) ? data.nameShort : player.OverridePlayerSwitchState, player.gameObject);
@@ -140,7 +142,7 @@ namespace CustomCharacters
             //AkSoundEngine.GetSwitch("CHR_Player", player.gameObject, out idk);
 
 
-            
+
 
             //BotsModule.Log((player.OverridePlayerSwitchState == null) ? data.nameShort : player.OverridePlayerSwitchState);
 

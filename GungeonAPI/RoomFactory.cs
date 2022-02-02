@@ -116,7 +116,7 @@ namespace GungeonAPI
                 AddExit(room, new Vector2(room.Width, room.Height / 2), DungeonData.Direction.EAST);
                 AddExit(room, new Vector2(0, room.Height / 2), DungeonData.Direction.WEST);
             }
-            ETGModConsole.Log("aaaa");
+            if (BotsModule.debugMode) ETGModConsole.Log("aaaa");
             if (roomData.musicState == "NONE")
             {
                 room.UseCustomMusicSwitch = false;
@@ -192,7 +192,7 @@ namespace GungeonAPI
                     ExpandPrefabs.CustomRoomTable2.includedRooms.elements.Add(ExpandRoomPrefabs.GenerateWeightedRoom(room, Weight.Value));*/
                 }
             }
-            ETGModConsole.Log(roomData.visualSubtypes.ToString());
+            if (BotsModule.debugMode) ETGModConsole.Log(roomData.visualSubtypes.ToString());
             room.overrideRoomVisualType = -1;//roomData.visualSubtypes;
 
             if (assignDecorationProperties)

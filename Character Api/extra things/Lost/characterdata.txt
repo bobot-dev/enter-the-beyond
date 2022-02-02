@@ -1,0 +1,29 @@
+#Lines starting with hashtags and empty lines are not read by the character loader
+
+#You HAVE to include these
+base: guide
+name short: Lost
+name: The Lost
+
+nickname: found
+
+#Set starting armor
+armor: 0
+
+<loadout>
+	bot:lost_sidearm
+	bot:wand
+	bot:lost_robe
+	
+
+</loadout>
+<altGuns>
+	bot:lost_sidearm_alt
+	bot:wand
+</altGuns>
+
+#This is an all-inclusive list of the stats available for changing
+#The default values are in the guide. It's in the workshop page downloads.
+<stats>
+
+</stats>

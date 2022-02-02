@@ -116,7 +116,180 @@ namespace CustomCharacters
 
             { "timefall", new Tuple<tk2dSpriteAnimationClip.WrapMode, int>( tk2dSpriteAnimationClip.WrapMode.Loop, 8) },
         };
-        #region aaaa
+
+        static Dictionary<string, Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]>> punchoutPlayerAnimInfo = new Dictionary<string, Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]>>
+        {
+            { "_idle", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Loop, 6, "idle", new int[] { 1, 1, 2, 4 } ) }, //1, 1, 2, 4
+
+            { "_punch_right", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 12, "punch_right", new int[] { 1, 2, 3 }) }, // 1, 2, 3
+            { "_punch_left", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 12, "punch_left", new int[] { 1, 2, 3 }) }, // 1, 2, 3
+
+            { "_punch_left_miss", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 6, "punch_blocked_left", new int[] { 2, 3 }) }, //1, 2
+            { "_punch_right_miss", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 6, "punch_blocked_right", new int[] { 2, 3 }) }, //1, 2
+
+            { "_punch_left_miss_far", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 6, "miss_left", new int[] { 2, 3 }) }, //2, 3
+            { "_punch_right_miss_far", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 6, "miss_right", new int[] { 2, 3 }) }, //2, 3
+
+            { "_hit_right", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 12, "hit_right", new int[] { 1, 2, 3, 3, 3 }) }, // 1, 2, 3, 3, 3
+            { "_hit_left", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 12, "hit_left", new int[] { 1, 2, 3, 3, 3 }) }, // 1, 2, 3, 3, 3
+
+            { "_super", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 12, "star", new int[] { 1, 1, 2, 2, 3, 3, 4, 5, 6, 6, 7, 7, 8, 8, 9, 9 }) }, // 1, 1, 2, 2, 3, 3, 4, 5, 6, 6, 7, 7, 8, 8, 9, 9
+            { "_super_final", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 8, "star", new int[] { 1, 1, 2, 2, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 6, 6, 7, 7, 8, 8, 9, 9 }) }, // 1, 1, 2, 2, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 6, 6, 7, 7, 8, 8, 9, 9
+
+            { "_dodge_left", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 10, "dodge_left", new int[] { 1, 1, 2, 2 }) }, // 1, 1, 2, 2
+            { "_dodge_right", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 10, "dodge_right", new int[] { 1, 1, 2, 2 }) }, // 1, 1, 2, 2
+
+            { "_block", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 10, "block", new int[] { 1, 2, 2, 2 , 2, 2 }) }, // 1, 2, 2, 2 , 2, 2
+
+            { "_block_hit", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 5, "block_hit", new int[] { 1, 1 }) }, // 1, 1
+
+            { "_duck", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Once, 10,"duck", new int[] { 1, 1, 2, 2, 2, 2, 2 }) }, // 2, 2, 3, 3, 3, 3, 3            
+
+            { "_exhaust", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Loop, 4, "exhaust", new int[] { 1, 2, 2, 3 }) },// 1, 2, 2, 3
+            { "_knockout", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.LoopSection, 10, "knockout", new int[] { 1, 2, 3, 4, 5, 6, 7 }) }, // start at 6. 1, 2, 3, 4, 5, 6, 7
+
+            { "_win", new Tuple<tk2dSpriteAnimationClip.WrapMode, int, string, int[]> ( tk2dSpriteAnimationClip.WrapMode.Loop, 4, "win", new int[] { 1, 2, 3, 4, 5, 6 }) }, // 1, 2, 3, 4, 5, 6
+        };
+
+        public static void SetupLitterallyEverythingForPunchOut2(CustomCharacterData data)
+        {
+            if (data.baseCharacter != PlayableCharacters.CoopCultist || data.baseCharacter != PlayableCharacters.Eevee || data.baseCharacter != PlayableCharacters.Cosmonaut || data.baseCharacter != PlayableCharacters.Ninja)
+            {
+                var player = ResourceManager.LoadAssetBundle("enemies_base_001").LoadAsset<GameObject>("MetalGearRat").GetComponent<AIActor>().GetComponent<MetalGearRatDeathController>().PunchoutMinigamePrefab.GetComponent<PunchoutController>().Player;
+                var libary = player.gameObject.GetComponent<tk2dSpriteAnimator>().Library;
+                var collection = libary.clips[0].frames[0].spriteCollection;
+                var baseName = GetPlayerStringFromIdentity(data.baseCharacter);
+                if (data.punchoutFaceCards != null && data.punchoutFaceCards.Count > 0)
+                {
+                    for (int i = 0; i < data.punchoutFaceCards.Count; i++)
+                    {
+                        player.PlayerUiSprite.Atlas.AddNewItemToAtlas(data.punchoutFaceCards[i], $"punch_player_health_{data.nameShort.ToLower()}_00{i + 1}");
+                    }
+                }
+                //ETGModConsole.Log("added to atlas");
+                var defMatches = collection.spriteDefinitions.Where(def => def.name.Contains(baseName)).Select(def => def);
+                List<int> ids = new List<int>();
+                //ETGModConsole.Log("pre foreach");
+                bool h = false;
+                foreach (var def in defMatches)
+                {
+                    //.Log(def.name.Replace(baseName, data.nameShort.ToLower()) +": " + data.punchoutSprites.Where(sprite => sprite.Key == (def.name.Replace(baseName, data.nameShort.ToLower()))).Select(sprite => sprite).Count().ToString());
+                    var id = AddSpriteToCollection(data.punchoutSprites.Where(sprite => sprite.Key == (def.name.Replace(baseName, data.nameShort.ToLower()))).First().Value, collection);
+                    if (!h)
+                    {
+                        ToolsCharApi.ExportTexture(collection.spriteDefinitions[id].material.mainTexture.GetReadable(), "ihateyou", "zatherzyoulittlefucker");
+                        h = true;
+                    }
+                    collection.spriteDefinitions[id].CopyToSelf(def);
+                    //ETGModConsole.Log(collection.spriteDefinitions[id].name);
+                    ids.Add(id);
+
+                }
+                //ETGModConsole.Log("added to collectiom");
+                var animMatches = libary.clips.Where(clip => clip.name.Contains(baseName)).Select(clip => clip);
+                
+                foreach (var clip in animMatches)
+                {
+                    var newClip = new tk2dSpriteAnimationClip();
+
+                    newClip.CopyFrom(clip);
+                    newClip.name = newClip.name.Replace(baseName, data.nameShort.ToLower());
+
+                    foreach (var frame in newClip.frames)
+                    {
+                        frame.spriteId = collection.spriteDefinitions.IndexOf(collection.spriteDefinitions.Where(def => def.name == collection.spriteDefinitions[frame.spriteId].name.Replace(baseName, data.nameShort.ToLower())).First());
+                    }
+                    //ETGModConsole.Log(newClip.name);
+                    libary.clips = libary.clips.Concat(new tk2dSpriteAnimationClip[] { newClip }).ToArray();
+                }
+
+                
+            }
+
+        }
+
+        public static string GetPlayerStringFromIdentity(PlayableCharacters identity)
+        {
+            if (identity == PlayableCharacters.Guide)
+            {
+                return "hunter";
+            }
+            else if (identity == PlayableCharacters.Soldier)
+            {
+                return "marine";
+            }
+            else if (identity == PlayableCharacters.Gunslinger)
+            {
+                return "slinger";
+            }
+            else
+            {
+                return identity.ToString().ToLower();
+            }
+        }
+
+
+        public static void SetupLitterallyEverythingForPunchOut(PlayerController player, CustomCharacterData data)
+        {
+
+           
+            Dictionary<string, int> spriteIds = new Dictionary<string, int>();
+
+            var libary = ResourceManager.LoadAssetBundle("enemies_base_001").LoadAsset<GameObject>("MetalGearRat").GetComponent<AIActor>().GetComponent<MetalGearRatDeathController>().PunchoutMinigamePrefab.GetComponent<PunchoutController>().Player.gameObject.GetComponent<tk2dSpriteAnimator>().Library;
+            var collection = libary.clips[0].frames[0].spriteCollection;
+
+
+            foreach (var sprite in data.punchoutSprites)
+            {
+                var id = AddSpriteToCollection(sprite.Value, collection);
+
+                collection.spriteDefinitions[id].position0 = collection.spriteDefinitions[collection.GetSpriteIdByName(sprite.Key.Replace(data.nameShort.ToLower(), "hunter"))].position0;
+                collection.spriteDefinitions[id].position1 = collection.spriteDefinitions[collection.GetSpriteIdByName(sprite.Key.Replace(data.nameShort.ToLower(), "hunter"))].position1;
+                collection.spriteDefinitions[id].position2 = collection.spriteDefinitions[collection.GetSpriteIdByName(sprite.Key.Replace(data.nameShort.ToLower(), "hunter"))].position2;
+                collection.spriteDefinitions[id].position3 = collection.spriteDefinitions[collection.GetSpriteIdByName(sprite.Key.Replace(data.nameShort.ToLower(), "hunter"))].position3;
+
+                spriteIds.Add(sprite.Key, id);
+            }
+
+
+            var matches = spriteIds.Where(pair => pair.Key.Contains("_punch_win_")).Select(pair => pair.Key);
+
+
+            foreach (var info in punchoutPlayerAnimInfo)
+            {
+                List<int> ids = new List<int>();
+
+                if (info.Key != "_win")
+                {
+                    foreach (var num in info.Value.Item4)
+                    {
+                        //ETGModConsole.Log($"{data.nameShort.ToLower()}_punch_{info.Value.Item3}_00{num}");
+                        ids.Add(spriteIds[$"{data.nameShort.ToLower()}_punch_{info.Value.Item3}_00{num}"]);
+
+                    }
+                }
+                else
+                {
+                    foreach(var key in matches)
+                    {
+                        ids.Add(spriteIds[key]);
+                    }
+                }
+
+                
+                var anim = AddAnimation(libary, collection, ids, $"{data.nameShort.ToLower()}{info.Key}", info.Value.Item1, info.Value.Item2);
+
+                if (info.Key == "_knockout")
+                {
+                    anim.loopStart = 6;
+                }
+            }
+
+            //foreach (var anim in libary.clips)
+            //{
+                //ETGModConsole.Log(anim.name);
+            //}
+        }
 
         public static tk2dSpriteAnimationClip AddAnimation(tk2dSpriteAnimator animator, tk2dSpriteCollectionData collection, List<int> spriteIDs,
             string clipName, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, float fps = 15)
@@ -158,6 +331,39 @@ namespace CustomCharacters
             clip.frames = frames.ToArray();
             return clip;
         }
+
+        public static tk2dSpriteAnimationClip AddAnimation(tk2dSpriteAnimation animaton, tk2dSpriteCollectionData collection, List<int> spriteIDs,
+            string clipName, tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop, float fps = 15)
+        {
+            ////BotsMod.BotsModule.Log("a2");
+            List<tk2dSpriteAnimationFrame> frames = new List<tk2dSpriteAnimationFrame>();
+            for (int i = 0; i < spriteIDs.Count; i++)
+            {
+                ////BotsMod.BotsModule.Log("a2.25");
+                tk2dSpriteDefinition sprite = collection.spriteDefinitions[spriteIDs[i]];
+                if (sprite.Valid)
+                {
+                    ////BotsMod.BotsModule.Log("a2.5");
+                    frames.Add(new tk2dSpriteAnimationFrame()
+                    {
+                        spriteCollection = collection,
+                        spriteId = spriteIDs[i]
+                    });
+                }
+            }
+            ////BotsMod.BotsModule.Log("a3");
+            var clip = new tk2dSpriteAnimationClip()
+            {
+                name = clipName,
+                fps = fps,
+                wrapMode = wrapMode,
+            };
+            Array.Resize(ref animaton.clips, animaton.clips.Length + 1);
+            animaton.clips[animaton.clips.Length - 1] = clip;
+
+            clip.frames = frames.ToArray();
+            return clip;
+        }
         public static void HandleSprites(PlayerController player, CustomCharacterData data)
         {
             if (data.minimapIcon != null)
@@ -185,17 +391,21 @@ namespace CustomCharacters
             if (data.faceCard != null)
                 HandleFacecards(player, data);
 
-            if (data.punchoutFaceCards != null && data.punchoutFaceCards.Count > 0)
-                HandlePunchoutFaceCards(data);
-
+            if (data.punchoutSprites != null && data.punchoutSprites.Count > 0)
+            {
+                //ETGModConsole.Log("pre punchout setup");
+                SetupLitterallyEverythingForPunchOut2(data);
+            }
+                
 
             if (data.loadoutSprites != null)
                 HandleLoudoutSprites(player, data);
 
             if (data.coopDeathScreenIcon != null)
             {
-                ETGModConsole.Log($"\"coop_page_death_{data.nameShort}_001\" added");
-                ToolsCharApi.LoadAssetFromAnywhere<GameObject>("Ammonomicon Atlas").GetComponent<dfAtlas>().AddNewItemToAtlas(data.coopDeathScreenIcon, $"coop_page_death_{data.nameShort}_001");
+                //ETGModConsole.Log($"\"coop_page_death_{data.nameShort.ToLower()}_001\" added");
+                uiAtlas.AddNewItemToAtlas(data.coopDeathScreenIcon, $"coop_page_death_{data.nameShort.ToLower()}_001");
+                ToolsCharApi.ExportTexture(ToolsCharApi.LoadAssetFromAnywhere<GameObject>("Ammonomicon Atlas").GetComponent<dfAtlas>().Texture.GetReadable(), "ihateyou", "YoumadeashitofpiecewithyourtrashMTG");
             }
                 
 
@@ -237,7 +447,7 @@ namespace CustomCharacters
                 
                 data.loadoutSpriteNames.Add(data.loadoutSprites[i].name.Replace(" ", "_"));
             }
-            ToolsCharApi.ExportTexture(uiAtlas.Texture, "SpriteDump/" + "atlasthingo");
+
         }
 
         /// <summary>
@@ -246,7 +456,8 @@ namespace CustomCharacters
         /// <returns>A new sprite definition with the given texture</returns>
         public static tk2dSpriteDefinition ConstructDefinition(Texture2D texture, Material overrideMat = null)
         {
-            RuntimeAtlasSegment ras = ETGMod.Assets.Packer.Pack(texture); //pack your resources beforehand or the outlines will turn out weird
+            RuntimeAtlasSegment ras = ETGMod.Assets.Packer.Pack(texture, true); //pack your resources beforehand or the outlines will turn out weird
+
             Material material = null;
             if (overrideMat != null)
             {
@@ -566,40 +777,49 @@ namespace CustomCharacters
 
                                 var anim = SpriteHandler.AddAnimation(data.animator, data.collection, spriteIds, dirName, playerAnimInfo[dirName.Replace("_armorless", "")].First, playerAnimInfo[dirName.Replace("_armorless", "")].Second);
 
-                                #endregion
                                 for (int i = 0; i <= anim.frames.Length; i++)
                                 {
-                                    if (anim.name.StartsWith("run_"))
+                                    if (anim.name.Contains("run_"))
                                     {
                                         if (i == 2 || i == 5)
                                         {
+                                           // ETGModConsole.Log($"({anim.frames.Length}){anim.name} [{i}]: Play_FS");
                                             anim.frames[i].eventAudio = "Play_FS";
+                                            anim.frames[i].triggerEvent = true;
                                         }
                                     }
                                     if (anim.name == "pitfall" || anim.name == "pitfall_down")
                                     {
                                         if (i == 0)
                                         {
+                                           // ETGModConsole.Log($"({anim.frames.Length}){anim.name} [{i}]: Play_Fall");
                                             anim.frames[i].eventAudio = "Play_Fall";
+                                            anim.frames[i].triggerEvent = true;
                                         }
                                     }
                                     if (anim.name == "pitfall_return")
                                     {
                                         if (i == 0)
                                         {
+                                           // ETGModConsole.Log($"({anim.frames.Length}){anim.name} [{i}]: Play_Respawn");
                                             anim.frames[i].eventAudio = "Play_Respawn";
+                                            anim.frames[i].triggerEvent = true;
                                         }
                                     }
 
-                                    if (anim.name.StartsWith("dodge"))
+                                    if (anim.name.Contains("dodge"))
                                     {
                                         if (i == 0)
                                         {
+                                           // ETGModConsole.Log($"({anim.frames.Length}){anim.name} [{i}]: Play_Leap");
                                             anim.frames[i].eventAudio = "Play_Leap";
+                                            anim.frames[i].triggerEvent = true;
                                         }
                                         if (i == 5)
                                         {
+                                           // ETGModConsole.Log($"({anim.frames.Length}){anim.name} [{i}]: Play_Roll");
                                             anim.frames[i].eventAudio = "Play_Roll";
+                                            anim.frames[i].triggerEvent = true;
                                         }
                                     }
 
@@ -607,15 +827,21 @@ namespace CustomCharacters
                                     {
                                         if (i == 0)
                                         {
+                                           // ETGModConsole.Log($"({anim.frames.Length}){anim.name} [{i}]: Play_CHR_boot_stairs_01");
                                             anim.frames[i].eventAudio = "Play_CHR_boot_stairs_01";
+                                            anim.frames[i].triggerEvent = true;
                                         }
                                     }
 
                                     if (anim.name == "pet")
                                     {
-                                        if (i == 0)
+                                        
+
+                                        if (i == 0)                                            
                                         {
+                                           // ETGModConsole.Log($"({anim.frames.Length}){anim.name} [{i}]: Play_CHR_fool_voice_01");
                                             anim.frames[i].eventAudio = "Play_CHR_fool_voice_01";
+                                            anim.frames[i].triggerEvent = true;
                                         }
                                     }
                                 }
@@ -1234,7 +1460,7 @@ namespace CustomCharacters
             uiFaceCards.Add(sprite);
         }
 
-        public static void HandlePunchoutSprites(PunchoutPlayerController player, CustomCharacterData data)
+        /*public static void HandlePunchoutSprites(PunchoutPlayerController player, CustomCharacterData data)
         {
             var primaryPlayer = GameManager.Instance.PrimaryPlayer;
             player.PlayerUiSprite.Atlas = uiAtlas;
@@ -1250,7 +1476,7 @@ namespace CustomCharacters
                 }
 
             }
-        }
+        }*/
 
         public static void HandlePunchoutFaceCards(CustomCharacterData data)
         {
@@ -1262,7 +1488,7 @@ namespace CustomCharacters
                 int count = Mathf.Min(data.punchoutFaceCards.Count, 3);
                 for (int i = 0; i < count; i++)
                 {
-                    var sprite = uiAtlas.AddNewItemToAtlas(data.punchoutFaceCards[i], data.nameInternal + "_punchout_facecard" + (i + 1));
+                    var sprite = uiAtlas.AddNewItemToAtlas(data.punchoutFaceCards[i], $"punch_player_health_{data.nameShort.ToLower()}_00{i + 1}");
                     //dfAtlas.ItemInfo info = new dfAtlas.ItemInfo();
                     //info.name = data.nameInternal + "_punchout_facecard" + (i + 1);
                     //info.region = TextureStitcher.AddFaceCardToAtlas(data.punchoutFaceCards[i], atlasTex, uiFaceCards.Count, uiFacecardBounds);
@@ -1292,10 +1518,10 @@ namespace CustomCharacters
 
             foreach (var tex in data.punchoutSprites)
             {
-                var def = copyCollection.GetSpriteDefinition(tex.name);
+                var def = copyCollection.GetSpriteDefinition(tex.Value.name);
                 if (def != null)
                 {
-                    def.ReplaceTexture(tex.CropWhiteSpace());
+                    def.ReplaceTexture(tex.Value.CropWhiteSpace());
                 }
             }
 
@@ -1334,9 +1560,6 @@ namespace CustomCharacters
 
         public static tk2dSpriteDefinition Copy(this tk2dSpriteDefinition orig)
         {
-
-
-
             tk2dSpriteDefinition copy = new tk2dSpriteDefinition()
             {
                 boundsDataCenter = orig.boundsDataCenter,
@@ -1350,9 +1573,9 @@ namespace CustomCharacters
                 extractRegion = orig.extractRegion,
                 flipped = orig.flipped,
                 indices = orig.indices,
-                //material = new Material(orig.material),
+                material = orig.material ? new Material(orig.material) : null,
                 materialId = orig.materialId,
-                //materialInst = new Material(orig.materialInst),
+                materialInst = orig.materialInst ? new Material(orig.materialInst) : null,
                 metadata = orig.metadata,
                 name = orig.name,
                 normals = orig.normals,
@@ -1371,59 +1594,40 @@ namespace CustomCharacters
                 untrimmedBoundsDataExtents = orig.untrimmedBoundsDataExtents,
                 uvs = orig.uvs
             };
-
-            if (orig.material != null)
-            {                 
-                copy.material = new Material(orig.material);
-            }
-           
-            if (orig.materialInst != null)
-            {
-                
-                copy.materialInst = new Material(orig.materialInst);
-            }
-            
-
-
             return copy;
         }
 
-        public static tk2dSpriteDefinition Copy(this tk2dSpriteDefinition orig, bool ignoreMat)
+        public static tk2dSpriteDefinition CopyToSelf(this tk2dSpriteDefinition self, tk2dSpriteDefinition targetToCopy)
         {
-            tk2dSpriteDefinition copy = new tk2dSpriteDefinition()
-            {
-                boundsDataCenter = orig.boundsDataCenter,
-                boundsDataExtents = orig.boundsDataExtents,
-                colliderConvex = orig.colliderConvex,
-                colliderSmoothSphereCollisions = orig.colliderSmoothSphereCollisions,
-                colliderType = orig.colliderType,
-                colliderVertices = orig.colliderVertices,
-                collisionLayer = orig.collisionLayer,
-                complexGeometry = orig.complexGeometry,
-                extractRegion = orig.extractRegion,
-                flipped = orig.flipped,
-                indices = orig.indices,
-
-                metadata = orig.metadata,
-                name = orig.name,
-                normals = orig.normals,
-                physicsEngine = orig.physicsEngine,
-                position0 = orig.position0,
-                position1 = orig.position1,
-                position2 = orig.position2,
-                position3 = orig.position3,
-                regionH = orig.regionH,
-                regionW = orig.regionW,
-                regionX = orig.regionX,
-                regionY = orig.regionY,
-                tangents = orig.tangents,
-                texelSize = orig.texelSize,
-                untrimmedBoundsDataCenter = orig.untrimmedBoundsDataCenter,
-                untrimmedBoundsDataExtents = orig.untrimmedBoundsDataExtents,
-                uvs = orig.uvs
-            };
-            return copy;
+            self.colliderConvex = targetToCopy.colliderConvex;
+            self.colliderSmoothSphereCollisions = targetToCopy.colliderSmoothSphereCollisions;
+            self.colliderType = targetToCopy.colliderType;
+            self.colliderVertices = targetToCopy.colliderVertices;
+            self.collisionLayer = targetToCopy.collisionLayer;
+            //self.complexGeometry = targetToCopy.complexGeometry;
+            //self.extractRegion = targetToCopy.extractRegion;
+            //self.flipped = targetToCopy.flipped;
+            self.indices = targetToCopy.indices;
+            self.material.shader = targetToCopy.material?.shader != null ? targetToCopy.material?.shader : self.material.shader;
+            //self.materialId = targetToCopy.materialId;
+            self.materialInst.shader = targetToCopy.materialInst?.shader != null ? targetToCopy.materialInst?.shader : self.materialInst.shader;
+            self.metadata = targetToCopy.metadata;
+            //self.normals = targetToCopy.normals;
+            self.physicsEngine = targetToCopy.physicsEngine;
+            self.position0 = targetToCopy.position0;
+            self.position1 = targetToCopy.position1;
+            self.position2 = targetToCopy.position2;
+            self.position3 = targetToCopy.position3;
+            //self.regionH = targetToCopy.regionH;
+            //self.regionW = targetToCopy.regionW;
+            //self.regionX = targetToCopy.regionX;
+            //self.regionY = targetToCopy.regionY;
+            //self.tangents = targetToCopy.tangents;
+            //self.texelSize = targetToCopy.texelSize;
+            //self.uvs = targetToCopy.uvs;//
+            return self;
         }
+
 
         public static tk2dSpriteAnimationClip CopyOf(tk2dSpriteAnimationClip orig)
         {
@@ -1442,15 +1646,28 @@ namespace CustomCharacters
             collection.InitDictionary(); //InitDictionary only runs if the dictionary is null
             return newDefs.Length - 1;
         }
-
-
-        public class ReplacedCharacterData
-        {
-            public PlayableCharacters baseCharacter;
-            public int origMapIconID = -1;
-            public int replaceMapIconID = -1;
-            public tk2dSpriteCollectionData origPlayerCollection;
-            public tk2dSpriteCollectionData replacePlayerCollection;
-        }
     }
+
+    public sealed class Tuple<T1, T2, T3, T4>
+    {
+        
+        public Tuple(T1 item1, T2 item2, T3 item3, T4 item4)
+        {
+            Item1 = item1;
+            Item2 = item2;
+            Item3 = item3;
+            Item4 = item4;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[{0}, {1}, {2}, {3}]", this.Item1, this.Item2, this.Item3, this.Item4);
+        }
+
+        public T1 Item1;
+        public T2 Item2;
+        public T3 Item3;
+        public T4 Item4;
+    }
+
 }

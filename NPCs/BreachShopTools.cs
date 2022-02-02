@@ -85,7 +85,7 @@ namespace NpcApi
                 }
                 catch (Exception e)
                 {
-                    BotsMod.BotsModule.Log(e.ToString(), "FF0000");
+                    BotsMod.BotsModule.Log(e.ToString(), "FF0000", false);
                 }
             }
         }

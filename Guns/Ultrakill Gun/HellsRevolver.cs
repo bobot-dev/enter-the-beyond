@@ -22,8 +22,8 @@ namespace BotsMod
 			Gun gun = ETGMod.Databases.Items.NewGun("Hell's Revolver", "hells_revolver");
 			Game.Items.Rename("outdated_gun_mods:hell's_revolver", "bot:hells_revolver");
 			var meNeedMakeCoin = gun.gameObject.AddComponent<HellsRevolver>();
-			gun.SetShortDescription("fuck you gabrial");
-			gun.SetLongDescription("MANKIND IS DEAD \nBLOOD IS FUEL \nHELL IS FULL");
+			gun.SetShortDescription("Blodd is Fuel");
+			gun.SetLongDescription("This weapon uses blood of fallen foes to genrate ammo.\n\nA powerful revolver once used by a war robot fighting it's way through bullet hell.");
 
 			gun.SetupSprite(null, "hells_revolver_idle_001", 8);
 			gun.SetAnimationFPS(gun.shootAnimation, 12);

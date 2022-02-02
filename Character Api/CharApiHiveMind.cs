@@ -85,7 +85,6 @@ namespace CustomCharacters
 
         private static IEnumerator Open(ArkController self, PlayerController interactor)
         {
-			ETGModConsole.Log("open called");
             for (int i = 0; i < GameManager.Instance.AllPlayers.Length; i++)
             {
                 if (GameManager.Instance.AllPlayers[i].healthHaver.IsAlive)
@@ -116,7 +115,6 @@ namespace CustomCharacters
 		private static IEnumerator HandleClockhair(ArkController self, PlayerController interactor)
 		{
 
-			ETGModConsole.Log("HandleClockhair called");
 			FieldInfo _heldPastGun = typeof(ArkController).GetField("m_heldPastGun", BindingFlags.NonPublic | BindingFlags.Instance);
 
 			Transform clockhairTransform = ((GameObject)UnityEngine.Object.Instantiate(BraveResources.Load("Clockhair", ".prefab"))).transform;
@@ -135,7 +133,7 @@ namespace CustomCharacters
 			while (elapsed < duration)
 			{
 				typeof(ArkController).GetMethod("UpdateCameraPositionDuringClockhair", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { interactor.CenterPosition });
-				ETGModConsole.Log("UpdateCameraPositionDuringClockhair called");
+				
 
 				if (GameManager.INVARIANT_DELTA_TIME == 0f)
 				{
@@ -153,9 +151,7 @@ namespace CustomCharacters
 				{
 					ETGModConsole.Log("clockhairTargetPosition null");
 				}
-				ETGModConsole.Log("GetTargetClockhairPosition about to be called");
 				clockhairTargetPosition = (Vector2)typeof(ArkController).GetMethod("GetTargetClockhairPosition", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { currentInput, clockhairTargetPosition });
-				ETGModConsole.Log("GetTargetClockhairPosition called");
 				//clockhairTargetPosition = self.GetTargetClockhairPosition(currentInput, clockhairTargetPosition);
 				Vector3 currentPosition = Vector3.Slerp(clockhairStartPosition, clockhairTargetPosition, smoothT);
 				clockhairTransform.position = currentPosition.WithZ(0f);
@@ -172,7 +168,6 @@ namespace CustomCharacters
 				}
 				clockhair.sprite.UpdateZDepth();
 				typeof(ArkController).GetMethod("PointGunAtClockhair", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { interactor, clockhairTransform });
-				ETGModConsole.Log("PointGunAtClockhair called");
 				yield return null;
 			}
 			clockhair.SetMotionType(1f);
@@ -185,24 +180,19 @@ namespace CustomCharacters
 			for (; ; )
 			{
 				typeof(ArkController).GetMethod("UpdateCameraPositionDuringClockhair", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { interactor.CenterPosition });
-				ETGModConsole.Log("UpdateCameraPositionDuringClockhair called");
 				clockhair.transform.position = clockhair.transform.position - lastJitterAmount;
 				clockhair.transform.position = (Vector2)typeof(ArkController).GetMethod("GetTargetClockhairPosition", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { currentInput, clockhair.transform.position.XY() });
-				ETGModConsole.Log("GetTargetClockhairPosition called");
 				clockhair.sprite.UpdateZDepth();
 				bool isTargetingValidTarget = (bool)typeof(ArkController).GetMethod("CheckPlayerTarget", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { GameManager.Instance.PrimaryPlayer, clockhairTransform });
-				ETGModConsole.Log("CheckPlayerTarget called");
 				shotPlayer = GameManager.Instance.PrimaryPlayer;
 				if (!isTargetingValidTarget && GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
 				{
 					isTargetingValidTarget = (bool)typeof(ArkController).GetMethod("CheckPlayerTarget", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { GameManager.Instance.SecondaryPlayer, clockhairTransform });
-					ETGModConsole.Log("CheckPlayerTarget called");
 					shotPlayer = GameManager.Instance.SecondaryPlayer;
 				}
 				if (!isTargetingValidTarget && GameStatsManager.Instance.AllCorePastsBeaten())
 				{
 					isTargetingValidTarget = (bool)typeof(ArkController).GetMethod("CheckHellTarget", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { self.HellCrackSprite, clockhairTransform });
-					ETGModConsole.Log("CheckHellTarget called");
 					didShootHellTrigger = isTargetingValidTarget;
 				}
 				if (isTargetingValidTarget)
@@ -370,7 +360,7 @@ namespace CustomCharacters
 			yield break;
 		}
 
-		public static float version = 1.0f;
+		public static float version = 1.1f;
 
         public static string modPrefix;
         public string modPrefixInternal;

@@ -22,7 +22,7 @@ namespace CustomCharacters
 			try
 			{
 
-				Hook getNicknamehook = new Hook(
+				/*Hook getNicknamehook = new Hook(
 				    typeof(StringTableManager).GetMethod("GetTalkingPlayerNick", BindingFlags.NonPublic | BindingFlags.Static),
 				    typeof(Hooks).GetMethod("GetTalkingPlayerNickHook")
 				);
@@ -30,7 +30,7 @@ namespace CustomCharacters
 				Hook getNamehook = new Hook(
 				    typeof(StringTableManager).GetMethod("GetTalkingPlayerName", BindingFlags.NonPublic | BindingFlags.Static),
 				   typeof(Hooks).GetMethod("GetTalkingPlayerNameHook")
-				);
+				);*/
 
 				Hook getValueHook = new Hook(
 					typeof(dfLanguageManager).GetMethod("GetValue", BindingFlags.Public | BindingFlags.Instance),
@@ -38,12 +38,12 @@ namespace CustomCharacters
 				);
 
 				
-				Hook punchoutUIHook = new Hook(
+				/*Hook punchoutUIHook = new Hook(
 					typeof(PunchoutPlayerController).GetMethod("UpdateUI", BindingFlags.Public | BindingFlags.Instance),
 					typeof(Hooks).GetMethod("PunchoutUpdateUI")
-				);
+				); */
 
-				Hook foyerCallbacksHook = new Hook(
+				 Hook foyerCallbacksHook = new Hook(
 					typeof(Foyer).GetMethod("SetUpCharacterCallbacks", BindingFlags.NonPublic | BindingFlags.Instance),
 					typeof(Hooks).GetMethod("FoyerCallbacks2")
 
@@ -174,6 +174,11 @@ namespace CustomCharacters
 					typeof(Hooks).GetMethod("GetDeathPortraitNameHook", BindingFlags.Static | BindingFlags.NonPublic)
 				);
 
+				Hook InitHook = new Hook(
+					typeof(PunchoutController).GetMethod("Init", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("InitHook", BindingFlags.Static | BindingFlags.Public)
+				);
+
 				Hook hook3 = new Hook(typeof(PlayerController).GetProperty("LocalShaderName", BindingFlags.Instance | BindingFlags.Public).GetGetMethod(), typeof(Hooks).GetMethod("LocalShaderNameGetHook"));
 
 				//BotsModule.Log("hooks done");
@@ -184,18 +189,72 @@ namespace CustomCharacters
 			}
 		}
 
-		public static void Init(Action<PunchoutController> orig, PunchoutController self)
+		//one hook in and im already at the point of wanting to punch my screen thats gotta be a new record!! Update its like 3? (i think, ive lost track couldve been a week) days later and i can say it got worse 
+		public static void InitHook(Action<PunchoutController> orig, PunchoutController self)
 		{
-
+			//ETGModConsole.Log("InitHook 0");
 			FieldInfo _isInitialized = typeof(PunchoutController).GetField("m_isInitialized", BindingFlags.NonPublic | BindingFlags.Instance);
-
-
-			if ((int)GameManager.Instance.PrimaryPlayer.characterIdentity > 10)
+			FieldInfo _PlayerNames = typeof(PunchoutPlayerController).GetField("PlayerNames", BindingFlags.NonPublic | BindingFlags.Static);
+			FieldInfo _PlayerUiNames = typeof(PunchoutPlayerController).GetField("PlayerUiNames", BindingFlags.NonPublic | BindingFlags.Static);
+			//ETGModConsole.Log("InitHook 1");
+			if ((int)GameManager.Instance.PrimaryPlayer.characterIdentity > 10 && GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacter>() != null)
             {
-				self.Player.SwapPlayer(new int?(6), false);
+				var name = GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacter>().data.nameShort.ToLower();
+
+				if (!((_PlayerNames.GetValue(null) as string[]).Contains("eevee")))
+				{
+					var fuckFuckFuck = (_PlayerNames.GetValue(null) as string[]).ToList();
+					fuckFuckFuck.Add("eevee");
+					_PlayerNames.SetValue(null, fuckFuckFuck.ToArray());
+
+					var fuckFuckFuckShit = (_PlayerUiNames.GetValue(null) as string[]).ToList();
+					fuckFuckFuckShit.Add($"punch_player_health_eevee_00");
+					_PlayerUiNames.SetValue(null, fuckFuckFuckShit.ToArray());
+				}
+
+
+				if (!((_PlayerNames.GetValue(null) as string[]).Contains(name)))
+                {
+					var fuckFuckFuck = (_PlayerNames.GetValue(null) as string[]).ToList();
+					fuckFuckFuck.Add(name);
+					_PlayerNames.SetValue(null, fuckFuckFuck.ToArray());
+
+					var fuckFuckFuckShit = (_PlayerUiNames.GetValue(null) as string[]).ToList();
+					fuckFuckFuckShit.Add($"punch_player_health_{name}_00");
+					_PlayerUiNames.SetValue(null, fuckFuckFuckShit.ToArray());
+
+
+					CustomCharacter.punchoutBullShit.Add(name, (_PlayerUiNames.GetValue(null) as string[]).Length - 1);
+				}
+
+
+
+
+				//ETGModConsole.Log("InitHook 1.5");
+				//ETGModConsole.Log(PunchoutPlayerController.PlayerNames.Length.ToString());
+				self.Player.SwapPlayer(new int?(CustomCharacter.punchoutBullShit[name]), false);
+				//ETGModConsole.Log("InitHook 2");
+
 				self.CoopCultist.gameObject.SetActive(GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER);
-				self.StartCoroutine(self.UiFadeInCR());
+				//ETGModConsole.Log("InitHook 3");
+				self.StartCoroutine(self.GetType().GetMethod("UiFadeInCR", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null) as IEnumerator);
 				_isInitialized.SetValue(self, true);
+
+				if ((int)GameManager.Instance.PrimaryPlayer?.characterIdentity > 10 && GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacter>() != null)
+				{
+					if (GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacter>().data.useGlow)
+					{
+						if (GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacter>().data.glowMaterial != null)
+						{
+							if (GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacter>().data.glowMaterial.GetTexture("_MainTex") != self.Player.sprite.renderer.material.GetTexture("_MainTex"))
+							{
+								GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacter>().data.glowMaterial.SetTexture("_MainTexture", self.Player.sprite.renderer.material.GetTexture("_MainTex"));
+							}
+							self.Player.sprite.renderer.material = GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacter>().data.glowMaterial;
+						}
+					}
+					self.Player.sprite.usesOverrideMaterial = true;
+				}
 			}
 			else
             {
@@ -209,8 +268,8 @@ namespace CustomCharacters
 		{
 			if ((int)GameManager.Instance.PrimaryPlayer.characterIdentity > 10 && GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacter>() != null)
             {
-				ETGModConsole.Log($"coop_page_death_{GameManager.Instance.PrimaryPlayer.GetComponent<CustomCharacter>().data.nameShort}_001");
-				return $"coop_page_death_{GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacter>().data.nameShort}_001";
+				//ETGModConsole.Log($"coop_page_death_{GameManager.Instance.PrimaryPlayer.GetComponent<CustomCharacter>().data.nameShort.ToLower()}_001");
+				return $"coop_page_death_{GameManager.Instance.PrimaryPlayer.gameObject.GetComponent<CustomCharacter>().data.nameShort.ToLower()}_001";
 
 			}
 			else
@@ -435,7 +494,7 @@ namespace CustomCharacters
 
 		public static void LoadHook(Action<GameStatsManager> orig)
 		{
-			ETGModConsole.Log($"loading save file...");
+			//ETGModConsole.Log($"loading save file...");
 			orig(GameStatsManager.Instance);
 			if (!SaveFileBullShit.HasInstance)
             {
@@ -446,7 +505,7 @@ namespace CustomCharacters
 			{
 				var character = characterStats.Key;
 				var stats = characterStats.Value;
-				ETGModConsole.Log($"Found custom character \"{character}\" adding them to m_characterStats");
+				//ETGModConsole.Log($"Found custom character \"{character}\" adding them to m_characterStats");
 				if (!GameStatsManager.Instance.m_characterStats.ContainsKey((PlayableCharacters)character) && stats != null)
 				{
 					GameStatsManager.Instance.m_characterStats.Add((PlayableCharacters)character, stats);
@@ -555,11 +614,12 @@ namespace CustomCharacters
 
 		public static void DoGhostBlankHook(Action<PlayerController> orig, PlayerController self)
 		{
-			if(self.gameObject.GetComponent<CustomCharacter>()?.data.coopBlankReplacement != null)
+			
+			if(CharacterBuilder.storedCharacters[self.gameObject.GetComponent<CustomCharacter>()?.data.nameInternal.ToLower()].First.coopBlankReplacement != null)
             {
 				FieldInfo _blankCooldownTimer = typeof(PlayerController).GetField("m_blankCooldownTimer", BindingFlags.NonPublic | BindingFlags.Instance);
 				self.QueueSpecificAnimation("ghost_sneeze_right");
-				ReflectionHelper.SetValue(_blankCooldownTimer, self, self.gameObject.GetComponent<CustomCharacter>().data.coopBlankReplacement(self));
+				ReflectionHelper.SetValue(_blankCooldownTimer, self, CharacterBuilder.storedCharacters[self.gameObject.GetComponent<CustomCharacter>()?.data.nameInternal.ToLower()].First.coopBlankReplacement(self));
 			} 
 			else
             {
@@ -642,11 +702,10 @@ namespace CustomCharacters
 				if (self.GetComponent<CustomCharacterFoyerController>() != null && self.GetComponent<CustomCharacterFoyerController>().metaCost > 0)
 				{
 
-					self.gameObject.SetActive(false);
-					self.GetComponent<SpeculativeRigidbody>().enabled = false;
-
 					GameStatsManager.Instance.RegisterStatChange(TrackedStats.META_CURRENCY, -(self.GetComponent<CustomCharacterFoyerController>().metaCost));
 				}
+				self.gameObject.SetActive(false);
+				self.GetComponent<SpeculativeRigidbody>().enabled = false;
 			}
 		}
 
@@ -736,16 +795,25 @@ namespace CustomCharacters
 			}
 		}
 
-		
 
 
+
+
+
+		#endregion
+		//Hook for Punchout UI being updated (called when UI updates)
+
 		
-		
-        #endregion
-        //Hook for Punchout UI being updated (called when UI updates)
-        public static void PunchoutUpdateUI(Action<PunchoutPlayerController> orig, PunchoutPlayerController self)
+        /*public static void PunchoutUpdateUI(Action<PunchoutPlayerController> orig, PunchoutPlayerController self)
         {
             orig(self);
+
+			if (!ab)
+            {
+				CollectionDumper.DumpAnimation(self.spriteAnimator.Library);
+				ab = true;
+			}
+
             var customChar = GameManager.Instance.PrimaryPlayer.GetComponent<CustomCharacter>();
             if (customChar != null)
             {
@@ -757,7 +825,7 @@ namespace CustomCharacters
                     ToolsCharApi.Print(self.PlayerUiSprite.SpriteName);
                 }
             }
-        }
+        }*/
 		
         public static string GetTalkingPlayerNickHook(Func<string> orig)
         {
@@ -1203,8 +1271,8 @@ namespace CustomCharacters
             "#CHAR_PARADOX_SHORT",
             "#CHAR_GUNSLINGER_SHORT"
         };
-
-        public struct GunBackupData
+		static bool ab = false;
+		public struct GunBackupData
         {
             public bool InfiniteAmmo,
                 CanBeDropped,

@@ -39,10 +39,10 @@ namespace BotsMod
 
             int price = 1;
 
-            //if (item.quality == PickupObject.ItemQuality.A || item.quality == PickupObject.ItemQuality.S)
-            //{
-            //    price = 2;
-            //}
+            if (item.quality == PickupObject.ItemQuality.A || item.quality == PickupObject.ItemQuality.S)
+            {
+                price = 2;
+            }
 
             if (GameManager.Instance.PrimaryPlayer.healthHaver.Armor >= price * 2)
             {

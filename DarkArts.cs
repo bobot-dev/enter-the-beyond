@@ -42,6 +42,14 @@ namespace BotsMod
 			item.poofVFX = (PickupObjectDatabase.GetById(462) as ConsumableStealthItem).poofVfx;
 			Tools.BeyondItems.Add(item.PickupObjectId);
 
+			item.sprite.usesOverrideMaterial = true;
+			Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+
+			material.SetTexture("_MainTex", item.sprite.renderer.material.mainTexture);
+			material.SetColor("_EmissiveColor", new Color32(255, 69, 245, 255));
+			material.SetFloat("_EmissiveColorPower", 1.55f);
+			material.SetFloat("_EmissivePower", 55);
+			item.sprite.renderer.material = material;
 		}
 
 		protected override void DoEffect(PlayerController user)

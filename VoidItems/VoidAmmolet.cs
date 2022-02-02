@@ -16,14 +16,14 @@ namespace BotsMod
         public static void Init()
         {
             string itemName = "Void Ammolet";
-            string resourceName = "BotsMod/sprites/wip";
+            string resourceName = "BotsMod/sprites/void_ammolet_temp";
             GameObject obj = new GameObject(itemName);
             var item = obj.AddComponent<VoidAmmolet>();
 
             ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
 
             string shortDesc = "Consumes Blanks";
-            string longDesc = "";
+            string longDesc = "Replaces the normal blank with a burst of bullets that destroy projectiles these projectiles inherit the powers of other ammolets";
 
             ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
 
@@ -31,7 +31,7 @@ namespace BotsMod
 
             item.AddPassiveStatModifier(PlayerStats.StatType.AdditionalBlanksPerFloor, 1, StatModifier.ModifyMethod.ADDITIVE);
 
-            item.quality = PickupObject.ItemQuality.C;
+            item.quality = PickupObject.ItemQuality.A;
 
             BotsItemIds.VoidAmmolet = item.PickupObjectId;
 
@@ -39,7 +39,7 @@ namespace BotsMod
             for (int i = 1; i <= 5; i++)
             {
                 var proj = Tools.SetupProjectile(15);
-                BotsMod.BotsModule.Log("setting up shard " + i);
+                //BotsMod.BotsModule.Log("setting up shard " + i);
                 proj.SetProjectileSpriteRight("blank_shard_00" + i, 15, 5, false, tk2dBaseSprite.Anchor.LowerLeft, 14, 4);
                 shardProjectiles.Add(proj);
                 proj.baseData.damage = 1f;
@@ -133,7 +133,7 @@ namespace BotsMod
                 amount /= 5;
             }
 
-            BotsMod.BotsModule.Log("VoidBlank triggered" + amount);
+            //BotsMod.BotsModule.Log("VoidBlank triggered" + amount);
             bool flag = true;
             float num = 10f;
             float num2 = 7f;

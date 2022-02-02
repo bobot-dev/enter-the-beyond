@@ -29,6 +29,7 @@ using ChamberGunApi;
 using static BotsMod.RandomComps;
 using AmmonomiconAPI;
 using BotsMod.NightmareNightmareNightmare;
+using ModdedItemWeightBalancer;
 //using ChallengeAPI;
 
 
@@ -37,7 +38,7 @@ namespace BotsMod
     public class BotsModule : ETGModule
     {
         public static readonly string MOD_NAME = "Enter The Beyond";
-        public static readonly string VERSION = "1.0.0";
+        public static readonly string VERSION = "0.5.0";
         public static readonly string TEXT_COLOR = "#e01279";
         public static readonly string LOST_COLOR = "#7732a8";
         public static readonly string LOCKED_CHARACTOR_COLOR = "#ba0c00";
@@ -45,7 +46,7 @@ namespace BotsMod
         public static AdvancedStringDB Strings;
         public static OverseerShield overseerShield;
         public static tk2dSpriteAnimation LostAltCostume;
-        public static bool debugMode = true;
+        public static bool debugMode = false;
         public static BaseShopController shop;
         public static BaseShopController shop2;
 
@@ -86,13 +87,13 @@ namespace BotsMod
                      DungeonHandler.debugFlow = !DungeonHandler.debugFlow;
                      string str = DungeonHandler.debugFlow ? "enabled" : "disabled";
                      string color = DungeonHandler.debugFlow ? "#00FF00" : "FF0000";
-                     BotsModule.Log("Debug flow " + str, color);
+                     BotsModule.Log("Debug flow " + str, color, false);
                  });
             }
             catch (Exception e)
             {
-                BotsModule.Log("Flow Command Broke", "#eb1313");
-                BotsModule.Log(string.Format(e + ""), "#eb1313");
+                BotsModule.Log("Flow Command Broke", "#eb1313", false);
+                BotsModule.Log(string.Format(e + ""), "#eb1313", false);
             }
             try
             {
@@ -111,7 +112,9 @@ namespace BotsMod
 
                 //ChallengeInit.Init();
 
-
+                SettingsHooks.Init();
+                BeyondSettings.Load();
+                debugMode = BeyondSettings.Instance.debug;
                 //GungeonAP.Init();
 
                 //GameManager.Instance.gameObject.AddComponent<DiscordController>();
@@ -130,14 +133,17 @@ namespace BotsMod
                 CharApi.Init("Bot");
 
                 //funny book api
-                AmmonomiconAPI.Tools.Init(); // <--- fuck you 
+
+                AmmonomiconAPI.Tools.Init();
                 Ammonomicon.Init();
+                
+
 
                 CustomClipAmmoTypeToolbox.Init();
 
                 BeyondPrefabs.InitCustomPrefabs();
+                VFXToolbox.BuildVFXList();
 
-               
 
                 //ETGModMainBehaviour.Instance.gameObject.AddComponent<UiTesting>().Init();
 
@@ -150,100 +156,99 @@ namespace BotsMod
                 CustomFire.Init();
                 BeyondNotificaionHandler.Init();
 
-                NoMoreFun.Init();
+               
+                if (debugMode)
+                {
+                    NoMoreFun.Init();
+                }
 
-
-                SoulHeartController.Init();
+                //SoulHeartController.Init();
 
                 FloorHooks.Init();
 
+                //ModdedItemWeightController.Init();
+
                 //StuffIStoleFromApacheForChallengeMode.Init();
-
-                var testroom = RoomFactory.BuildFromResource("BotsMod/rooms/a.room", true, true);
-                testroom.usesCustomAmbientLight = true;
-                testroom.customAmbientLight = new Color32(75, 5, 122, 255);
-                //var testroom = RoomFactory.BuildFromResource("BotsMod/rooms/challengeShrineCodeIsShit.room", true, true);
-                //RoomFactory.BuildFromResource("BotsMod/rooms/challengeShrineOffsetTest.room", true, true);
-
-                /*RoomFactory.RoomData roomData = new RoomFactory.RoomData
+                if (debugMode)
                 {
-                    room = testroom,
-                    isSpecialRoom = false,
-                    category = "NORMAL",
-                    specialSubCategory = "COMBAT"
-                };
-
-                RoomFactory.rooms.Add("metestroomsyessss", roomData);
-                DungeonHandler.Register(roomData);*/
-
-
-                //InitGameObjects.Init();
-                ChestInitStuff.Init();
-
+                    var testroom = RoomFactory.BuildFromResource("BotsMod/rooms/a.room", true, true);
+                    testroom.usesCustomAmbientLight = true;
+                    testroom.customAmbientLight = new Color32(75, 5, 122, 255);
+                    ChestInitStuff.Init();
+                }
                 //GlobalWarning.Init();
 
                 BeyondMasteryToken.Init();
-                BeyondSniper.Add();
+                if (debugMode) BeyondSniper.Add();
                 BeyondChamberGun.Add();
-               
+
                 //ScrapBook.Init();
 
 
 
-                Bob.Init();
+                if (debugMode) Bob.Init();
                 //CosmicSludge.Init();
                 //BlessedOrb.Init();
                 //BabyGoodMistake.Init();
                 //LostsPast.Init();
-                PirmalShotgrub.Init();
-                BeyondKin.Init();
+                if (debugMode) PirmalShotgrub.Init();
+                if (debugMode) BeyondKin.Init();
                 OverseerFloor.Init();
                 //OverseerDecoy.Init();
-                TestActive.Init();
+                if (debugMode) TestActive.Init();
                 //SpecialDungeon.Init();
                 //SpecialDungeon2CozFuckYou.Init();
                 //RichPresenceItem.Register();
 
-                LeshysCamera.Init();
+                if (debugMode) LeshysCamera.Init();
 
                 CarpetBurn.Init();
 
-                BeyondScout.Init();
+                if (debugMode) BeyondScout.Init();
                 DeadEye.Init();
-                
 
-                TestGun.Add();
+
+                if (debugMode) TestGun.Add();
 
                 //AAAAAAAAAA.a.Init();
 
                 Coin.Init();
                 HellsRevolver2.Add();
                 HellsRevolver.Add();
-                HellsShotgun.Add();
+                if (debugMode) HellsShotgun.Add();
                 NailGun.Add();
 
-                ChargeLance.Add();
+                if (debugMode) ChargeLance.Add();
 
-                Kr82m.Add();
+                if (debugMode) Kr82m.Add();
 
-                Alternator.Add();
+                if (debugMode) Alternator.Add();
 
                 CoolAssChargeGun.Add();
 
                 BreachCutter.Add();
 
+                BeyondSmg.Add();
+
+                Judgment.Add();
+
                 BeyondUnlock.Add();
                 BeyondUnlock.Add2();
                 BeyondUnlock.Add3();
-
-                Tools.shared_auto_002.LoadAsset<GameObject>("NPC_GunberMuncher").GetComponent<GunberMuncherController>().DefinedRecipes.Add(new GunberMuncherRecipe
+                if (debugMode)
                 {
-                    Annotation = "beyond unlock stuff",
-                    gunIDs_A = new List<int> { BotsItemIds.Relic1 },
-                    gunIDs_B = new List<int> { BotsItemIds.Relic2 },
-                    resultID = BotsItemIds.Relic3,
-                });
-                Orb.Init();
+                    Tools.shared_auto_002.LoadAsset<GameObject>("NPC_GunberMuncher").GetComponent<GunberMuncherController>().DefinedRecipes.Add(new GunberMuncherRecipe
+                    {
+                        Annotation = "beyond unlock stuff",
+                        gunIDs_A = new List<int> { BotsItemIds.Relic1 },
+                        gunIDs_B = new List<int> { BotsItemIds.Relic2 },
+                        resultID = BotsItemIds.Relic3,
+                    });
+                    Orb.Init();
+                    TheMessanger.Add();
+                    HellsGrasp.Init();
+                }
+               
 
                 //CompletlyRandomGun.Add();
 
@@ -254,7 +259,7 @@ namespace BotsMod
                 //PortalThing.Init();
                 //NoTimeToExplain.Add();
 
-                TheMessanger.Add();
+                
 
                 LostsCloak.Init();
 
@@ -267,34 +272,34 @@ namespace BotsMod
 
                 //TrailBullets.Init();
 
-                SpellInit.Init();
+                StaticSpellReferences.Init();
                 Wand.Add();
 
-                HellsGrasp.Init();
+                
 
 
                 EnchantedEnemies.Init();
 
-               
 
-                TestPassive.Init();
+
+                if (debugMode) TestPassive.Init();
 
                 LightningRounds.Init();
-                ChainedBullets.Init();
+                if (debugMode) ChainedBullets.Init();
                 FracturedRounds.Init();
 
                 Sin.Init();
-                PhyGun.Add();
-                Roomba.Init();
+                if (debugMode) PhyGun.Add();
+                if (debugMode) Roomba.Init();
 
-                ThrowableTest.Init();
+                if (debugMode) ThrowableTest.Init();
 
                 SpinDownDice.Init();
-                DarkArts.Init();
+                if (debugMode) DarkArts.Init();
                 //OtherworldlyConnections.Init();
                 OtherwordlyFury.Init();
 
-                VoidGlassGuonStone.Init();
+                if (debugMode) VoidGlassGuonStone.Init();
                 VoidAmmolet.Init();
 
                 #region shop setup
@@ -302,13 +307,13 @@ namespace BotsMod
                 List<string> testNpcIdleSprites = new List<string>
                 {
                     "stairway_npc_idle_001.png",
-                   
+
                 };
 
                 List<string> testNpcTalkSprites = new List<string>
                 {
                     "stairway_npc_idle_001.png",
-                    
+
                 };
 
                 List<string> beyondNpcIdleSprites = new List<string>
@@ -342,7 +347,7 @@ namespace BotsMod
                 //int x = 0;
                 for (int i = 0; i < testNpcIdleSprites.Count; i++)
                 {
-                    testNpcIdleSprites[i] = "BotsMod/sprites/Npcs/Stairway/" + testNpcIdleSprites[i];                   
+                    testNpcIdleSprites[i] = "BotsMod/sprites/Npcs/Stairway/" + testNpcIdleSprites[i];
                 }
 
                 for (int i = 0; i < testNpcTalkSprites.Count; i++)
@@ -366,7 +371,7 @@ namespace BotsMod
                     beyondLootTable.AddItemToPool(item);
                 }
 
-                
+
 
                 ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_RUNBASEDMULTILINE_GENERIC", "{wb}You are not one of us free of the masters control...");
                 ETGMod.Databases.Strings.Core.AddComplex("#BEYOND_RUNBASEDMULTILINE_GENERIC", "Not often we get outsiders here");
@@ -400,6 +405,17 @@ namespace BotsMod
 
                 shop.gameObject.GetComponentInChildren<tk2dSpriteAnimator>().Library.clips[1].wrapMode = tk2dSpriteAnimationClip.WrapMode.LoopSection;
                 shop.gameObject.GetComponentInChildren<tk2dSpriteAnimator>().Library.clips[1].loopStart = 3;
+
+
+
+                shop.GetAnySprite().usesOverrideMaterial = true;
+                Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+
+                material.SetTexture("_MainTex", shop.GetAnySprite().renderer.material.mainTexture);
+                material.SetColor("_EmissiveColor", new Color32(255, 69, 245, 255));
+                material.SetFloat("_EmissiveColorPower", 1.55f);
+                material.SetFloat("_EmissivePower", 55);
+                shop.GetAnySprite().renderer.material = material;
 
 
                 GameObject m_ParadoxPortal = UnityEngine.Object.Instantiate(BraveResources.Load<GameObject>("Global Prefabs/VFX_ParadoxPortal"), shop2.gameObject.GetComponentInChildren<tk2dSpriteAnimator>().transform);
@@ -494,8 +510,6 @@ namespace BotsMod
 
                 metadata = this.Metadata;
 
-
-
                 //GUI.Init();
 
                 //CatogreyText = GUI.CreateText(null, new Vector2(15f, 265), "", TextAnchor.MiddleLeft, font_size: FontSize);
@@ -505,8 +519,17 @@ namespace BotsMod
                 InitSynergies.Init();
 
                 //var name = Loader.BuildCharacter("BotsMod/Characters/Lost", CustomPlayableCharacters.Lost, new Vector3(15.8f, 26.6f, 27.1f), true, new Vector3(15.3f, 24.8f, 25.3f), true, false, false, true, true, new Color32(175, 19, 30, 255), 4.55f, 55, 2, true, "botfs_lost").nameInternal;
-                var name = Loader.BuildCharacter("BotsMod/Characters/Lost", CustomPlayableCharacters.Lost, new Vector3(15.8f, 26.6f, 27.1f), true, new Vector3(15.3f, 24.8f, 25.3f), true, false, false, true, true, new GlowMatDoer (new Color32(255, 0, 38, 255), 4.55f, 55),
-                    new GlowMatDoer(new Color32(255, 69, 248, 255), 1.55f, 55), 2, true, "botfs_lost").nameInternal;
+                var data = Loader.BuildCharacter("BotsMod/Characters/Lost", CustomPlayableCharacters.Lost, new Vector3(15.8f, 26.6f, 27.1f), true, new Vector3(15.3f, 24.8f, 25.3f), true, false, false, true, true, new GlowMatDoer (new Color32(255, 0, 38, 255), 4.55f, 55),
+                    new GlowMatDoer(new Color32(255, 69, 248, 255), 1.55f, 55), 0, true, "botfs_lost");
+                data.prerequisites = new DungeonPrerequisite[1]
+                {
+                    new CustomDungeonPrerequisite
+                    {
+                        requireCustomFlag = true,
+                        customFlagToCheck = CustomDungeonFlags.BOT_LOST_UNLOCKED,  
+                    }
+                };
+                var name = data.nameInternal;
 
                 Loader.SetupCustomAnimation(name, "dance", 12, tk2dSpriteAnimationClip.WrapMode.Loop);
 
@@ -530,37 +553,60 @@ namespace BotsMod
                     vfxTrigger = CharacterSelectIdlePhase.VFXPhaseTrigger.NONE,
                 });
 
+                Loader.AddCoopBlankOverride(name, CoopBlankOverrides.LostOverrideBlank);
+                Loader.GetAnimation(name, "pitfall_return").fps *= 2;
+
+                var first = SpriteBuilder.SpriteFromResource("BotsMod/Characters/Lost/groundthings/randomstuffthatgoonground_001.png");
+
+
+                first.GetComponent<tk2dSprite>().usesOverrideMaterial = true;
+                Material floorGlowMat = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+                floorGlowMat.mainTexture = first.GetComponent<tk2dSprite>().renderer.material.mainTexture;
+                floorGlowMat.SetColor("_EmissiveColor", new Color32(255, 69, 245, 255));
+                floorGlowMat.SetFloat("_EmissiveColorPower", 1.55f);
+                floorGlowMat.SetFloat("_EmissivePower", 55);
+                first.GetComponent<tk2dSprite>().renderer.material = floorGlowMat;
+                FakePrefab.MarkAsFakePrefab(first);
+
+                Loader.AddFoyerObject(name, first, new Vector3(-0.17f, 0.29f, 19), CustomDungeonFlags.BOT_LOST_UNLOCKED);
 
                 ChamberGunAPI.Init("EnterTheBeyond");
 
                 //Ammonomicon.Init();              
-
-                AlphabetSoupSynergyProcessor alphabetSoupSynergyProcessor = PickupObjectDatabase.GetById(340).gameObject.GetComponent<AlphabetSoupSynergyProcessor>();
-
-
-
-                AlphabetSoupEntry TransRights = new AlphabetSoupEntry
+                if (debugMode)
                 {
-                    Words = new string[]
-{
+                    AlphabetSoupSynergyProcessor alphabetSoupSynergyProcessor = PickupObjectDatabase.GetById(340).gameObject.GetComponent<AlphabetSoupSynergyProcessor>();
+
+
+
+                    AlphabetSoupEntry TransRights = new AlphabetSoupEntry
+                    {
+                        Words = new string[]
+    {
                         "transrights".ToUpper(),
-},
-                    BaseProjectile = alphabetSoupSynergyProcessor.Entries[0].BaseProjectile,
-                    //BaseProjectile = 
-                    RequiredSynergy = CustomSynergyType.ALPHABET_PLUS_ONE,//CustomEnums.CustomCustomSynergyType.LOWER_CASE_R_TEST,
-                    AudioEvents = new string[]
-{
+    },
+                        BaseProjectile = alphabetSoupSynergyProcessor.Entries[0].BaseProjectile,
+                        //BaseProjectile = 
+                        RequiredSynergy = CustomSynergyType.ALPHABET_PLUS_ONE,//CustomEnums.CustomCustomSynergyType.LOWER_CASE_R_TEST,
+                        AudioEvents = new string[]
+    {
                         "Play_WPN_rgun_bullet_01"
-}
-                };
+    }
+                    };
+
+                    var funnylist = PickupObjectDatabase.GetById(340).gameObject.GetComponent<AlphabetSoupSynergyProcessor>().Entries.ToList();
+                    // var funnylist = alphabetSoupSynergyProcessor.Entries.ToList();
+                    //funnylist.Add(iShouldntHaveBeenGivenThisPower6);
+                    funnylist.Add(TransRights);
+
+                    PickupObjectDatabase.GetById(340).gameObject.GetComponent<AlphabetSoupSynergyProcessor>().Entries = funnylist.ToArray();
+
+                }
 
 
-                var funnylist = PickupObjectDatabase.GetById(340).gameObject.GetComponent<AlphabetSoupSynergyProcessor>().Entries.ToList();
-                // var funnylist = alphabetSoupSynergyProcessor.Entries.ToList();
-                //funnylist.Add(iShouldntHaveBeenGivenThisPower6);
-                funnylist.Add(TransRights);
 
-                PickupObjectDatabase.GetById(340).gameObject.GetComponent<AlphabetSoupSynergyProcessor>().Entries = funnylist.ToArray();
+
+
 
                 ModLogo = GungeonAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/title_words_beyond_001.png");
                 try
@@ -573,20 +619,24 @@ namespace BotsMod
                 catch (Exception ex)
                 {
 
-                    Log(ex.ToString());
+                    Log(ex.ToString(), debug: false);
                     return;
                 }
                 
 
                 Commands.Init();
 
+                CollectionDumper.DumpdfAtlas(ResourceManager.LoadAssetBundle("enemies_base_001").LoadAsset<GameObject>("MetalGearRat").GetComponent<AIActor>().GetComponent<MetalGearRatDeathController>().PunchoutMinigamePrefab.GetComponent<PunchoutController>()
+                    .Player.PlayerUiSprite.Atlas)
+               ;
+
 
                 ETGMod.StartGlobalCoroutine(this.DelayedStartCR());
-                Log($"{MOD_NAME} v{VERSION} started successfully.", TEXT_COLOR);
+                Log($"{MOD_NAME} v{VERSION} started successfully.", TEXT_COLOR, false);
             }
             catch (Exception arg)
             {
-                Log("[Bots Mod]: Something in the start method broke heres why: " + arg, "#eb1313");
+                Log("[Bots Mod]: Something in the start method broke heres why: " + arg, "#eb1313", false);
             }
         }
         public static Texture2D ModLogo;
@@ -638,7 +688,7 @@ namespace BotsMod
             private void MainMenuUpdateHook(Action<MainMenuFoyerController> orig, MainMenuFoyerController self)
         {
             orig(self);
-            if (self.TitleCard != null)
+            if (self.TitleCard != null && BeyondSettings.Instance.titleScreenOverrideEnabled)
             {
                 if (((dfTextureSprite)self.TitleCard).Texture.name != ModLogo.name)
                 {
@@ -651,9 +701,13 @@ namespace BotsMod
 
         
 
-        public static void Log(string text, string color="#FFFFFF")
+        public static void Log(string text, string color="#FFFFFF", bool debug = true)
         {
-            ETGModConsole.Log($"<color={color}>{text}</color>");
+            if ((debug && debugMode) || !debug)
+            {
+                ETGModConsole.Log($"<color={color}>{text}</color>");
+            }
+            
         }
         private static bool hasInitialized;
 

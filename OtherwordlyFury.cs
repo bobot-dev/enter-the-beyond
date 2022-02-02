@@ -24,8 +24,8 @@ namespace BotsMod
 			var item = obj.AddComponent<OtherwordlyFury>();
 
 			ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
-			string shortDesc = "";
-			string longDesc = "";
+			string shortDesc = "Spinning Death";
+			string longDesc = "Creates 3 disks that orbit its user when activated these disks produce a beam of energy";
 			ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
 			ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Damage, 300);
 			item.consumable = false;
@@ -102,6 +102,15 @@ namespace BotsMod
 			beam = projectile4;
 
 			Tools.BeyondItems.Add(item.PickupObjectId);
+
+			item.sprite.usesOverrideMaterial = true;
+			Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+
+			material.SetTexture("_MainTex", item.sprite.renderer.material.mainTexture);
+			material.SetColor("_EmissiveColor", new Color32(255, 69, 245, 255));
+			material.SetFloat("_EmissiveColorPower", 1.25f);
+			material.SetFloat("_EmissivePower", 35);
+			item.sprite.renderer.material = material;
 
 		}
 

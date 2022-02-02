@@ -50,35 +50,40 @@ namespace BotsMod
         }
         public void ShowSpinDownHologram(int itemId, GameObject obj)
         {
-            tk2dSpriteCollectionData encounterIconCollection = AmmonomiconController.ForceInstance.EncounterIconCollection;
-
+            tk2dSpriteCollectionData collection = AmmonomiconController.ForceInstance.EncounterIconCollection;
             itemId = SpinDownDice.SpinDownID(itemId);
-
             var pickupObject = PickupObjectDatabase.GetById(itemId);
-            Debug.Log("id found");
-            if (pickupObject?.encounterTrackable && (obj.gameObject.transform.Find("Item Hologram") == null ||
-                pickupObject?.encounterTrackable?.journalData?.AmmonomiconSprite != obj.gameObject.transform.Find("Item Hologram")?.GetComponent<tk2dSprite>()?.Collection.spriteDefinitions[obj.gameObject.transform.Find("Item Hologram").GetComponent<tk2dSprite>().spriteId].name))
+            var spriteName = pickupObject?.encounterTrackable?.journalData?.AmmonomiconSprite;
+            if (collection && pickupObject && !string.IsNullOrEmpty(spriteName))
             {
-                Debug.Log("setting up sprite");
-                if (obj.transform.Find("Item Hologram") != null) { Destroy(obj.transform.Find("Item Hologram").gameObject); }
-                var extantSprite = new GameObject("Item Hologram", new Type[] { typeof(tk2dSprite) }) { layer = 0 };
-                extantSprite.transform.position = (transform.position + new Vector3(0.5f, 2));
-                var m_ItemSprite = extantSprite.AddComponent<tk2dSprite>();
-                // CloningAndDuplication.DuplicateSprite(m_ItemSprite, sprite as tk2dSprite);
-                m_ItemSprite.SetSprite(encounterIconCollection, pickupObject?.encounterTrackable?.journalData?.AmmonomiconSprite);
-                m_ItemSprite.PlaceAtPositionByAnchor(extantSprite.transform.position, tk2dBaseSprite.Anchor.LowerCenter);
-                m_ItemSprite.transform.localPosition = m_ItemSprite.transform.localPosition.Quantize(0.0625f);
-                if (pickupObject != null) { extantSprite.transform.parent = pickupObject.transform; }
-                Debug.Log("set up sprite");
-                if (m_ItemSprite)
+
+
+
+                
+                var spriteId = collection.GetSpriteIdByName(spriteName);
+
+
+                var m_hologramSprite = obj.transform.Find("spindown hologram")?.gameObject.GetComponent<tk2dSprite>();
+                if (m_hologramSprite == null)
                 {
-                    sprite.AttachRenderer(m_ItemSprite);
-                    m_ItemSprite.depthUsesTrimmedBounds = true;
-                    m_ItemSprite.UpdateZDepth();
+                    GameObject go = new GameObject("spindown hologram");
+                    m_hologramSprite = tk2dSprite.AddComponent(go, collection, spriteId);
+                    m_hologramSprite.transform.parent = obj.transform;
+
+                    //this.Glower.usesOverrideMaterial = true;
+                    //this.Glower.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
                 }
-                sprite.UpdateZDepth();
-                Debug.Log("adding shader to sprite");
-                ApplyHologramShader(m_ItemSprite, hologramIsGreen);
+                else
+                {
+                    m_hologramSprite.SetSprite(collection, spriteId);
+                    m_hologramSprite.ForceUpdateMaterial();
+                }
+                m_hologramSprite.renderer.enabled = true;
+                m_hologramSprite.usesOverrideMaterial = true;
+                m_hologramSprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
+                m_hologramSprite.PlaceAtPositionByAnchor(obj.GetComponent<tk2dSprite>() != null ? obj.GetComponent<tk2dSprite>().WorldTopCenter + new Vector2(0f, 0.25f) : (Vector2)obj.transform.position + new Vector2(0f, 0.5f), tk2dBaseSprite.Anchor.LowerCenter);
+                m_hologramSprite.transform.localPosition = m_hologramSprite.transform.localPosition.Quantize(0.0625f);
+
             }
         }
 

@@ -227,17 +227,17 @@ namespace BotsMod
 
 		private static void ToggleBeyondStatus(UINotificationController self)
 		{
-			ETGModConsole.Log("0");
+			if (BotsModule.debugMode) ETGModConsole.Log("0");
 			self.CrosshairSprite.SpriteName = "crosshair_beyond";
 			self.CrosshairSprite.Size = self.CrosshairSprite.SpriteInfo.sizeInPixels * 3f;
-			ETGModConsole.Log("1");
+			if (BotsModule.debugMode) ETGModConsole.Log("1");
 			self.BoxSprite.SpriteName = "notification_box_beyondns_001";
-			ETGModConsole.Log("2");
+			if (BotsModule.debugMode) ETGModConsole.Log("2");
 			self.ObjectBoxSprite.IsVisible = true;
 			self.ObjectBoxSprite.SpriteName = "object_box_beyond_001";
-			ETGModConsole.Log("3");
+			if (BotsModule.debugMode) ETGModConsole.Log("3");
 			self.StickerSprite.IsVisible = false;
-			ETGModConsole.Log("4");
+			if (BotsModule.debugMode) ETGModConsole.Log("4");
 
 		}
 

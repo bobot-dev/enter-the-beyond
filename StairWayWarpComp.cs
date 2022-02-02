@@ -15,10 +15,22 @@ namespace BotsMod
 		// Token: 0x060068CF RID: 26831 RVA: 0x0003E8FF File Offset: 0x0003CAFF
 		private void Start()
 		{
-			curRoom = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(base.transform.position.IntXY(VectorConversions.Floor));
+			foreach (RoomHandler roomHandler2 in GameManager.Instance.Dungeon.data.rooms)
+			{
+				if (roomHandler2.area.PrototypeRoomCategory == PrototypeDungeonRoom.RoomCategory.ENTRANCE)
+				{
+					curRoom = roomHandler2;
+					break;
+				}
+			}
+
+			//curRoom = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(base.transform.position.IntXY(VectorConversions.Floor));
+			if (curRoom == null) ETGModConsole.Log("FUUUCK");
 			curRoom.RegisterInteractable(this);
-			Debug.Log("set up 1");
+
+			
 			curRoom.Exited += StairWayWarpComp_Exited;
+
 		}
 
         private void StairWayWarpComp_Exited()
@@ -78,6 +90,9 @@ namespace BotsMod
 					break;
 				}
 			}
+
+			roomHandler.ForcePitfallForFliers = true;
+			roomHandler.TargetPitfallRoom = curRoom;
 
 			Vector2 targetPoint2 = roomHandler.area.basePosition.ToVector2() + new Vector2((float)roomHandler.area.dimensions.x / 2f, 8f);
 			player.WarpToPoint(targetPoint2, false, false);

@@ -20,6 +20,7 @@ namespace BotsMod
 		public static GameObject Mines_Cave_In;
 		public static GameObject Foyer_ElevatorChamber;		
 		public static List<int> BeyondItems = new List<int>();
+		public static List<int> Spells = new List<int>();
 
 
 
@@ -125,6 +126,133 @@ namespace BotsMod
 				}
 			}
 			return result;
+		}
+
+
+		public static WeightedGameObjectCollection GetCompiledCollectionButCooler(this GenericLootTable lootTable)
+		{
+			int num = 0;
+
+			if (lootTable.includedLootTables.Count == 0 && num == 0)
+			{
+				return lootTable.defaultItemDrops;
+			}
+			WeightedGameObjectCollection weightedGameObjectCollection = new WeightedGameObjectCollection();
+			for (int i = 0; i < lootTable.defaultItemDrops.elements.Count; i++)
+			{
+				weightedGameObjectCollection.Add(lootTable.defaultItemDrops.elements[i]);
+			}
+			int j = 0;
+			while (j < lootTable.includedLootTables.Count)
+			{
+				if (lootTable.includedLootTables[j].tablePrerequisites.Length <= 0)
+				{
+					goto IL_136;
+				}
+				bool flag = false;
+				for (int k = 0; k < lootTable.includedLootTables[j].tablePrerequisites.Length; k++)
+				{
+					if (!lootTable.includedLootTables[j].tablePrerequisites[k].CheckConditionsFulfilled())
+					{
+						flag = true;
+						break;
+					}
+				}
+				if (!flag)
+				{
+					goto IL_136;
+				}
+				IL_17F:
+				j++;
+				continue;
+				IL_136:
+				WeightedGameObjectCollection compiledCollection = lootTable.includedLootTables[j].GetCompiledCollectionButCooler();
+				for (int l = 0; l < compiledCollection.elements.Count; l++)
+				{
+					weightedGameObjectCollection.Add(compiledCollection.elements[l]);
+				}
+				goto IL_17F;
+			}
+			return weightedGameObjectCollection;
+		}
+
+		public static GameObject SelectByWeightButGood(this WeightedGameObjectCollection lootTable, out int outIndex, bool useSeedRandom = false)
+		{
+			outIndex = -1;
+			List<WeightedGameObject> list = new List<WeightedGameObject>();
+			float num = 0f;
+			for (int i = 0; i < lootTable.elements.Count; i++)
+			{
+				WeightedGameObject weightedGameObject = lootTable.elements[i];
+				bool flag = true;
+				if (weightedGameObject.additionalPrerequisites != null)
+				{
+					for (int j = 0; j < weightedGameObject.additionalPrerequisites.Length; j++)
+					{
+						if (!weightedGameObject.additionalPrerequisites[j].CheckConditionsFulfilled())
+						{
+							flag = false;
+							break;
+						}
+					}
+				}
+				if (weightedGameObject.gameObject != null)
+				{
+					PickupObject component = weightedGameObject.gameObject.GetComponent<PickupObject>();
+					if (component != null)
+					{
+						flag = false;
+					}
+				}
+				if (flag)
+				{
+					list.Add(weightedGameObject);
+					num += weightedGameObject.weight;
+				}
+			}
+			float num2 = ((!useSeedRandom) ? UnityEngine.Random.value : BraveRandom.GenerationRandomValue()) * num;
+			float num3 = 0f;
+			for (int k = 0; k < list.Count; k++)
+			{
+				num3 += list[k].weight;
+				if (num3 > num2)
+				{
+					outIndex = lootTable.elements.IndexOf(list[k]);
+					return list[k].gameObject;
+				}
+			}
+			outIndex = lootTable.elements.IndexOf(list[list.Count - 1]);
+			return list[list.Count - 1].gameObject;
+		}
+
+
+		public static GameObject SpawnCustomBowlerNote(GameObject note, Vector2 position, RoomHandler parentRoom, string customText, bool doPoof = false)
+		{
+			GameObject noteObject = UnityEngine.Object.Instantiate(note, position.ToVector3ZisY(0f), Quaternion.identity);
+			if (noteObject)
+			{
+				NoteDoer BowlerNote = noteObject.GetComponentInChildren<NoteDoer>();
+				if (BowlerNote)
+				{
+					if (BowlerNote)
+					{
+						BowlerNote.alreadyLocalized = true;
+						BowlerNote.stringKey = customText;
+						BowlerNote.RegenerateCache();
+					}
+				}
+				IPlayerInteractable[] interfacesInChildren = noteObject.GetInterfacesInChildren<IPlayerInteractable>();
+				for (int i = 0; i < interfacesInChildren.Length; i++) { parentRoom.RegisterInteractable(interfacesInChildren[i]); }
+			}
+			if (doPoof)
+			{
+				GameObject vfxObject = (GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/VFX_Item_Spawn_Poof"));
+				tk2dBaseSprite component = vfxObject.GetComponent<tk2dBaseSprite>();
+				component.PlaceAtPositionByAnchor(position.ToVector3ZUp(0f) + new Vector3(0.5f, 0.75f, 0f), tk2dBaseSprite.Anchor.MiddleCenter);
+				component.HeightOffGround = 5f;
+				component.UpdateZDepth();
+			}
+			return noteObject;
 		}
 
 		public static PickupObject GetPickupObjectFromAnywhere(this GameObject obj)
@@ -2196,13 +2324,28 @@ namespace BotsMod
 			return false;
 		}
 
-		
+		public static T ReflectGetField<T>(Type classType, string fieldName, object o = null)
+		{
+			FieldInfo field = classType.GetField(fieldName, BindingFlags.Public | BindingFlags.NonPublic | ((o != null) ? BindingFlags.Instance : BindingFlags.Static));
+			return (T)field.GetValue(o);
+		}
+
 		public static tk2dSpriteDefinition CopyDefinitionFrom(this tk2dSpriteDefinition other)
 		{
-			return new tk2dSpriteDefinition
+			tk2dSpriteDefinition result = new tk2dSpriteDefinition
 			{
-				boundsDataCenter = other.boundsDataCenter,
-				boundsDataExtents = other.boundsDataExtents,
+				boundsDataCenter = new Vector3
+				{
+					x = other.boundsDataCenter.x,
+					y = other.boundsDataCenter.y,
+					z = other.boundsDataCenter.z
+				},
+				boundsDataExtents = new Vector3
+				{
+					x = other.boundsDataExtents.x,
+					y = other.boundsDataExtents.y,
+					z = other.boundsDataExtents.z
+				},
 				colliderConvex = other.colliderConvex,
 				colliderSmoothSphereCollisions = other.colliderSmoothSphereCollisions,
 				colliderType = other.colliderType,
@@ -2219,23 +2362,78 @@ namespace BotsMod
 				name = other.name,
 				normals = other.normals,
 				physicsEngine = other.physicsEngine,
-				position0 = other.position0,
-				position1 = other.position1,
-				position2 = other.position2,
-				position3 = other.position3,
+				position0 = new Vector3
+				{
+					x = other.position0.x,
+					y = other.position0.y,
+					z = other.position0.z
+				},
+				position1 = new Vector3
+				{
+					x = other.position1.x,
+					y = other.position1.y,
+					z = other.position1.z
+				},
+				position2 = new Vector3
+				{
+					x = other.position2.x,
+					y = other.position2.y,
+					z = other.position2.z
+				},
+				position3 = new Vector3
+				{
+					x = other.position3.x,
+					y = other.position3.y,
+					z = other.position3.z
+				},
 				regionH = other.regionH,
 				regionW = other.regionW,
 				regionX = other.regionX,
 				regionY = other.regionY,
 				tangents = other.tangents,
-				texelSize = other.texelSize,
-				untrimmedBoundsDataCenter = other.untrimmedBoundsDataCenter,
-				untrimmedBoundsDataExtents = other.untrimmedBoundsDataExtents,
-				uvs = other.uvs
+				texelSize = new Vector2
+				{
+					x = other.texelSize.x,
+					y = other.texelSize.y
+				},
+				untrimmedBoundsDataCenter = new Vector3
+				{
+					x = other.untrimmedBoundsDataCenter.x,
+					y = other.untrimmedBoundsDataCenter.y,
+					z = other.untrimmedBoundsDataCenter.z
+				},
+				untrimmedBoundsDataExtents = new Vector3
+				{
+					x = other.untrimmedBoundsDataExtents.x,
+					y = other.untrimmedBoundsDataExtents.y,
+					z = other.untrimmedBoundsDataExtents.z
+				}
 			};
+			List<Vector2> uvs = new List<Vector2>();
+			foreach (Vector2 vector in other.uvs)
+			{
+				uvs.Add(new Vector2
+				{
+					x = vector.x,
+					y = vector.y
+				});
+			}
+			result.uvs = uvs.ToArray();
+			List<Vector3> colliderVertices = new List<Vector3>();
+			foreach (Vector3 vector in other.colliderVertices)
+			{
+				colliderVertices.Add(new Vector3
+				{
+					x = vector.x,
+					y = vector.y,
+					z = vector.z
+				});
+			}
+			result.colliderVertices = colliderVertices.ToArray();
+			return result;
 		}
 
-		
+
 		public static Gun GetGunById(this PickupObjectDatabase database, int id)
 		{
 			return PickupObjectDatabase.GetById(id) as Gun;

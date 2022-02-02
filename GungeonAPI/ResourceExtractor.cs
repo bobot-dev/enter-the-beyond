@@ -104,13 +104,11 @@ namespace GungeonAPI
 			});
 		}
 
-		// Token: 0x06000034 RID: 52 RVA: 0x00003800 File Offset: 0x00001A00
 		public static string BytesToString(byte[] bytes)
 		{
 			return Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 		}
 
-		// Token: 0x06000035 RID: 53 RVA: 0x00003824 File Offset: 0x00001A24
 		public static List<string> GetResourceFolders()
 		{
 			List<string> list = new List<string>();
@@ -125,8 +123,6 @@ namespace GungeonAPI
 			}
 			return list;
 		}
-
-		// Token: 0x06000036 RID: 54 RVA: 0x0000388C File Offset: 0x00001A8C
 		public static byte[] ExtractEmbeddedResource(string filePath)
 		{
 			filePath = filePath.Replace("/", ".");

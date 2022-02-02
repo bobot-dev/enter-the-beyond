@@ -25,7 +25,7 @@ namespace BotsMod
 			gun.DefaultModule.ammoCost = 1;
 
 			gun.DefaultModule.shootStyle = ProjectileModule.ShootStyle.SemiAutomatic;
-			gun.StarterGunForAchievement = true;
+			gun.StarterGunForAchievement = false;
 
 			gun.reloadTime = 1.3f;
 
@@ -53,6 +53,7 @@ namespace BotsMod
 			ETGMod.Databases.Items.Add(gun, null, "ANY");
 
 			BotsItemIds.Relic1 = gun.PickupObjectId;
+			Tools.BeyondItems.Add(gun.PickupObjectId);
 		}
 
 		public static void Add2()
@@ -72,7 +73,7 @@ namespace BotsMod
 			gun.DefaultModule.ammoCost = 1;
 
 			gun.DefaultModule.shootStyle = ProjectileModule.ShootStyle.SemiAutomatic;
-			gun.StarterGunForAchievement = true;
+			gun.StarterGunForAchievement = false;
 
 			gun.reloadTime = 1.3f;
 
@@ -100,6 +101,7 @@ namespace BotsMod
 			ETGMod.Databases.Items.Add(gun, null, "ANY");
 
 			BotsItemIds.Relic2 = gun.PickupObjectId;
+			Tools.BeyondItems.Add(gun.PickupObjectId);
 		}
 
 		public static void Add3()
@@ -119,7 +121,7 @@ namespace BotsMod
 			gun.DefaultModule.ammoCost = 1;
 
 			gun.DefaultModule.shootStyle = ProjectileModule.ShootStyle.SemiAutomatic;
-			gun.StarterGunForAchievement = true;
+			gun.StarterGunForAchievement = false;
 
 			gun.reloadTime = 1.3f;
 
@@ -147,6 +149,7 @@ namespace BotsMod
 			ETGMod.Databases.Items.Add(gun, null, "ANY");
 
 			BotsItemIds.Relic3 = gun.PickupObjectId;
+			Tools.BeyondItems.Add(gun.PickupObjectId);
 		}
 	}
 }

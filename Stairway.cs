@@ -26,14 +26,15 @@ namespace BotsMod
             
 
 
-            string shortDesc = "";
-            string longDesc = "spawns a ";
+            string shortDesc = "Ascend";
+            string longDesc = "Creates a ladder to a secret shop that trades guns for items.\n\nheads up this item works the npc is just a tad unfinished thus the broken text";
             ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
-            item.quality = ItemQuality.A;
+            item.quality = ItemQuality.B;
 
             //PrayerKeep = RoomFactory.BuildFromResource("Planetside/Resources/ShrineRooms/PrayerRooms/PrayerRoomKeep.room").room;
             Tools.BeyondItems.Add(item.PickupObjectId);
             StairWay.InitRooms();
+            BotsItemIds.Stairway = item.PickupObjectId;
         }
 
         public override void Pickup(PlayerController player)
@@ -51,11 +52,11 @@ namespace BotsMod
             var forgeDungeon = DungeonDatabase.GetOrLoadByName("base_nakatomi");
             var hellDrag = FakePrefab.Clone(forgeDungeon.PatternSettings.flows[0].AllNodes.Where(node => node.overrideExactRoom != null && node.overrideExactRoom.name.Contains("OFFICE_13_Fire_escape_01")).First().overrideExactRoom.placedObjects
             .Where(ppod => ppod != null && ppod.nonenemyBehaviour != null).First().nonenemyBehaviour.gameObject.GetComponentsInChildren<UsableBasicWarp>()[0].gameObject);
-
+            UnityEngine.Object.Destroy(hellDrag.GetComponent<UsableBasicWarp>());
             var shopObj = DungeonPlaceableUtility.InstantiateDungeonPlaceable(hellDrag.gameObject, entrance, new IntVector2(1, 8), false);
 
 
-            UnityEngine.Object.Destroy(shopObj.GetComponent<UsableBasicWarp>());
+            
             shopObj.AddComponent<StairWayWarpComp>().targetRoomName = ModRoomPrefabs.StairWayRoom.name;
 
             //GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(shopObj.GetComponent<TalkDoerLite>());

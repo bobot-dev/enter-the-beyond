@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace BotsMod
 {
-    class CharacterDatabase : ObjectDatabase<PlayerController>
+    class CharacterDatabase : ObjectDatabase<PickupObject>
 	{
 		public static CharacterDatabase Instance
 		{
@@ -16,16 +16,12 @@ namespace BotsMod
 				{
 					
 					CharacterDatabase.m_instance = ScriptableObject.CreateInstance(typeof(CharacterDatabase)) as CharacterDatabase;
-					CharacterDatabase.m_instance.Objects = new List<PlayerController>();
-					CharacterDatabase.m_instance.Objects.Add(AmmonomiconAPI.Tools.LoadAssetFromAnywhere<GameObject>("PlayerRogue").GetComponent<PlayerController>());
-					CharacterDatabase.m_instance.Objects.Add(AmmonomiconAPI.Tools.LoadAssetFromAnywhere<GameObject>("PlayerConvict").GetComponent<PlayerController>());
-					CharacterDatabase.m_instance.Objects.Add(AmmonomiconAPI.Tools.LoadAssetFromAnywhere<GameObject>("PlayerRobot").GetComponent<PlayerController>());
-					CharacterDatabase.m_instance.Objects.Add(AmmonomiconAPI.Tools.LoadAssetFromAnywhere<GameObject>("PlayerMarine").GetComponent<PlayerController>());
-					CharacterDatabase.m_instance.Objects.Add(AmmonomiconAPI.Tools.LoadAssetFromAnywhere<GameObject>("PlayerGuide").GetComponent<PlayerController>());
-					CharacterDatabase.m_instance.Objects.Add(AmmonomiconAPI.Tools.LoadAssetFromAnywhere<GameObject>("PlayerCoopCultist").GetComponent<PlayerController>());
-					CharacterDatabase.m_instance.Objects.Add(AmmonomiconAPI.Tools.LoadAssetFromAnywhere<GameObject>("PlayerBullet").GetComponent<PlayerController>());
-					CharacterDatabase.m_instance.Objects.Add(AmmonomiconAPI.Tools.LoadAssetFromAnywhere<GameObject>("PlayerEevee").GetComponent<PlayerController>());
-					CharacterDatabase.m_instance.Objects.Add(AmmonomiconAPI.Tools.LoadAssetFromAnywhere<GameObject>("PlayerGunslinger").GetComponent<PlayerController>());
+					CharacterDatabase.m_instance.Objects = new List<PickupObject>();
+
+					foreach(var id in Tools.Spells)
+                    {
+						CharacterDatabase.m_instance.Objects.Add(PickupObjectDatabase.GetById(id));
+                    }
 				}
 				return CharacterDatabase.m_instance;
 			}

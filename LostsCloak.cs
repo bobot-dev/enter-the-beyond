@@ -17,8 +17,7 @@ namespace BotsMod
     public class LostsCloak : PassiveItem
     {
 
-        public static string EnterTheBeyondConfigPath = Path.Combine(ETGMod.ResourcesDirectory, "EnterTheBeyondConfig.json");
-
+        
         //Call this method from the Start() method of your ETGModule extension
         public static void Init()
         {
@@ -29,7 +28,7 @@ namespace BotsMod
             var item = obj.AddComponent<LostsCloak>();
             ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
             string shortDesc = "idk ill put something here";
-            string longDesc = "This robe seems to b";
+            string longDesc = "*good description and lore here* atm this item just makes items from this mod more common it'll will be changed in the future but im unsure when that will be";
             ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
             item.quality = ItemQuality.SPECIAL;
 
@@ -40,8 +39,15 @@ namespace BotsMod
             BotsItemIds.LostCloak = item.PickupObjectId;
 
             item.PlaceItemInAmmonomiconAfterItemById(414);
-
-
+            List<LootModData> itemList = new List<LootModData>();
+            foreach(var po in PickupObjectDatabase.Instance.Objects)
+            {
+                if (po != null && po.PickupObjectId >= BotsItemIds.BeyondMasteryToken && po.PickupObjectId <= BotsItemIds.Stairway)
+                {
+                    itemList.Add(new LootModData { AssociatedPickupId = po.PickupObjectId, DropRateMultiplier = 5 });
+                }
+            }
+            item.associatedItemChanceMods = itemList.ToArray();
             //Tools.BeyondItems.Add(item.PickupObjectId);
 
         }

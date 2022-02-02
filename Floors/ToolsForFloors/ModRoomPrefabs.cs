@@ -6,6 +6,7 @@ using System.Text;
 using NpcApi;
 using Dungeonator;
 using UnityEngine;
+using ItemAPI;
 
 namespace BotsMod
 {
@@ -157,6 +158,44 @@ namespace BotsMod
             StairWayRoom = RoomFactory.BuildFromResource("BotsMod/rooms/StairWayNpcRoom.room");
             ItsDaFuckinShopApi.RegisterShopRoom(BotsModule.shop2.gameObject, StairWayRoom, new UnityEngine.Vector2(4f, 17));
 
+
+            GameObject noteObject = FakePrefab.Clone(GameManager.Instance.RewardManager.BowlerNoteOtherSource);
+            NoteDoer BowlerNote = noteObject.GetComponentInChildren<NoteDoer>();
+            ETGMod.Databases.Strings.Core.Set("#STAIRWAY_PIT_INFO", "The pit leads back to where you came from.");
+            if (BowlerNote)
+            {
+                if (BowlerNote)
+                {
+                    //BowlerNote.alreadyLocalized = true;
+                    BowlerNote.stringKey = "#STAIRWAY_PIT_INFO";
+                    BowlerNote.RegenerateCache();
+                }
+            }
+
+            StairWayRoom.placedObjectPositions.Add(new Vector2(7, 9));
+            StairWayRoom.placedObjects.Add(new PrototypePlacedObjectData
+            {
+                contentsBasePosition = vector,
+                fieldData = new List<PrototypePlacedObjectFieldData>(),
+                instancePrerequisites = array,
+                linkedTriggerAreaIDs = new List<int>(),
+                placeableContents = new DungeonPlaceable
+                {
+                    width = 2,
+                    height = 2,
+                    respectsEncounterableDifferentiator = true,
+                    variantTiers = new List<DungeonPlaceableVariant>
+                    {
+                        new DungeonPlaceableVariant
+                        {
+                            percentChance = 1f,
+                            nonDatabasePlaceable = noteObject,
+                            prerequisites = new DungeonPrerequisite[0],
+                            materialRequirements = new DungeonPlaceableRoomMaterialRequirement[0]
+                        }
+                    }
+                }
+            });
             //foreach (PrototypeRoomExit exit in Mod_Boss.exitData.exits) { exit.exitType = PrototypeRoomExit.ExitType.ENTRANCE_ONLY; }
             //    RoomBuilder.AddExitToRoom(Mod_Boss, new Vector2(26, 37), DungeonData.Direction.NORTH, PrototypeRoomExit.ExitType.EXIT_ONLY, PrototypeRoomExit.ExitGroup.B);
 

@@ -58,11 +58,11 @@ namespace BotsMod
                 if (!p_playerArmourLabel.gameObject.activeSelf)
                 {
                     p_playerArmourLabel.gameObject.SetActive(true);
-                    ETGModConsole.Log("activated p_playerArmourLabel");
+                    if (BotsModule.debugMode) ETGModConsole.Log("activated p_playerArmourLabel");
 
                 }
                 ETGModConsole.Log(GameUIRoot.Instance.p_playerKeyLabel.transform.parent.ToString());
-                ETGModConsole.Log("was null... setup done");
+                if (BotsModule.debugMode) ETGModConsole.Log("was null... setup done");
 
 
 
@@ -74,7 +74,7 @@ namespace BotsMod
                 if (!p_playerArmourSprite.gameObject.activeSelf)
                 {
                     p_playerArmourSprite.gameObject.SetActive(true);
-                    ETGModConsole.Log("activated p_playerArmourSprite");
+                    if (BotsModule.debugMode) ETGModConsole.Log("activated p_playerArmourSprite");
                 }
                 GameUIRoot.Instance.AddControlToMotionGroups(p_playerArmourSprite, DungeonData.Direction.WEST, false);
                 //p_playerArmourSprite.Parent.AddControl<dfPanel>();

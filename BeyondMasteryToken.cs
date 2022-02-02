@@ -26,7 +26,7 @@ namespace BotsMod
             ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
             item.quality = ItemQuality.SPECIAL;
 
-            //EncounterDatabase.GetEntry(item.encounterTrackable.EncounterGuid).usesPurpleNotifications = true;
+            EncounterDatabase.GetEntry(item.encounterTrackable.EncounterGuid).usesPurpleNotifications = true;
 
             ItemBuilder.AddPassiveStatModifier(item, PlayerStats.StatType.Health, 1f, StatModifier.ModifyMethod.ADDITIVE);
 
@@ -35,7 +35,7 @@ namespace BotsMod
 
             //item.ItemRespectsHeartMagnificence = true;
 
-            item.minimapIcon = BotsModule.WarCrime;
+            //item.minimapIcon = BotsModule.WarCrime;
 
             item.IsMasteryToken = true;
 

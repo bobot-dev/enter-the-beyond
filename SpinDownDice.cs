@@ -21,7 +21,7 @@ namespace BotsMod
 
 			//WandOfWonderItem
 			ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
-			string shortDesc = "SPIIIIIIIIIIIIIIIIIIIIIIIINNNNNNNNNNNNNNNNNNNNNNNNNNNNNN";
+			string shortDesc = "You Spin Me Right Round";
 			string longDesc = "Rerolls all items in the room to by lowering the item's id by 1";
 			ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
 			ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Damage, 650);
@@ -29,6 +29,15 @@ namespace BotsMod
 			item.quality = ItemQuality.S;
 
 			Tools.BeyondItems.Add(item.PickupObjectId);
+
+			item.sprite.usesOverrideMaterial = true;
+			Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+
+			material.SetTexture("_MainTex", item.sprite.renderer.material.mainTexture);
+			material.SetColor("_EmissiveColor", new Color32(255, 69, 245, 255));
+			material.SetFloat("_EmissiveColorPower", 1.55f);
+			material.SetFloat("_EmissivePower", 55);
+			item.sprite.renderer.material = material;
 
 		}
 		CustomHologramDoer hologramDoer;
@@ -39,9 +48,69 @@ namespace BotsMod
 			base.Pickup(player);
         }
 
-        public override void Update()
+		public override void Update()
         {
 			if (LastOwner != null && LastOwner.CurrentItem == this)
+            {
+				foreach (DebrisObject debrisObject in StaticReferenceManager.AllDebris.ToArray())
+				{
+					if (debrisObject.gameObject != gameObject)
+                    {
+						PickupObject pickupObject = debrisObject.GetComponent<PickupObject>();
+
+						Gun componentInChildren = debrisObject.GetComponentInChildren<Gun>();
+
+						bool flag2 = pickupObject == null && componentInChildren == null;
+						if (!flag2)
+						{
+							if (pickupObject == null && componentInChildren != null)
+							{
+								pickupObject = componentInChildren;
+							}
+							hologramDoer.ShowSpinDownHologram(pickupObject.PickupObjectId, pickupObject.gameObject);
+
+							
+						}
+					}
+					
+				}
+
+				foreach (var item in LastOwner.passiveItems)
+				{
+
+					if (item != null)
+					{
+						if (item.gameObject.transform.Find("spindown hologram") != null)
+						{
+							Destroy(item.gameObject.transform.Find("spindown hologram").gameObject);
+						}
+					}
+				}
+				foreach (var item in LastOwner.inventory.AllGuns)
+				{
+
+					if (item != null)
+					{
+						if (item.gameObject.transform.Find("spindown hologram") != null)
+						{
+							Destroy(item.gameObject.transform.Find("spindown hologram").gameObject);
+						}
+					}
+				}
+				foreach (var item in LastOwner.activeItems)
+				{
+
+					if (item != null)
+					{
+						if (item.gameObject.transform.Find("spindown hologram") != null)
+						{
+							Destroy(item.gameObject.transform.Find("spindown hologram").gameObject);
+						}
+					}
+				}
+
+			}
+			else
             {
 				foreach (DebrisObject debrisObject in StaticReferenceManager.AllDebris.ToArray())
 				{
@@ -57,14 +126,16 @@ namespace BotsMod
 						{
 							pickupObject = componentInChildren;
 						}
-						hologramDoer.ShowSpinDownHologram(pickupObject.PickupObjectId, pickupObject.gameObject);
+						if(pickupObject.gameObject.transform.Find("spindown hologram") != null)
+                        {
+							Destroy(pickupObject.gameObject.transform.Find("spindown hologram").gameObject);
+                        }
 
 
 					}
 
-					
+
 				}
-				
 			}
             base.Update();
         }
@@ -110,6 +181,9 @@ namespace BotsMod
 
 		public static int SpinDownID(int id)
 		{
+
+
+
 			int newId = id - 1;
 
 
@@ -122,12 +196,21 @@ namespace BotsMod
 
 				num++;
 
+				bool baseCheck = PickupObjectDatabase.GetById(newId) != null && !excludedOutputIds.Contains(newId);
+				bool settingsCheck = BeyondSettings.HasInstance && BeyondSettings.Instance.allowSpindownInsanity;
+				bool antifunCheck = (PickupObjectDatabase.GetById(newId).PrerequisitesMet() && PickupObjectDatabase.GetById(newId).quality != ItemQuality.EXCLUDED && PickupObjectDatabase.GetById(newId).quality != ItemQuality.SPECIAL && PickupObjectDatabase.GetById(newId).quality != ItemQuality.COMMON
+					&& (PickupObjectDatabase.GetById(newId) is Gun || PickupObjectDatabase.GetById(newId) is PlayerItem || PickupObjectDatabase.GetById(newId) is PassiveItem));
 
-				if (PickupObjectDatabase.GetById(newId) != null && PickupObjectDatabase.GetById(newId).PrerequisitesMet() && PickupObjectDatabase.GetById(newId).quality != ItemQuality.EXCLUDED && PickupObjectDatabase.GetById(newId).quality != ItemQuality.COMMON
-					&& !excludedOutputIds.Contains(newId))
+				if (baseCheck && settingsCheck)
 				{
+					//ETGModConsole.Log("setting");
 					return newId;
-				} 
+				}
+				else if(baseCheck && antifunCheck)
+				{
+					//ETGModConsole.Log("fun bad");
+					return newId;
+				}
 				else
 				{
 					newId--;

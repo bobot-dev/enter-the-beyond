@@ -191,10 +191,13 @@ namespace BotsMod
 						m.GetParameters()[0].ParameterType == typeof(object)),
 					typeof(Hooks).GetMethod("LogHookU", BindingFlags.Static | BindingFlags.Public));
 				//ETGModConsole.Log("post shitty hook");
+				if (BeyondSettings.Instance.debug)
+                {
+					var Crime = new Hook(
+						typeof(CharacterCostumeSwapper).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic),
+						typeof(Hooks).GetMethod("StartHook", BindingFlags.Static | BindingFlags.NonPublic));
+				}
 
-				var Crime = new Hook(
-					typeof(CharacterCostumeSwapper).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic),
-					typeof(Hooks).GetMethod("StartHook", BindingFlags.Static | BindingFlags.NonPublic));
 
 
 				var ReloadText = new Hook(
@@ -265,7 +268,7 @@ namespace BotsMod
 				var UpdateBlanksHook = new Hook(
 					typeof(GameUIBlankController).GetMethod("UpdateBlanks", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("UpdateBlanksHook", BindingFlags.Static | BindingFlags.Public));
-				BotsModule.Log("aaa");
+				//BotsModule.Log("aaa");
 				/*
 				var ProcessHeartSpriteModificationsHook = new Hook(
 					typeof(GameUIHeartController).GetMethod("ProcessHeartSpriteModifications", BindingFlags.Instance | BindingFlags.NonPublic),
@@ -295,8 +298,27 @@ namespace BotsMod
 				/*var RegisterConnectedRoomHook = new Hook(
 					typeof(RoomHandler).GetMethod("RegisterConnectedRoom", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("RegisterConnectedRoomHook", BindingFlags.Static | BindingFlags.Public)); */
+				var AttackHook = new Hook(
+					typeof(Gun).GetMethod("Attack", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("AttackHook", BindingFlags.Static | BindingFlags.Public));
 
-				 BotsModule.Log("hooks set up hopefully");
+				//var UpdateAmmoUIForModuleHook = new Hook(
+				//	typeof(GameUIAmmoController).GetMethod("UpdateAmmoUIForModule", BindingFlags.Instance | BindingFlags.NonPublic),
+				//	typeof(Hooks).GetMethod("UpdateAmmoUIForModuleHook", BindingFlags.Static | BindingFlags.NonPublic));
+
+				var UpdateGunSpriteHook = new Hook(
+					typeof(GameUIAmmoController).GetMethod("UpdateGunSprite", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("UpdateGunSpriteHook", BindingFlags.Static | BindingFlags.NonPublic));
+
+				var UpdateUIGunHook = new Hook(
+					typeof(GameUIAmmoController).GetMethod("UpdateUIGun", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("UpdateUIGunHook", BindingFlags.Static | BindingFlags.Public));
+
+				var SpawnClipAtPositionHook = new Hook(
+					typeof(Gun).GetMethod("SpawnClipAtPosition", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("SpawnClipAtPositionHook", BindingFlags.Static | BindingFlags.NonPublic));
+
+				BotsModule.Log("hooks set up hopefully");
 
 			}
 			catch (Exception arg)
@@ -306,6 +328,100 @@ namespace BotsMod
 
 			}
 		}
+
+		private static void SpawnClipAtPositionHook(Action<Gun, Vector3> orig, Gun self, Vector3 position)
+		{
+
+
+			if (self.PickupObjectId == BotsItemIds.BeyondChargeGun)
+            {
+
+
+
+				
+				if (self.clipObject != null)
+				{
+					
+					
+					var dir = self.CurrentAngle < 0 ? self.CurrentAngle - 25 : -self.CurrentAngle + 25;
+
+					Vector3 vector = Quaternion.Euler(0f, 0f, dir) * (self.transform.PositionVector2().normalized * 2).ToVector3ZUp(2);
+					GameObject gameObject = SpawnManager.SpawnDebris(self.clipObject, position.WithZ(-0.05f), Quaternion.Euler(0f, 0f, dir));
+					tk2dSprite component = gameObject.GetComponent<tk2dSprite>();
+					if (self.sprite.attachParent != null && component != null)
+					{
+						component.attachParent = self.sprite.attachParent;
+						component.HeightOffGround = self.sprite.HeightOffGround;
+					}
+					DebrisObject component2 = gameObject.GetComponent<DebrisObject>();
+					vector = Vector3.Scale(vector, Vector3.one) * 0.7f;
+					component2.Trigger(vector, 0.5f, 3);
+				}
+			}
+			else
+            {
+				orig(self, position);
+			}
+		}
+
+		private static void UpdateGunSpriteHook(Action<GameUIAmmoController, Gun, int, Gun> orig, GameUIAmmoController self, Gun newGun, int change, Gun secondaryGun = null)
+		{
+			orig(self, newGun, change, secondaryGun);
+			if (newGun.gameObject.GetComponent<OverheatGunBehaviour>() != null)
+			{
+
+				var heat = newGun.gameObject.GetComponent<OverheatGunBehaviour>().heatLevel * 3;
+				var maxHeat = newGun.gameObject.GetComponent<OverheatGunBehaviour>().GetModMaxOverheat(newGun.CurrentOwner) * 3;
+
+				self.GunCooldownForegroundSprite.RelativePosition = self.GunBoxSprite.RelativePosition;
+				self.GunCooldownFillSprite.RelativePosition = self.GunBoxSprite.RelativePosition + new Vector3(123f, 3f, 0f);
+				self.GunCooldownFillSprite.ZOrder = self.GunBoxSprite.ZOrder + 1;
+				self.GunCooldownForegroundSprite.ZOrder = self.GunCooldownFillSprite.ZOrder + 1;
+				self.GunCooldownFillSprite.IsVisible = true;
+				self.GunCooldownForegroundSprite.IsVisible = true;
+				self.GunCooldownFillSprite.FillAmount = heat / maxHeat;
+			}
+		}
+
+		public static void UpdateUIGunHook(Action<GameUIAmmoController, GunInventory, int> orig, GameUIAmmoController self, GunInventory guns, int inventoryShift)
+		{
+			orig(self, guns, inventoryShift);
+			Gun currentGun = guns.CurrentGun;
+
+			if (currentGun == null || GameUIRoot.Instance.ForceHideGunPanel || self.temporarilyPreventVisible || self.forceInvisiblePermanent)
+			{
+				self.ToggleRenderers(false);
+				return;
+			}
+
+			if (currentGun.gameObject.GetComponent<OverheatGunBehaviour>() != null)
+			{
+				FieldInfo _cachedMaxAmmo = typeof(GameUIAmmoController).GetField("m_cachedMaxAmmo", BindingFlags.NonPublic | BindingFlags.Instance);
+
+				FieldInfo _bgSpritesForModules = typeof(GameUIAmmoController).GetField("bgSpritesForModules", BindingFlags.NonPublic | BindingFlags.Instance);
+				FieldInfo _fgSpritesForModules = typeof(GameUIAmmoController).GetField("fgSpritesForModules", BindingFlags.NonPublic | BindingFlags.Instance);
+
+				FieldInfo _topCapsForModules = typeof(GameUIAmmoController).GetField("topCapsForModules", BindingFlags.NonPublic | BindingFlags.Instance);
+				FieldInfo _bottomCapsForModules = typeof(GameUIAmmoController).GetField("bottomCapsForModules", BindingFlags.NonPublic | BindingFlags.Instance);
+				
+					
+				var heat = Mathf.FloorToInt(currentGun.gameObject.GetComponent<OverheatGunBehaviour>().heatLevel);
+				var maxHeat = Mathf.FloorToInt(currentGun.gameObject.GetComponent<OverheatGunBehaviour>().GetModMaxOverheat(currentGun.CurrentOwner));
+				self.GunAmmoCountLabel.Text = $"{heat}/{maxHeat}";
+
+				for (int l = 0; l < (_bgSpritesForModules.GetValue(self) as List<dfTiledSprite>).Count; l++)
+				{
+					(_fgSpritesForModules.GetValue(self) as List<dfTiledSprite>)[l].IsVisible = false;
+					(_bgSpritesForModules.GetValue(self) as List<dfTiledSprite>)[l].IsVisible = false;
+				}
+				for (int m = 0; m < (_topCapsForModules.GetValue(self) as List<dfSprite>).Count; m++)
+				{
+					(_topCapsForModules.GetValue(self) as List<dfSprite>)[m].IsVisible = false;
+					(_bottomCapsForModules.GetValue(self) as List<dfSprite>)[m].IsVisible = false;
+				}
+			}
+		}
+
 		/*
 		public override void EffectTick(GameActorFireEffect self, GameActor actor, RuntimeGameActorEffectData effectData)
 		{
@@ -360,6 +476,20 @@ namespace BotsMod
 		}
 		*/
 
+
+
+
+		public static Gun.AttackResult AttackHook(Func<Gun, ProjectileData, GameObject, Gun.AttackResult> orig, Gun self, ProjectileData overrideProjectileData = null, GameObject overrideBulletObject = null)
+		{
+
+			if (self.gameObject.GetComponent<OverheatGunBehaviour>() != null && self.gameObject.GetComponent<OverheatGunBehaviour>().overheated)
+            {
+				return Gun.AttackResult.Fail;
+			}
+
+			return orig(self, overrideProjectileData, overrideBulletObject);
+		}
+
 		public static void RegisterConnectedRoomHook(RoomHandler self, RoomHandler other, RuntimeRoomExitData usedExit)
 		{
 			usedExit.oneWayDoor = true;
@@ -370,9 +500,9 @@ namespace BotsMod
 			self.connectedRoomsByExit.Add(usedExit.referencedExit, other);
 		}
 
-		private static bool CheckSourceInKnockbacksHook(KnockbackDoer self, GameObject source)
+		private static bool CheckSourceInKnockbacksHook(Func<KnockbackDoer, GameObject, bool> orig, KnockbackDoer self, GameObject source)
 		{
-
+			
 			FieldInfo _activeKnockbacks = typeof(KnockbackDoer).GetField("m_activeKnockbacks", BindingFlags.NonPublic | BindingFlags.Instance);
 
 			if (source == null)
@@ -381,29 +511,28 @@ namespace BotsMod
 			}
 
 			
-			if ((_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>) == null)
+			if ((_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>) != null)
 			{
-				BotsModule.Log($"_activeKnockbacks nulled", "#91ff00");
-			}
-
-			for (int i = 0; i < (_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>).Count; i++)
-			{
-				if ((_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>)[i] == null)
+				List<ActiveKnockbackData> ok = new List<ActiveKnockbackData>();
+				foreach (var a in (_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>))
 				{
-					BotsModule.Log($"_activeKnockbacks {i} nulled", "#91ff00");
+					if (a == null || a.sourceObject == null)
+					{
+						ok.Add(a);
+						//BotsModule.Log($"_activeKnockbacks {a} nulled", "#91ff00");
+					}
+					else if (a.sourceObject == source)
+					{
+						ok.Add(a);
+					}
 				}
-				BotsModule.Log((_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>)[i].sourceObject.ToString(), "#91ff00");
-				if ((_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>)[i].sourceObject == null)
-                {
-					BotsModule.Log("_activeKnockbacks sourceObject nulled", "#91ff00");
-				}
-
-				if ((_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>)[i].sourceObject == source)
+				foreach (var a in ok)
 				{
-					return true;
+					(_activeKnockbacks.GetValue(self) as List<ActiveKnockbackData>).Remove(a);
 				}
+				ok.Clear();
 			}
-			return false;
+			return orig(self, source);
 		}
 
 
@@ -740,7 +869,7 @@ namespace BotsMod
 
 		public static void UpdatePlayerConsumablesHook(GameUIRoot self, PlayerConsumables playerConsumables)
 		{
-			ETGModConsole.Log("0");
+			if (BotsModule.debugMode) ETGModConsole.Log("0");
 			FieldInfo _playerCoinSprite = typeof(GameUIRoot).GetField("p_playerCoinSprite", BindingFlags.NonPublic | BindingFlags.Instance);
 			//GameObject pannel = null;
 			if (UiTesting.p_playerArmourLabel == null)
@@ -771,19 +900,19 @@ namespace BotsMod
 
 			}
 
-			ETGModConsole.Log("1");
+			if (BotsModule.debugMode) ETGModConsole.Log("1");
 			if (UiTesting.p_playerArmourSprite == null)
 			{
 				ETGModConsole.Log("was null... shit 2");
 			}
-			ETGModConsole.Log("2");
+			if (BotsModule.debugMode) ETGModConsole.Log("2");
 			self.p_playerCoinLabel.Text = IntToStringSansGarbage.GetStringForInt(playerConsumables.Currency);
 			self.p_playerKeyLabel.Text = IntToStringSansGarbage.GetStringForInt(playerConsumables.KeyBullets);
 			UiTesting.p_playerArmourLabel.Text = IntToStringSansGarbage.GetStringForInt(10);
-			ETGModConsole.Log("3");
+			if (BotsModule.debugMode) ETGModConsole.Log("3");
 
 			typeof(GameUIRoot).GetMethod("UpdateSpecialKeys", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { playerConsumables });
-			ETGModConsole.Log("3.5");
+			if (BotsModule.debugMode) ETGModConsole.Log("3.5");
 
 			if(UiTesting.p_playerArmourLabel == null)
             {
@@ -799,21 +928,21 @@ namespace BotsMod
 				ETGModConsole.Log("p_playerArmourLabel.Parent.Parent");
 				
 			}
-			ETGModConsole.Log("4.05");
+			if (BotsModule.debugMode) ETGModConsole.Log("4.05");
 			if (GameManager.Instance.PrimaryPlayer != null && GameManager.Instance.PrimaryPlayer.Blanks == 0)
 			{
-				ETGModConsole.Log("4.15");
+				if (BotsModule.debugMode) ETGModConsole.Log("4.15");
 				//ETGModConsole.Log(self.p_playerCoinLabel.Parent.Parent.ToString());
 				self.p_playerCoinLabel.Parent.Parent.RelativePosition = self.p_playerCoinLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y);
-				ETGModConsole.Log("4.1");
+				if (BotsModule.debugMode) ETGModConsole.Log("4.1");
 				self.p_playerKeyLabel.Parent.Parent.RelativePosition = self.p_playerKeyLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y);
-				ETGModConsole.Log("4.2");
+				if (BotsModule.debugMode) ETGModConsole.Log("4.2");
 				UiTesting.p_playerArmourLabel.Parent.Parent.RelativePosition = UiTesting.p_playerArmourLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y) + new Vector3(10, 0, 0);
-				ETGModConsole.Log("4.3");
+				if (BotsModule.debugMode) ETGModConsole.Log("4.3");
 			}
 			else
 			{
-				ETGModConsole.Log("4.35");
+				if (BotsModule.debugMode) ETGModConsole.Log("4.35");
 				//ETGModConsole.Log(self.p_playerCoinLabel.Parent.Parent.ToString());
 				if (self.p_playerCoinLabel.Parent.Parent == null)
                 {
@@ -821,13 +950,13 @@ namespace BotsMod
 				}
 
 				self.p_playerCoinLabel.Parent.Parent.RelativePosition = self.p_playerCoinLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y + self.blankControllers[0].Panel.Height - 9f);
-				ETGModConsole.Log("4.4");
+				if (BotsModule.debugMode) ETGModConsole.Log("4.4");
 				self.p_playerKeyLabel.Parent.Parent.RelativePosition = self.p_playerKeyLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y + self.blankControllers[0].Panel.Height - 9f);
-				ETGModConsole.Log("4.5");
+				if (BotsModule.debugMode) ETGModConsole.Log("4.5");
 				UiTesting.p_playerArmourLabel.Parent.Parent.RelativePosition = UiTesting.p_playerArmourLabel.Parent.Parent.RelativePosition.WithY(self.blankControllers[0].Panel.RelativePosition.y + self.blankControllers[0].Panel.Height - 9f)   + new Vector3(10, 0, 0);
-				ETGModConsole.Log("4.6");
+				if (BotsModule.debugMode) ETGModConsole.Log("4.6");
 			}
-			ETGModConsole.Log("4");
+			if (BotsModule.debugMode) ETGModConsole.Log("4");
 			if (GameManager.Instance.CurrentLevelOverrideState == GameManager.LevelOverrideState.FOYER)
 			{
 				int num = Mathf.RoundToInt(GameStatsManager.Instance.GetPlayerStatValue(TrackedStats.META_CURRENCY));
@@ -851,7 +980,7 @@ namespace BotsMod
 					(_playerCoinSprite.GetValue(self) as dfSprite).IsVisible = false;
 				}
 			}
-			ETGModConsole.Log("5");
+			if (BotsModule.debugMode) ETGModConsole.Log("5");
 		}
 
 
@@ -1551,7 +1680,7 @@ namespace BotsMod
 
 			FieldInfo _active = typeof(CharacterCostumeSwapper).GetField("m_active", BindingFlags.NonPublic | BindingFlags.Instance);
 
-			bool flag = true;//GameStatsManager.Instance.GetCharacterSpecificFlag(self.TargetCharacter, CharacterSpecificGungeonFlags.KILLED_PAST);
+			bool flag = GameStatsManager.Instance.GetCharacterSpecificFlag(self.TargetCharacter, CharacterSpecificGungeonFlags.KILLED_PAST);
 			if (self.HasCustomTrigger)
 			{
 				if (self.CustomTriggerIsFlag)
@@ -2373,9 +2502,9 @@ namespace BotsMod
 			if (Foyer.DoIntroSequence)
 			{
 				GameManager.Instance.StartCoroutine((IEnumerator)typeof(FinalIntroSequenceManager).GetMethod("CoreSequence", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null));
-				ETGModConsole.Log("first thing started");
+				if (BotsModule.debugMode) ETGModConsole.Log("first thing started");
 				GameManager.Instance.StartCoroutine(HandleBackgroundSkipChecks(self));
-				ETGModConsole.Log("second thing started");
+				if (BotsModule.debugMode) ETGModConsole.Log("second thing started");
 			}
 		}
 

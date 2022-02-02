@@ -158,7 +158,11 @@ namespace NpcApi
             atlas.Texture.Apply();
             atlas.AddItem(item);
             colourNum++;
-            ETGModConsole.Log("added new item to atlas: " + name);
+            if (BotsMod.BotsModule.debugMode)
+            {
+                ETGModConsole.Log("added new item to atlas: " + name);
+            }
+
             return item;
         }
         static List<Color> colors = new List<Color>

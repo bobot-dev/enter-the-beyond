@@ -16,11 +16,12 @@ namespace CustomCharacters
         public CustomPlayableCharacters identity;
         public string name, nameShort, nickname, nameInternal, pathForSprites, pathForAltSprites;
         public Dictionary<PlayerStats.StatType, float> stats;
-        public List<Texture2D> sprites, altSprites, foyerCardSprites, punchoutSprites, punchoutFaceCards, loadoutSprites;
+        public List<Texture2D> sprites, altSprites, foyerCardSprites, punchoutFaceCards, loadoutSprites;
         public List<string> loadoutSpriteNames = new List<string>();
         public Texture2D altPlayerSheet, playerSheet, minimapIcon, junkanWinPic, pastWinPic, altObjSprite1, altObjSprite2, coopDeathScreenIcon;
         public Texture2D faceCard;
         public List<Texture2D> bossCard = new List<Texture2D>();
+        public Dictionary<string, Texture2D> punchoutSprites;
         public List<Tuple<PickupObject, bool>> loadout, altGun;
         public int characterID, metaCost;
         public float health = 3, armor = 0;
@@ -54,7 +55,7 @@ namespace CustomCharacters
 
         public CharacterSelectIdleDoer idleDoer;
 
-        public List<Tuple<GameObject, Vector2>> randomFoyerBullshitNNAskedFor = new List<Tuple<GameObject, Vector2>>();
+        public List<Tuple<GameObject, Vector3>> randomFoyerBullshitNNAskedFor = new List<Tuple<GameObject, Vector3>>();
     }
 
     class CustomCharacterFoyerController : MonoBehaviour
@@ -89,6 +90,8 @@ namespace CustomCharacters
        
         public string past, overrideAnimation;
         public bool hasPast;
+
+        public static Dictionary<string, int> punchoutBullShit = new Dictionary<string, int>();
         
 
         void Start()

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Gungeon;
 using GungeonAPI;
 using ItemAPI;
@@ -53,7 +52,7 @@ namespace BotsMod
 			
 
 
-			gun.StarterGunForAchievement = true;
+			gun.StarterGunForAchievement = false;
 
 			gun.gunSwitchGroup = "EnergyCannon";
 
@@ -65,11 +64,13 @@ namespace BotsMod
 
 			Gun gun5 = PickupObjectDatabase.GetById(37) as Gun;
 			gun.finalMuzzleFlashEffects = gun5.muzzleFlashEffects;
+			gun.DefaultModule.numberOfShotsInClip = 1000;
+			gun.DefaultModule.cooldownTime = 0.05f;
+			gun.DefaultModule.ammoType = GameUIAmmoType.AmmoType.BEAM;
 
 
 
-
-				
+			gun.DefaultModule.shootStyle = ProjectileModule.ShootStyle.Automatic;
 
 			gun.quality = PickupObject.ItemQuality.EXCLUDED;
 			Guid.NewGuid().ToString();
@@ -95,7 +96,7 @@ namespace BotsMod
 			//dieBirds.AngularVelocity = 180;
 			//dieBirds.HomingRadius = 2;
 
-			var laser = projectile.gameObject.AddComponent<St4keProj>();
+			/*var laser = projectile.gameObject.AddComponent<St4keProj>();
 
 			//laser.BackLinkProjectile = null;
 			//laser.damageCooldown = 1;
@@ -203,7 +204,57 @@ namespace BotsMod
 
 
 			ETGMod.Databases.Items.Add(gun, null, "ANY");
+
 		}
+
+		public float heatLevel;
+		public float maxHeat = 3;
+		public bool overheated;
+
+		float waitTime;
+		float maxWaitTime = 0.8f;
+
+		void Update()
+        {
+			if(this.gun.CurrentOwner != null && this.gun.CurrentOwner is PlayerController)
+            {
+				if (this.gun.IsFiring)
+                {
+					waitTime = 0;
+					if (heatLevel >= maxHeat)
+					{
+						if (!overheated)
+						{
+							overheated = true;
+							this.gun.CeaseAttack(false, null);
+						}
+					}
+					else if (heatLevel < maxHeat)
+					{
+						heatLevel += Time.deltaTime;
+					}
+				} 
+				else
+                {
+					if (waitTime >= maxWaitTime)
+                    {
+						if (heatLevel > 0)
+						{
+							heatLevel -= Time.deltaTime * 2;
+							if (heatLevel <= 0)
+							{
+								overheated = false;
+								heatLevel = 0;
+							}
+						}
+					}
+					else if (waitTime < maxWaitTime)
+					{
+						waitTime += Time.deltaTime;
+					}
+				}				
+            }
+        }
 
 		public override void OnInitializedWithOwner(GameActor actor)
 		{

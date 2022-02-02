@@ -424,94 +424,107 @@ namespace AmmonomiconAPI
 
 				foreach (var bookmark in Ammonomicon.customBookmarks)
 				{
-					
+
 					if (!ammonomiconBookmarks.Contains(bookmark))
-                    {
+					{
 						//Tools.Log(bookmark.gameObject.name);
 						ammonomiconBookmarks.Insert(ammonomiconBookmarks.Count - 2, bookmark);
 					}
 				}
-
-				
-				
-				//Tools.Log("8");
-				var dumbObj = FakePrefab.Clone(self.bookmarks[ammonomiconBookmarks.Count - 1].gameObject);
-
-
-				AmmonomiconBookmarkController tabController2 = dumbObj.GetComponent<AmmonomiconBookmarkController>();
-
-				//Tools.Log("9");
-				dumbObj.transform.parent = self.bookmarks[2].gameObject.transform.parent;
-				dumbObj.transform.position = self.bookmarks[2].gameObject.transform.position;
-				dumbObj.transform.localPosition = new Vector3(0, -1.2f, 0);
-
-				tabController2.gameObject.name = "Mods";
-				//1967693681992645534
-				tabController2.DeselectSelectedSpriteName = "bookmark_beyond_select_hover_001";
-				tabController2.SelectSpriteName = "bookmark_beyond_hover_001";
-
-				FieldInfo _sprites = typeof(dfAnimationClip).GetField("sprites", BindingFlags.NonPublic | BindingFlags.Instance);
-
-				var beyondClipObj = new GameObject("AmmonomiconBookmarkBeyondHover");
-				FakePrefab.MarkAsFakePrefab(beyondClipObj);
-				var beyondClip = beyondClipObj.AddComponent<dfAnimationClip>();
-				beyondClip.Atlas = self.bookmarks[2].AppearClip.Atlas;
-
-				_sprites.SetValue(beyondClip, new List<string> { "bookmark_beyond_001", "bookmark_beyond_002", "bookmark_beyond_003", "bookmark_beyond_004" });
-
-				var beyondClipObj2 = new GameObject("AmmonomiconBookmarkBeyondSelectHover");
-				FakePrefab.MarkAsFakePrefab(beyondClipObj2);
-				var beyondClip2 = beyondClipObj.AddComponent<dfAnimationClip>();
-				beyondClip2.Atlas = self.bookmarks[2].AppearClip.Atlas;
-
-				_sprites.SetValue(beyondClip2, new List<string> { "bookmark_beyond_select_001", "bookmark_beyond_select_002", "bookmark_beyond_select_003" });
-
-				tabController2.TargetNewPageLeft = "Global Prefabs/Ammonomicon Pages/Beyond Page Left";
-				tabController2.TargetNewPageRight = "Global Prefabs/Ammonomicon Pages/Info Page Right";
-				tabController2.RightPageType = (AmmonomiconPageRenderer.PageType)CustomEnums.CustomPageType.MODS_RIGHT;
-				//tabController2.RightPageType = AmmonomiconPageRenderer.PageType.ITEMS_RIGHT;
-				tabController2.LeftPageType = (AmmonomiconPageRenderer.PageType)CustomEnums.CustomPageType.MODS_LEFT;
-				//tabController2.LeftPageType = AmmonomiconPageRenderer.PageType.ITEMS_LEFT;
-				tabController2.AppearClip = beyondClip;
-				tabController2.SelectClip = beyondClip2;
-				//Tools.Log("9.5");
-				
-				/*FieldInfo m_sprite = typeof(AmmonomiconBookmarkController).GetField("m_sprite", BindingFlags.NonPublic | BindingFlags.Instance);
-				m_sprite.SetValue(tabController2, m_sprite.GetValue(self.bookmarks[2]) as dfButton);
-				
-				FieldInfo m_animator = typeof(AmmonomiconBookmarkController).GetField("m_animator", BindingFlags.NonPublic | BindingFlags.Instance);
-				m_animator.SetValue(tabController2, m_animator.GetValue(self.bookmarks[2]) as dfSpriteAnimation);
-				*/
-				//Tools.Log("10");
-
-				if (dumbObj.GetComponent<dfButton>() == null)
+				bool dosetup = true;
+				foreach (var mark in self.bookmarks)
 				{
-					Tools.Log("dfButton nulled :(");
+					if (mark.name.Contains("Spells"))
+					{
+						
+						dosetup = false;
+						break;
+					}
+
 				}
+				if (dosetup)
+                {
+					var dumbObj = FakePrefab.Clone(self.bookmarks[ammonomiconBookmarks.Count - 1].gameObject);
 
-				dumbObj.GetComponent<dfButton>().BackgroundSprite = "bookmark_beyond_004";
 
-				ammonomiconBookmarks.Insert(ammonomiconBookmarks.Count - 1, tabController2);
+					AmmonomiconBookmarkController tabController2 = dumbObj.GetComponent<AmmonomiconBookmarkController>();
 
-				//ammonomiconBookmarks.Add(deathBookmark);
+					//Tools.Log("9");
+					dumbObj.transform.parent = self.bookmarks[2].gameObject.transform.parent;
+					dumbObj.transform.position = self.bookmarks[2].gameObject.transform.position;
+					dumbObj.transform.localPosition = new Vector3(0, -1.2f, 0);
 
-				//Tools.Log("11");
-				//self.bookmarks = ammonomiconBookmarks.ToArray();
+					tabController2.gameObject.name = "Spells";
+					//1967693681992645534
+					tabController2.DeselectSelectedSpriteName = "bookmark_beyond_select_hover_001";
+					tabController2.SelectSpriteName = "bookmark_beyond_hover_001";
 
-				//Tools.Log("12");
+					FieldInfo _sprites = typeof(dfAnimationClip).GetField("sprites", BindingFlags.NonPublic | BindingFlags.Instance);
 
-				dumbObj.SetActive(true);
-				//ItemAPI.FakePrefab.MarkAsFakePrefab(dumbObj);*/
-				self.bookmarks = ammonomiconBookmarks.ToArray();
-				//Tools.Log("13");
+					var beyondClipObj = new GameObject("AmmonomiconBookmarkBeyondHover");
+					FakePrefab.MarkAsFakePrefab(beyondClipObj);
+					var beyondClip = beyondClipObj.AddComponent<dfAnimationClip>();
+					beyondClip.Atlas = self.bookmarks[2].AppearClip.Atlas;
 
-			
+					_sprites.SetValue(beyondClip, new List<string> { "bookmark_beyond_001", "bookmark_beyond_002", "bookmark_beyond_003", "bookmark_beyond_004" });
 
+					var beyondClipObj2 = new GameObject("AmmonomiconBookmarkBeyondSelectHover");
+					FakePrefab.MarkAsFakePrefab(beyondClipObj2);
+					var beyondClip2 = beyondClipObj.AddComponent<dfAnimationClip>();
+					beyondClip2.Atlas = self.bookmarks[2].AppearClip.Atlas;
+
+					_sprites.SetValue(beyondClip2, new List<string> { "bookmark_beyond_select_001", "bookmark_beyond_select_002", "bookmark_beyond_select_003" });
+
+					tabController2.TargetNewPageLeft = "Global Prefabs/Ammonomicon Pages/Beyond Page Left";
+					tabController2.TargetNewPageRight = "Global Prefabs/Ammonomicon Pages/Info Page Right";
+					tabController2.RightPageType = (AmmonomiconPageRenderer.PageType)CustomEnums.CustomPageType.MODS_RIGHT;
+					//tabController2.RightPageType = AmmonomiconPageRenderer.PageType.ITEMS_RIGHT;
+					tabController2.LeftPageType = (AmmonomiconPageRenderer.PageType)CustomEnums.CustomPageType.MODS_LEFT;
+					//tabController2.LeftPageType = AmmonomiconPageRenderer.PageType.ITEMS_LEFT;
+					tabController2.AppearClip = beyondClip;
+					tabController2.SelectClip = beyondClip2;
+					//Tools.Log("9.5");
+
+					/*FieldInfo m_sprite = typeof(AmmonomiconBookmarkController).GetField("m_sprite", BindingFlags.NonPublic | BindingFlags.Instance);
+					m_sprite.SetValue(tabController2, m_sprite.GetValue(self.bookmarks[2]) as dfButton);
+
+					FieldInfo m_animator = typeof(AmmonomiconBookmarkController).GetField("m_animator", BindingFlags.NonPublic | BindingFlags.Instance);
+					m_animator.SetValue(tabController2, m_animator.GetValue(self.bookmarks[2]) as dfSpriteAnimation);
+					*/
+					//Tools.Log("10");
+
+					if (dumbObj.GetComponent<dfButton>() == null)
+					{
+						Tools.Log("dfButton nulled :(");
+					}
+
+					dumbObj.GetComponent<dfButton>().BackgroundSprite = "bookmark_beyond_004";
+
+					ammonomiconBookmarks.Insert(ammonomiconBookmarks.Count - 1, tabController2);
+
+					//ammonomiconBookmarks.Add(deathBookmark);
+
+					//Tools.Log("11");
+					//self.bookmarks = ammonomiconBookmarks.ToArray();
+
+					//Tools.Log("12");
+
+					dumbObj.SetActive(true);
+					//ItemAPI.FakePrefab.MarkAsFakePrefab(dumbObj);*/
+					self.bookmarks = ammonomiconBookmarks.ToArray();
+					//Tools.Log("13");
+
+
+
+					
+					foreach (Transform bookmark in tabController2.transform.parent)
+					{
+						//Tools.Log(bookmark.gameObject.name);
+					}
+				}
 				orig(self);
-				foreach (Transform bookmark in tabController2.transform.parent)
-				{
-					//Tools.Log(bookmark.gameObject.name);
-				}
+				//Tools.Log("8");
+
 			}
 
 			catch (Exception e)

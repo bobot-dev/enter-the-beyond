@@ -116,7 +116,7 @@ namespace BotsMod
 			gun.InfiniteAmmo = false;
 
 			
-			gun.StarterGunForAchievement = true;
+			gun.StarterGunForAchievement = false;
 
 			//gun.barrelOffset = gun4,
 
@@ -131,7 +131,7 @@ namespace BotsMod
 			gun.finalMuzzleFlashEffects = gun5.muzzleFlashEffects;
 
 			
-			gun.quality = PickupObject.ItemQuality.B;
+			gun.quality = PickupObject.ItemQuality.EXCLUDED;
 			gun.gunClass = GunClass.SHOTGUN;
 			
 

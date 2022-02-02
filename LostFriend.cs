@@ -39,7 +39,7 @@ namespace BotsMod
 
 		public static void Init()
 		{
-			string itemName = "IDFK what to call this thing";
+			string itemName = "Beyond Sentry";
 			string resourceName = "BotsMod/sprites/LostFriend/idle/lostfriend1";
 
 			GameObject obj = new GameObject();
@@ -47,7 +47,7 @@ namespace BotsMod
 			ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
 
 			string shortDesc = "A Lost Friend";
-			string longDesc = "no";
+			string longDesc = "Fires a weak laser at nearby enemies.\n\nA once standard issue self defence unit in the beyond now obsolete after the overseer's take over.";
 
 			ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
 			item.quality = PickupObject.ItemQuality.C;
@@ -61,6 +61,15 @@ namespace BotsMod
 			item.PlaceItemInAmmonomiconAfterItemById(664);
 
 			Tools.BeyondItems.Add(item.PickupObjectId);
+
+			item.sprite.usesOverrideMaterial = true;
+			Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+
+			material.SetTexture("_MainTex", item.sprite.renderer.material.mainTexture);
+			material.SetColor("_EmissiveColor", new Color32(255, 69, 245, 255));
+			material.SetFloat("_EmissiveColorPower", 1.55f);
+			material.SetFloat("_EmissivePower", 55);
+			item.sprite.renderer.material = material;
 		}
 		
 		public static void BuildPrefab()
@@ -92,7 +101,7 @@ namespace BotsMod
 			//moonraker bloom material
 			BasicBeamController beamComp = projectile4.GenerateBeamPrefab("BotsMod/sprites/beam/LostFriend/lost_friend_laser_middle_001", new Vector2(32, 4),new Vector2(0, 0),BeamAnimPaths, 8,ImpactAnimPaths, 13,new Vector2(0, 0),new Vector2(0, 0),
 				muzzleVFXAnimationPaths: StartAnimPaths, muzzleVFXColliderDimensions: new Vector2(32, 4), muzzleVFXColliderOffsets: new Vector2(0, 0), glows: true);
-			//projectile4.gameObject.SetActive(false);
+			projectile4.gameObject.SetActive(false);
 			projectile4.collidesWithPlayer = false;
 			FakePrefab.MarkAsFakePrefab(projectile4.gameObject);
 			UnityEngine.Object.DontDestroyOnLoad(projectile4);

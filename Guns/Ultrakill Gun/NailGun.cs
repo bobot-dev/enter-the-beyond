@@ -19,13 +19,13 @@ namespace BotsMod
 			Gun gun = ETGMod.Databases.Items.NewGun("Nail Minigun", "nail_vulcan");
 			Game.Items.Rename("outdated_gun_mods:nail_minigun", "bot:nail_minigun");
 			var meNeedMakeCoin = gun.gameObject.AddComponent<NailGun>();
-			gun.SetShortDescription("fuck you gabrial");
-			gun.SetLongDescription("MANKIND IS DEAD \nBLOOD IS FUEL \nHELL IS FULL");
+			gun.SetShortDescription("MANKIND IS DEAD");
+			gun.SetLongDescription("A heavily modified version of the Vulcan that now fires nails and magnets");
 
 			gun.SetupSprite(null, "nail_vulcan_idle_001", 8);
 			gun.SetAnimationFPS(gun.shootAnimation, 12);
 			gun.SetAnimationFPS(gun.reloadAnimation, 10);
-			gun.gameObject.AddComponent<UltraKillGun>();
+			//gun.gameObject.AddComponent<UltraKillGun>();
 
 			Gun other = PickupObjectDatabase.GetById(26) as Gun;
 			gun.AddProjectileModuleFrom(other, true, false);

@@ -16,18 +16,18 @@ namespace BotsMod
         public static void Init()
         {
             string itemName = "Carpet Burn";
-            string resourceName = "BotsMod/sprites/wip";
+            string resourceName = "BotsMod/sprites/carpet_burn";
             GameObject obj = new GameObject(itemName);
-            var item = obj.AddComponent<PassiveItemTemplate>();
+            var item = obj.AddComponent<CarpetBurn>();
 
             ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
 
-            string shortDesc = "";
-            string longDesc = "";
+            string shortDesc = "IT BURNS";
+            string longDesc = "Causes any gundead unfortunate enough to stand on carpet to burst into flames.";
 
             ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
 
-            item.quality = PickupObject.ItemQuality.D;
+            item.quality = PickupObject.ItemQuality.C;
 
             id = item.PickupObjectId;
 

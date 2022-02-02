@@ -58,7 +58,7 @@ namespace BotsMod
         {
             var thing = FakePrefab.Clone(GameUIRoot.Instance.p_playerReloadBar.statusBarPoison.gameObject).GetComponent<dfProgressBar>();
 
-            ETGModConsole.Log(GameUIRoot.Instance.p_playerReloadBar.statusBarPoison.transform.parent.name);
+            if (BotsModule.debugMode) ETGModConsole.Log(GameUIRoot.Instance.p_playerReloadBar.statusBarPoison.transform.parent.name);
             thing.transform.parent = GameUIRoot.Instance.p_playerReloadBar.statusBarPoison.transform.parent;
 
             FieldInfo progressSprite = typeof(dfProgressBar).GetField("progressSprite", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -69,12 +69,12 @@ namespace BotsMod
 
             cachedManager.SetValue(thing, (cachedManager.GetValue(GameUIRoot.Instance.p_playerReloadBar.statusBarPoison) as dfGUIManager));
 
-            ETGModConsole.Log((cachedManager.GetValue(GameUIRoot.Instance.p_playerReloadBar.statusBarPoison) as dfGUIManager).ToString());
-            ETGModConsole.Log((cachedManager.GetValue(thing) as dfGUIManager).ToString());
+            if (BotsModule.debugMode) ETGModConsole.Log((cachedManager.GetValue(GameUIRoot.Instance.p_playerReloadBar.statusBarPoison) as dfGUIManager).ToString());
+            if (BotsModule.debugMode) ETGModConsole.Log((cachedManager.GetValue(thing) as dfGUIManager).ToString());
 
             progressSprite.SetValue(thing, (atlas.GetValue(thing) as dfAtlas).AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource(ProgressSprite)).name);
             backgroundSprite.SetValue(thing, (atlas.GetValue(thing) as dfAtlas).AddNewItemToAtlas(ItemAPI.ResourceExtractor.GetTextureFromResource(BackgroundSprite)).name);
-            ETGModConsole.Log("AAA");
+            if (BotsModule.debugMode) ETGModConsole.Log("AAA");
             return thing;
         }
 

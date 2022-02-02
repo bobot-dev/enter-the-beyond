@@ -9,6 +9,7 @@ using UnityEngine;
 
 using System.Reflection;
 using ItemAPI;
+using SaveAPI;
 
 namespace CustomCharacters
 {
@@ -92,12 +93,56 @@ namespace CustomCharacters
             return null;
         }
 
-        public static void AddFoyerObject(string character, GameObject obj, Vector2 offset)
+        public static void AddFoyerObject(string character, GameObject obj, Vector2 offset, CustomDungeonFlags requiredFlag = CustomDungeonFlags.NONE)
         {
             character = character.ToLower();
             if (CharacterBuilder.storedCharacters.ContainsKey(character))
             {
-                CharacterBuilder.storedCharacters[character].First.randomFoyerBullshitNNAskedFor.Add(new Tuple<GameObject, Vector2>(obj, offset));
+                var cc = CharacterBuilder.storedCharacters[character].First;
+                obj.layer = 22;
+                var flagDisabler = obj.AddComponent<CustomSimpleFlagDisabler>();
+                flagDisabler.FlagToCheckFor = requiredFlag;
+                flagDisabler.UseNumberOfAttempts = false;
+
+                CharacterBuilder.storedCharacters[character].First.randomFoyerBullshitNNAskedFor.Add(new Tuple<GameObject, Vector3>(obj, offset));
+            }
+            else
+            {
+                ETGModConsole.Log($"No character found under the name \"{character}\" or tk2dSpriteAnimator is null");
+            }
+        }
+        public static void AddFoyerObject(string character, GameObject obj, Vector2 offset, CustomTrackedStats requiredStat, int amount)
+        {
+            character = character.ToLower();
+            if (CharacterBuilder.storedCharacters.ContainsKey(character))
+            {
+                var cc = CharacterBuilder.storedCharacters[character].First;
+                obj.layer = 22;
+                var flagDisabler = obj.AddComponent<CustomSimpleFlagDisabler>();
+                flagDisabler.UsesStatComparisonInstead = true;
+                flagDisabler.RelevantStat = requiredStat;
+                flagDisabler.minStatValue = amount;
+                flagDisabler.UseNumberOfAttempts = false;
+
+                CharacterBuilder.storedCharacters[character].First.randomFoyerBullshitNNAskedFor.Add(new Tuple<GameObject, Vector3>(obj, offset));
+            }
+            else
+            {
+                ETGModConsole.Log($"No character found under the name \"{character}\" or tk2dSpriteAnimator is null");
+            }
+        }
+        public static void AddFoyerObject(string character, GameObject obj, Vector2 offset, int minRunCount = 2)
+        {
+            character = character.ToLower();
+            if (CharacterBuilder.storedCharacters.ContainsKey(character))
+            {
+                var cc = CharacterBuilder.storedCharacters[character].First;
+                obj.layer = 22;
+                var flagDisabler = obj.AddComponent<CustomSimpleFlagDisabler>();
+                flagDisabler.UseNumberOfAttempts = minRunCount >= 0;
+                flagDisabler.minStatValue = minRunCount;
+
+                CharacterBuilder.storedCharacters[character].First.randomFoyerBullshitNNAskedFor.Add(new Tuple<GameObject, Vector3>(obj, offset));
             }
             else
             {
@@ -232,12 +277,11 @@ namespace CustomCharacters
             return null;
         }
 
-        //Finds sprite folders, sprites, and characterdata.txt (and parses it)
-        public static void LoadCharacterData()
+
+        public static void AddCoopBlankOverride(string character, Func<PlayerController, float> overrideMethod)
         {
-            //LoadDirectories();
-            //LoadZips();
-        }        
+            CharacterBuilder.storedCharacters[character.ToLower()].First.coopBlankReplacement = overrideMethod;
+        }
 
         private static CustomCharacterData GetCharacterData(string filePath)
         {
@@ -282,6 +326,12 @@ namespace CustomCharacters
             string spritesDir = Path.Combine(filePath, "sprites").Replace("/", ".").Replace("\\", ".");
             string newSpritesDir = Path.Combine(filePath, "newspritesetup").Replace("/", ".").Replace("\\", ".");
             string newAltSpritesDir = Path.Combine(filePath, "newaltspritesetup").Replace("/", ".").Replace("\\", ".");
+            string altSpritesDir = Path.Combine(filePath, "alt_sprites").Replace("/", ".").Replace("\\", ".");
+            string loadoutDir = Path.Combine(filePath, "loadoutsprites").Replace("/", ".").Replace("\\", ".");
+            string foyerDir = Path.Combine(filePath, "foyercard").Replace("/", ".").Replace("\\", ".");
+            string punchoutDir = Path.Combine(filePath, "punchout").Replace("/", ".").Replace("\\", ".");
+            string punchoutSpritesDir = Path.Combine(filePath, "punchout.sprites").Replace("/", ".").Replace("\\", ".");
+
 
             string[] resources = ToolsCharApi.GetResourceNames();
             
@@ -296,7 +346,7 @@ namespace CustomCharacters
                         data.sprites = ToolsCharApi.GetTexturesFromResource(spritesDir);
                     }
 
-                    string altSpritesDir = Path.Combine(filePath, "alt_sprites").Replace("/", ".").Replace("\\", ".");
+                    
 
                     if (resources[i].StartsWith(altSpritesDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.altSprites == null)
                     {
@@ -316,7 +366,7 @@ namespace CustomCharacters
                         data.pathForAltSprites = newAltSpritesDir;
                     }
 
-                    string foyerDir = Path.Combine(filePath, "foyercard").Replace("/", ".").Replace("\\", ".");
+                    
                     if (resources[i].StartsWith(foyerDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.foyerCardSprites == null)
                     {
                         //ToolsCharApi.PrintError("Found: Foyer card folder");
@@ -324,7 +374,7 @@ namespace CustomCharacters
                     }
                    
 
-                    string loadoutDir = Path.Combine(filePath, "loadoutsprites").Replace("/", ".").Replace("\\", ".");
+                    
                     if (resources[i].StartsWith(loadoutDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.loadoutSprites == null)
                     {
                         //ToolsCharApi.PrintError("Found: Loadout card folder");
@@ -333,22 +383,25 @@ namespace CustomCharacters
 
                         //ToolsCharApi.PrintError(data.loadoutSprites.Count.ToString());
                     }
-
-                    string punchoutDir = Path.Combine(filePath, "punchout").Replace("/", ".").Replace("\\", ".");
-
-                    string punchoutSpritesDir = Path.Combine(punchoutDir, "sprites").Replace("/", ".").Replace("\\", ".");
+                   
                     
                     if (resources[i].StartsWith(punchoutSpritesDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.punchoutSprites == null)
                     {
                         ToolsCharApi.Print("Found: Punchout Sprites folder");
                         ETGModConsole.Log("Found: Punchout Sprites folder");
-                        data.punchoutSprites = ToolsCharApi.GetTexturesFromResource(punchoutSpritesDir);
+                        data.punchoutSprites = new Dictionary<string, Texture2D>();
+                        foreach (var tex in ToolsCharApi.GetTexturesFromResource(punchoutSpritesDir))
+                        {
+                            data.punchoutSprites.Add(tex.name, tex);
+                        }
+
+                        
                     }
 
                     if (resources[i].StartsWith(punchoutDir.Replace('/', '.'), StringComparison.OrdinalIgnoreCase) && data.punchoutFaceCards == null)
                     {
                         data.punchoutFaceCards = new List<Texture2D>();
-                        ETGModConsole.Log(punchoutDir);
+                        //ETGModConsole.Log(punchoutDir);
                         var punchoutSprites = ToolsCharApi.GetTexturesFromResource(punchoutDir);
                         foreach (var tex in punchoutSprites)
                         {

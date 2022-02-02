@@ -28,6 +28,7 @@ using NpcApi;
 using ChamberGunApi;
 using static BotsMod.RandomComps;
 using AmmonomiconAPI;
+using ModdedItemWeightBalancer;
 //using ChallengeAPI;
 
 namespace BotsMod
@@ -101,13 +102,114 @@ namespace BotsMod
                 return list.ToArray();
             });
 
+            ETGModConsole.Commands.AddGroup("etb");
 
+            ETGModConsole.Commands.GetGroup("etb").AddUnit("allowSpindownInsanity", delegate (string[] args)
+            {
+                if(!BeyondSettings.HasInstance)
+                {
+                    BeyondSettings.Load();
+                }
+ 
+                BeyondSettings.Instance.allowSpindownInsanity = !BeyondSettings.Instance.allowSpindownInsanity;
+
+                BotsModule.Log($"allowSpindownInsanity enabled: {BeyondSettings.Instance.allowSpindownInsanity}");
+                BeyondSettings.Save();
+            });
+            
+            ETGModConsole.Commands.GetGroup("etb").AddUnit("debug", delegate (string[] args)
+            {
+                if (!BeyondSettings.HasInstance)
+                {
+                    BeyondSettings.Load();
+                }
+
+                BeyondSettings.Instance.debug = !BeyondSettings.Instance.debug;
+
+                BotsModule.Log($"debug enabled: {BeyondSettings.Instance.debug}");
+                BeyondSettings.Save();
+            });
+
+            ETGModConsole.Commands.GetGroup("etb").AddUnit("toggleCustomTitleScreen", delegate (string[] args)
+            {
+                if (!BeyondSettings.HasInstance)
+                {
+                    BeyondSettings.Load();
+                }
+
+                BeyondSettings.Instance.titleScreenOverrideEnabled = !BeyondSettings.Instance.titleScreenOverrideEnabled;
+
+                BotsModule.Log($"custom titlescreen enabled: {BeyondSettings.Instance.titleScreenOverrideEnabled}");
+                BeyondSettings.Save();
+            });
 
             ETGModConsole.Commands.AddGroup("bot");
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("randomize", delegate (string[] args)
             {
                 EtgRandomizerController.Init();
+            });
+
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("getModdedItems", delegate (string[] args)
+            {
+                ModdedItemWeightController.CheckModdedItems();
+            });
+
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("itemCount", delegate (string[] args)
+            {
+                var itemCountByMod = new Dictionary<string, int>();
+
+                
+                foreach (var item in PickupObjectDatabase.Instance.Objects)
+                {
+                    if (item != null)
+                    {
+                        ModdedItemWeightController.MIWCAddItemToDictWithoutHook(item);
+
+                        var match = ModdedItemWeightController.GetMatch(item);
+                        if (match != null && ModdedItemWeightController.MIWCActualModItemDict.ContainsKey(match) && ModdedItemWeightController.MIWCActualModItemDict[match] != null && ModdedItemWeightController.MIWCActualModItemDict[match].Metadata != null &&
+                        !string.IsNullOrEmpty(ModdedItemWeightController.MIWCActualModItemDict[match].Metadata.Name))
+                        {
+                            if (itemCountByMod.ContainsKey(ModdedItemWeightController.MIWCActualModItemDict[match].Metadata.Name))
+                            {
+                                itemCountByMod[ModdedItemWeightController.MIWCActualModItemDict[match].Metadata.Name] += 1;
+                            }
+                            else
+                            {
+                                itemCountByMod.Add(ModdedItemWeightController.MIWCActualModItemDict[match].Metadata.Name, 1);
+                            }
+                            //ETGModConsole.Log($"(command) added item to modded list {ModdedItemWeightController.MIWCActualModItemDict[match].Metadata.Name}");
+                            //MIWCActualModItemDict[match].Metadata.Name
+
+                        }
+                        else if (item.PickupObjectId <= 823)
+                        {
+                            if (itemCountByMod.ContainsKey("Gungeon"))
+                            {
+                                itemCountByMod["Gungeon"] += 1;
+                            }
+                            else
+                            {
+                                itemCountByMod.Add("Gungeon", 1);
+                            }
+                        }
+
+                        if (item != null && item.quality != PickupObject.ItemQuality.EXCLUDED && item.quality != PickupObject.ItemQuality.SPECIAL && item.quality != PickupObject.ItemQuality.COMMON)
+                        {
+
+                        }
+                    }
+                    
+
+                    
+                    
+                }
+                foreach (var item in itemCountByMod)
+                {
+                    ETGModConsole.Log($"[{item.Key}]: item count: {item.Value}");
+                }
+
+                
             });
 
 
@@ -177,7 +279,7 @@ namespace BotsMod
             {
 
                 GUIhandler handler = GameManager.Instance.PrimaryPlayer.gameObject.GetOrAddComponent<GUIhandler>();
-                handler.enabled = true;
+                handler.enabled = GameManager.Instance.PrimaryPlayer.HasPickupID(BotsItemIds.Wand);
 
             });
 
@@ -1153,8 +1255,8 @@ namespace BotsMod
                 }
                 catch (Exception e)
                 {
-                    BotsModule.Log("swapper dump broke", "#eb1313");
-                    BotsModule.Log(string.Format(e + ""), "#eb1313");
+                    BotsModule.Log("swapper dump broke", "#eb1313", false);
+                    BotsModule.Log(string.Format(e + ""), "#eb1313", false);
                 }
             });
             /*

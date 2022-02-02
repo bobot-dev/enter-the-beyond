@@ -22,7 +22,7 @@ namespace BotsMod
             var item = obj.AddComponent<LightningRounds>();
             ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
             string shortDesc = "Truly Shocking";
-            string longDesc = "bullets have a chance to chain lightning to nearby enemies";
+            string longDesc = "Bullets have a chance to chain lightning to nearby enemies. \n\nThese bullets are the result of a gungeoneer named Jacob being far to lazy to aim.";
             ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
             item.quality = ItemQuality.A;
 
@@ -195,7 +195,7 @@ namespace BotsMod
 			//}
 		}
 
-		public static void ChainLightningToTarget(Vector2 pos, float damage, float range, List<AIActor> ignoreList, int limit, bool purple = true)
+		public static void ChainLightningToTarget(Vector2 pos, float damage, float range, List<AIActor> ignoreList, int limit, bool purple = true, GameObject overrideVFX = null)
         {
 			var room = GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(pos.ToIntVector2());
 			if (damage <= 0.5f || range <= 0 || room == null)
@@ -207,9 +207,18 @@ namespace BotsMod
 			var enemy = room.GetNearestEnemy(pos, out distance, ignoreList, true, true);
 			if (distance <= range && enemy != null)
             {
-				var linkVFXPrefab = (purple ? CustomLightning.lightningVFX : Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX);
+				GameObject linkVFXPrefab = null;
+				if (overrideVFX != null)
+                {
+					linkVFXPrefab = overrideVFX;
+				}
+				else
+                {
+					linkVFXPrefab = (purple ? CustomLightning.lightningVFX : Game.Items["shock_rounds"].GetComponent<ComplexProjectileModifier>().ChainLightningVFX);
+				}
+				
 
-				ETGModConsole.Log($"{(purple ? "purple" : "blue")}");
+				if (BotsModule.debugMode) ETGModConsole.Log($"{(purple ? "purple" : "blue")}");
 
 				tk2dTiledSprite component = SpawnManager.SpawnVFX(linkVFXPrefab, false).GetComponent<tk2dTiledSprite>();
 				extantLink = component;
@@ -230,7 +239,7 @@ namespace BotsMod
         }
 
 
-		private static void UpdateLink(AIActor target, tk2dTiledSprite m_extantLink, Vector2 landedPoint)
+		public static void UpdateLink(AIActor target, tk2dTiledSprite m_extantLink, Vector2 landedPoint)
 		{
 			//SpeculativeRigidbody specRigidbody = target.specRigidbody;
 			//SpeculativeRigidbody speculativeRigidbody = specRigidbody;

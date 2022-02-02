@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,7 +39,7 @@
   <ItemGroup>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Desktop\dependencies\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files\Epic Games\EnterTheGungeon\EtG_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp.Base.mm, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -68,9 +69,6 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Threading.Tasks.NET35, Version=3.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\System.Threading.Tasks.Unofficial.3.1\lib\net35\System.Threading.Tasks.NET35.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -125,23 +123,29 @@
     <Compile Include="ActionsPlus\MoreActions.cs" />
     <Compile Include="Character Api\CharApiHiveMind.cs" />
     <Compile Include="Character Api\CharApi.cs" />
+    <Compile Include="Character Api\-EXAMPLEPLEASELOOKATTHISFFS.cs" />
     <Compile Include="Character Api\SaveFileBullShit.cs" />
+    <Compile Include="Character Api\Tools\CustomSimpleFlagDisabler.cs" />
     <Compile Include="Character Api\Tools\SaveFileHelper.cs" />
-    <Compile Include="BreachCutter.cs" />
-    <Compile Include="LeshysCamera.cs" />
+    <Compile Include="Guns\BeyondGuns\Judgment.cs" />
+    <Compile Include="Guns\Bases\OverheatGunBehaviour.cs" />
+    <Compile Include="Guns\BeyondGuns\BreachCutter.cs" />
+    <Compile Include="Characters\CoopBlankOverrides.cs" />
+    <Compile Include="Guns\BeyondGuns\BeyondSmg.cs" />
+    <Compile Include="Guns\LeshysCamera.cs" />
     <Compile Include="Alternator.cs" />
     <Compile Include="AmmonomiconAPI\CharacterDatabase.cs" />
     <Compile Include="Audio\AudioResourceLoader.cs" />
     <Compile Include="Audio\ResourceLoaderSoundbanks.cs" />
-    <Compile Include="AltLostSidearm.cs" />
+    <Compile Include="Guns\BeyondGuns\AltLostSidearm.cs" />
     <Compile Include="BeyondUnlockShit\BeyondUnlock.cs" />
     <Compile Include="BeyondUnlockShit\EffigyInteractableComp.cs" />
     <Compile Include="ChamberGun\BotsCustomChamberGun.cs" />
     <Compile Include="ChamberGun\AddItemsToChamberGunIndex.cs" />
     <Compile Include="Character Api\Tools\TexturePacker.cs" />
-    <Compile Include="ChargeLance.cs" />
+    <Compile Include="Guns\ChargeLance.cs" />
     <Compile Include="ChainedBullets.cs" />
-    <Compile Include="BeyondSniper.cs" />
+    <Compile Include="Guns\BeyondGuns\BeyondSniper.cs" />
     <Compile Include="BeyondChamberGun.cs" />
     <Compile Include="CarpetBurn.cs" />
     <Compile Include="AntiAirProjectile.cs" />
@@ -152,10 +156,13 @@
     <Compile Include="Enemies\Behaviors\SummonEnemyBehavior.cs" />
     <Compile Include="Enemies\Bosses\Orb.cs" />
     <Compile Include="Enemies\Bosses\TheOrbOLD.cs" />
-    <Compile Include="CoolAssChargeGun.cs" />
-    <Compile Include="Kr82m.cs" />
+    <Compile Include="Guns\BeyondGuns\CoolAssChargeGun.cs" />
+    <Compile Include="Guns\Kr82m.cs" />
     <Compile Include="Enemies\Beyond\DeadEye.cs" />
     <Compile Include="FracturedRounds.cs" />
+    <Compile Include="ModdedItemWeightBalancer\ModdedItemWeightController.cs" />
+    <Compile Include="ModSettings\BeyondSettings.cs" />
+    <Compile Include="ModSettings\SettingsHooks.cs" />
     <Compile Include="NightmareNightmareNightmare\NoMoreFun.cs" />
     <Compile Include="Notifications\BeyondNotificaionHandler.cs" />
     <Compile Include="PrefabApi\AssetBundleBuilder.cs" />
@@ -205,11 +212,18 @@
     <Compile Include="PrefabApi\SerializedTypeStorage.cs" />
     <Compile Include="PrefabApi\SevenZipHelper.cs" />
     <Compile Include="PrefabApi\TypeTreeNode.cs" />
+    <Compile Include="ToolsAndStuff\ActualMagic.cs" />
+    <Compile Include="ToolsAndStuff\BreakableAPI.cs" />
+    <Compile Include="ToolsAndStuff\SpinDownHologramDoer.cs" />
     <Compile Include="ToolsAndStuff\CustomHologramDoer.cs" />
+    <Compile Include="ToolsAndStuff\MeleeStuff\ProjectileSlashingBehaviour.cs" />
+    <Compile Include="ToolsAndStuff\MeleeStuff\SlashDoer.cs" />
+    <Compile Include="ToolsAndStuff\MeleeStuff\VFXBuilder.cs" />
+    <Compile Include="ToolsAndStuff\MeleeStuff\VFXToolbox.cs" />
     <Compile Include="UI\UiTesting.cs" />
     <Compile Include="VoidItems\BlankShardModifier.cs" />
     <Compile Include="VoidItems\VoidAmmolet.cs" />
-    <Compile Include="PhyGun.cs" />
+    <Compile Include="Guns\PhyGun.cs" />
     <Compile Include="DarkArts.cs" />
     <Compile Include="Enemies\Behaviors\TwoBeamsBehavior.cs" />
     <Compile Include="Floors\ToolsForFloors\BeyondTileGrids.cs" />
@@ -249,9 +263,8 @@
     <Compile Include="AmmonomiconAPI\Tools.cs" />
     <Compile Include="Character Api\Tools\Enums.cs" />
     <Compile Include="BotsProjectileMotionModule.cs" />
-    <Compile Include="Class2.cs" />
     <Compile Include="Enemies\Overseer\OverseerBulletScripts.cs" />
-    <Compile Include="TheMessanger.cs" />
+    <Compile Include="Guns\TheMessanger.cs" />
     <Compile Include="Debuff\CustomGameActorFireEffect.cs" />
     <Compile Include="Enemies\Behaviors\AIBeamShooter2.cs" />
     <Compile Include="Enemies\Behaviors\AddBeamsBehavior.cs" />
@@ -286,8 +299,7 @@
     <Compile Include="Guns\Ultrakill Gun\HellsShotgun.cs" />
     <Compile Include="Guns\Ultrakill Gun\ProjBoostModifer.cs" />
     <Compile Include="Guns\Ultrakill Gun\FuckYouThisIsAnAwfulIdea.cs" />
-    <Compile Include="Guns\NoitaGun\Spells\Arrow.cs" />
-    <Compile Include="Guns\NoitaGun\UITExtMeshControllers\ColorPicker.cs" />
+    <Compile Include="Guns\BeyondGuns\NoitaGun\UITExtMeshControllers\ColorPicker.cs" />
     <Compile Include="Guns\Ultrakill Gun\CoinGunModifier.cs" />
     <Compile Include="Guns\Ultrakill Gun\Coin.cs" />
     <Compile Include="Guns\Ultrakill Gun\HellsRevolver2.cs" />
@@ -308,22 +320,20 @@
     <Compile Include="ToolsAndStuff\GUI.cs" />
     <Compile Include="TrailBullets.cs" />
     <Compile Include="CustomHealth\SoulHeartController.cs" />
-    <Compile Include="Guns\NoitaGun\EnchantedEnemies.cs" />
-    <Compile Include="Guns\NoitaGun\Spells\SpellPickupObject.cs" />
-    <Compile Include="Guns\NoitaGun\Spells\SpellInit.cs" />
-    <Compile Include="Guns\NoitaGun\Spells\SparkBolt.cs" />
-    <Compile Include="Guns\NoitaGun\StaticSpellReferences.cs" />
-    <Compile Include="Guns\NoitaGun\GUIhandler.cs" />
-    <Compile Include="Guns\NoitaGun\UITExtMeshControllers\UIBodyPartPicker.cs" />
-    <Compile Include="Guns\NoitaGun\UITExtMeshControllers\UITextMesh.cs" />
-    <Compile Include="Guns\NoitaGun\Wand.cs" />
+    <Compile Include="Guns\BeyondGuns\NoitaGun\EnchantedEnemies.cs" />
+    <Compile Include="Guns\BeyondGuns\NoitaGun\Spells\SpellPickupObject.cs" />
+    <Compile Include="Guns\BeyondGuns\NoitaGun\StaticSpellReferences.cs" />
+    <Compile Include="Guns\BeyondGuns\NoitaGun\GUIhandler.cs" />
+    <Compile Include="Guns\BeyondGuns\NoitaGun\UITExtMeshControllers\UIBodyPartPicker.cs" />
+    <Compile Include="Guns\BeyondGuns\NoitaGun\UITExtMeshControllers\UITextMesh.cs" />
+    <Compile Include="Guns\BeyondGuns\NoitaGun\Wand.cs" />
     <Compile Include="NPCs\NpcInitShit.cs" />
     <Compile Include="OtherwordlyFury.cs" />
     <Compile Include="StuffForOthers\Class1.cs" />
     <Compile Include="TestGun.cs" />
     <Compile Include="OtherworldlyConnections.cs" />
     <Compile Include="SpinDownDice.cs" />
-    <Compile Include="CompletlyRandomGun.cs" />
+    <Compile Include="Guns\CompletlyRandomGun.cs" />
     <Compile Include="Roomba.cs" />
     <Compile Include="DiscordGameSDK\DiscordController.cs" />
     <Compile Include="DiscordGameSDK\ActivityManager.cs" />
@@ -350,7 +360,7 @@
     <Compile Include="Character Api\Tools\Tools.cs" />
     <Compile Include="BotsCompanionFollowPlayerBehavior.cs" />
     <Compile Include="Chests\ChestInitStuff.cs" />
-    <Compile Include="Class1.cs" />
+    <Compile Include="ZenithGun.cs" />
     <Compile Include="Debuff\NotReallyADebuff.cs" />
     <Compile Include="LightningRounds.cs" />
     <Compile Include="Enemies\Behaviors\RockFallBehavior.cs" />
@@ -364,10 +374,10 @@
     <Compile Include="Debuff\DecayDebuffEffect .cs" />
     <Compile Include="Enemies\lost.cs" />
     <Compile Include="Enemies\BeyondKin.cs" />
-    <Compile Include="LostSidearm.cs" />
+    <Compile Include="Guns\LostSidearm.cs" />
     <Compile Include="OldShitThatLikelyWontGetFinished\Marks\LevelerGUIController.cs" />
     <Compile Include="OldShitThatLikelyWontGetFinished\Marks\Leveler.cs" />
-    <Compile Include="NoTimeToExplain.cs" />
+    <Compile Include="Guns\NoTimeToExplain.cs" />
     <Compile Include="MakeThemAllPetable.cs" />
     <Compile Include="LostFriend.cs" />
     <Compile Include="BabyGoodMistake.cs" />
@@ -438,7 +448,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ItemAPI\ResourceExtractor.cs" />
     <Compile Include="ItemAPI\SpriteBuilder.cs" />
-    <Compile Include="Enemies\Shellet.cs" />
     <Compile Include="TestActive.cs" />
     <Compile Include="ToolsAndStuff\AdvancedStringDB.cs" />
     <Compile Include="ToolsAndStuff\SpecialDungeon2CozFuckYou.cs" />
@@ -833,6 +842,19 @@
     <EmbeddedResource Include="sprites\overseer_floor\overseerf_Bosscard_001.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="sprites\void_ammolet_temp.png" />
+    <EmbeddedResource Include="sprites\Spells\new\spellicon11.png" />
+    <EmbeddedResource Include="sprites\Spells\new\spellicon12.png" />
+    <EmbeddedResource Include="sprites\Spells\new\spellicon10.png" />
+    <EmbeddedResource Include="sprites\Spells\new\spellicon1.png" />
+    <EmbeddedResource Include="sprites\Spells\new\spellicon2.png" />
+    <EmbeddedResource Include="sprites\Spells\new\spellicon3.png" />
+    <EmbeddedResource Include="sprites\Spells\new\spellicon4.png" />
+    <EmbeddedResource Include="sprites\Spells\new\spellicon5.png" />
+    <EmbeddedResource Include="sprites\Spells\new\spellicon6.png" />
+    <EmbeddedResource Include="sprites\Spells\new\spellicon7.png" />
+    <EmbeddedResource Include="sprites\Spells\new\spellicon8.png" />
+    <EmbeddedResource Include="sprites\Spells\new\spellicon9.png" />
     <EmbeddedResource Include="sprites\Ammonomicon\bookmark_beyond_001.png" />
     <EmbeddedResource Include="sprites\Ammonomicon\bookmark_beyond_002.png" />
     <EmbeddedResource Include="sprites\Ammonomicon\bookmark_beyond_003.png" />
@@ -1439,63 +1461,11 @@
     <EmbeddedResource Include="Characters\Lost\punchout\facecard1.png" />
     <EmbeddedResource Include="Characters\Lost\punchout\facecard2.png" />
     <EmbeddedResource Include="Characters\Lost\punchout\facecard3.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_block_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_block_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_block_003.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_block_hit_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_dodge_left_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_dodge_left_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_dodge_right_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_dodge_right_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_duck_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_duck_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_exhaust_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_exhaust_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_exhaust_003.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_hit_left_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_hit_left_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_hit_right_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_hit_right_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_hit_right_003.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_hit_rleft_003.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_idle_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_idle_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_idle_004.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_knockout_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_knockout_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_knockout_003.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_knockout_004.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_knockout_005.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_knockout_006.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_knockout_007.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_miss_left_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_miss_left_003.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_miss_right_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_miss_right_003.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_punch_blocked_left_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_punch_blocked_left_003.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_punch_blocked_right_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_punch_blocked_right_003.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_punch_left_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_punch_left_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_punch_left_003.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_punch_right_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_punch_right_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_punch_right_003.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_star_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_star_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_star_003.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_star_004.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_star_005.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_star_006.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_star_007.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_star_008.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_star_009.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_win_001-export.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_win_001.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_win_002.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_win_003.png" />
-    <EmbeddedResource Include="Characters\Lost\punchout\sprites\hunter_punch_win_004.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_block_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_win_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_win_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_win_003.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_win_004.png" />
     <EmbeddedResource Include="Characters\Lost\Win_Pic_001.png" />
     <EmbeddedResource Include="Characters\Lost\win_pic_junkan.png" />
     <EmbeddedResource Include="Characters\Lost\newspritesetup\death_coop\cc_sprite_placeholder.png" />
@@ -1531,7 +1501,6 @@
     <EmbeddedResource Include="Characters\Lost\foyercard\facecard_idle_004.png" />
     <EmbeddedResource Include="Characters\Lost\loadoutsprites\1lostsidearm.png" />
     <EmbeddedResource Include="Characters\Lost\loadoutsprites\2beyond_wand_fire_001.png" />
-    <EmbeddedResource Include="Characters\Lost\loadoutsprites\3lostrobe.png" />
     <EmbeddedResource Include="Characters\Lost\newspritesetup\item_get\guide_item_get_001.png" />
     <EmbeddedResource Include="Characters\Lost\newspritesetup\item_get\guide_item_get_002.png" />
     <EmbeddedResource Include="Characters\Lost\newspritesetup\item_get\guide_item_get_003.png" />
@@ -1543,12 +1512,79 @@
     <EmbeddedResource Include="Characters\Lost\newspritesetup\item_get\guide_item_get_009.png" />
     <EmbeddedResource Include="Characters\Lost\newspritesetup\item_get\guide_item_get_010.png" />
     <EmbeddedResource Include="Characters\Lost\coop_page_death.png" />
+    <EmbeddedResource Include="Characters\Lost\loadoutsprites\cloak.png" />
+    <EmbeddedResource Include="Characters\Lost\newspritesetup\pitfall_return\guide_pitfall_return_005.png" />
+    <EmbeddedResource Include="Characters\Lost\newspritesetup\pitfall_return\guide_pitfall_return_006.png" />
+    <EmbeddedResource Include="Characters\Lost\newspritesetup\pitfall_return\guide_pitfall_return_007.png" />
+    <EmbeddedResource Include="Characters\Lost\newspritesetup\pitfall_return\guide_pitfall_return_008.png" />
+    <EmbeddedResource Include="Characters\Lost\groundthings\randomstuffthatgoonground_001.png" />
+    <EmbeddedResource Include="Characters\Lost\groundthings\randomstuffthatgoonground_002.png" />
     <Content Include="Characters\Lost\newspritesetup\tablekick_down_hand\cc_sprite_placeholder.png" />
     <EmbeddedResource Include="sprites\beyond_portal_texture.png" />
     <EmbeddedResource Include="sprites\fire_blue_effect_ver1_sheet_11x4.png" />
     <EmbeddedResource Include="sprites\curse_of_the_blind_sprite.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_block_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_block_003.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_block_hit_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_dodge_left_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_dodge_left_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_dodge_right_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_dodge_right_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_duck_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_duck_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_exhaust_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_exhaust_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_exhaust_003.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_hit_left_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_hit_left_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_hit_right_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_hit_right_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_hit_right_003.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_hit_rleft_003.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_idle_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_idle_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_idle_004.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_knockout_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_knockout_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_knockout_003.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_knockout_004.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_knockout_005.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_knockout_006.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_knockout_007.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_miss_left_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_miss_left_003.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_miss_right_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_miss_right_003.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_punch_blocked_left_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_punch_blocked_left_003.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_punch_blocked_right_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_punch_blocked_right_003.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_punch_left_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_punch_left_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_punch_left_003.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_punch_right_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_punch_right_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_punch_right_003.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_star_001.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_star_002.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_star_003.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_star_004.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_star_005.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_star_006.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_star_007.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_star_008.png" />
+    <EmbeddedResource Include="Characters\Lost\punchout\sprites\lost_punch_star_009.png" />
+    <EmbeddedResource Include="sprites\CustomGunAmmoTypes\cool_beyond_charge_gun_custom_clip.png" />
+    <EmbeddedResource Include="sprites\CustomGunAmmoTypes\cool_beyond_charge_gun_custom_clip_empty.png" />
+    <EmbeddedResource Include="sprites\CustomGunAmmoTypes\judgment_custom_clip_001.png" />
+    <EmbeddedResource Include="sprites\CustomGunAmmoTypes\judgment_custom_clip_empty_001.png" />
+    <EmbeddedResource Include="sprites\beyond_energy_cell_001.png" />
+    <EmbeddedResource Include="sprites\carpet_burn.png" />
     <Content Include="sprites\overseerf_Bosscard_001.png" />
     <EmbeddedResource Include="sprites\water_standard_base_001.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>COPY "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\Enter the Gungeon\Mods\BotsMod"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

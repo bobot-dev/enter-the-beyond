@@ -83,8 +83,8 @@ namespace BotsMod
             }
             catch (Exception e)
             {
-                BotsModule.Log("Discord stuff did a broken now you can cry", "#eb1313");
-                BotsModule.Log(string.Format(e + ""), "#eb1313");
+                BotsModule.Log("Discord stuff did a broken now you can cry", "#eb1313", false);
+                BotsModule.Log(string.Format(e + ""), "#eb1313", false);
             }
             base.Pickup(player);
         }

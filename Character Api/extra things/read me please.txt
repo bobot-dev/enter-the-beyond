@@ -1,0 +1,3 @@
+ignore if youre using the old sprite setup  method
+
+any files with "_hand" or "_twohands" can just be left with the place holder sprite in them and it will just use the base version of the animation same goes for "death_coop"

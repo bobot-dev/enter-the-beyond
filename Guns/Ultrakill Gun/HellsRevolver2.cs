@@ -37,7 +37,7 @@ namespace BotsMod
 			gun.DefaultModule.ammoCost = 1;
 
 			gun.DefaultModule.shootStyle = ProjectileModule.ShootStyle.SemiAutomatic;
-			gun.StarterGunForAchievement = true;
+			gun.StarterGunForAchievement = false;
 
 
 			//gun.damageModifier = 1;

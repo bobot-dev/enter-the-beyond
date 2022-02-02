@@ -136,7 +136,9 @@ namespace CustomCharacters
 
             var td = selectFlag.talkDoer;
 
-            
+            GameObject groundThingHandler = new GameObject($"{customCharacter.First.nameShort}GroundThingHandler");
+
+            groundThingHandler.transform.position = customCharacter.First.foyerPos;
 
             //Setup overhead card
             if (!string.IsNullOrEmpty(customCharacter.First.pathForSprites))
@@ -175,7 +177,8 @@ namespace CustomCharacters
 
             foreach (var thing in customCharacter.First.randomFoyerBullshitNNAskedFor)
             {
-                UnityEngine.Object.Instantiate<GameObject>(thing.First, selectFlag.transform).transform.localPosition = thing.Second;
+
+                UnityEngine.Object.Instantiate<GameObject>(thing.First, Foyer.Instance.transform.Find("Livery xform")).transform.position = customCharacter.First.foyerPos + thing.Second;
             }
 
             CreateOverheadCard(selectFlag, customCharacter.First);

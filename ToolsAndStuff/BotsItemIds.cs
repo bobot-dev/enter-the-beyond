@@ -30,6 +30,12 @@ namespace BotsMod
 
         public static int VoidAmmolet;
 
+        public static int BeyondSmg;
+
+        public static int BeyondChargeGun;
+
+        public static int Stairway;
+
 
     }
 }
