@@ -21,7 +21,11 @@ public class FireLotsOfLasersBehaviour : BasicAttackBehavior
 				this.m_laserBeam = null;
 			}
 		};
+		FuckYouEdmund = FakePrefab.Clone((GameObject)BraveResources.Load("Global VFX/VFX_LaserSight", ".prefab")); 
 	}
+
+	GameObject FuckYouEdmund;
+
 	private bool ShowSpecificBeamShooter()
 	{
 		return this.beamSelection == ShootBeamBehavior.BeamSelection.Specify;
@@ -202,15 +206,34 @@ public class FireLotsOfLasersBehaviour : BasicAttackBehavior
 							num3 = (zero - (Vector2)pos).magnitude;
 						}
 
-						GameObject gameObject = SpawnManager.SpawnVFX(tellThing, false);
+
+						var gameObject = SpawnManager.SpawnVFX(FuckYouEdmund, false);
+
+						var component = gameObject.GetComponent<tk2dTiledSprite>();
+
+						component.usesOverrideMaterial = true;
+						component.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+						component.sprite.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_ON");
+
+						component.renderer.material.SetFloat("_EmissivePower", 150);
+						component.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
+						//Color laser = new Color(92f, 9f, 140f, 1);
+						Color laser = new Color(2f, 0f, 1.94f, 1);
+
+						component.renderer.material.SetColor("_OverrideColor", laser);
+						component.renderer.material.SetColor("_EmissiveColor", laser);
+
+
+						component.transform.position = new Vector3(pos.x, pos.y, pos.y);// + (Vector3)BraveMathCollege.DegreesToVector(this.LaserAngle + (j * 60), 2f);
+						component.transform.localRotation = Quaternion.Euler(0f, 0f, this.LaserAngle + (j * 60));
+						component.dimensions = new Vector2((num3 - 3f) * 16f, 5f);
+
+
+						/*GameObject gameObject = SpawnManager.SpawnVFX(tellThing, false);
 
 						tk2dSlicedSprite component2 = gameObject.GetComponent<tk2dSlicedSprite>();
-						component2.transform.position = new Vector3(pos.x, pos.y, pos.y) + (Vector3)BraveMathCollege.DegreesToVector(this.LaserAngle + (j * 60), 2f);
-						component2.transform.localRotation = Quaternion.Euler(0f, 0f, this.LaserAngle + (j * 60));
-						component2.dimensions = new Vector2((num3 - 3f) * 16f, 5f);
-						component2.UpdateZDepth();
 
-						//component2.HeightOffGround = 35;
+						component2.HeightOffGround = 35;
 
 						//BotsModule.Log(j + ": " + component2.transform.position.z.ToString());
 
@@ -218,7 +241,7 @@ public class FireLotsOfLasersBehaviour : BasicAttackBehavior
 						component2.sprite.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_ON");
 						component2.sprite.renderer.material.SetFloat("_EmissivePower", 300);
 						component2.sprite.renderer.material.SetFloat("_EmissiveColorPower", 1.55f + 1 / (j - 20));
-
+						*/
 						this.m_reticles.Add(gameObject);
 					}
 					doneLaserTeleGraph = true;
@@ -421,7 +444,7 @@ public class FireLotsOfLasersBehaviour : BasicAttackBehavior
 		{
 			AIBeamShooter2 aibeamShooter2 = this.m_currentBeamShooters2[i];
 
-			yes.StartCoroutine(this.FireBeam(aibeamShooter2, i));
+			yes.StartCoroutine(this.FireBeam(aibeamShooter2, this.m_currentBeamShooters2.Count - i));
 		}
 
 	}
@@ -451,6 +474,7 @@ public class FireLotsOfLasersBehaviour : BasicAttackBehavior
 
 	protected IEnumerator FireBeam(AIBeamShooter2 aibeamShooter2, int j)
 	{
+		new WaitForSeconds(0.5f);
 		this.CleanupReticles();
 		//""
 
@@ -458,7 +482,7 @@ public class FireLotsOfLasersBehaviour : BasicAttackBehavior
 		float enemyTickCooldown = 0f;
 		//for (int j = 0; j < 6; j++)
         //{
-		BotsModule.Log(j + " :(");
+		//BotsModule.Log(j + " :(");
         
 
 		GameObject beamObject = UnityEngine.Object.Instantiate<GameObject>(aibeamShooter2.beamModule.GetCurrentProjectile().gameObject);
@@ -511,11 +535,12 @@ public class FireLotsOfLasersBehaviour : BasicAttackBehavior
 				hitRigidbody.majorBreakable.ApplyDamage(26f * BraveTime.DeltaTime, dirVec, false, false, false);
 			}
 		};
-
+		
 		bool firstFrame = true;
 		while (beamCont != null && this.IsfiringLaser)
 		{
-			//ETGModConsole.Log(aibeamShooter2.LaserAngle.ToString());
+			if (firstFrame) yield return new WaitForSeconds(0.2f * j);
+			
 			enemyTickCooldown = Mathf.Max(enemyTickCooldown - BraveTime.DeltaTime, 0f);
 			float clampedAngle;
 

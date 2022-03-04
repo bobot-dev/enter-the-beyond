@@ -12,6 +12,8 @@ namespace BotsMod
         public static int LostSidearm;
         public static int AltLostSidearm;
         public static int LostCloak;
+        public static int SpinDownDice;
+        public static int BeyondBattery;
 
         public static int GlobalWarming;
 

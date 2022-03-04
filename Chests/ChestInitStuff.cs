@@ -23,7 +23,7 @@ namespace BotsMod
             //CreateKeyMimicPrefab();
         }
         static Texture2D texture = ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod\\sprites\\paradox_test.png");
-        public static void InitChest(string name, string id, List<string> spritePaths, List<int> forcedIds)
+        public static GameObject InitChest(string name, string id, string idleSpritePath, List<string> openSpritePaths, int openFps, List<string> breakSpritePaths, int breakFps, List<string> appearSpritePaths, int appearFps, List<int> forcedIds, LootData lootData, LootData brokenLootData, tk2dSprite shadowSprite, int overrideJunkId, GameObject preSpawnVfx, GameObject groundHitVfx, float groundHitDelay)
         {
 
             var spriteAnimator = Tools.shared_auto_001.LoadAsset<GameObject>("Chest_Animation").GetComponent<tk2dSpriteAnimation>(); ;
@@ -35,27 +35,109 @@ namespace BotsMod
 
             var idList = new List<int>();
 
-            foreach (var sprite in spritePaths)
+            BotsModule.Log("c0");
+            //var chestObj = PrefabBuilder.BuildObject($"{id}:{name}_chest");
+            var chestObj = FakePrefab.Clone(GameManager.Instance.RewardManager.C_Chest.gameObject);
+            chestObj.name = $"{id}:{name}_chest";
+            SpriteBuilder.SpriteFromResource(idleSpritePath, chestObj);
+
+
+            var chestAnimator = chestObj.GetComponent<tk2dSpriteAnimator>();
+            chestAnimator.Library = spriteAnimator;
+
+            foreach (var sprite in breakSpritePaths)
             {
                 idList.Add(SpriteHandler.AddSpriteToCollection(ItemAPI.ResourceExtractor.GetTextureFromResource(sprite), collection));
-                //BotsModule.Log(copy.name);
             }
+            SpriteHandler.AddAnimation(chestAnimator, collection, idList, $"{id}_{name}_chest_break", tk2dSpriteAnimationClip.WrapMode.Once, breakFps);
+            idList.Clear();
 
 
+            foreach (var sprite in openSpritePaths)
+            {
+                idList.Add(SpriteHandler.AddSpriteToCollection(ItemAPI.ResourceExtractor.GetTextureFromResource(sprite), collection));
+            }
+            SpriteHandler.AddAnimation(chestAnimator, collection, idList, $"{id}_{name}_chest_open", tk2dSpriteAnimationClip.WrapMode.Once, openFps);
+            idList.Clear();
 
 
-            var chestObj = PrefabBuilder.BuildObject($"{id}:{name}");
+            foreach (var sprite in appearSpritePaths)
+            {
+                idList.Add(SpriteHandler.AddSpriteToCollection(ItemAPI.ResourceExtractor.GetTextureFromResource(sprite), collection));
+            }
+            SpriteHandler.AddAnimation(chestAnimator, collection, idList, $"{id}_{name}_chest_appear", tk2dSpriteAnimationClip.WrapMode.Once, appearFps);
+            idList.Clear();
+
+            BotsModule.Log("c1");
             
+            var attachPoint = chestObj.GetComponent<tk2dSpriteAttachPoint>();
+            attachPoint.attachPoints = new List<Transform> { chestObj.transform.Find("lock") };
+            /*
+            attachPoint.deactivateUnusedAttachPoints = false;
+            attachPoint.disableEmissionOnUnusedParticleSystems = false;
+            attachPoint.ignorePosition = false;
+            attachPoint.ignoreRotation = false;
+            attachPoint.ignoreScale = false;
+            attachPoint.centerUnusedAttachPoints = false;
+            var a = new GameObject("lockAttachPoint").transform;
+            a.parent = chestObj.transform;
+            attachPoint.attachPoints = new List<Transform>
+            {
+                a
+            };
 
-            var chest = chestObj.AddComponent<Chest>();
+            var majorBreakable = chestObj.AddComponent<MajorBreakable>();
 
-            chest.placeableHeight = 1;
-            chest.placeableWidth = 3;
-            chest.difficulty = 0;
-            chest.isPassable = true;
-            chest.ChestIdentifier = Chest.SpecialChestIdentifier.NORMAL;
-            chest.placeableWidth = 3;
+            majorBreakable.HitPoints = 40;
+            majorBreakable.DamageReduction = 0;
+            majorBreakable.MinHits = 0;
+            majorBreakable.EnemyDamageOverride = -1;
+            majorBreakable.ImmuneToBeastMode = false;
+            majorBreakable.ScaleWithEnemyHealth = false;
+            majorBreakable.OnlyExplosions = false;
+            majorBreakable.IgnoreExplosions = false;
+            majorBreakable.GameActorMotionBreaks = false;
+            majorBreakable.spawnShards = true;
+            majorBreakable.distributeShards = false;
+            majorBreakable.shardClusters = new ShardCluster[0];
+            majorBreakable.minShardPercentSpeed = 0.05f;
+            majorBreakable.maxShardPercentSpeed = 0.3f;
+            majorBreakable.shardBreakStyle = MinorBreakable.BreakStyle.CONE;
+            majorBreakable.usesTemporaryZeroHitPointsState = true;
+            majorBreakable.spriteNameToUseAtZeroHP = $"{id}_{name}_chest_break_001";
+            majorBreakable.destroyedOnBreak = false;
+            majorBreakable.childrenToDestroy = new List<GameObject>();
+            majorBreakable.playsAnimationOnNotBroken = false;
+            majorBreakable.notBreakAnimation = "";
+            majorBreakable.handlesOwnBreakAnimation = false;
+            majorBreakable.breakAnimation = "";
+            majorBreakable.handlesOwnPrebreakFrames = false;
+            majorBreakable.prebreakFrames = new BreakFrame[0];
+            majorBreakable.damageVfx = new VFXPool { effects = new VFXComplex[0], type = VFXPoolType.None };
+            majorBreakable.damageVfxMinTimeBetween = 0.2f;
+            majorBreakable.breakVfx = new VFXPool { effects = new VFXComplex[0], type = VFXPoolType.None };
+            majorBreakable.delayDamageVfx = false;
+            majorBreakable.SpawnItemOnBreak = false;
+            majorBreakable.ItemIdToSpawnOnBreak = -1;
+            majorBreakable.HandlePathBlocking = false;
 
+
+
+
+
+
+            var rigidbody = chestObj.AddComponent<SpeculativeRigidbody>();
+
+            rigidbody.PixelColliders = GameManager.Instance.RewardManager.C_Chest.specRigidbody.PixelColliders;
+            */
+            var chest = chestObj.GetComponent<Chest>();
+
+            //chest.placeableHeight = 1;
+            //chest.placeableWidth = 3;
+            //chest.difficulty = 0;
+            //chest.isPassable = true;
+            //chest.ChestIdentifier = Chest.SpecialChestIdentifier.NORMAL;
+            chest.forceContentIds = forcedIds;
             /*if (chest != null && chest.sprite != null && chest.sprite.renderer != null && chest.sprite.renderer.material != null)
 			{
 
@@ -70,23 +152,36 @@ namespace BotsMod
 
 
 			}*/
+            BotsModule.Log("c2");
+            chest.lootTable = lootData;
+            BotsModule.Log("c2.5");
+            chest.breakertronLootTable = brokenLootData;
+            BotsModule.Log("c3");
+            chest.ShadowSprite = shadowSprite;
 
-            chest.lootTable.overrideItemLootTables.Clear();
-			chest.lootTable.lootTable = ItemBuilder.LoadShopTable("Shop_Key_Items_01");
-			chest.ChestType = Chest.GeneralChestType.UNSPECIFIED;
+            chest.breakAnimName = $"{id}_{name}_chest_break";
+            chest.openAnimName = $"{id}_{name}_chest_open";
+            chest.spawnAnimName = $"{id}_{name}_chest_appear";
+            BotsModule.Log("c4");
+            chest.overrideJunkId = overrideJunkId;
+            chest.VFX_PreSpawn = preSpawnVfx;
+            chest.VFX_GroundHit = groundHitVfx;
+            chest.groundHitDelay = groundHitDelay;
 
-			chest.lootTable.S_Chance = 0.1f;
-			chest.lootTable.A_Chance = 0.1f;
-			chest.lootTable.B_Chance = 0.2f;
-			chest.lootTable.C_Chance = 0.4f;
-			chest.lootTable.D_Chance = 0.5f;
-
-
-			
+            BotsModule.Log("c5");
             
+            chest.LockAnimator = GameManager.Instance.RewardManager.C_Chest.LockAnimator;
+            chest.LockBreakAnim = GameManager.Instance.RewardManager.C_Chest.LockBreakAnim;
+            chest.LockNoKeyAnim = GameManager.Instance.RewardManager.C_Chest.LockNoKeyAnim;
+            chest.LockOpenAnim = GameManager.Instance.RewardManager.C_Chest.LockOpenAnim;
+
+            BotsModule.Log("c6");
+
             chest.overrideMimicChance = 0;
-            
-            Commands.KeyChest = chest;
+
+           
+
+            return chest.gameObject;
         }
         public static void CreateKeyMimicPrefab()
         {

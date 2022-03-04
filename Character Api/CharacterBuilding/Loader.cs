@@ -216,8 +216,7 @@ namespace CustomCharacters
         }
 
         public static CustomCharacterData BuildCharacter(string filePath, CustomPlayableCharacters identity, Vector3 foyerPos, bool hasAltSkin, Vector3 altSwapperPos, bool removeFoyerExtras = true, bool hasArmourlessAnimations = false, bool usesArmourNotHealth = false, bool paradoxUsesSprites = true,
-            bool useGlow = false, GlowMatDoer glowVars = null, GlowMatDoer altGlowVars = null,
-            int metaCost = 0, bool hasCustomPast = false, string customPast = "")
+            bool useGlow = false, GlowMatDoer glowVars = null, GlowMatDoer altGlowVars = null, int metaCost = 0, bool hasCustomPast = false, string customPast = "")
         {
             //ETGModConsole.Log(BotsModule.FilePath);
             //ETGModConsole.Log(BotsModule.ZipFilePath);
@@ -392,6 +391,7 @@ namespace CustomCharacters
                         data.punchoutSprites = new Dictionary<string, Texture2D>();
                         foreach (var tex in ToolsCharApi.GetTexturesFromResource(punchoutSpritesDir))
                         {
+                            ETGModConsole.Log(tex.name);
                             data.punchoutSprites.Add(tex.name, tex);
                         }
 

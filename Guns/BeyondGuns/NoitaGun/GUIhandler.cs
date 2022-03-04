@@ -73,10 +73,15 @@ namespace LiveRecolor
 
         void OnDestroy()
         {
-            Destroy(panel);
-            for (int i = 0; i < pickers.Length; i++)
+            if (panel) Destroy(panel);
+
+            if (pickers != null) 
             {
-                pickers[i].Destroy();
+                for (int i = 0; i < pickers.Length; i++)
+                {
+
+                    if (pickers[i] != null) pickers[i].Destroy();
+                }
             }
         }
 
@@ -88,7 +93,7 @@ namespace LiveRecolor
             if (GameManager.Instance.PrimaryPlayer != null && !GameManager.Instance.PrimaryPlayer.HasPickupID(BotsItemIds.Wand)) { enabled = false; }
 
             if (!BraveInput.HasInstanceForPlayer(m_player.PlayerIDX) && GameManager.Instance.PrimaryPlayer != null && GameManager.Instance.PrimaryPlayer.HasPickupID(BotsItemIds.Wand)) { return; }
-            if (Key(GungeonActions.GungeonActionType.Interact) && KeyTime(GungeonActions.GungeonActionType.Interact) > .5f && !locked)
+            if (Key(GungeonActions.GungeonActionType.Interact) && KeyTime(GungeonActions.GungeonActionType.Interact) > .5f && !locked && GameManager.Instance.PrimaryPlayer != null && GameManager.Instance.PrimaryPlayer.HasPickupID(BotsItemIds.Wand) && GameManager.Instance.PrimaryPlayer.CurrentGun.PickupObjectId == BotsItemIds.Wand)
             {
                 Toggle();
                 locked = true;

@@ -187,6 +187,76 @@ namespace ItemAPI
             return clip;
         }
 
+        public static void AddAnimation(this GameObject obj, string enemyName, string name, string spriteDirectory, int fps, AnimationType type, DirectionType directionType = DirectionType.None, FlipType flipType = FlipType.None,
+            tk2dSpriteAnimationClip.WrapMode wrapMode = tk2dSpriteAnimationClip.WrapMode.Once)
+        {
+            AIAnimator aiAnimator = obj.GetOrAddComponent<AIAnimator>();
+            DirectionalAnimation animation = aiAnimator.GetDirectionalAnimation(name, directionType, type);
+            if (animation == null)
+            {
+                animation = new DirectionalAnimation()
+                {
+                    AnimNames = new string[DirectionalAnimation.m_combined[(int)directionType].Length + 1],
+                    Flipped = new FlipType[DirectionalAnimation.m_combined[(int)directionType].Length + 1],
+                    Type = directionType,
+                    Prefix = string.Empty
+                };
+            }
+
+            animation.AnimNames = animation.AnimNames.Concat(new string[] { name }).ToArray();
+            //animation.Flipped = animation.Flipped.Concat(new FlipType[] { flipType }).ToArray();
+            aiAnimator.AssignDirectionalAnimation(name, animation, type);
+            BuildAnimations(aiAnimator, name, enemyName, directionType, spriteDirectory, fps, wrapMode);
+
+            for(int i = 0; i < DirectionalAnimation.m_combined[(int)directionType].Length; i++)
+            {
+                animation.AnimNames[i] = $"{name.ToLower()}_{DirectionalAnimation.m_combined[(int)directionType][i].suffix}";
+            }
+        }
+
+        public static void BuildAnimations(AIAnimator aiAnimator, string name, string enemyName, DirectionType directionType, string spriteDirectory, int fps, tk2dSpriteAnimationClip.WrapMode wrapMode)
+        {
+            tk2dSpriteCollectionData collection = aiAnimator.GetComponent<tk2dSpriteCollectionData>();
+            if (!collection)
+                collection = SpriteBuilder.ConstructCollection(aiAnimator.gameObject, $"{aiAnimator.name}_collection");
+
+            string[] resources = ResourceExtractor.GetResourceNames();
+
+            List<string> anims = new List<string>();
+            foreach (var a in DirectionalAnimation.m_combined[(int)directionType])
+            {
+                List<int> indices = new List<int>();
+                for (int i = 0; i < resources.Length; i++)
+                {
+                   
+                    if (resources[i].Contains(spriteDirectory.Replace('/', '.'), false))
+                    {
+                        
+                        if (resources[i].Contains(spriteDirectory.Replace('/', '.') + $".{enemyName}_{name.ToLower()}_{a.suffix}_0", false))
+                        {
+                            ETGModConsole.Log($"{spriteDirectory.Replace('/', '.') + $".{enemyName}_{name.ToLower()}_{a.suffix}_0"} - {resources[i]}");
+                            indices.Add(SpriteBuilder.AddSpriteToCollection(resources[i], collection));
+                        }
+
+                    }
+                }
+                ETGModConsole.Log(indices.Count.ToString());
+                if (indices.Count > 0)
+                {
+                    ETGModConsole.Log(a.suffix);
+                    tk2dSpriteAnimationClip clip = SpriteBuilder.AddAnimation(aiAnimator.spriteAnimator, collection, indices, $"{name.ToLower()}_{a.suffix}", wrapMode);
+                    clip.fps = fps;
+                }
+                
+            }
+
+
+           
+            //return clip;
+        }
+
+
+
         public static DirectionalAnimation GetDirectionalAnimation(this AIAnimator aiAnimator, string name, DirectionType directionType, AnimationType type)
         {
             DirectionalAnimation result = null;

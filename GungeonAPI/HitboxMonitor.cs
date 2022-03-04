@@ -21,11 +21,66 @@ namespace GungeonAPI
             LogHitboxInfo(collider);
         }
 
+        public static void DisplayHead(AIActor speculativeRigidbody)
+        {
+            var sprite = speculativeRigidbody.sprite;
+            Tools.Log("Sprite Found...");
+            if (!speculativeRigidbody.gameObject.GetComponent<HeadDisplay>())
+                speculativeRigidbody.gameObject.AddComponent<HeadDisplay>();
+            Tools.Log("Displaying...");
+            //LogHitboxInfo(collider);
+        }
+
         public static void DeleteHitboxDisplays()
         {
             foreach (var comp in GameObject.FindObjectsOfType<HitBoxDisplay>())
             {
                 GameObject.Destroy(comp);
+            }
+        }
+
+        public class HeadDisplay : BraveBehaviour
+        {
+            GameObject hitboxDisplay = null;
+            void Start()
+            {
+                CreateDisplay();
+            }
+
+            public void CreateDisplay()
+            {
+                string displayerName = "HitboxDisplay";
+
+                if (hitboxDisplay == null)
+                    hitboxDisplay = GameObject.CreatePrimitive(PrimitiveType.Cube);
+
+                hitboxDisplay.GetComponent<Renderer>().material.color = new Color(1, 0, 1, .75f);
+                hitboxDisplay.name = displayerName;
+                hitboxDisplay.transform.SetParent(specRigidbody.transform);
+            }
+
+            void FixedUpdate()
+            {
+                hitboxDisplay.transform.localScale = new Vector3(
+
+                    (sprite.WorldTopRight - sprite.WorldTopLeft).x, // pixelsPerUnit,
+                    (sprite.WorldTopCenter - sprite.WorldCenter).y, // pixelsPerUnit,
+                    1f
+                );
+                Vector3 offset = new Vector3(
+                    hitboxDisplay.transform.localScale.x,// * 0.5f,
+                    hitboxDisplay.transform.localScale.y,// * 0.5f,
+                    -pixelsPerUnit
+                );
+                offset /= pixelsPerUnit;
+                hitboxDisplay.transform.localPosition = offset;
+                //hitboxDisplay.transform.localPosition = sprite.WorldCenter - (Vector2)hitboxDisplay.transform.position;
+            }
+
+            protected override void OnDestroy()
+            {
+                if (hitboxDisplay)
+                    GameObject.DestroyImmediate(hitboxDisplay);
             }
         }
 

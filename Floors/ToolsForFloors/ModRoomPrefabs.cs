@@ -21,13 +21,12 @@ namespace BotsMod
                 //"Beyond_Entrance2.room"
             };
             //Mod_Entrance_Room = RoomFactory.BuildFromResource("Mod/Resources/ModRooms/floorEntrance.room");
-            Mod_Exit_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Exit.room");
+            Mod_Exit_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Exit.room", isBeyondRoom: true);
 
-            Mod_Entrance_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Entrance2.room");
+            Mod_Entrance_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Entrance2.room", isBeyondRoom: true);
 
-            
 
-            Mod_Shop_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Shop2.room");
+            Mod_Shop_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Shop2.room", isBeyondRoom: true);
             ItsDaFuckinShopApi.RegisterShopRoom(BotsModule.shop.gameObject, Mod_Shop_Room, new UnityEngine.Vector2(5f, 12f));
             
 
@@ -95,7 +94,7 @@ namespace BotsMod
 
             foreach (string name in Mod_RoomList)
             {
-                PrototypeDungeonRoom m_room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/" + name);
+                PrototypeDungeonRoom m_room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/" + name, isBeyondRoom: true);
                 m_feyondRooms.Add(m_room);
             }
 
@@ -106,7 +105,7 @@ namespace BotsMod
                 BeyondPrefabs.BeyondRoomTable.includedRooms.elements.Add(GenerateWeightedRoom(room, 1));
             }
 
-            Mod_Boss = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/overseerbossroombutround.room");
+            Mod_Boss = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/overseerbossroombutround.room", isBeyondRoom: true);
             Mod_Boss.category = PrototypeDungeonRoom.RoomCategory.BOSS;
             Mod_Boss.subCategoryBoss = PrototypeDungeonRoom.RoomBossSubCategory.FLOOR_BOSS;
             Mod_Boss.subCategoryNormal = PrototypeDungeonRoom.RoomNormalSubCategory.COMBAT;
@@ -139,7 +138,7 @@ namespace BotsMod
             Mod_Boss_Past.overriddenTilesets = GlobalDungeonData.ValidTilesets.BELLYGEON;
 
 
-            var Play_Test_Boss = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/overseerbossroombutround.room");
+            var Play_Test_Boss = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/overseerbossroombutround.room", isBeyondRoom: true);
             Play_Test_Boss.category = PrototypeDungeonRoom.RoomCategory.BOSS;
             Play_Test_Boss.subCategoryBoss = PrototypeDungeonRoom.RoomBossSubCategory.MINI_BOSS;
             Play_Test_Boss.subCategoryNormal = PrototypeDungeonRoom.RoomNormalSubCategory.COMBAT;

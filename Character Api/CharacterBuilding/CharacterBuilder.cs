@@ -160,7 +160,7 @@ namespace CustomCharacters
             //BotsModule.Log("Player is: " + data.nameShort.ToString(), BotsModule.LOST_COLOR);
             //BotsModule.Log("#CHAR_" + data.nameShort.ToUpper(), BotsModule.LOST_COLOR);
 
-            if (!hasClearedEeveeAnims)
+            /*if (!hasClearedEeveeAnims)
             {
                 var eevee = (GameObject)ResourceCache.Acquire("PlayerEevee");
                 if (eevee != null)
@@ -168,7 +168,7 @@ namespace CustomCharacters
                     eevee.GetComponent<CharacterAnimationRandomizer>().AnimationLibraries.Clear();
                 }
                 hasClearedEeveeAnims = true;
-            }
+            }*/
 
             if (paradoxUsesSprites)
             {

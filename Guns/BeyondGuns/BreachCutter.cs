@@ -85,10 +85,10 @@ namespace BotsMod
 
 			gun.DefaultModule.projectiles[0] = projectile;
 			gun.DefaultModule.angleVariance = 0;
-			gun.DefaultModule.positionOffset = new Vector3(0f, 1.4f, 0f);
+			gun.DefaultModule.positionOffset = new Vector3(0f, 0.5f, 0f);
 
 			gun.Volley.projectiles[1].projectiles[0] = projectile;
-			gun.Volley.projectiles[1].positionOffset = new Vector3(0f, -1.4f, 0f);
+			gun.Volley.projectiles[1].positionOffset = new Vector3(0f, -0.5f, 0f);
 			gun.Volley.projectiles[1].angleVariance = 0;
 
 			ETGMod.Databases.Items.Add(gun, null, "ANY");

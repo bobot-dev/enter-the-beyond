@@ -118,7 +118,7 @@ namespace BotsMod
 			UnityEngine.Object.DontDestroyOnLoad(projectile);
 			gun.DefaultModule.projectiles[0] = projectile;
 
-			projectile.baseData.damage = 25f;
+			projectile.baseData.damage = 45f;
 			projectile.baseData.force = 10f;
 
 			ProjectileSlashingBehaviour slashing = projectile.gameObject.AddComponent<ProjectileSlashingBehaviour>();
@@ -126,11 +126,12 @@ namespace BotsMod
 			slashing.SlashDamageUsesBaseProjectileDamage = true;
 			slashing.UsesAngleVariance = false;
 			slashing.DoSound = true;
-			slashing.SlashRange = 2.55f;
+			slashing.SlashRange = 1f;
 			slashing.SlashDimensions = 90f;
 			slashing.delayBeforeSlash = 0.2f;
 			slashing.InteractMode = SlashDoer.ProjInteractMode.DESTROY;
 			slashing.playerKnockback = 5;
+			slashing.playerKnockbackImmutable = true;
 
 			Tools.BeyondItems.Add(gun.PickupObjectId);
 			MeshRenderer component = gun.GetComponent<MeshRenderer>();
@@ -157,19 +158,26 @@ namespace BotsMod
 			if (gun.spriteAnimator.AnimationEventTriggered == null)
             {
 				gun.spriteAnimator.AnimationEventTriggered = this.HandleAnimationEvent;
-
 			}
 			else
             {
 				gun.spriteAnimator.AnimationEventTriggered += this.HandleAnimationEvent;
-
 			}
 
 			//gun.spriteAnimator.AnimationEventTriggered += HandleAnimationEvent;
 
 		}
 
-		void OnDestroy()
+        public override void OnDropped()
+        {
+			attackStage = 1;
+			this.gun.shootAnimation = $"judgment_fire";
+			this.gun.idleAnimation = $"judgment_idle";
+			gun.spriteAnimator.AnimationEventTriggered -= HandleAnimationEvent;
+			base.OnDropped();
+        }
+
+        void OnDestroy()
         {
 
 
@@ -187,20 +195,23 @@ namespace BotsMod
 
 				if (frame?.eventInfo == "startDash")
 				{
-					isAlreadyEthereal = !owner.ReceivesTouchDamage;
+					//isAlreadyEthereal = !owner.ReceivesTouchDamage;
 
-					if (!isAlreadyEthereal)
-					{
-						owner.ReceivesTouchDamage = false;
+					//if (!isAlreadyEthereal)
+					//{
+					owner.healthHaver.IsVulnerable = false;
 						
-					}
+					//}
 					
-					afterImage.spawnShadows = true;
-					afterImage.shadowTimeDelay = 0.025f;
+
 					if (owner.gameObject.GetComponent<ImprovedAfterImage>() == null)
 					{
-						afterImage = owner.gameObject.AddComponent(afterImage);
+						afterImage = owner.gameObject.AddComponent<ImprovedAfterImage>();
 					}
+					afterImage.dashColor = new Color32(255, 0, 247, 255);
+					afterImage.spawnShadows = true;
+					afterImage.shadowTimeDelay = 0.025f;
+					owner.SetInputOverride("THY PUNISHMENT IS DEATH");
 					ETGMod.StartGlobalCoroutine(DelayEthereal(owner));
 				}
 				else if (frame?.eventInfo == "endDash")
@@ -210,22 +221,30 @@ namespace BotsMod
 			}
 
 		}
-
+		List<AIActor> ignore = new List<AIActor>();
 		IEnumerator DelayEthereal(PlayerController owner)
         {
-			yield return new WaitForSeconds(0.5f);
-			if (!isAlreadyEthereal)
-			{
-				owner.ReceivesTouchDamage = true;
-			}
-			afterImage.spawnShadows = false;
+			yield return null;
+
+			//owner.knockbackDoer.ApplyKnockback(angle, 260, 0.25f, false);
 			
+			yield return new WaitForSeconds(0.5f);
+			//if (!isAlreadyEthereal)
+			//{
+				owner.healthHaver.IsVulnerable = true;
+			//}
+			owner.ClearInputOverride("THY PUNISHMENT IS DEATH");
+			if (owner.gameObject.GetComponent<ImprovedAfterImage>() != null)
+			{
+				afterImage.spawnShadows = false;
+			}
+
 		}
 
 		ImprovedAfterImage afterImage = new ImprovedAfterImage()
 		{
 			dashColor = new Color32(255, 0, 247, 255),
-			spawnShadows = true,
+			spawnShadows = false,
 		};
 
 
@@ -243,7 +262,7 @@ namespace BotsMod
 			if (attackStage == 3)
 			{
 				projectile.gameObject.GetComponent<ProjectileSlashingBehaviour>().playerKnockback = 260;
-				projectile.gameObject.GetComponent<ProjectileSlashingBehaviour>().delayBeforeSlash = 0.2f;
+				projectile.gameObject.GetComponent<ProjectileSlashingBehaviour>().delayBeforeSlash = 0f;
 
 			}
 			else if (attackStage == 2)
@@ -277,8 +296,20 @@ namespace BotsMod
 			//
         }
 
-		protected void Update()
+        //public override void OnInitializedWithOwner(GameActor actor)
+        //{
+        //    base.OnInitializedWithOwner(actor);
+        //}
+
+        protected void Update()
 		{
+
+			//if (gun.CurrentOwner != null)
+            //{
+			//	OnInitializedWithOwner(gun.CurrentOwner);
+
+			//}
+
 			if (this.gun.CurrentOwner)
 			{
 				if (!this.gun.PreventNormalFireAudio)
@@ -290,6 +321,44 @@ namespace BotsMod
 					this.HasReloaded = true;
 				}
 			}
+
+			if(this.gun?.CurrentOwner?.GetAbsoluteParentRoom() != null && afterImage && afterImage.spawnShadows)
+            {
+
+
+				//var angle = (this.gun.CurrentOwner as PlayerController).unadjustedAimPoint.XY() - this.gun.CurrentOwner.CenterPosition;
+
+				//-1f * BraveMathCollege.DegreesToVector(this.gunAngle, 1f)
+				// 0.5f
+
+				//this.gun.CurrentOwner.specRigidbody.Velocity += new Vector2(Mathf.Lerp(this.gun.CurrentOwner.specRigidbody.Velocity.x, angle.normalized.x * 26, 0.1f), Mathf.Lerp(this.gun.CurrentOwner.specRigidbody.Velocity.y, angle.normalized.y * 26, 0.1f));
+				this.gun?.CurrentOwner?.GetAbsoluteParentRoom().ApplyActionToNearbyEnemies(this.gun.CurrentOwner.sprite.WorldCenter, 1.3f, delegate (AIActor enemy, float dist)
+				{
+					if (enemy && enemy.healthHaver)
+					{
+						enemy.healthHaver.ApplyDamage(30, (this.gun.CurrentOwner as PlayerController).unadjustedAimPoint.XY() - (this.gun.CurrentOwner as PlayerController).CenterPosition, "JUDGMENT!", CoreDamageTypes.None, DamageCategory.Normal);
+						ignore.Add(enemy);
+					}
+				});
+			}
+			else if (afterImage && !afterImage.spawnShadows && ignore.Count > 0)
+            {
+				ignore.Clear();
+            }
+		}
+
+
+		IEnumerator DoDashVelocity(float time, Vector2 direction, float force)
+        {
+			float elTime = 0;
+
+			while (time >= elTime)
+            {
+				elTime += Time.deltaTime;
+				yield return null;
+				//direction.normalized * (force / 10f);
+			}
+
 		}
 
 		public override void OnReloadPressed(PlayerController player, Gun gun, bool bSOMETHING)

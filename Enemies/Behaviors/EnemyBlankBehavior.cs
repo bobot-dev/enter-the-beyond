@@ -262,7 +262,7 @@ namespace BotsMod
 			var ring = this.m_radialIndicator.GetComponent<HeatIndicatorController>();
 			ring.IsFire = false;
 			ring.CurrentRadius = Radius;
-			ring.CurrentColor = Color.magenta;
+			ring.CurrentColor = new Color32(255, 82, 249, 255);
 
 
 
@@ -341,17 +341,10 @@ namespace BotsMod
 				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("6c43fddfd401456c916089fdd1c99b1c").bulletBank.GetBullet("sweep"));
 
 			}
-			for (int i = 0; i <= EnemyBlankBehavior.destroyedBulletCount; i++)
+			for (int i = 0; i <= EnemyBlankBehavior.destroyedBulletCount * 2; i++)
 			{
 				this.Fire(new Offset(new Vector2(0.1f * i, 0.1f * i)), new Direction((float)(i * 10), DirectionType.Aim, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
-				if (i > 36)
-                {
-					
-				} 
-				else
-                {
-					//this.Fire(new Direction((float)(i), DirectionType.Aim, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
-				}
+				yield return Wait(1);
 			}
 			EnemyBlankBehavior.destroyedBulletCount = 0;
 			yield break;

@@ -38,7 +38,7 @@ namespace BotsMod
     public class BotsModule : ETGModule
     {
         public static readonly string MOD_NAME = "Enter The Beyond";
-        public static readonly string VERSION = "0.5.0";
+        public static readonly string VERSION = "0.5.5";
         public static readonly string TEXT_COLOR = "#e01279";
         public static readonly string LOST_COLOR = "#7732a8";
         public static readonly string LOCKED_CHARACTOR_COLOR = "#ba0c00";
@@ -98,7 +98,7 @@ namespace BotsMod
             try
             {
 
-
+                //GlobalDungeonData.GUNGEON_EXPERIMENTAL = true;
 
                 ZipFilePath = this.Metadata.Archive;
                 FilePath = this.Metadata.Directory;
@@ -115,6 +115,7 @@ namespace BotsMod
                 SettingsHooks.Init();
                 BeyondSettings.Load();
                 debugMode = BeyondSettings.Instance.debug;
+                debugMode = true;
                 //GungeonAP.Init();
 
                 //GameManager.Instance.gameObject.AddComponent<DiscordController>();
@@ -136,9 +137,9 @@ namespace BotsMod
 
                 AmmonomiconAPI.Tools.Init();
                 Ammonomicon.Init();
-                
 
 
+                Tools.Init();
                 CustomClipAmmoTypeToolbox.Init();
 
                 BeyondPrefabs.InitCustomPrefabs();
@@ -148,7 +149,7 @@ namespace BotsMod
                 //ETGModMainBehaviour.Instance.gameObject.AddComponent<UiTesting>().Init();
 
                 //my stuff
-                Tools.Init();
+
                 Hooks.Init();
                 Rooms.Init();
                 //BeyondPrefabs.Init();
@@ -156,7 +157,15 @@ namespace BotsMod
                 CustomFire.Init();
                 BeyondNotificaionHandler.Init();
 
-               
+                //Dungeon CatacombsPrefab = FloorHooks.GetOrLoadByName_Orig("Base_Catacombs");
+                //foreach(var roomMat in CatacombsPrefab.roomMaterialDefinitions)
+                //{
+                //    if (roomMat.supportsIceSquares == true)
+                //    {
+                //        roomMat.overrideFloorType = CellVisualData.CellFloorType.Ice;
+                //        roomMat.overrideStoneFloorType = true;
+                //    }
+                //}
                 if (debugMode)
                 {
                     NoMoreFun.Init();
@@ -203,9 +212,10 @@ namespace BotsMod
                 if (debugMode) LeshysCamera.Init();
 
                 CarpetBurn.Init();
+                BeyondBattery.Init();
 
                 if (debugMode) BeyondScout.Init();
-                DeadEye.Init();
+                if (debugMode) DeadEye.Init();
 
 
                 if (debugMode) TestGun.Add();
@@ -225,12 +235,15 @@ namespace BotsMod
                 if (debugMode) Alternator.Add();
 
                 CoolAssChargeGun.Add();
+                if (debugMode) BeyondRailgun.Add();
 
-                BreachCutter.Add();
+                if (debugMode) BreachCutter.Add();
 
                 BeyondSmg.Add();
 
                 Judgment.Add();
+
+                if (debugMode) GunParasite.Add();
 
                 BeyondUnlock.Add();
                 BeyondUnlock.Add2();
@@ -280,6 +293,7 @@ namespace BotsMod
 
                 EnchantedEnemies.Init();
 
+                CustomAmmo.Init();
 
 
                 if (debugMode) TestPassive.Init();
@@ -365,11 +379,7 @@ namespace BotsMod
                     beyondNpcTalkSprites[i] = "BotsMod/sprites/Npcs/Beyond/" + beyondNpcTalkSprites[i];
                 }
 
-                var beyondLootTable = LootTableAPI.LootTableTools.CreateLootTable();
-                foreach (var item in Tools.BeyondItems)
-                {
-                    beyondLootTable.AddItemToPool(item);
-                }
+                
 
 
 
@@ -399,7 +409,7 @@ namespace BotsMod
                     new Vector3[] { new Vector3(1.125f, 2.125f, 1), new Vector3(0f, 3.250f, 1), new Vector3(5.250f, 3.250f, 1), new Vector3(4.125f, 2.125f, 1), new Vector3(2.625f, 1f, 1) }, 1, false, null, ShopMerchantStuff.CustomCanBuyWeapons, ShopMerchantStuff.RemoveCurrencyWeapons,
                     ShopMerchantStuff.CustomPriceWeapons, null, null, "BotsMod/sprites/shopguygunmoneyicon.png", "gunTextIcon", true, false).GetComponent<CustomShopController>();
                 //mapiconshop
-                shop = NpcApi.ItsDaFuckinShopApi.SetUpShop("BeyondShopKeep", "bot", beyondNpcIdleSprites, 6, beyondNpcTalkSprites, 8, beyondLootTable, CustomShopItemController.ShopCurrencyType.CUSTOM, "#BEYOND_RUNBASEDMULTILINE_GENERIC", "#BEYOND_RUNBASEDMULTILINE_STOPPER", "#BEYOND_SHOP_PURCHASED",
+                shop = NpcApi.ItsDaFuckinShopApi.SetUpShop("BeyondShopKeep", "bot", beyondNpcIdleSprites, 6, beyondNpcTalkSprites, 8, BeyondPrefabs.beyondLootTable, CustomShopItemController.ShopCurrencyType.CUSTOM, "#BEYOND_RUNBASEDMULTILINE_GENERIC", "#BEYOND_RUNBASEDMULTILINE_STOPPER", "#BEYOND_SHOP_PURCHASED",
                     "#BEYOND_PURCHASE_FAILED", "#BEYOND_INTRO", "#BEYOND_TAKEPLAYERDAMAGE", ItsDaFuckinShopApi.defaultTalkPointOffset, ItsDaFuckinShopApi.defaultItemPositions, 1, false, null, ShopMerchantStuff.CustomCanBuyBeyond, ShopMerchantStuff.RemoveCurrencyBeyond,
                     ShopMerchantStuff.CustomPriceBeyond, null, null, "", "heart_big_idle_001", false, true, "BotsMod/sprites/Npcs/beyond_merch_carpet_001.png", true, "BotsMod/sprites/Npcs/mapiconshop.png", true, 0.01f).GetComponent<CustomShopController>();
 
@@ -529,6 +539,8 @@ namespace BotsMod
                         customFlagToCheck = CustomDungeonFlags.BOT_LOST_UNLOCKED,  
                     }
                 };
+
+                if (!debugMode) data.prerequisites = new DungeonPrerequisite[0];
                 var name = data.nameInternal;
 
                 Loader.SetupCustomAnimation(name, "dance", 12, tk2dSpriteAnimationClip.WrapMode.Loop);

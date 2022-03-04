@@ -36,7 +36,7 @@ namespace BotsMod
 				{
 					//BotsMod.BotsModule.Log("some what");
 					AIActor aIActor = EnemyDatabase.GetOrLoadByGuid("31a3ea0c54a745e182e22ea54844a82d");
-					prefab = EnemyBuilder.BuildPrefab("DeadEye", guid, "BotsMod/sprites/Enemies/DeadEye/Idle/sniper_thing_idle_001.png", new IntVector2(10, 5), new IntVector2(14, 34), true);
+					prefab = EnemyBuilder.BuildPrefab("DeadEye", guid, "BotsMod/sprites/Enemies/DeadEye/Idle/dead_eye_idle_front_001.png", new IntVector2(10, 5), new IntVector2(14, 34), true);
 					var companion = prefab.AddComponent<EnemyBehavior>();
 
 					companion.aiActor.knockbackDoer.weight = 800;
@@ -55,6 +55,7 @@ namespace BotsMod
 					companion.aiActor.healthHaver.SetHealthMaximum(55f, null, false);
 					companion.aiActor.ShadowObject = EnemyDatabase.GetOrLoadByGuid("31a3ea0c54a745e182e22ea54844a82d").ShadowObject;
 
+
 					companion.aiActor.specRigidbody.PixelColliders.Clear();
 
 
@@ -68,8 +69,8 @@ namespace BotsMod
 						BagleUseFirstFrameOnly = false,
 						SpecifyBagelFrame = string.Empty,
 						BagelColliderNumber = 0,
-						ManualOffsetX = 10,
-						ManualOffsetY = 5,
+						ManualOffsetX = 6,
+						ManualOffsetY = 1,
 						ManualWidth = 14,
 						ManualHeight = 34,
 						ManualDiameter = 0,
@@ -87,8 +88,8 @@ namespace BotsMod
 						BagleUseFirstFrameOnly = false,
 						SpecifyBagelFrame = string.Empty,
 						BagelColliderNumber = 0,
-						ManualOffsetX = 10,
-						ManualOffsetY = 5,
+						ManualOffsetX = 6,
+						ManualOffsetY = 1,
 						ManualWidth = 14,
 						ManualHeight = 34,
 						ManualDiameter = 0,
@@ -103,9 +104,10 @@ namespace BotsMod
 					companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid("31a3ea0c54a745e182e22ea54844a82d").CorpseObject;
 					companion.aiActor.PreventBlackPhantom = false;
 
-					companion.gameObject.AddAnimation("idle", "BotsMod/sprites/Enemies/DeadEye/Idle", 6, AnimationType.Idle, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
+					companion.gameObject.AddAnimation("dead_eye", "idle", "BotsMod/sprites/Enemies/DeadEye/Idle", 6, AnimationType.Idle, DirectionalAnimation.DirectionType.SixWay, DirectionalAnimation.FlipType.Mirror, tk2dSpriteAnimationClip.WrapMode.Loop);
 					companion.gameObject.AddAnimation("teleport", "BotsMod/sprites/Enemies/DeadEye/StartTeleport", 6, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
 					companion.gameObject.AddAnimation("teleport_end", "BotsMod/sprites/Enemies/DeadEye/EndTeleport", 6, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
+
 
 					var bs = prefab.GetComponent<BehaviorSpeculator>();
 					BehaviorSpeculator behaviorSpeculator = EnemyDatabase.GetOrLoadByGuid("31a3ea0c54a745e182e22ea54844a82d").behaviorSpeculator;
@@ -132,37 +134,37 @@ namespace BotsMod
 						new ShootGunBehavior() {
 							GroupCooldownVariance = 0.2f,
 							LineOfSight = false,
-							WeaponType = WeaponType.AIShooterProjectile,
+							WeaponType = WeaponType.BulletScript,
 							OverrideBulletName = "sniper",
 							BulletScript = new CustomBulletScriptSelector(typeof(SniperScript)),
 							FixTargetDuringAttack = true,
 							StopDuringAttack = true,
-							LeadAmount = 0.4f,
+							LeadAmount = 0,
 							LeadChance = 1,
 							RespectReload = true,
-							MagazineCapacity = 3,
-							ReloadSpeed = 1f,
+							MagazineCapacity = 1,
+							ReloadSpeed = 0.78f,
 							EmptiesClip = true,
 							SuppressReloadAnim = false,
-							TimeBetweenShots = 0.01f,
+							TimeBetweenShots = 0.8f,
 							PreventTargetSwitching = true,
 							OverrideAnimation = null,
 							OverrideDirectionalAnimation = null,
 							HideGun = false,
 							UseLaserSight = true,
 							UseGreenLaser = false,
-							PreFireLaserTime = 1,
+							PreFireLaserTime = 1f,
 							AimAtFacingDirectionWhenSafe = false,
 							Cooldown = 3f,
 							CooldownVariance = 0,
 							AttackCooldown = 0,
 							GlobalCooldown = 0,
-							InitialCooldown = 10000,
+							InitialCooldown = 0,
 							InitialCooldownVariance = 0,
 							GroupName = null,
 							GroupCooldown = 0,
 							MinRange = 0,
-							Range = 16,
+							Range = 32,
 							MinWallDistance = 0,
 							MaxEnemiesInRoom = 0,
 							MinHealthThreshold = 0,
@@ -174,10 +176,9 @@ namespace BotsMod
 							resetCooldownOnDamage = null,
 							RequiresLineOfSight = true,
 							MaxUsages = 0,
-
 						},
-						new TeleportBehavior
-                        {
+						/*new TeleportBehavior
+						{
 							AttackableDuringAnimation = true,
 							AllowCrossRoomTeleportation = false,
 							teleportRequiresTransparency = false,
@@ -197,7 +198,7 @@ namespace BotsMod
 							RequiresLineOfSight = false,
 							roomMax = new Vector2(0,0),
 							roomMin = new Vector2(0,0),
-							
+
 							GlobalCooldown = 0,
 							Cooldown = 3f,
 							CooldownVariance = 0f,
@@ -215,7 +216,7 @@ namespace BotsMod
 							targetAreaStyle = null,
 							HealthThresholds = new float[0],
 							MinWallDistance = 0,
-                        }
+						}*/
 					};
 					bs.MovementBehaviors = new List<MovementBehaviorBase>
 					{
@@ -252,8 +253,9 @@ namespace BotsMod
 
 					shooter.AllowTwoHands = true;
 					shooter.ForceGunOnTop = true;
-					
 
+
+					UnityEngine.Object.Destroy(prefab.transform.Find("BulletManHand(Clone)").gameObject);
 
 					Game.Enemies.Add("bot:dead_eye", companion.aiActor);
 					//ETGModConsole.Log("cool");
@@ -274,22 +276,37 @@ namespace BotsMod
 				{
 					base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("31a3ea0c54a745e182e22ea54844a82d").bulletBank.GetBullet("sniper"));
 				}
-				for (int i = 0; i < 3; i++)
+				for (int i = 0; i < 2; i++)
 				{
 					this.Fire(new Direction(0, DirectionType.Aim, -1f), new Speed(40f, SpeedType.Absolute), new SniperBullet());
 					yield return Wait(5);
 				}
+				this.Fire(new Direction(0, DirectionType.Aim, -1f), new Speed(40f, SpeedType.Absolute), new SniperBullet(true));
 				yield break;
 			}
 		}
 
 		public class SniperBullet : Bullet
 		{
-			public SniperBullet() : base("sniper", false, false, false)
+			public SniperBullet(bool burst = false) : base("sniper", false, false, false)
 			{
-
+				doBurst = burst;
+			}
+			bool doBurst;
+			public override void OnBulletDestruction(Bullet.DestroyType destroyType, SpeculativeRigidbody hitRigidbody, bool preventSpawningProjectiles)
+			{
+				if (!preventSpawningProjectiles && doBurst)
+				{
+					float num = base.RandomAngle();
+					float num2 = 30f;
+					for (int i = 0; i < 12; i++)
+					{
+						base.Fire(new Direction(num + (float)i * num2, DirectionType.Absolute, -1f), new Speed(9f, SpeedType.Absolute), new SniperBullet());
+					}
+				}
 			}
 		}
+
 
 		public class EnemyBehavior : BraveBehaviour
 		{
@@ -303,7 +320,7 @@ namespace BotsMod
 				mat.SetFloat("_EmissiveColorPower", 1.55f);
 				mat.SetFloat("_EmissivePower", 50);
 				aiActor.sprite.renderer.material = mat;
-
+				base.aiActor.OverrideBlackPhantomShader = BeyondPrefabs.BeyondJammedShader;
 				m_StartRoom = aiActor.GetAbsoluteParentRoom();
 				//base.aiActor.HasBeenEngaged = true;
 				base.aiActor.healthHaver.OnPreDeath += (obj) =>

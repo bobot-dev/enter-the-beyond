@@ -53,7 +53,7 @@ namespace GungeonAPI
         }
 
 
-        public static PrototypeDungeonRoom BuildFromResource(string roomPath, bool setRoomCategory = false, bool autoAssignToFloor = false, bool defineFullPath = false, bool assignDecorationSettings = false)
+        public static PrototypeDungeonRoom BuildFromResource(string roomPath, bool setRoomCategory = false, bool autoAssignToFloor = false, bool defineFullPath = false, bool assignDecorationSettings = false, bool isBeyondRoom = false)
         {
             string RoomPath = (roomPath);
             if (defineFullPath) { RoomPath = roomPath; }
@@ -64,7 +64,9 @@ namespace GungeonAPI
                 roomData.waveTriggers = new string[0];
             }
             //ETGModConsole.Log("visualSubtypes: " + roomData.visualSubtypes.ToString());
-            return Build(texture, roomData, setRoomCategory, autoAssignToFloor, assignDecorationSettings, roomData.weight);
+            var room = Build(texture, roomData, setRoomCategory, autoAssignToFloor, assignDecorationSettings, roomData.weight);
+            if (isBeyondRoom) room.overrideRoomVisualType = -1;
+            return room;
         }
 
         public static PrototypeDungeonRoom Build(Texture2D texture, RoomData roomData, bool SetRoomCategory, bool AutoAssignToFloor, bool AssignDecorationProperties, float? Weight)

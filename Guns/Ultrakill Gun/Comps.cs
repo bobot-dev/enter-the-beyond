@@ -271,16 +271,24 @@ namespace BotsMod
 				magnets.Remove(this);
 			}
 		}
+		Vector3 enemyOffset;
+		bool attachedToEnemy = false;
+		Transform enemyTransform;
 
         void OnHitEnemy(Projectile proj, SpeculativeRigidbody target, bool fatal)
         {
-			if (target.aiActor != null)
+			if (target.aiActor != null && !fatal)
             {
 				
 
 				if (this.m_projectile)
 				{
-					this.m_projectile.gameObject.transform.parent = target.transform;
+					//this.m_projectile.gameObject.transform.parent = target.healthHaver.transform;
+					m_projectile.ManualControl = true;
+					m_projectile.collidesWithEnemies = false;
+					enemyOffset = m_projectile.transform.position - target.healthHaver.transform.position;
+					enemyTransform = target.healthHaver.transform;
+					attachedToEnemy = true;
 				}
 
 				var enemy = target.aiActor;
@@ -297,7 +305,8 @@ namespace BotsMod
 			{
 				UnityEngine.Object.Destroy(this.m_projectile.gameObject);
 			}
-			
+
+			if (attachedToEnemy && enemyTransform && m_projectile) m_projectile.transform.position = enemyTransform.position + enemyOffset;
 		}
 
 		private void HealthHaver_OnPreDeath(Vector2 obj)
@@ -316,7 +325,7 @@ namespace BotsMod
 			if (hasHitSomething)
 			{
 				
-				if (tileCollision.OtherRigidbody && tileCollision.OtherRigidbody.projectile)// && !tileCollision.OtherRigidbody.GetComponent<NailHomingModifier>())
+				if (tileCollision.OtherRigidbody && tileCollision.OtherRigidbody.projectile && (((tileCollision.OtherRigidbody.projectile.Owner is PlayerController) && attachedToEnemy)) || !attachedToEnemy)// && !tileCollision.OtherRigidbody.GetComponent<NailHomingModifier>())
                 {
 					if (this.m_projectile)
 					{

@@ -28,7 +28,7 @@ namespace BotsMod
 			ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
 			ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Timed, 1);
 			item.consumable = false;
-			item.quality = ItemQuality.S;
+			item.quality = ItemQuality.EXCLUDED;
 
 		}
 		GenericRoomTable CastleRoomTable;

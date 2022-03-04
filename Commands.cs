@@ -145,6 +145,41 @@ namespace BotsMod
 
             ETGModConsole.Commands.AddGroup("bot");
 
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("showheadshot", (args) =>
+            {
+                foreach (var obj in GameObject.FindObjectsOfType<AIActor>())
+                {
+                    if (obj && obj.sprite && Vector2.Distance(obj.sprite.WorldCenter, GameManager.Instance.PrimaryPlayer.sprite.WorldCenter) < 8)
+                    {
+                        ETGModConsole.Log(obj?.name);
+                        HitboxMonitor.DisplayHead(obj);
+                    }
+                }
+            });
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("spawnChest", (args) =>
+            {
+                foreach (var obj in GameObject.FindObjectsOfType<AIActor>())
+                {
+                    if (obj && obj.sprite && Vector2.Distance(obj.sprite.WorldCenter, GameManager.Instance.PrimaryPlayer.sprite.WorldCenter) < 8)
+                    {
+                        ETGModConsole.Log(obj?.name);
+                        HitboxMonitor.DisplayHead(obj);
+                    }
+                }
+            });
+            ETGModConsole.Commands.AddUnit("hidehitboxes", (args) => HitboxMonitor.DeleteHitboxDisplays());
+            ETGModConsole.Commands.AddUnit("showhitboxes", (args) =>
+            {
+                foreach (var obj in GameObject.FindObjectsOfType<SpeculativeRigidbody>())
+                {
+                    if (obj && obj.sprite && Vector2.Distance(obj.sprite.WorldCenter, GameManager.Instance.PrimaryPlayer.sprite.WorldCenter) < 8)
+                    {
+                        ETGModConsole.Log(obj?.name);
+                        HitboxMonitor.DisplayHitbox(obj);
+                    }
+                }
+            });
+
             ETGModConsole.Commands.GetGroup("bot").AddUnit("randomize", delegate (string[] args)
             {
                 EtgRandomizerController.Init();
@@ -154,6 +189,134 @@ namespace BotsMod
             {
                 ModdedItemWeightController.CheckModdedItems();
             });
+
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("getTileCollectionInfo", delegate (string[] args)
+            {
+                foreach(var def in BeyondPrefabs.beyondCollection.spriteDefinitions)
+                {
+                    ETGModConsole.Log($"[\"{def.name}\" ({BeyondPrefabs.beyondCollection.spriteDefinitions.IndexOf(def)})]: type {def.metadata.type} - subtype {def.metadata.dungeonRoomSubType} - weight {def.metadata.weight}");
+                }
+            });
+
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("createTilesetMap", delegate (string[] args)
+            {
+                var targetFloor = "base_castle";
+                Dungeon dungeonPrefab = FloorHooks.GetOrLoadByName_Orig(targetFloor);
+
+                Color color = Color.blue;
+
+                foreach (var roomMat in dungeonPrefab.roomMaterialDefinitions)
+                {
+                    var listThing = dungeonPrefab.decoSettings.standardRoomVisualSubtypes.elements.Where(vst => vst.value == dungeonPrefab.roomMaterialDefinitions.IndexOf(roomMat) && !vst.annotation.Contains("unused", false)).ToList();
+                    if (listThing.Count > 0)
+                    {
+                        var subtypeName = listThing[0].annotation;
+                        var path = $"{ETGMod.ResourcesDirectory}/TilesetMaps/{targetFloor}/{subtypeName}";
+                        if (!Directory.Exists(path))
+                        {
+                            Directory.CreateDirectory(path);
+                        }
+                        var properties = roomMat.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
+                        var collection = dungeonPrefab.tileIndices.dungeonCollection;
+                        ETGModConsole.Log("count (roomMat): " + properties.Length);
+                        foreach (var propertyInfo in properties)
+                        {
+                            //ETGModConsole.Log("0");
+                            if (propertyInfo.MemberType != MemberTypes.Method && propertyInfo.DeclaringType == typeof(TileIndexGrid) || true)
+                            {                              
+                                try
+                                {
+                                    //ETGModConsole.Log("1");
+                                    ETGModConsole.Log(propertyInfo.Name);
+                                    if (propertyInfo.DeclaringType.Name == typeof(TileIndexGrid).Name || true)
+                                    {
+                                        TileIndexGrid indexGrid = ReflectionHelper.GetValue(propertyInfo, roomMat) as TileIndexGrid;
+                                        if (!indexGrid)
+                                        {
+                                            //ETGModConsole.Log("why");
+                                            continue;
+                                        }
+                                        var grids = indexGrid.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
+                                        //ETGModConsole.Log("2");
+                                        ETGModConsole.Log("count (grids): " + grids.Length);
+                                        foreach (var grid in grids)
+                                        {
+                                            if (grid.MemberType != MemberTypes.Method)
+                                            {
+                                                TileIndexList indexList = ReflectionHelper.GetValue(grid, indexGrid) as TileIndexList;
+                                                if (indexList == null)
+                                                {
+                                                    ETGModConsole.Log("why");
+                                                    continue;
+                                                }
+                                                if (indexList.indices.Where(id => id >= 0).ToList().Count > 0)
+                                                {
+                                                    var output = Tools.AddBorderToAtlasSprites(collection, indexList, subtypeName, color);
+
+                                                    ToolsCharApi.ExportTexture(output, path, propertyInfo.Name);
+                                                }
+
+
+
+                                            }
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                       
+
+                                        TileIndexGrid[] indexGrids = ReflectionHelper.GetValue(propertyInfo, roomMat) as TileIndexGrid[];
+                                        if (indexGrids == null)
+                                        {
+                                            ETGModConsole.Log("why[]"); 
+                                            continue;
+
+                                        }
+
+                                        foreach (var indexGrid in indexGrids)
+                                        {
+                                            var grids = indexGrid.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public);
+                                            //ETGModConsole.Log("2");
+                                            ETGModConsole.Log("count (grids): " + grids.Length);
+                                            foreach (var grid in grids)
+                                            {
+                                                if (grid.MemberType != MemberTypes.Method && grid.DeclaringType == typeof(TileIndexList))
+                                                {
+                                                    TileIndexList indexList = ReflectionHelper.GetValue(propertyInfo, grid) as TileIndexList;
+                                                    if (indexList.indices.Where(id => id >= 0).ToList().Count > 0)
+                                                    {
+                                                        var output = Tools.AddBorderToAtlasSprites(collection, indexList, subtypeName, color);
+
+                                                        ToolsCharApi.ExportTexture(output, path, propertyInfo.Name);
+                                                    }
+
+
+                                                }
+                                            }
+                                        }
+
+                                        
+                                    }
+
+                                }
+                                catch (Exception message)
+                                {
+                                    ETGModConsole.Log(message.ToString());
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ETGModConsole.Log($"no materials found at {dungeonPrefab.roomMaterialDefinitions.IndexOf(roomMat)} :|");
+                    }
+                    
+                }
+            });
+
+
+            
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("itemCount", delegate (string[] args)
             {
@@ -1450,7 +1613,7 @@ namespace BotsMod
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("chest", delegate (string[] args)
             {
-                Chest.Spawn(KeyChest, (GameManager.Instance.PrimaryPlayer.CenterPosition + new Vector2(1f, 0f)).ToIntVector2(VectorConversions.Round));
+                Chest.Spawn(BeyondPrefabs.beyondChestPrefab.GetComponent<Chest>(), (GameManager.Instance.PrimaryPlayer.CenterPosition + new Vector2(1f, 0f)).ToIntVector2(VectorConversions.Round), GameManager.Instance.Dungeon.data.GetRoomFromPosition(GameManager.Instance.PrimaryPlayer.CenterPosition.ToIntVector2(VectorConversions.Round)), true);
             });
 
 
@@ -1497,17 +1660,17 @@ namespace BotsMod
             ETGModConsole.Commands.GetGroup("bot").AddUnit("asset_bundle_objects", delegate (string[] args)
             {
                 ETGModConsole.Log("===================================");
-                foreach (string str in BeyondPrefabs.AHHH.GetAllAssetNames())
+                foreach (string str in BeyondPrefabs.fucktilesets.GetAllAssetNames())
                 {
-                    ETGModConsole.Log(BeyondPrefabs.AHHH.name + ": " + str);
+                    ETGModConsole.Log(BeyondPrefabs.fucktilesets.name + ": " + str);
                 }
                 ETGModConsole.Log("===================================");
-                var part = UnityEngine.Object.Instantiate<GameObject>(BeyondPrefabs.AHHH.LoadAsset<GameObject>("Cylinder"), GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, Quaternion.identity);
+                //var part = UnityEngine.Object.Instantiate<GameObject>(BeyondPrefabs.AHHH.LoadAsset<GameObject>("Cylinder"), GameManager.Instance.PrimaryPlayer.sprite.WorldCenter, Quaternion.identity);
 
-                if (part.layer != LayerMask.NameToLayer("Unpixelated"))
-                {
-                    part.SetLayerRecursively(LayerMask.NameToLayer("Unpixelated"));
-                }
+                //if (part.layer != LayerMask.NameToLayer("Unpixelated"))
+                //{
+                //    part.SetLayerRecursively(LayerMask.NameToLayer("Unpixelated"));
+                //}
 
                 //part.AddComponent<MakeObjSpin>();
             });

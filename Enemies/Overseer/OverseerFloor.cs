@@ -540,7 +540,7 @@ namespace BotsMod
 
 					new AttackBehaviorGroup.AttackGroupItem()
 					{
-						Probability = 1,
+						Probability = 6,
 
 						Behavior = new SequentialAttackBehaviorGroup()
 						{
@@ -616,6 +616,7 @@ namespace BotsMod
 									turnRateMultiplier = 1.5f,
 									LockInPlaceWhileAttacking = true,
 									ShootPoint = m_CachedGunAttachPoint.transform,
+									
 									//BulletScript = new CustomBulletScriptSelector(typeof(Wailer.Wail))
 									MinWallDistance = 5,
 								},
@@ -639,7 +640,7 @@ namespace BotsMod
 
 						Behavior = new SequentialAttackBehaviorGroup()
 						{
-							
+
 
 							AttackBehaviors = new List<AttackBehaviorBase>
 							{
@@ -647,7 +648,7 @@ namespace BotsMod
 								#region dash1
 								new DashButGoodBehavior
 								{
-									dashDirection = DashButGoodBehavior.DashDirection.KindaTowardTarget,
+									dashDirection = DashButGoodBehavior.DashDirection.PerpendicularToTarget,
 									quantizeDirection = 0,
 									dashDistance = 15,
 									dashTime = 0.3f,
@@ -655,7 +656,7 @@ namespace BotsMod
 									doubleDashChance = 0.3f,
 									avoidTarget = true,
 									ShootPoint = m_CachedGunAttachPoint,
-									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),									
+									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
 									fireAtDashStart = true,
 									stopOnCollision = false,
 									warpDashAnimLength = false,
@@ -741,7 +742,7 @@ namespace BotsMod
 								#region dash1
 								new DashButGoodBehavior
 								{
-									dashDirection = DashButGoodBehavior.DashDirection.KindaTowardTarget,
+									dashDirection = DashButGoodBehavior.DashDirection.PerpendicularToTarget,
 									quantizeDirection = 0,
 									dashDistance = 5,
 									dashTime = 0.3f,
@@ -835,7 +836,7 @@ namespace BotsMod
 								#region dash1
 								new DashButGoodBehavior
 								{
-									dashDirection = DashButGoodBehavior.DashDirection.KindaTowardTarget,
+									dashDirection = DashButGoodBehavior.DashDirection.PerpendicularToTarget,
 									quantizeDirection = 0,
 									dashDistance = 5,
 									dashTime = 0.3f,
@@ -929,7 +930,7 @@ namespace BotsMod
 								#region dash1
 								new DashButGoodBehavior
 								{
-									dashDirection = DashButGoodBehavior.DashDirection.KindaTowardTarget,
+									dashDirection = DashButGoodBehavior.DashDirection.PerpendicularToTarget,
 									quantizeDirection = 0,
 									dashDistance = 5,
 									dashTime = 0.3f,
@@ -1258,7 +1259,7 @@ namespace BotsMod
 					new AttackBehaviorGroup.AttackGroupItem()
 					{
 						Probability = 1f,
-						Behavior = new RemoteShootBehavior
+						/*Behavior = new RemoteShootBehavior
 						{
 							DefineRadius = true,
 							MinRadius = 4,
@@ -1268,8 +1269,8 @@ namespace BotsMod
 							remoteBulletScript = new CustomBulletScriptSelector(typeof(OverseerRemoteBullets)),
 							FireTime = 3.5f,
 							Multifire = true,
-							MinShots = 2,
-							MaxShots = 5,
+							MinShots = 3,
+							MaxShots = 3,
 							MidShotTime = 0.7f,
 							ShootVfx = "magic",
 							PostFireAnim = "remote_end",
@@ -1277,6 +1278,22 @@ namespace BotsMod
 							StopDuringAnimation = true,
 							
 
+						},*/
+
+						Behavior = new ShootBehavior
+						{
+							ShootPoint = m_CachedGunAttachPoint,
+							BulletScript = new CustomBulletScriptSelector(typeof(OverseerRemoteBullets)),
+							LeadAmount = 0f,
+							AttackCooldown = 1.2f,
+							TellAnimation = "",
+							FireAnimation = "",
+							RequiresLineOfSight = false,
+							Cooldown = 3f,
+							MinWallDistance = 3,
+
+							StopDuring = ShootBehavior.StopType.Attack,
+							Uninterruptible = true
 						},
 						NickName = "remote pew pew"
 					},

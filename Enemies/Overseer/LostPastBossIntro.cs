@@ -40,6 +40,12 @@ namespace BotsMod
             }
         }
 
+        protected override void OnDestroy()
+        {
+            this.ModifyCamera(false);
+            base.OnDestroy();
+        }
+
         public override void PlayerWalkedIn(PlayerController player, List<tk2dSpriteAnimator> animators)
         {
             GameManager.Instance.StartCoroutine(PlaySound());

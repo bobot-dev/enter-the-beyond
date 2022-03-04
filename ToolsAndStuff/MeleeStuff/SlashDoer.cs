@@ -15,16 +15,16 @@ namespace BotsMod
     {
 
 
-        public static void DoSwordSlash(Vector2 position, float angle, PlayerController owner, float playerKnockbackForce, ProjInteractMode intmode, SlashVFXToUse slashVFX, float damageToDeal, float enemyKnockbackForce, List<GameActorEffect> statusEffects = null, Transform parentTransform = null, float jammedDamageMult = 1, float bossDamageMult = 1, float SlashRange = 2.5f, float SlashDimensions = 90f, Projectile sourceProjectile = null)
+        public static void DoSwordSlash(Vector2 position, float angle, PlayerController owner, float playerKnockbackForce, bool playerKnockbackImmutable, ProjInteractMode intmode, SlashVFXToUse slashVFX, float damageToDeal, float enemyKnockbackForce, List<GameActorEffect> statusEffects = null, Transform parentTransform = null, float jammedDamageMult = 1, float bossDamageMult = 1, float SlashRange = 2.5f, float SlashDimensions = 90f, Projectile sourceProjectile = null)
         {
           
-            GameManager.Instance.StartCoroutine(HandleSlash(position, angle, owner, playerKnockbackForce, intmode, damageToDeal, enemyKnockbackForce, statusEffects, jammedDamageMult, bossDamageMult, SlashRange, SlashDimensions, slashVFX,  sourceProjectile));
+            GameManager.Instance.StartCoroutine(HandleSlash(position, angle, owner, playerKnockbackForce, playerKnockbackImmutable, intmode, damageToDeal, enemyKnockbackForce, statusEffects, jammedDamageMult, bossDamageMult, SlashRange, SlashDimensions, slashVFX,  sourceProjectile));
         }
-        private static IEnumerator HandleSlash(Vector2 position, float angle, PlayerController owner, float knockbackForce, ProjInteractMode intmode, float damageToDeal, float enemyKnockback, List<GameActorEffect> statusEffects, float jammedDMGMult, float bossDMGMult, float SlashRange, float SlashDimensions, SlashVFXToUse slashVFXToUse, Projectile sourceProjectile = null)
+        private static IEnumerator HandleSlash(Vector2 position, float angle, PlayerController owner, float knockbackForce, bool playerKnockbackImmutable, ProjInteractMode intmode, float damageToDeal, float enemyKnockback, List<GameActorEffect> statusEffects, float jammedDMGMult, float bossDMGMult, float SlashRange, float SlashDimensions, SlashVFXToUse slashVFXToUse, Projectile sourceProjectile = null)
         {
             int slashId = Time.frameCount;
             List<SpeculativeRigidbody> alreadyHit = new List<SpeculativeRigidbody>();
-            if (knockbackForce != 0f && owner != null) owner.knockbackDoer.ApplyKnockback(BraveMathCollege.DegreesToVector(angle, 1f), knockbackForce, 0.25f, false);
+            if (knockbackForce != 0f && owner != null) owner.knockbackDoer.ApplyKnockback(BraveMathCollege.DegreesToVector(angle, 1f), knockbackForce, 0.25f, playerKnockbackImmutable);
             VFXPool slashVFX = new VFXPool();
             slashVFX = null;
             slashVFX = CreateNewVFX(slashVFXToUse);

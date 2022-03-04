@@ -180,7 +180,6 @@ namespace CustomCharacters
 				);
 
 				Hook hook3 = new Hook(typeof(PlayerController).GetProperty("LocalShaderName", BindingFlags.Instance | BindingFlags.Public).GetGetMethod(), typeof(Hooks).GetMethod("LocalShaderNameGetHook"));
-
 				//BotsModule.Log("hooks done");
 			}
 			catch (Exception e)
@@ -188,6 +187,8 @@ namespace CustomCharacters
 				ToolsCharApi.PrintException(e);
 			}
 		}
+
+		
 
 		//one hook in and im already at the point of wanting to punch my screen thats gotta be a new record!! Update its like 3? (i think, ive lost track couldve been a week) days later and i can say it got worse 
 		public static void InitHook(Action<PunchoutController> orig, PunchoutController self)

@@ -1,4 +1,5 @@
-﻿using Dungeonator;
+﻿using CustomCharacters;
+using Dungeonator;
 using FerryMansOar;
 using Gungeon;
 using ItemAPI;
@@ -18,13 +19,13 @@ namespace BotsMod
 	public static class Tools //1
 	{
 		public static GameObject Mines_Cave_In;
-		public static GameObject Foyer_ElevatorChamber;		
+		public static GameObject Foyer_ElevatorChamber;
 		public static List<int> BeyondItems = new List<int>();
 		public static List<int> Spells = new List<int>();
 
 
 
-		
+
 		public static void Init()
 		{
 
@@ -97,6 +98,309 @@ namespace BotsMod
 			Tools.DefaultCheeseGoop = (PickupObjectDatabase.GetById(626) as Gun).DefaultModule.projectiles[0].cheeseEffect.CheeseGoop;
 			Tools.DefaultBlobulonGoop = EnemyDatabase.GetOrLoadByGuid("0239c0680f9f467dbe5c4aab7dd1eca6").GetComponent<GoopDoer>().goopDefinition;
 			Tools.DefaultPoopulonGoop = EnemyDatabase.GetOrLoadByGuid("116d09c26e624bca8cca09fc69c714b3").GetComponent<GoopDoer>().goopDefinition;
+		}
+
+		public static void SetupTileMetaData(this TilesetIndexMetadata metadata, TilesetIndexMetadata.TilesetFlagType type, float weight = 1, int dungeonRoomSubType = 0, int dungeonRoomSubType2 = -1, int dungeonRoomSubType3 = -1, bool animated = false, bool preventStamps = true)
+		{
+			metadata.type = type;
+			metadata.weight = weight;
+			metadata.dungeonRoomSubType = dungeonRoomSubType;
+			metadata.secondRoomSubType = dungeonRoomSubType2;
+			metadata.thirdRoomSubType = dungeonRoomSubType3;
+			metadata.usesAnimSequence = animated;
+			metadata.usesNeighborDependencies = false;
+			metadata.preventWallStamping = preventStamps;
+
+			metadata.usesPerTileVFX = false;
+			metadata.tileVFXPlaystyle = TilesetIndexMetadata.VFXPlaystyle.CONTINUOUS;
+			metadata.tileVFXChance = 0;
+			metadata.tileVFXPrefab = null;
+			metadata.tileVFXOffset = Vector2.zero;
+			metadata.tileVFXDelayTime = 1;
+			metadata.tileVFXDelayVariance = 0;
+			metadata.tileVFXAnimFrame = 0;
+		}
+
+		public static Texture2D AddBorderToAtlasSprites(tk2dSpriteCollectionData collection, TileIndexList indexList, string subtypeName, Color color)
+		{
+
+			tk2dSpriteDefinition def;
+			string defName;
+			Material material;
+			Texture2D texture, output;
+			int width, height, minX, minY, maxX, maxY, w, h;
+			Vector2[] uvs;
+
+			def = collection.spriteDefinitions[0];
+			material = def.material == null ? def.materialInst : def.material;
+
+			texture = (Texture2D)material.mainTexture.GetReadable();
+			width = texture.width;
+			height = texture.height;
+			output = new Texture2D(width, height);
+			
+
+			foreach (var id in indexList.indices)
+			{
+				//ETGModConsole.Log($"{id}/{collection.spriteDefinitions.Length - 1}");
+				if (id < 0) continue;
+				def = collection.spriteDefinitions[id];
+				if (def == null) continue;
+
+
+				defName = def.name;
+
+				uvs = def.uvs;
+				if (def.uvs == null || def.uvs.Length < 4)
+				{
+					ToolsCharApi.PrintError($"Failed to dump {defName} in {subtypeName}: Invalid UV's");
+					continue;
+				}
+
+				minX = Mathf.RoundToInt(uvs[0].x * width);
+				minY = Mathf.RoundToInt(uvs[0].y * height);
+				maxX = Mathf.RoundToInt(uvs[3].x * width);
+				maxY = Mathf.RoundToInt(uvs[3].y * height);
+
+				w = maxX - minX;
+				h = maxY - minY;
+
+
+
+				for (int y = minY; y < maxY; y++)
+				{
+					if (y == minY || y == maxY - 1)
+					{
+						for (int x = minX; x < maxX; x++)
+						{
+							output.SetPixel(x, y, color);
+						}
+					}
+					else
+					{
+						output.SetPixel(minX, y, color);
+						output.SetPixel(maxX, y, color);
+					}
+
+				}
+				output.Apply();
+
+			}
+
+			output.name = subtypeName + UnityEngine.Random.Range(0, 100000);
+
+
+			return output;
+			
+			
+		}
+
+		public static void SetMaterial(this tk2dSpriteCollectionData collection, int spriteId, int matNum)
+        {
+			collection.spriteDefinitions[spriteId].material = collection.materials[matNum];
+			collection.spriteDefinitions[spriteId].materialId = matNum;
+
+		}
+
+		public static void SetupTilesetSpriteDef(this tk2dSpriteDefinition def, bool wall = false, bool lower = false)
+        {
+			def.boundsDataCenter = new Vector3(0.5f, 0.5f, 0);
+			def.boundsDataExtents = new Vector3(1, 1f, 0);
+			def.untrimmedBoundsDataCenter = new Vector3(0.5f, 0.5f, 0);
+			def.untrimmedBoundsDataExtents = new Vector3(1, 1, 0);
+			def.texelSize = new Vector2(0.625f, 0.625f);
+			//def.colliderType = tk2dSpriteDefinition.ColliderType.None'
+			def.position0 = new Vector3(0, 0f, 0);
+			def.position1 = new Vector3(1, 0f, 0);
+			def.position2 = new Vector3(0, 1, 0);
+			def.position3 = new Vector3(1, 1, 0);
+			def.regionH = 16;
+			def.regionW = 16;
+			if (wall)
+            {
+				def.colliderType = tk2dSpriteDefinition.ColliderType.Box;
+				def.collisionLayer = lower ? CollisionLayer.LowObstacle : CollisionLayer.HighObstacle;
+				def.colliderVertices = new Vector3[]
+				{
+					new Vector3(0, 1, -1),
+					new Vector3(0, 1, 1),
+					new Vector3(0, 0, -1),
+					new Vector3(0, 0, 1),
+					new Vector3(1, 0, -1),
+					new Vector3(1, 0, 1),
+					new Vector3(1, 1, -1),
+					new Vector3(1, 1, 1),
+				};
+			}
+		}
+
+		public static TileIndexGrid CreateBlankIndexGrid()
+        {
+			var indexGrid = ScriptableObject.CreateInstance<TileIndexGrid>();
+			var yes = new TileIndexList { indexWeights = new List<float> { 0.1f }, indices = new List<int> { -1 } };
+
+			indexGrid.topLeftIndices = yes;
+			indexGrid.topIndices = yes;
+			indexGrid.topRightIndices = yes;
+			indexGrid.leftIndices = yes;
+			indexGrid.centerIndices = yes;
+			indexGrid.rightIndices = yes;
+			indexGrid.bottomLeftIndices = yes;
+			indexGrid.bottomIndices = yes;
+			indexGrid.bottomRightIndices = yes;
+			indexGrid.horizontalIndices = yes;
+			indexGrid.verticalIndices = yes;
+			indexGrid.topCapIndices = yes;
+			indexGrid.rightCapIndices = yes;
+			indexGrid.bottomCapIndices = yes;
+			indexGrid.leftCapIndices = yes;
+			indexGrid.allSidesIndices = yes;
+			indexGrid.topLeftNubIndices = yes;
+			indexGrid.topRightNubIndices = yes;
+			indexGrid.bottomLeftNubIndices = yes;
+			indexGrid.bottomRightNubIndices = yes;
+
+			indexGrid.extendedSet = false;
+
+			indexGrid.topCenterLeftIndices = yes;
+			indexGrid.topCenterIndices = yes;
+			indexGrid.topCenterRightIndices = yes;
+			indexGrid.thirdTopRowLeftIndices = yes;
+			indexGrid.thirdTopRowCenterIndices = yes;
+			indexGrid.thirdTopRowRightIndices = yes;
+			indexGrid.internalBottomLeftCenterIndices = yes;
+			indexGrid.internalBottomCenterIndices = yes;
+			indexGrid.internalBottomRightCenterIndices = yes;
+
+			indexGrid.borderTopNubLeftIndices = yes;
+			indexGrid.borderTopNubRightIndices = yes;
+			indexGrid.borderTopNubBothIndices = yes;
+			indexGrid.borderRightNubTopIndices = yes;
+			indexGrid.borderRightNubBottomIndices = yes;
+			indexGrid.borderRightNubBothIndices = yes;
+			indexGrid.borderBottomNubLeftIndices = yes;
+			indexGrid.borderBottomNubRightIndices = yes;
+			indexGrid.borderBottomNubBothIndices = yes;
+			indexGrid.borderLeftNubTopIndices = yes;
+			indexGrid.borderLeftNubBottomIndices = yes;
+			indexGrid.borderLeftNubBothIndices = yes;
+			indexGrid.diagonalNubsTopLeftBottomRight = yes;
+			indexGrid.diagonalNubsTopRightBottomLeft = yes;
+			indexGrid.doubleNubsTop = yes;
+			indexGrid.doubleNubsRight = yes;
+			indexGrid.doubleNubsBottom = yes;
+			indexGrid.doubleNubsLeft = yes;
+			indexGrid.quadNubs = yes;
+			indexGrid.topRightWithNub = yes;
+			indexGrid.topLeftWithNub = yes;
+			indexGrid.bottomRightWithNub = yes;
+			indexGrid.bottomLeftWithNub = yes;
+
+			indexGrid.diagonalBorderNE = yes;
+			indexGrid.diagonalBorderSE = yes;
+			indexGrid.diagonalBorderSW = yes;
+			indexGrid.diagonalBorderNW = yes;
+			indexGrid.diagonalCeilingNE = yes;
+			indexGrid.diagonalCeilingSE = yes;
+			indexGrid.diagonalCeilingSW = yes;
+			indexGrid.diagonalCeilingNW = yes;
+
+			indexGrid.CenterCheckerboard = false;
+			indexGrid.CheckerboardDimension = 1;
+			indexGrid.CenterIndicesAreStrata = false;
+
+			indexGrid.PitInternalSquareGrids = new List<TileIndexGrid>();
+
+			indexGrid.PitInternalSquareOptions = new PitSquarePlacementOptions { CanBeFlushBottom = false, CanBeFlushLeft = false, CanBeFlushRight = false, PitSquareChance = -1 };
+
+			indexGrid.PitBorderIsInternal = false;
+
+			indexGrid.PitBorderOverridesFloorTile = false;
+
+			indexGrid.CeilingBorderUsesDistancedCenters = false;
+
+			indexGrid.UsesRatChunkBorders = false;
+			indexGrid.RatChunkNormalSet = yes;
+			indexGrid.RatChunkBottomSet = yes;
+
+			indexGrid.PathFacewallStamp = null;
+			indexGrid.PathSidewallStamp = null;
+
+			indexGrid.PathPitPosts = yes;
+			indexGrid.PathPitPostsBL = yes;
+			indexGrid.PathPitPostsBR = yes;
+
+			indexGrid.PathStubNorth = null;
+			indexGrid.PathStubEast = null;
+			indexGrid.PathStubSouth = null;
+			indexGrid.PathStubWest = null;
+
+
+			return indexGrid;
+		}
+
+
+		public static void SetupBeyondRoomMaterial(ref DungeonMaterial material)
+        {
+			material.facewallLightStamps = new List<LightStampData>
+			{
+				new LightStampData
+				{
+					width = 1,
+					height = 2,
+					relativeWeight = 1,
+					placementRule = DungeonTileStampData.StampPlacementRule.ON_LOWER_FACEWALL,
+					occupySpace = DungeonTileStampData.StampSpace.WALL_SPACE,
+					stampCategory = DungeonTileStampData.StampCategory.MUNDANE,
+					preferredIntermediaryStamps = 0,
+					intermediaryMatchingStyle = DungeonTileStampData.IntermediaryMatchingStyle.ANY,
+					requiresForcedMatchingStyle = false,
+					opulence = Opulence.FINE,
+					roomTypeData = new List<StampPerRoomPlacementSettings>(),
+					indexOfSymmetricPartner = -1,
+					preventRoomRepeats = false,
+					objectReference = BeyondPrefabs.shared_auto_001.LoadAsset<GameObject>("DefaultTorchPurple"),
+					CanBeCenterLight = true,
+					CanBeTopWallLight = true,
+					FallbackIndex = 0,
+				}
+			};
+
+			material.sidewallLightStamps = new List<LightStampData>
+			{
+				new LightStampData
+				{
+					width = 1,
+					height = 2,
+					relativeWeight = 1,
+					placementRule = DungeonTileStampData.StampPlacementRule.ON_LOWER_FACEWALL,
+					occupySpace = DungeonTileStampData.StampSpace.WALL_SPACE,
+					stampCategory = DungeonTileStampData.StampCategory.MUNDANE,
+					preferredIntermediaryStamps = 0,
+					intermediaryMatchingStyle = DungeonTileStampData.IntermediaryMatchingStyle.ANY,
+					requiresForcedMatchingStyle = false,
+					opulence = Opulence.FINE,
+					roomTypeData = new List<StampPerRoomPlacementSettings>(),
+					indexOfSymmetricPartner = -1,
+					preventRoomRepeats = false,
+					objectReference = BeyondPrefabs.shared_auto_001.LoadAsset<GameObject>("DefaultTorchSidePurple"),
+					CanBeCenterLight = true,
+					CanBeTopWallLight = true,
+					FallbackIndex = 0,
+				}
+			};
+
+			material.lightPrefabs.elements = new List<WeightedGameObject>
+			{
+				new WeightedGameObject
+				{
+					additionalPrerequisites = new DungeonPrerequisite[0],
+					forceDuplicatesPossible = false,
+					pickupId = -1,
+					rawGameObject = BeyondPrefabs.shared_auto_001.LoadAsset<GameObject>("Gungeon Light (Purple)"),
+					weight = 1,
+				}
+			};
 		}
 
 		public static AIActor GetNearestEnemy(this RoomHandler room, Vector2 position, out float nearestDistance, List<AIActor> excludedActors, bool includeBosses = true, bool excludeDying = false)

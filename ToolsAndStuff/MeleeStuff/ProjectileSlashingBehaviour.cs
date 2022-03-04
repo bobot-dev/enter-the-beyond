@@ -131,7 +131,7 @@ namespace BotsMod
            
             //figure out why this is happening. If no work, just make fake vfx 
             SlashDoer.GrabBoolsAndValuesAndShitForTheFuckingSlashingApplyEffect(AppliesStun, StunApplyChance, StunTime);
-            SlashDoer.DoSwordSlash(this.m_projectile.specRigidbody.UnitCenter, (this.m_projectile.Direction.ToAngle() + angle), owner, playerKnockback, this.InteractMode, SlashVFXToUse, SlashDamage, slashKnockback, effects, null, SlashJammedMult, SlashBossMult, SlashRange, SlashDimensions, m_projectile);
+            SlashDoer.DoSwordSlash(this.m_projectile.specRigidbody.UnitCenter, (this.m_projectile.Direction.ToAngle() + angle), owner, playerKnockback, playerKnockbackImmutable, this.InteractMode, SlashVFXToUse, SlashDamage, slashKnockback, effects, null, SlashJammedMult, SlashBossMult, SlashRange, SlashDimensions, m_projectile);
             //slashVFX.SpawnAtPosition(this.m_projectile.specRigidbody.UnitCenter, this.m_projectile.Direction.ToAngle() + angle, null, null, null, -0.05f);
            
             if (DoSound) AkSoundEngine.PostEvent(soundToPlay, this.m_projectile.gameObject);
@@ -188,7 +188,7 @@ namespace BotsMod
                 }
                 SlashDoer.GrabBoolsAndValuesAndShitForTheFuckingSlashingApplyEffect(AppliesStun, StunApplyChance, StunTime);
 
-                SlashDoer.DoSwordSlash(this.m_projectile.specRigidbody.UnitCenter, (this.m_projectile.Direction.ToAngle() + angle), owner, playerKnockback, this.InteractMode , SlashVFXToUse, SlashDamage, slashKnockback, this.m_projectile.statusEffectsToApply, null, SlashJammedMult, SlashBossMult, SlashRange, SlashDimensions);
+                SlashDoer.DoSwordSlash(this.m_projectile.specRigidbody.UnitCenter, (this.m_projectile.Direction.ToAngle() + angle), owner, playerKnockback, playerKnockbackImmutable, this.InteractMode , SlashVFXToUse, SlashDamage, slashKnockback, this.m_projectile.statusEffectsToApply, null, SlashJammedMult, SlashBossMult, SlashRange, SlashDimensions);
 
                 if (DoSound) AkSoundEngine.PostEvent(soundToPlay, this.m_projectile.gameObject);
                 //slashVFX.SpawnAtPosition(this.m_projectile.specRigidbody.UnitCenter, this.m_projectile.Direction.ToAngle() + angle, null, null, null, -0.05f);
@@ -223,6 +223,7 @@ namespace BotsMod
         /// Don't know what this does. Best to not change it
         /// </summary>
         public float playerKnockback;
+        public bool playerKnockbackImmutable;
         /// <summary>
         /// Knockback of the slash. Doesn't need to be set if SlashDamageUsesBaseProjectileDamage is true
         /// </summary>

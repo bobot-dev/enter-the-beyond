@@ -20,6 +20,7 @@ namespace BotsMod
 		public static GameObject beyondEnterance;
 		public static GameObject pastControllerObject;
 		public static GameObject laserCutterParticles;
+		public static GameObject beyondChestPrefab;
 
 		public static PlayerHandController basicBeyondHands;
 
@@ -60,6 +61,11 @@ namespace BotsMod
 		public static AssetBundle EtbAssetBundle;
 		public static AssetBundle BotsAssetBundle;
 
+		public static Shader BeyondJammedShader;
+
+		public static tk2dSpriteCollectionData beyondCollection;
+		public static GenericLootTable beyondLootTable;
+
 		public static void InitCustomPrefabs()
 		{
 
@@ -69,10 +75,31 @@ namespace BotsMod
 			EtbAssetBundle = BotsModule.LoadAssetBundleFromLiterallyAnywhere("enterthebeyond");
 			BotsAssetBundle = BotsModule.LoadAssetBundleFromLiterallyAnywhere("botsassetbundle");
 
+			Material[] materials = fucktilesets.LoadAllAssets<Material>();
+			foreach (Material m in materials)
+			{
+				var shaderName = m.shader.name;
+				var newShader = Shader.Find(shaderName);
+				if (newShader != null)
+				{
+					m.shader = newShader;
+				}
+				else
+				{
+					Debug.LogWarning("unable to refresh shader: " + shaderName + " in material " + m.name);
+				}
+			}
 
 			ModAssets = AssetBundleLoader.LoadAssetBundleFromLiterallyAnywhere("modassets");
 
 			//ENV_Tileset_Beyond = ModAssets.LoadAsset<Texture2D>("ENV_Tileset_Beyond");
+
+
+			BeyondJammedShader = fucktilesets.LoadAsset<Shader>("BeyondJammedNoSF");
+
+			//BeyondJammedShader.
+
+
 			ENV_Tileset_Beyond = ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/ENV_Tileset_Beyond.png");
 
 			AssetBundle assetBundle = ResourceManager.LoadAssetBundle("shared_auto_001");
@@ -209,6 +236,11 @@ namespace BotsMod
 			basicBeyondHands = SpriteBuilder.SpriteFromResource("BotsMod/sprites/Enemies/hand.png", new GameObject("BeyondHand")).AddComponent<PlayerHandController>();
 			FakePrefab.MarkAsFakePrefab(basicBeyondHands.gameObject);
 			basicBeyondHands.ForceRenderersOff = false;
+			var handSprite = basicBeyondHands.gameObject.GetComponent<tk2dSprite>();
+			handSprite.Collection.spriteDefinitions[handSprite.spriteId].position0 = new Vector3(-0.125f, -0.125f, 0);
+			handSprite.Collection.spriteDefinitions[handSprite.spriteId].position1 = new Vector3(0.125f, -0.125f, 0);
+			handSprite.Collection.spriteDefinitions[handSprite.spriteId].position2 = new Vector3(-0.125f, 0.125f, 0);
+			handSprite.Collection.spriteDefinitions[handSprite.spriteId].position3 = new Vector3(0.125f, 0.125f, 0);
 
 
 			beyondEnterance = SpriteBuilder.SpriteFromResource(idleSpritePaths[0], new GameObject("EffigyOfTheBeyond"));
@@ -235,6 +267,514 @@ namespace BotsMod
 
 			laserCutterParticles = BeyondPrefabs.AHHH.LoadAsset<GameObject>("LaserCutterSystem");
 			laserCutterParticles.AddComponent<PlayParticleSystemDuringBossIntro>();
+
+			//ETGModConsole.Log($"{.GetComponent<UvStorer>().uvArray.Length}");
+			//
+			var beyondCollectionObject = FakePrefab.Clone(FloorHooks.GetOrLoadByName_Orig("Finalscenario_Soldier").tileIndices.dungeonCollection.gameObject);
+			beyondCollectionObject.name = "BeyondCollection";
+			beyondCollection = beyondCollectionObject.GetComponent<tk2dSpriteCollectionData>();
+
+			var baseObj = fucktilesets.LoadAsset<GameObject>("BeyondSpriteCollection");
+			ETGModConsole.Log("obj done");
+			foreach (Component component in baseObj.GetComponents<Component>())
+			{
+				ETGModConsole.Log(component.ToString());
+				if (component.GetType().ToString().ToLower().Contains("tk2dspritecollectiondata"))
+				{
+					ETGModConsole.Log("comp done");
+					tk2dSpriteDefinition[] uvArray = (tk2dSpriteDefinition[])ReflectionHelper.GetValue(component.GetType().GetField("spriteDefinitions"), component);
+
+					ETGModConsole.Log(uvArray.Length.ToString());
+					//var b = uvArray.ToList();
+					//b.Sort();
+					//uvArray = b.ToArray();
+
+					var material = fucktilesets.LoadAsset<Material>("assets/tilesets/beyond/beyondspritecollection data/beyondtilesetmat.mat");
+					ETGModConsole.Log("mat loaded");
+					ETGModConsole.Log(beyondCollection.materials.Length.ToString());
+
+					var mat1 = new Material(beyondCollection.materials[0]);
+					var mat2 = new Material(beyondCollection.materials[1]);
+					var mat3 = new Material(beyondCollection.materials[2]);
+
+					beyondCollection.material = mat1;
+
+					beyondCollection.materials = new Material[] { mat1, mat2, mat3 };
+					ETGModConsole.Log("mat done");
+					var tex = material.GetTexture("_MainTex");
+					tex.filterMode = FilterMode.Point;
+					mat1.SetTexture("_MainTex", tex);
+					mat2.SetTexture("_MainTex", tex);
+					mat3.SetTexture("_MainTex", tex);
+
+					ETGModConsole.Log("tex loaded");
+					beyondCollection.textures = new Texture[] { tex };
+					ETGModConsole.Log("tex done");
+
+
+					foreach (var def in uvArray)
+					{
+						bool isWall = (int.Parse(def.name) >= 22 && int.Parse(def.name) <= 28) || (int.Parse(def.name) >= 44 && int.Parse(def.name) <= 50) || (int.Parse(def.name) >= 44 && int.Parse(def.name) <= 50);
+						beyondCollection.spriteDefinitions[int.Parse(def.name)].uvs = def.uvs.ToArray();
+						beyondCollection.spriteDefinitions[int.Parse(def.name)].SetupTilesetSpriteDef(isWall, (int.Parse(def.name) >= 44 && int.Parse(def.name) <= 50));
+
+						//beyondCollection.spriteDefinitions[] = def;
+					}
+
+					var backupDefs = beyondCollection.spriteDefinitions;
+
+					beyondCollection.spriteDefinitions = new tk2dSpriteDefinition[704];
+
+					foreach (var def in backupDefs)
+                    {
+						def.name = def.name.Replace("Final_Scenario_Tileset_Pilot/", "");
+						//ETGModConsole.Log(def.name);
+						beyondCollection.spriteDefinitions[int.Parse(def.name)] = def;
+						
+
+						def.name = "ENV_Beyond/" + def.name;
+					}
+					ETGModConsole.Log("reorder done");
+					for (int i = 0; i < 704; i++)
+					{
+						beyondCollection.spriteDefinitions[i].material = beyondCollection.materials[0];
+						beyondCollection.spriteDefinitions[i].materialId = 0;
+						//ETGModConsole.Log($"[{i}] {beyondCollection.materials[beyondCollection.spriteDefinitions[i].materialId].name}");
+
+					}
+
+					beyondCollection.SetMaterial(0, 1);
+					beyondCollection.SetMaterial(1, 1);
+					beyondCollection.SetMaterial(2, 1);
+					beyondCollection.SetMaterial(3, 1);
+					beyondCollection.SetMaterial(4, 1);
+					beyondCollection.SetMaterial(5, 1);
+					beyondCollection.SetMaterial(6, 1);
+					beyondCollection.SetMaterial(7, 1);
+					beyondCollection.SetMaterial(8, 1);
+					beyondCollection.SetMaterial(9, 1);
+					beyondCollection.SetMaterial(10, 1);
+					beyondCollection.SetMaterial(11, 1);
+					beyondCollection.SetMaterial(12, 1);
+					beyondCollection.SetMaterial(13, 1);
+					beyondCollection.SetMaterial(14, 1);
+					beyondCollection.SetMaterial(15, 1);
+					beyondCollection.SetMaterial(16, 1);
+					beyondCollection.SetMaterial(17, 1);
+					beyondCollection.SetMaterial(18, 1);
+					beyondCollection.SetMaterial(19, 1);
+					beyondCollection.SetMaterial(20, 1);
+
+					beyondCollection.SetMaterial(42, 1);
+					beyondCollection.SetMaterial(43, 1);
+
+					beyondCollection.SetMaterial(64, 1);
+					beyondCollection.SetMaterial(65, 1);
+
+					beyondCollection.SetMaterial(86, 1);
+					beyondCollection.SetMaterial(87, 1);
+
+					beyondCollection.SetMaterial(242, 2);
+					beyondCollection.SetMaterial(243, 2);
+					beyondCollection.SetMaterial(264, 2);
+					beyondCollection.SetMaterial(265, 2);
+					beyondCollection.SetMaterial(286, 2);
+					beyondCollection.SetMaterial(308, 2);
+					beyondCollection.SetMaterial(330, 2);
+					beyondCollection.SetMaterial(352, 2);
+					beyondCollection.SetMaterial(374, 2);
+					beyondCollection.SetMaterial(396, 2);
+					beyondCollection.SetMaterial(418, 2);
+					beyondCollection.SetMaterial(528, 2);
+					beyondCollection.SetMaterial(529, 2);
+					beyondCollection.SetMaterial(530, 2);
+					beyondCollection.SetMaterial(550, 2);
+
+
+
+					beyondCollection.spriteDefinitions[25].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FACEWALL_UPPER_LEFTEDGE, 1, 1);
+					beyondCollection.spriteDefinitions[26].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FACEWALL_UPPER, 1, 1);
+					beyondCollection.spriteDefinitions[27].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FACEWALL_UPPER, 0.05f, 1);
+					beyondCollection.spriteDefinitions[28].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FACEWALL_UPPER_RIGHTEDGE, 1, 1);
+
+					beyondCollection.spriteDefinitions[29].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FACEWALL_UPPER, 0, 1);
+					beyondCollection.spriteDefinitions[30].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FACEWALL_UPPER, 0, 1);
+					beyondCollection.spriteDefinitions[31].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FACEWALL_UPPER, 0, 1);
+
+					beyondCollection.spriteDefinitions[27].metadata.usesAnimSequence = true;
+
+					SimpleTilesetAnimationSequence wallEye = new SimpleTilesetAnimationSequence();
+
+					wallEye.playstyle = SimpleTilesetAnimationSequence.TilesetSequencePlayStyle.DELAYED_LOOP;
+					wallEye.loopDelayMin = 6;
+					wallEye.loopDelayMax = 25;
+					wallEye.loopceptionTarget = -1;
+					wallEye.loopceptionMin = 1;
+					wallEye.loopceptionMax = 3;
+					wallEye.coreceptionMin = 1;
+					wallEye.coreceptionMax = 1;
+					wallEye.randomStartFrame = true;
+					wallEye.entries = new List<SimpleTilesetAnimationSequenceEntry>
+					{
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 29,
+							frameTime = 5f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 30,
+							frameTime = 0.2f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 31,
+							frameTime = 0.2f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 27,
+							frameTime = 0.6f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 31,
+							frameTime = 0.1f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 29,
+							frameTime = 0.6f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 31,
+							frameTime = 0.1f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 27,
+							frameTime = 0.6f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 31,
+							frameTime = 0.1f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 30,
+							frameTime = 0.2f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 29,
+							frameTime = 0.1f
+						},
+					};
+
+					beyondCollection.SpriteIDsWithAnimationSequences.Add(27);
+					beyondCollection.SpriteDefinedAnimationSequences.Add(wallEye);
+
+
+
+					beyondCollection.spriteDefinitions[47].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FACEWALL_LOWER_LEFTEDGE, 1, 1);
+					beyondCollection.spriteDefinitions[48].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FACEWALL_LOWER, 1, 1);
+					beyondCollection.spriteDefinitions[49].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FACEWALL_LOWER, 1, 1);
+					beyondCollection.spriteDefinitions[50].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FACEWALL_LOWER_RIGHTEDGE, 1, 1);
+
+					beyondCollection.spriteDefinitions[58].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[59].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[60].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[61].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+					beyondCollection.spriteDefinitions[80].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					//beyondCollection.spriteDefinitions[80].metadata.usesAnimSequence = true;
+					beyondCollection.spriteDefinitions[81].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[82].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[83].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+
+					beyondCollection.spriteDefinitions[102].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[103].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[104].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[105].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+
+					beyondCollection.spriteDefinitions[124].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[125].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[126].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[127].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+
+					//beyondCollection.spriteDefinitions[58].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+					beyondCollection.spriteDefinitions[111].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FLOOR_TILE, 1, 1);
+
+					beyondCollection.spriteDefinitions[112].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FLOOR_TILE, 0.01f, 1);
+
+					beyondCollection.spriteDefinitions[112].metadata.usesAnimSequence = true;
+
+					SimpleTilesetAnimationSequence floorEye = new SimpleTilesetAnimationSequence();
+
+					floorEye.playstyle = SimpleTilesetAnimationSequence.TilesetSequencePlayStyle.DELAYED_LOOP;
+					floorEye.loopDelayMin = 6;
+					floorEye.loopDelayMax = 25;
+					floorEye.loopceptionTarget = -1;
+					floorEye.loopceptionMin = 1;
+					floorEye.loopceptionMax = 3;
+					floorEye.coreceptionMin = 1;
+					floorEye.coreceptionMax = 1;
+					floorEye.randomStartFrame = true;
+					floorEye.entries = new List<SimpleTilesetAnimationSequenceEntry>
+					{
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 112,
+							frameTime = 5f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 113,
+							frameTime = 0.2f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 114,
+							frameTime = 0.2f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 115,
+							frameTime = 0.6f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 113,
+							frameTime = 0.1f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 115,
+							frameTime = 0.6f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 113,
+							frameTime = 0.1f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 115,
+							frameTime = 0.6f
+						},
+
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 114,
+							frameTime = 0.1f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 113,
+							frameTime = 0.2f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 112,
+							frameTime = 0.1f
+						},
+					};
+
+					beyondCollection.SpriteIDsWithAnimationSequences.Add(112);
+					beyondCollection.SpriteDefinedAnimationSequences.Add(floorEye);
+
+					beyondCollection.spriteDefinitions[113].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FLOOR_TILE, 0, 1);
+					beyondCollection.spriteDefinitions[114].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FLOOR_TILE, 0, 1);
+					beyondCollection.spriteDefinitions[115].metadata.SetupTileMetaData(TilesetIndexMetadata.TilesetFlagType.FLOOR_TILE, 0, 1);
+					
+
+
+					beyondCollection.spriteDefinitions[286].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[308].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[330].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[352].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+
+
+					beyondCollection.spriteDefinitions[291].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[292].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+					beyondCollection.spriteDefinitions[313].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[314].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+					beyondCollection.spriteDefinitions[335].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[336].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+					beyondCollection.spriteDefinitions[357].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[358].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+					beyondCollection.spriteDefinitions[379].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[380].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[381].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[382].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+					beyondCollection.spriteDefinitions[401].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[402].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[403].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[404].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+					beyondCollection.spriteDefinitions[423].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[424].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[425].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[426].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+					beyondCollection.spriteDefinitions[445].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[446].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[447].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[448].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+					beyondCollection.spriteDefinitions[467].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[469].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[470].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[471].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+					beyondCollection.spriteDefinitions[489].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[490].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[491].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[492].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[493].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+					beyondCollection.spriteDefinitions[511].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[512].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[513].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[514].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[515].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+					beyondCollection.spriteDefinitions[533].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[555].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[577].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+					beyondCollection.spriteDefinitions[599].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
+
+
+					var waterMat = new Material(FloorHooks.GetOrLoadByName_Orig("base_castle").tileIndices.dungeonCollection.materials[5]);
+					waterMat.SetColor("_CausticColor", new Color(0.4f, 0.11f, 0.41f, 0.672f));
+					waterMat.SetTexture("_MainTex", tex);
+					waterMat.SetTexture("_MaskTex", fucktilesets.LoadAsset<Texture2D>("atlasrefl0"));
+
+					beyondCollection.spriteDefinitions[80].material = waterMat;
+					beyondCollection.spriteDefinitions[80].materialId = 3;
+
+					beyondCollection.spriteDefinitions[124].material = waterMat;
+					beyondCollection.spriteDefinitions[124].materialId = 3;
+
+					var ihatearrays = beyondCollection.materials.ToList();
+					ihatearrays.Add(waterMat);
+					beyondCollection.materials = ihatearrays.ToArray();
+
+					SimpleTilesetAnimationSequence waterAnim = new SimpleTilesetAnimationSequence();
+					
+					waterAnim.playstyle = SimpleTilesetAnimationSequence.TilesetSequencePlayStyle.SIMPLE_LOOP;
+					waterAnim.loopDelayMin = 1;
+					waterAnim.loopDelayMax = 3;
+					waterAnim.loopceptionTarget = -1;
+					waterAnim.loopceptionMin = 1;
+					waterAnim.loopceptionMax = 3;
+					waterAnim.coreceptionMin = 1;
+					waterAnim.coreceptionMax = 1;
+					waterAnim.randomStartFrame = false;
+					waterAnim.entries = new List<SimpleTilesetAnimationSequenceEntry>
+					{
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 80,
+							frameTime = 0.3f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 81,
+							frameTime = 0.3f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 82,
+							frameTime = 0.3f
+						},
+						new SimpleTilesetAnimationSequenceEntry
+						{
+							entryIndex = 83,
+							frameTime = 0.3f
+						},
+					};
+
+					//beyondCollection.SpriteIDsWithAnimationSequences.Add(80);
+					//beyondCollection.SpriteDefinedAnimationSequences.Add(waterAnim);
+
+
+
+
+					break;
+				}
+			}
+
+			beyondLootTable = LootTableAPI.LootTableTools.CreateLootTable();
+			foreach (var item in Tools.BeyondItems)
+			{
+				if (item == BotsItemIds.SpinDownDice)
+				{
+					beyondLootTable.AddItemToPool(item, 0.5f);
+				}
+				else
+				{
+					beyondLootTable.AddItemToPool(item);
+				}
+
+			}
+
+
+			beyondChestPrefab = ChestInitStuff.InitChest(
+				"beyond",
+				"bot",
+				"BotsMod/sprites/chest/chest_beyond_idle_001.png",
+				new List<string> { "BotsMod/sprites/chest/chest_beyond_open_001.png", "BotsMod/sprites/chest/chest_beyond_open_002.png", "BotsMod/sprites/chest/chest_beyond_open_003.png", "BotsMod/sprites/chest/chest_beyond_open_004.png", "BotsMod/sprites/chest/chest_beyond_open_005.png" },
+				12,
+				new List<string> { "BotsMod/sprites/chest/chest_beyond_appear_001.png", "BotsMod/sprites/chest/chest_beyond_appear_002.png", "BotsMod/sprites/chest/chest_beyond_appear_003.png", "BotsMod/sprites/chest/chest_beyond_appear_004.png", "BotsMod/sprites/chest/chest_beyond_appear_005.png" },
+				11,
+				new List<string> { "BotsMod/sprites/chest/chest_beyond_break_001.png", "BotsMod/sprites/chest/chest_beyond_break_001.png", "BotsMod/sprites/chest/chest_beyond_break_001.png", "BotsMod/sprites/chest/chest_beyond_break_001.png" },
+				10,
+				new List<int> { 0 },
+				new LootData
+				{
+					D_Chance = 0.5f,
+					C_Chance = 0.4f,
+					B_Chance = 0.3f,
+					A_Chance = 0.05f,
+					S_Chance = 0.05f,
+					Common_Chance = 0,
+					CompletesSynergy = false,
+					canDropMultipleItems = false,
+					lootTable = beyondLootTable,
+					multipleItemDropChances = new WeightedIntCollection { elements = new WeightedInt[0] },
+					onlyOneGunCanDrop = true,
+
+				},
+				new LootData
+				{
+					D_Chance = 0.2f,
+					C_Chance = 0.8f,
+					B_Chance = 0.1f,
+					A_Chance = 0.025f,
+					S_Chance = 0.025f,
+					Common_Chance = 0,
+					CompletesSynergy = false,
+					canDropMultipleItems = false,
+					lootTable = beyondLootTable,
+					multipleItemDropChances = new WeightedIntCollection { elements = new WeightedInt[0] },
+					onlyOneGunCanDrop = true,
+
+				},
+				null,
+				-1,
+				GameManager.Instance.RewardManager.C_Chest.VFX_PreSpawn,
+				GameManager.Instance.RewardManager.C_Chest.VFX_GroundHit,
+				0.73f
+			);
 		}
-	}
+	}	
 }

@@ -10,7 +10,6 @@ namespace ItemAPI
     public class FakePrefab : Component
     {
         internal static HashSet<GameObject> ExistingFakePrefabs = new HashSet<GameObject>();
-        internal static GameObject clone;
 
         /// <summary>
         /// Checks if an object is marked as a fake prefab.

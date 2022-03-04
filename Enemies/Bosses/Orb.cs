@@ -315,6 +315,91 @@ namespace BotsMod
 					new AttackBehaviorGroup.AttackGroupItem()
 					{
 						Probability = 1,
+
+						Behavior = new SequentialAttackBehaviorGroup()
+						{
+							
+							AttackBehaviors = new List<AttackBehaviorBase>
+							{
+								new TeleportToMiddleBehavior()
+								{
+
+									AttackableDuringAnimation = true,
+									AllowCrossRoomTeleportation = false,
+									teleportRequiresTransparency = false,
+									hasOutlinesDuringAnim = true,
+									ManuallyDefineRoom = false,
+									MaxHealthThreshold = 1f,
+									GoneTime = 1f,
+									OnlyTeleportIfPlayerUnreachable = false,
+									teleportInAnim = "",
+									teleportOutAnim = "",
+									AttackCooldown = 1f,
+									InitialCooldown = 1f,
+									RequiresLineOfSight = false,
+									roomMax = new Vector2(0,0),
+									roomMin = new Vector2(0,0),
+
+									
+									GlobalCooldown = 0.5f,
+									Cooldown = 4f,
+									CooldownVariance = 1f,
+									InitialCooldownVariance = 0f,
+									goneAttackBehavior = null,
+									IsBlackPhantom = false,
+
+
+									GroupName = null,
+									GroupCooldown = 0,
+									MinRange = 0,
+									Range = 0,
+									MinHealthThreshold = 0,
+									MaxEnemiesInRoom = 1,
+									MaxUsages = 0,
+									AccumulateHealthThresholds = true,
+									//shadowInAnim = null,
+									//shadowOutAnim = null,
+									targetAreaStyle = null,
+									HealthThresholds = new float[0],
+									MinWallDistance = 0,
+									//resetCooldownOnDamage = null,
+									//shadowSupport = (TeleportBehavior.ShadowSupport)1,
+								},
+								new ShootBehavior
+								{
+
+
+									ShootPoint = m_CachedGunAttachPoint,
+									BulletScript = new CustomBulletScriptSelector(typeof(RainHellFireUponThePlayer)),
+									LeadAmount = 0f,
+									AttackCooldown = 1.2f,
+									TellAnimation = "",
+									FireAnimation = "",
+									RequiresLineOfSight = false,
+									Cooldown = 3f,
+
+									StopDuring = ShootBehavior.StopType.Attack,
+									Uninterruptible = true
+
+
+
+								
+								},
+							},
+							OverrideCooldowns = new List<float>
+							{
+								0
+							},
+							RunInClass = false,
+
+						},
+						NickName = "Beam Teleport Magic bs"
+
+					},
+
+					new AttackBehaviorGroup.AttackGroupItem()
+					{
+						Probability = 1,
 						Behavior = new SummonEnemyViaWaveBehavior
 						{
 
@@ -445,6 +530,81 @@ namespace BotsMod
 
 			}
 			
+		}
+
+		public class RainHellFireUponThePlayer : Script // This BulletScript is just a modified version of the script BulletManShroomed, which you can find with dnSpy.
+		{
+			protected override IEnumerator Top() // This is just a simple example, but bullet scripts can do so much more.
+			{
+				if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
+				{
+					base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("4d164ba3f62648809a4a82c90fc22cae").bulletBank.GetBullet("big_one"));
+					base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("4d164ba3f62648809a4a82c90fc22cae").bulletBank.GetBullet("default"));
+				}
+				this.Fire(Offset.OverridePosition((Vector2)this.BulletBank.aiActor.transform.position + new Vector2(0f, 30f) + new Vector2(0f, 8)), new Direction(-90f, DirectionType.Absolute, -1f), new Speed(30f, SpeedType.Absolute), new BigBullet());
+				yield return Wait(16);
+				this.Fire(Offset.OverridePosition((Vector2)this.BulletBank.aiActor.transform.position + new Vector2(0f, 30f) + new Vector2(6f, 6)), new Direction(-90f, DirectionType.Absolute, -1f), new Speed(30f, SpeedType.Absolute), new BigBullet());
+				yield return Wait(16);
+				this.Fire(Offset.OverridePosition((Vector2)this.BulletBank.aiActor.transform.position + new Vector2(0f, 30f) + new Vector2(8f, 0)), new Direction(-90f, DirectionType.Absolute, -1f), new Speed(30f, SpeedType.Absolute), new BigBullet());
+				yield return Wait(16);
+				this.Fire(Offset.OverridePosition((Vector2)this.BulletBank.aiActor.transform.position + new Vector2(0f, 30f) + new Vector2(6f, -6)), new Direction(-90f, DirectionType.Absolute, -1f), new Speed(30f, SpeedType.Absolute), new BigBullet());
+				yield return Wait(16);
+				this.Fire(Offset.OverridePosition((Vector2)this.BulletBank.aiActor.transform.position + new Vector2(0f, 30f) + new Vector2(0f, -8)), new Direction(-90f, DirectionType.Absolute, -1f), new Speed(30f, SpeedType.Absolute), new BigBullet());
+				yield return Wait(16);
+				this.Fire(Offset.OverridePosition((Vector2)this.BulletBank.aiActor.transform.position + new Vector2(0f, 30f) + new Vector2(-6, -6)), new Direction(-90f, DirectionType.Absolute, -1f), new Speed(30f, SpeedType.Absolute), new BigBullet());
+				yield return Wait(16);
+				this.Fire(Offset.OverridePosition((Vector2)this.BulletBank.aiActor.transform.position + new Vector2(0f, 30f) + new Vector2(-8f, 0)), new Direction(-90f, DirectionType.Absolute, -1f), new Speed(30f, SpeedType.Absolute), new BigBullet());
+				yield return Wait(16);
+				this.Fire(Offset.OverridePosition((Vector2)this.BulletBank.aiActor.transform.position + new Vector2(0f, 30f) + new Vector2(-6f, 6)), new Direction(-90f, DirectionType.Absolute, -1f), new Speed(30f, SpeedType.Absolute), new BigBullet());
+
+
+
+				
+				yield break;
+			}
+		}
+
+		private class BigBullet : Bullet
+		{
+			public BigBullet() : base("big_one", false, false, false)
+			{
+			}
+
+			public override void Initialize()
+			{
+				this.Projectile.spriteAnimator.StopAndResetFrameToDefault();
+				base.Initialize();
+			}
+
+			protected override IEnumerator Top()
+			{
+				this.Projectile.specRigidbody.CollideWithTileMap = false;
+				this.Projectile.specRigidbody.CollideWithOthers = false;
+				yield return this.Wait(45);
+				this.Speed = 0f;
+				this.Projectile.spriteAnimator.Play();
+				float startingAngle = this.RandomAngle();
+				for (int j = 0; j < 39; j++)
+				{
+					float startAngle = startingAngle;
+					int numBullets = 39;
+					int i2 = j;
+					bool offset = false;
+					float direction = this.SubdivideCircle(startAngle, numBullets, i2, 1f, offset);
+					this.Fire(new Direction(direction, DirectionType.Absolute, -1f), new Speed(0f, SpeedType.Absolute), new SpeedChangingBullet(10f, 17, -1));
+				}
+				yield return this.Wait(30);
+				this.Vanish(true);
+				yield break;
+			}
+
+			public override void OnBulletDestruction(Bullet.DestroyType destroyType, SpeculativeRigidbody hitRigidbody, bool preventSpawningProjectiles)
+			{
+				if (preventSpawningProjectiles)
+				{
+					return;
+				}
+			}
 		}
 
 		public class EnemyBehavior : BraveBehaviour

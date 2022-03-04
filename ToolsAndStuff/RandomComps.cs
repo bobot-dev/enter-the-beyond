@@ -1,4 +1,5 @@
-﻿using ItemAPI;
+﻿using Dungeonator;
+using ItemAPI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -173,5 +174,51 @@ namespace BotsMod
         private BasicBeamController beamcont;
         public float EmissivePower;
         public float EmissiveColorPower;
+    }
+
+    public class NukeModifer : MonoBehaviour
+    {
+        public void DoNuke(PlayerController user, Vector2 worldCenter)
+        {
+            this.DoStrike(worldCenter);
+            this.HandleEngoopening(worldCenter, this.goopRadius);
+           
+            if (user && user.CurrentRoom != null)
+            {
+                List<AIActor> activeEnemies = user.CurrentRoom.GetActiveEnemies(RoomHandler.ActiveEnemyType.All);
+                if (activeEnemies != null)
+                {
+                    int count = activeEnemies.Count;
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (activeEnemies[i] && activeEnemies[i].HasBeenEngaged && activeEnemies[i].healthHaver && activeEnemies[i].IsNormalEnemy && !activeEnemies[i].healthHaver.IsDead && !activeEnemies[i].healthHaver.IsBoss && !activeEnemies[i].IsTransmogrified && UnityEngine.Random.value < this.TransmogrifyChance && Vector2.Distance(activeEnemies[i].CenterPosition, worldCenter) < this.TransmogrifyRadius)
+                        {
+                            activeEnemies[i].Transmogrify(EnemyDatabase.GetOrLoadByGuid(this.TransmogrifyTargetGuid), null);
+                        }
+                    }
+                }
+            }
+            
+            StickyFrictionManager.Instance.RegisterCustomStickyFriction(0.15f, 1f, false, false);
+        }
+
+        protected void HandleEngoopening(Vector2 startPoint, float radius)
+        {
+            float duration = 1f;
+            DeadlyDeadlyGoopManager goopManagerForGoopType = DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(this.goopDefinition);
+            goopManagerForGoopType.TimedAddGoopCircle(startPoint, radius, duration, false);
+        }
+
+        private void DoStrike(Vector2 currentTarget)
+        {
+            Exploder.Explode(currentTarget, this.strikeExplosionData, Vector2.zero, null, false, CoreDamageTypes.None, false);
+        }
+        public string TransmogrifyTargetGuid;
+        public float TransmogrifyChance;
+        public float TransmogrifyRadius;
+        public float goopRadius;
+        public ExplosionData strikeExplosionData;
+        public GoopDefinition goopDefinition;
+
     }
 }

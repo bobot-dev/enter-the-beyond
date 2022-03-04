@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Dungeonator;
 using Gungeon;
@@ -90,6 +91,20 @@ namespace BotsMod
 				new StatModifier
 				{
 					statToBoost = PlayerStats.StatType.RangeMultiplier,
+					amount = 0,
+					modifyType = StatModifier.ModifyMethod.ADDITIVE,
+					isMeatBunBuff = false
+				},
+				new StatModifier
+				{
+					statToBoost = PlayerStats.StatType.AdditionalShotBounces,
+					amount = 0,
+					modifyType = StatModifier.ModifyMethod.ADDITIVE,
+					isMeatBunBuff = false
+				},
+				new StatModifier
+				{
+					statToBoost = PlayerStats.StatType.AdditionalShotPiercing,
 					amount = 0,
 					modifyType = StatModifier.ModifyMethod.ADDITIVE,
 					isMeatBunBuff = false
@@ -228,8 +243,27 @@ namespace BotsMod
 
 		}
 
+        public override void OnPostFired(PlayerController player, Gun gun)
+        {
+			//foreach (var spell in Wand.spells)
+			//{
+			//	if (spell.useMaxUses && spell.maxUses > 0)
+			//	{
+			//		spell.maxUses--;
+			//	}
+			//	if (spell.useMaxUses && spell.maxUses < 0)
+			//	{
+			//		
+			//		spells[spells.IndexOf(spell)] = spells.Where(sp => sp.type == SpellTypes.emptySlot).ToList()[0];
+			//	}
+			//	Wand.avalableSpells.Remove(spell);
+			//	ChangeWandProperties(this.gun);
+			//}
+			base.OnPostFired(player, gun);
+        }
 
-		public override void PostProcessProjectile(Projectile projectile)
+
+        public override void PostProcessProjectile(Projectile projectile)
         {
 			foreach (var spell in Wand.spells)
 			{
@@ -250,7 +284,7 @@ namespace BotsMod
 						homingModifier.AngularVelocity += spell.homingModifier.AngularVelocity;
 
 						//projectile.gameObject.AddComponent<HomingModifier>(spell.homingModifier);
-						BotsModule.Log("added homing");
+						//BotsModule.Log("added homing");
 					}
 					
 
@@ -280,6 +314,8 @@ namespace BotsMod
 			float Reload = 0;
 			float Speed = 0;
 			float Range = 0;
+			float Bounce = 0;
+			float Pierce = 0;
 
 			wand.DefaultModule.projectiles.Clear();
 			spellSlots = Wand.spells.Count;
@@ -298,33 +334,41 @@ namespace BotsMod
 					i++;
 					projectileVolleyData.projectiles[0].projectiles.Add(spell.spellProj);
 				}
+
 				Spread += spell.impactOnSpread;
 				FireRate += spell.impactOnFireRate;
 				Reload += spell.impactOnReload;
 				Speed += spell.impactOnSpeed;
 				Range += spell.impactOnRange;
+				Bounce += spell.impactOnBounces;
+				Pierce += spell.impactOnPiercing;
 				u++;
 				
 			}
-			
+
 
 			//wand.modifiedVolley 
-
+			projectileVolleyData.projectiles[0].burstShotCount = projectileVolleyData.projectiles[0].projectiles.Count;
 			wand.Volley = projectileVolleyData;
 
-			wand.DefaultModule.numberOfShotsInClip = i;
-			wand.DefaultModule.burstShotCount = i;
+			
+			projectileVolleyData.projectiles[0].numberOfShotsInClip = i;
+			projectileVolleyData.projectiles[0].burstShotCount = i;
+
+			wand.Volley.projectiles[0].ResetRuntimeData();
 
 			wand.currentGunStatModifiers[0].amount = Spread;
 			wand.currentGunStatModifiers[1].amount = FireRate;
 			wand.currentGunStatModifiers[2].amount = Reload;
 			wand.currentGunStatModifiers[3].amount = Speed;
 			wand.currentGunStatModifiers[4].amount = Range;
+			wand.currentGunStatModifiers[5].amount = Bounce;
+			wand.currentGunStatModifiers[6].amount = Pierce;
 			if (wand.CurrentOwner != null && wand.CurrentOwner is PlayerController)
 			{
 				(wand.CurrentOwner as PlayerController).stats.RecalculateStats(wand.CurrentOwner as PlayerController);
 			}
-
+			
 		}
 
 		public void AddSpellToWand (Gun wand, Spell spell, bool updateWand = true)
@@ -373,11 +417,14 @@ namespace BotsMod
 		public int index;
 		public int itemId;
 
+		public int maxUses;
+
 		public bool isCombatSpell;
 		public bool isEmptySlot;
 		public bool isLockedSlot;
 		public bool addsComponents;
 		public bool isChainLightning;
+		public bool useMaxUses;
 
 		public float impactOnFireRate;
 		public float impactOnReload;
@@ -410,6 +457,8 @@ namespace BotsMod
 				impactOnReload = this.impactOnReload,
 				impactOnSpeed = this.impactOnSpeed,
 				impactOnSpread = this.impactOnSpread,
+				impactOnBounces = this.impactOnBounces,
+				impactOnPiercing = this.impactOnPiercing,
 				isCombatSpell = this.isCombatSpell,
 				isEmptySlot = this.isEmptySlot,
 				isLockedSlot = this.isLockedSlot,
@@ -421,6 +470,8 @@ namespace BotsMod
 				homingModifier = this.homingModifier,
 				pierceProjModifier = this.pierceProjModifier,
 				bounceProjModifier = this.bounceProjModifier,
+				maxUses = this.maxUses,
+				useMaxUses = this.useMaxUses,
 			};
 
 

@@ -27,7 +27,7 @@ namespace BotsMod
 			ItemBuilder.SetCooldownType(item, ItemBuilder.CooldownType.Damage, 650);
 			item.consumable = false;
 			item.quality = ItemQuality.S;
-
+			
 			Tools.BeyondItems.Add(item.PickupObjectId);
 
 			item.sprite.usesOverrideMaterial = true;
@@ -38,6 +38,7 @@ namespace BotsMod
 			material.SetFloat("_EmissiveColorPower", 1.55f);
 			material.SetFloat("_EmissivePower", 55);
 			item.sprite.renderer.material = material;
+			BotsItemIds.SpinDownDice = item.PickupObjectId;
 
 		}
 		CustomHologramDoer hologramDoer;
@@ -67,7 +68,7 @@ namespace BotsMod
 							{
 								pickupObject = componentInChildren;
 							}
-							hologramDoer.ShowSpinDownHologram(pickupObject.PickupObjectId, pickupObject.gameObject);
+							if (!excludedInputIds.Contains(pickupObject.PickupObjectId)) hologramDoer.ShowSpinDownHologram(pickupObject.PickupObjectId, pickupObject.gameObject);
 
 							
 						}
@@ -196,10 +197,10 @@ namespace BotsMod
 
 				num++;
 
-				bool baseCheck = PickupObjectDatabase.GetById(newId) != null && !excludedOutputIds.Contains(newId);
+				bool baseCheck = PickupObjectDatabase.GetById(newId) != null;
 				bool settingsCheck = BeyondSettings.HasInstance && BeyondSettings.Instance.allowSpindownInsanity;
-				bool antifunCheck = (PickupObjectDatabase.GetById(newId).PrerequisitesMet() && PickupObjectDatabase.GetById(newId).quality != ItemQuality.EXCLUDED && PickupObjectDatabase.GetById(newId).quality != ItemQuality.SPECIAL && PickupObjectDatabase.GetById(newId).quality != ItemQuality.COMMON
-					&& (PickupObjectDatabase.GetById(newId) is Gun || PickupObjectDatabase.GetById(newId) is PlayerItem || PickupObjectDatabase.GetById(newId) is PassiveItem));
+				bool antifunCheck = baseCheck && (PickupObjectDatabase.GetById(newId).PrerequisitesMet() && !excludedOutputIds.Contains(newId) && PickupObjectDatabase.GetById(newId).quality != ItemQuality.EXCLUDED && PickupObjectDatabase.GetById(newId).quality != ItemQuality.SPECIAL &&
+					PickupObjectDatabase.GetById(newId).quality != ItemQuality.COMMON && (PickupObjectDatabase.GetById(newId) is Gun || PickupObjectDatabase.GetById(newId) is PlayerItem || PickupObjectDatabase.GetById(newId) is PassiveItem));
 
 				if (baseCheck && settingsCheck)
 				{

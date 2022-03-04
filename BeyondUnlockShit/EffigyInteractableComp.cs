@@ -37,7 +37,7 @@ namespace BotsMod
 
 			SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.1f, 0f, SpriteOutlineManager.OutlineType.NORMAL);
 
-			if (SaveAPIManager.GetFlag(CustomDungeonFlags.BOT_EFFIGY_POWERED))
+			if (!BeyondSettings.Instance.debug || SaveAPIManager.GetFlag(CustomDungeonFlags.BOT_EFFIGY_POWERED))
             {
 				state = EffigyState.POWERED;
 				animator.DefaultClipId = spriteAnimator.GetClipIdByName("idle");

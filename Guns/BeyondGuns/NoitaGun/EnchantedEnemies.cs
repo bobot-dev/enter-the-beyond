@@ -43,7 +43,8 @@ namespace BotsMod
 				mat.SetTexture("_MainTex", material.mainTexture);
 				mat.SetTexture("_Gradient", ResourceExtractor.GetTextureFromResource("BotsMod/sprites/gradient.png"));
 
-				//target.sprite.renderer.material = mat;
+				target.sprite.renderer.material = mat;
+				target.sprite.usesOverrideMaterial = true;
 				//material.SetFloat("_PhantomGradientScale", 1);
 
 				target.behaviorSpeculator.CooldownScale *= 0.2f;
@@ -76,9 +77,9 @@ namespace BotsMod
 			GenericLootTable singleItemRewardTable = StaticSpellReferences.spellLootTable;
 
 
-			
 
-			var gameObject2 = singleItemRewardTable.GetCompiledCollection().SelectByWeightButGood(worldCenter, Vector2.up, 1f, true, false, false);
+			var gameObject2 = LootEngine.SpawnItem(StaticSpellReferences.spellLootTable.SelectByWeight(false), worldCenter, Vector2.up, 1f, true, false, false);
+			//var gameObject2 = singleItemRewardTable.GetCompiledCollectionButCooler().SelectByWeightButGood(worldCenter, Vector2.up, 1f, true, false, false);
 			IPlayerInteractable[] interfacesInChildren = GameObjectExtensions.GetInterfacesInChildren<IPlayerInteractable>(gameObject2.gameObject);
 			for (int i = 0; i < interfacesInChildren.Length; i++)
 			{

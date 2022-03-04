@@ -5,7 +5,7 @@ base: guide
 name short: Lost
 name: The Lost
 
-nickname: found
+nickname: Hunted
 
 #Set starting armor
 armor: 0
@@ -14,9 +14,8 @@ armor: 0
 	bot:lost_sidearm
 	bot:wand
 	bot:lost_robe
-	
-
 </loadout>
+
 <altGuns>
 	bot:lost_sidearm_alt
 	bot:wand

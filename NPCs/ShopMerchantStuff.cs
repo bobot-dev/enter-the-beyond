@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace BotsMod
@@ -37,6 +38,13 @@ namespace BotsMod
         public static int CustomPriceBeyond(CustomShopController shop, CustomShopItemController shopItem, PickupObject item)
         {
 
+
+            if (GameManager.Instance.PrimaryPlayer.name == "PlayerShade(Clone)")
+            {
+                shopItem.customPriceSprite = "armor_shield_pickup_001";
+                return 0;
+            }
+ 
             int price = 1;
 
             if (item.quality == PickupObject.ItemQuality.A || item.quality == PickupObject.ItemQuality.S)
@@ -57,6 +65,16 @@ namespace BotsMod
         }
         public static int RemoveCurrencyBeyond(CustomShopController shop, PlayerController player, int cost)
         {
+
+            if (player.name == "PlayerShade(Clone)")
+            {
+                FieldInfo _itemControllers = typeof(CustomShopController).GetField("m_itemControllers", BindingFlags.NonPublic | BindingFlags.Instance);
+                foreach(CustomShopItemController item in _itemControllers.GetValue(shop) as List<ShopItemController>)
+                {
+                    item.ForceOutOfStock();
+                }
+            }
+
             if (shop.gameObject.GetOrAddComponent<DevilDealShopHelper>().usingArmour)
             {
                 player.healthHaver.Armor -= cost;

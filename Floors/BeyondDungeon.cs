@@ -69,14 +69,286 @@ namespace BotsMod
             //DungeonMaterial FinalScenario_MainMaterial = UnityEngine.Object.Instantiate(RatDungeonPrefab.roomMaterialDefinitions[0]);
             DungeonMaterial FinalScenario_MainMaterial = UnityEngine.Object.Instantiate(MarinePastPrefab.roomMaterialDefinitions[0]);
             FinalScenario_MainMaterial.supportsPits = true;
-            FinalScenario_MainMaterial.doPitAO = true;
+            //FinalScenario_MainMaterial.doPitAO = true;
             // FinalScenario_MainMaterial.pitsAreOneDeep = true;
             FinalScenario_MainMaterial.useLighting = true;
-            // FinalScenario_MainMaterial.supportsLavaOrLavalikeSquares = true;
-            FinalScenario_MainMaterial.lightPrefabs.elements[0].rawGameObject = MarinePastPrefab.roomMaterialDefinitions[0].lightPrefabs.elements[0].rawGameObject;
-            FinalScenario_MainMaterial.roomFloorBorderGrid = MarinePastPrefab.roomMaterialDefinitions[0].roomFloorBorderGrid;
-            FinalScenario_MainMaterial.pitBorderFlatGrid = MarinePastPrefab.roomMaterialDefinitions[0].pitBorderFlatGrid;
-            FinalScenario_MainMaterial.pitLayoutGrid = MarinePastPrefab.roomMaterialDefinitions[0].pitLayoutGrid;
+
+            FinalScenario_MainMaterial.supportsDiagonalWalls = true;
+
+
+
+            var pitGridCave = Tools.CreateBlankIndexGrid();
+            pitGridCave.topLeftIndices = new TileIndexList { indices = new List<int> { 58 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.topIndices = new TileIndexList { indices = new List<int> { 58 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.topRightIndices = new TileIndexList { indices = new List<int> { 58 }, indexWeights = new List<float> { 1f } };
+
+            pitGridCave.leftIndices = new TileIndexList { indices = new List<int> { 124 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.centerIndices = new TileIndexList { indices = new List<int> { 124 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.rightIndices = new TileIndexList { indices = new List<int> { 124 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.bottomLeftIndices = new TileIndexList { indices = new List<int> { 124 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.bottomIndices = new TileIndexList { indices = new List<int> { 124 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.bottomRightIndices = new TileIndexList { indices = new List<int> { 124 }, indexWeights = new List<float> { 1f } };
+
+
+            pitGridCave.horizontalIndices = new TileIndexList { indices = new List<int> { 58 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.verticalIndices = new TileIndexList { indices = new List<int> { 124 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.topCapIndices = new TileIndexList { indices = new List<int> { 58 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.rightCapIndices = new TileIndexList { indices = new List<int> { 58 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.leftCapIndices = new TileIndexList { indices = new List<int> { 58 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.allSidesIndices = new TileIndexList { indices = new List<int> { 58 }, indexWeights = new List<float> { 1f } };
+
+            pitGridCave.extendedSet = true;
+            pitGridCave.topCenterLeftIndices = new TileIndexList { indices = new List<int> { 80 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.topCenterIndices = new TileIndexList { indices = new List<int> { 80 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.topCenterRightIndices = new TileIndexList { indices = new List<int> { 80 }, indexWeights = new List<float> { 1f } };
+
+            pitGridCave.thirdTopRowLeftIndices = new TileIndexList { indices = new List<int> { 124 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.thirdTopRowCenterIndices = new TileIndexList { indices = new List<int> { 124 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.thirdTopRowRightIndices = new TileIndexList { indices = new List<int> { 124 }, indexWeights = new List<float> { 1f } };
+            pitGridCave.CheckerboardDimension = 1;
+            pitGridCave.PitInternalSquareOptions = new PitSquarePlacementOptions { CanBeFlushBottom = false, CanBeFlushLeft = false, CanBeFlushRight = false, PitSquareChance = 0.1f };
+
+
+
+
+            FinalScenario_MainMaterial.pitLayoutGrid = pitGridCave;
+
+            var pitBorderGridCave = Tools.CreateBlankIndexGrid();
+
+            pitBorderGridCave.topLeftIndices = new TileIndexList { indices = new List<int> { 94 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridCave.topIndices = new TileIndexList { indices = new List<int> { 95 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridCave.topRightIndices = new TileIndexList { indices = new List<int> { 96 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridCave.leftIndices = new TileIndexList { indices = new List<int> { 116 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridCave.rightIndices = new TileIndexList { indices = new List<int> { 118 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridCave.bottomLeftIndices = new TileIndexList { indices = new List<int> { 138 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridCave.bottomIndices = new TileIndexList { indices = new List<int> { 139 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridCave.bottomRightIndices = new TileIndexList { indices = new List<int> { 140 }, indexWeights = new List<float> { 1f } };
+
+            pitBorderGridCave.topLeftNubIndices = new TileIndexList { indices = new List<int> { 120 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridCave.topRightNubIndices = new TileIndexList { indices = new List<int> { 119 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridCave.bottomLeftNubIndices = new TileIndexList { indices = new List<int> { 98 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridCave.bottomRightNubIndices = new TileIndexList { indices = new List<int> { 97 }, indexWeights = new List<float> { 1f } };
+
+            pitBorderGridCave.diagonalNubsTopLeftBottomRight = new TileIndexList { indices = new List<int> { 142 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridCave.diagonalNubsTopRightBottomLeft = new TileIndexList { indices = new List<int> { 141 }, indexWeights = new List<float> { 1f } };
+
+            pitBorderGridCave.PitBorderIsInternal = false;
+            pitBorderGridCave.extendedSet = false;
+            pitBorderGridCave.PitBorderOverridesFloorTile = false;
+            FinalScenario_MainMaterial.pitBorderFlatGrid = pitBorderGridCave;
+            FinalScenario_MainMaterial.supportsUpholstery = true;
+
+
+            Tools.SetupBeyondRoomMaterial(ref FinalScenario_MainMaterial);
+
+            DungeonMaterial beyondBrickMaterial = ScriptableObject.CreateInstance<DungeonMaterial>();
+
+            //Tools.SetupBeyondRoomMaterial(ref beyondBrickMaterial);
+            beyondBrickMaterial.lightPrefabs = FinalScenario_MainMaterial.lightPrefabs;
+            beyondBrickMaterial.facewallLightStamps = FinalScenario_MainMaterial.facewallLightStamps;
+            beyondBrickMaterial.sidewallLightStamps = FinalScenario_MainMaterial.sidewallLightStamps;
+            beyondBrickMaterial.wallShards = FinalScenario_MainMaterial.wallShards;
+            beyondBrickMaterial.bigWallShards = FinalScenario_MainMaterial.bigWallShards;
+            
+            beyondBrickMaterial.bigWallShardDamageThreshold = 10;
+            beyondBrickMaterial.fallbackVerticalTileMapEffects = FinalScenario_MainMaterial.fallbackVerticalTileMapEffects;
+            beyondBrickMaterial.fallbackHorizontalTileMapEffects = FinalScenario_MainMaterial.fallbackHorizontalTileMapEffects;
+            beyondBrickMaterial.pitfallVFXPrefab = FinalScenario_MainMaterial.pitfallVFXPrefab;
+            beyondBrickMaterial.UsePitAmbientVFX = false;
+            beyondBrickMaterial.AmbientPitVFX = new List<GameObject>();
+            beyondBrickMaterial.PitVFXMinCooldown = 5;
+            beyondBrickMaterial.PitVFXMaxCooldown = 30;
+            beyondBrickMaterial.ChanceToSpawnPitVFXOnCooldown = 1;
+            beyondBrickMaterial.UseChannelAmbientVFX = false;
+            beyondBrickMaterial.ChannelVFXMinCooldown = 1;
+            beyondBrickMaterial.ChannelVFXMaxCooldown = 15;
+            beyondBrickMaterial.AmbientChannelVFX = new List<GameObject>();
+            beyondBrickMaterial.stampFailChance = 0.2f;
+            beyondBrickMaterial.overrideTableTable = null;
+            beyondBrickMaterial.supportsPits = true;
+            beyondBrickMaterial.doPitAO = true;
+            beyondBrickMaterial.useLighting = true;
+            beyondBrickMaterial.pitsAreOneDeep = false;
+            beyondBrickMaterial.supportsDiagonalWalls = false;
+            beyondBrickMaterial.supportsUpholstery = true;
+            beyondBrickMaterial.carpetIsMainFloor = false;
+            var carpetGridBrick = Tools.CreateBlankIndexGrid();
+
+            carpetGridBrick.topLeftIndices = new TileIndexList { indices = new List<int> { 278 }, indexWeights = new List<float> { 1f } };//
+            carpetGridBrick.topIndices = new TileIndexList { indices = new List<int> { 279 }, indexWeights = new List<float> { 1f } };//
+            carpetGridBrick.topRightIndices = new TileIndexList { indices = new List<int> { 280 }, indexWeights = new List<float> { 1f } };
+            carpetGridBrick.leftIndices = new TileIndexList { indices = new List<int> { 300 }, indexWeights = new List<float> { 1f } };//
+            carpetGridBrick.centerIndices = new TileIndexList { indices = new List<int> { 325, 325, 327, 328, 326 }, indexWeights = new List<float> { 1f, 1, 1, 1, 1 } };
+            carpetGridBrick.rightIndices = new TileIndexList { indices = new List<int> { 302 }, indexWeights = new List<float> { 1f } };
+            carpetGridBrick.bottomLeftIndices = new TileIndexList { indices = new List<int> { 322 }, indexWeights = new List<float> { 1f } };
+            carpetGridBrick.bottomIndices = new TileIndexList { indices = new List<int> { 323 }, indexWeights = new List<float> { 1f } };//
+            carpetGridBrick.bottomRightIndices = new TileIndexList { indices = new List<int> { 324 }, indexWeights = new List<float> { 1f } };
+            carpetGridBrick.topLeftNubIndices = new TileIndexList { indices = new List<int> { 304 }, indexWeights = new List<float> { 1f } };
+            carpetGridBrick.topRightNubIndices = new TileIndexList { indices = new List<int> { 303 }, indexWeights = new List<float> { 1f } };
+            carpetGridBrick.bottomLeftNubIndices = new TileIndexList { indices = new List<int> { 282 }, indexWeights = new List<float> { 1f } };
+            carpetGridBrick.bottomRightNubIndices = new TileIndexList { indices = new List<int> { 281 }, indexWeights = new List<float> { 1f } };
+            carpetGridBrick.extendedSet = true;
+            carpetGridBrick.CenterIndicesAreStrata = true;
+
+            beyondBrickMaterial.carpetGrids = new TileIndexGrid[]
+            {
+                carpetGridBrick,
+            };
+            //beyondBrickMaterial.carpetGrids = new TileIndexGrid[0];
+            beyondBrickMaterial.supportsChannels = false;
+            beyondBrickMaterial.minChannelPools = 0;
+            beyondBrickMaterial.maxChannelPools = 3;
+            beyondBrickMaterial.channelTenacity = 0.75f;
+            beyondBrickMaterial.channelGrids = new TileIndexGrid[0];        
+            beyondBrickMaterial.supportsLavaOrLavalikeSquares = false;
+            beyondBrickMaterial.lavaGrids = new TileIndexGrid[0];
+            beyondBrickMaterial.supportsIceSquares = false;
+            beyondBrickMaterial.iceGrids = new TileIndexGrid[0];
+
+            var ceilingBorderGrid = Tools.CreateBlankIndexGrid();
+            ceilingBorderGrid.topLeftIndices = new TileIndexList { indices = new List<int> { 291 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.topIndices = new TileIndexList { indices = new List<int> { 379 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.topRightIndices = new TileIndexList { indices = new List<int> { 313 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.leftIndices = new TileIndexList { indices = new List<int> { 401 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.centerIndices = new TileIndexList { indices = new List<int> { 468 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.rightIndices = new TileIndexList { indices = new List<int> { 423 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.bottomLeftIndices = new TileIndexList { indices = new List<int> { 335 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.bottomIndices = new TileIndexList { indices = new List<int> { 445 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.bottomRightIndices = new TileIndexList { indices = new List<int> { 357 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.horizontalIndices = new TileIndexList { indices = new List<int> { 555 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.verticalIndices = new TileIndexList { indices = new List<int> { 577 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.topCapIndices = new TileIndexList { indices = new List<int> { 467 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.rightCapIndices = new TileIndexList { indices = new List<int> { 511 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.bottomCapIndices = new TileIndexList { indices = new List<int> { 533 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.leftCapIndices = new TileIndexList { indices = new List<int> { 489 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.allSidesIndices = new TileIndexList { indices = new List<int> { 599 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.topLeftNubIndices = new TileIndexList { indices = new List<int> { 493 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.topRightNubIndices = new TileIndexList { indices = new List<int> { 492 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.bottomLeftNubIndices = new TileIndexList { indices = new List<int> { 471 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.bottomRightNubIndices = new TileIndexList { indices = new List<int> { 470 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.borderTopNubBothIndices = new TileIndexList { indices = new List<int> { 382 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.borderRightNubTopIndices = new TileIndexList { indices = new List<int> { 425 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.borderRightNubBottomIndices = new TileIndexList { indices = new List<int> { 424 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.borderRightNubBothIndices = new TileIndexList { indices = new List<int> { 426 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.borderBottomNubLeftIndices = new TileIndexList { indices = new List<int> { 446 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.borderBottomNubRightIndices = new TileIndexList { indices = new List<int> { 447 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.borderBottomNubBothIndices = new TileIndexList { indices = new List<int> { 448 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.borderLeftNubTopIndices = new TileIndexList { indices = new List<int> { 403 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.borderLeftNubBottomIndices = new TileIndexList { indices = new List<int> { 402 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.borderLeftNubBothIndices = new TileIndexList { indices = new List<int> { 404 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.diagonalNubsTopLeftBottomRight = new TileIndexList { indices = new List<int> { 469 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.diagonalNubsTopRightBottomLeft = new TileIndexList { indices = new List<int> { 491 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.doubleNubsTop = new TileIndexList { indices = new List<int> { 513 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.doubleNubsRight = new TileIndexList { indices = new List<int> { 514 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.doubleNubsBottom = new TileIndexList { indices = new List<int> { 512 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.doubleNubsLeft = new TileIndexList { indices = new List<int> { 515 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.quadNubs = new TileIndexList { indices = new List<int> { 490 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.topRightWithNub = new TileIndexList { indices = new List<int> { 314 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.topLeftWithNub = new TileIndexList { indices = new List<int> { 292 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.bottomRightWithNub = new TileIndexList { indices = new List<int> { 358 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.bottomLeftWithNub = new TileIndexList { indices = new List<int> { 336 }, indexWeights = new List<float> { 1f } };
+            ceilingBorderGrid.CheckerboardDimension = 1;
+
+
+            beyondBrickMaterial.roomCeilingBorderGrid = ceilingBorderGrid;
+
+            var pitBorderGridBrick = Tools.CreateBlankIndexGrid();
+
+            pitBorderGridBrick.topLeftIndices = new TileIndexList { indices = new List<int> { 209 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridBrick.topIndices = new TileIndexList { indices = new List<int> { 210 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridBrick.topRightIndices = new TileIndexList { indices = new List<int> { 211 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridBrick.leftIndices = new TileIndexList { indices = new List<int> { 231 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridBrick.rightIndices = new TileIndexList { indices = new List<int> { 233 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridBrick.bottomLeftIndices = new TileIndexList { indices = new List<int> { 253 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridBrick.bottomIndices = new TileIndexList { indices = new List<int> { 254 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridBrick.bottomRightIndices = new TileIndexList { indices = new List<int> { 255 }, indexWeights = new List<float> { 1f } };
+            
+            pitBorderGridBrick.topLeftNubIndices = new TileIndexList { indices = new List<int> { 235 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridBrick.topRightNubIndices = new TileIndexList { indices = new List<int> { 234 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridBrick.bottomLeftNubIndices = new TileIndexList { indices = new List<int> { 213 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridBrick.bottomRightNubIndices = new TileIndexList { indices = new List<int> { 212 }, indexWeights = new List<float> { 1f } };
+
+            pitBorderGridBrick.diagonalNubsTopLeftBottomRight = new TileIndexList { indices = new List<int> { 257 }, indexWeights = new List<float> { 1f } };
+            pitBorderGridBrick.diagonalNubsTopRightBottomLeft = new TileIndexList { indices = new List<int> { 256 }, indexWeights = new List<float> { 1f } };
+
+            pitBorderGridBrick.PitBorderIsInternal = false;
+            pitBorderGridBrick.extendedSet = false;
+            pitBorderGridBrick.PitBorderOverridesFloorTile = false;
+
+            beyondBrickMaterial.pitLayoutGrid = null;
+            beyondBrickMaterial.pitBorderFlatGrid = pitBorderGridBrick;
+            beyondBrickMaterial.pitBorderRaisedGrid = null;
+            beyondBrickMaterial.additionalPitBorderFlatGrid = null;
+
+            beyondBrickMaterial.roomFloorBorderGrid = pitBorderGridBrick;
+
+            //beyondBrickMaterial.outerCeilingBorderGrid = ceilingBorderGrid;
+            /// CastleDungeonPrefab.roomMaterialDefinitions[3]..outerCeilingBorderGrid.roomTypeRestriction = -1;
+            //beyondBrickMaterial.outerCeilingBorderGrid = CastleDungeonPrefab.roomMaterialDefinitions[3].outerCeilingBorderGrid;
+            beyondBrickMaterial.floorSquareDensity = 0.05f;
+            beyondBrickMaterial.floorSquares = null;
+            
+
+
+            var brickFaceWallGrid = Tools.CreateBlankIndexGrid();
+
+
+            brickFaceWallGrid.roomTypeRestriction = -1;
+            brickFaceWallGrid.topLeftIndices = new TileIndexList { indices = new List<int> { 25 }, indexWeights = new List<float> { 1f } };
+            brickFaceWallGrid.topIndices = new TileIndexList { indices = new List<int> { 26, 27 }, indexWeights = new List<float> { 1f, 0.005f } };
+            brickFaceWallGrid.topRightIndices = new TileIndexList { indices = new List<int> { 28 }, indexWeights = new List<float> { 1f } };
+            brickFaceWallGrid.bottomLeftIndices = new TileIndexList { indices = new List<int> { 47 }, indexWeights = new List<float> { 1f } };
+            brickFaceWallGrid.bottomIndices = new TileIndexList { indices = new List<int> { 48, 49 }, indexWeights = new List<float> { 1f } };
+            brickFaceWallGrid.bottomRightIndices = new TileIndexList { indices = new List<int> { 50 }, indexWeights = new List<float> { 1f } };
+
+            beyondBrickMaterial.facewallGrids = new FacewallIndexGridDefinition[]
+            {
+                new FacewallIndexGridDefinition
+                {
+                    minWidth = 3,
+                    maxWidth = 6,
+                    hasIntermediaries = false,
+                    minIntermediaryBuffer = 0,
+                    maxIntermediaryBuffer = 20,
+                    maxIntermediaryLength = 1,
+                    minIntermediaryLength = 1,
+                    topsMatchBottoms = true,
+                    middleSectionSequential = false,
+                    canExistInCorners = false,
+                    forceEdgesInCorners = false,
+                    canAcceptWallDecoration = false,
+                    canAcceptFloorDecoration = true,
+                    forcedStampMatchingStyle = DungeonTileStampData.IntermediaryMatchingStyle.ANY,
+                    canBePlacedInExits = false,
+                    chanceToPlaceIfPossible = 0.025f,
+                    perTileFailureRate = 0.5f,
+                    grid = brickFaceWallGrid,
+                }
+            };
+            beyondBrickMaterial.usesFacewallGrids = true;
+            beyondBrickMaterial.usesProceduralMaterialTransitions = false;
+
+            beyondBrickMaterial.internalMaterialTransitions = new RoomInternalMaterialTransition[0];
+            beyondBrickMaterial.secretRoomWallShardCollections = new List<GameObject>();
+            beyondBrickMaterial.overrideStoneFloorType = false;
+            beyondBrickMaterial.overrideFloorType = CellVisualData.CellFloorType.Stone;
+            beyondBrickMaterial.useLighting = true;
+            beyondBrickMaterial.usesDecalLayer = false;
+            beyondBrickMaterial.decalIndexGrid = null;
+            beyondBrickMaterial.decalLayerStyle = TilemapDecoSettings.DecoStyle.GROW_FROM_WALLS;
+            beyondBrickMaterial.decalSize = 1;
+            beyondBrickMaterial.decalSpacing = 1;
+            beyondBrickMaterial.usesPatternLayer = false;
+            beyondBrickMaterial.patternIndexGrid = null;
+
+            beyondBrickMaterial.patternLayerStyle = TilemapDecoSettings.DecoStyle.GROW_FROM_WALLS;
+            beyondBrickMaterial.patternSize = 1;
+            beyondBrickMaterial.patternSpacing = 1;
+            beyondBrickMaterial.forceEdgesDiagonal = false;
+            beyondBrickMaterial.exteriorFacadeBorderGrid = null;
+            beyondBrickMaterial.facadeTopGrid = null;
+            beyondBrickMaterial.bridgeGrid = null;
+
 
             Debug.Log("beyond setup 2");
 
@@ -90,7 +362,7 @@ namespace BotsMod
             m_FloorNameStampData.objectStamps = MarinePastPrefab.stampData.objectStamps;
             m_FloorNameStampData.SymmetricFrameChance = 0.25f;
             m_FloorNameStampData.SymmetricCompleteChance = 0.6f;
-
+            
             Debug.Log("beyond setup 2.5");
 
             dungeon.gameObject.name = "Base_Beyond";
@@ -105,80 +377,60 @@ namespace BotsMod
                 RAPID_DEBUG_DUNGEON_ITERATION_SEEKER = false,
                 RAPID_DEBUG_DUNGEON_ITERATION = false,
                 RAPID_DEBUG_DUNGEON_COUNT = 50,
-                GENERATION_VIEWER_MODE = true,
-                FULL_MINIMAP_VISIBILITY = true,
-                COOP_TEST = true,
-                DISABLE_ENEMIES = true,
+                GENERATION_VIEWER_MODE = false,
+                FULL_MINIMAP_VISIBILITY = false,
+                COOP_TEST = false,
+                DISABLE_ENEMIES = false,
                 DISABLE_LOOPS = false,
-                DISABLE_SECRET_ROOM_COVERS = true,
+                DISABLE_SECRET_ROOM_COVERS = false,
                 DISABLE_OUTLINES = false,
-                WALLS_ARE_PITS = true
+                WALLS_ARE_PITS = false
             };
             dungeon.ForceRegenerationOfCharacters = false;
             dungeon.ActuallyGenerateTilemap = true;
             Debug.Log("beyond setup 3");
-            /*tk2dSpriteCollectionData mycollecion = new GameObject("aaaa").AddComponent<tk2dSpriteCollectionData>();
-            FakePrefab.MarkAsFakePrefab(mycollecion.gameObject);
+            //tk2dSpriteCollectionData mycollecion = PrefabAPI.PrefabBuilder.BuildObject("BeyondCollection").AddComponent<tk2dSpriteCollectionData>();
 
-            UnityEngine.JsonUtility.FromJsonOverwrite(Tools.fucktilesets.LoadAsset<TextAsset>("Beyond_Collection_Data").text, mycollecion);
-            mycollecion.textures = new Texture[] { ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/atlas0.png") };
-            mycollecion.material = Tools.fucktilesets.LoadAsset<Material>("atlas0 material");
-            mycollecion.materials = new Material[] { Tools.fucktilesets.LoadAsset<Material>("atlas0 material") };
-            for (int i = 0; i < mycollecion.spriteDefinitions.Length; i++)
-            {
-                mycollecion.spriteDefinitions[i].material = Tools.fucktilesets.LoadAsset<Material>("atlas0 material");
-                mycollecion.spriteDefinitions[i].metadata.dungeonRoomSubType = 0;
-                mycollecion.spriteDefinitions[i].metadata.preventWallStamping = true;
-                mycollecion.spriteDefinitions[i].metadata.secondRoomSubType = -1;
-                mycollecion.spriteDefinitions[i].metadata.thirdRoomSubType = -1;
-                mycollecion.spriteDefinitions[i].metadata.weight = 0.1f;
-                mycollecion.spriteDefinitions[i].metadata.usesAnimSequence = false;
-                mycollecion.spriteDefinitions[i].metadata.usesNeighborDependencies = false;
-                mycollecion.spriteDefinitions[i].metadata.usesPerTileVFX = false;
 
-                //mycollecion.spriteDefinitions[i].colliderType = gofuckyourself.spriteDefinitions[i].colliderType;
-            }*/
 
             dungeon.tileIndices = new TileIndices()
             {
                 tilesetId = (GlobalDungeonData.ValidTilesets)CustomValidTilesets.BEYOND, //sets it to our floors CustomValidTileset
 
-                //since the tileset im using here is a copy of the Rat dungeon tileset, the first variable in ReplaceDungeonCollection is RatDungeonPrefab.tileIndices.dungeonCollection,
-                //otherwise we will use a different dungeon prefab
-                //dungeonCollection = Tools.ReplaceDungeonCollection(gofuckyourself, BeyondPrefabs.ENV_Tileset_Beyond),
-                dungeonCollection = gofuckyourself,
-                
+                dungeonCollection = BeyondSettings.Instance.debug ? BeyondPrefabs.beyondCollection : gofuckyourself,
+
+
 
                 dungeonCollectionSupportsDiagonalWalls = false,
 
                 //aoTileIndices = MarinePastPrefab.tileIndices.aoTileIndices,
                 aoTileIndices = new AOTileIndices
                 {
-                    AOFloorTileIndex = -1,
-                    AOBottomWallBaseTileIndex = -1,
-                    AOBottomWallTileRightIndex = -1,
-                    AOBottomWallTileLeftIndex = -1,
-                    AOBottomWallTileBothIndex = -1,
-                    AOTopFacewallRightIndex = -1,
-                    AOTopFacewallLeftIndex = -1,
-                    AOTopFacewallBothIndex = -1,
-                    AOFloorWallLeft = -1,
-                    AOFloorWallRight = -1,
-                    AOFloorWallBoth = -1,
-                    AOFloorPizzaSliceLeft = -1,
-                    AOFloorPizzaSliceRight = -1,
-                    AOFloorPizzaSliceBoth = -1,
-                    AOFloorPizzaSliceLeftWallRight = -1,
-                    AOFloorPizzaSliceRightWallLeft = -1,
-                    AOFloorWallUpAndLeft = -1,
-                    AOFloorWallUpAndRight = -1,
-                    AOFloorWallUpAndBoth = -1,
-                    AOFloorDiagonalWallNortheast = -1,
-                    AOFloorDiagonalWallNortheastLower = -1,
-                    AOFloorDiagonalWallNortheastLowerJoint = -1,
-                    AOFloorDiagonalWallNorthwest = -1,
-                    AOFloorDiagonalWallNorthwestLower = -1,
-                    AOFloorDiagonalWallNorthwestLowerJoint = -1,
+                    AOFloorTileIndex = 0,
+                    AOBottomWallBaseTileIndex = 1,
+                    AOBottomWallTileRightIndex = 2,
+                    AOBottomWallTileLeftIndex = 3,
+                    AOBottomWallTileBothIndex = 4,
+                    AOTopFacewallRightIndex = 6,
+                    AOTopFacewallLeftIndex = 5,
+                    AOTopFacewallBothIndex = 7,
+                    AOFloorWallLeft = 5,
+                    AOFloorWallRight = 6,
+                    AOFloorWallBoth = 7,
+                    AOFloorPizzaSliceLeft = 8,
+                    AOFloorPizzaSliceRight = 9,
+                    AOFloorPizzaSliceBoth = 10,
+                    AOFloorPizzaSliceLeftWallRight = 11,
+                    AOFloorPizzaSliceRightWallLeft = 12,
+                    AOFloorWallUpAndLeft = 13,
+                    AOFloorWallUpAndRight = 14,
+                    AOFloorWallUpAndBoth = 15,
+                    AOFloorDiagonalWallNortheast = 42,
+                    AOFloorDiagonalWallNortheastLower = 64,
+                    AOFloorDiagonalWallNortheastLowerJoint = 86,
+                    AOFloorDiagonalWallNorthwest = 43,
+                    AOFloorDiagonalWallNorthwestLower = 65,
+                    AOFloorDiagonalWallNorthwestLowerJoint = 87,
                     AOBottomWallDiagonalNortheast = -1,
                     AOBottomWallDiagonalNorthwest = -1
                 },
@@ -212,8 +464,6 @@ namespace BotsMod
             {
                 Debug.LogError("beyond setup dungeon.tileIndices.dungeonCollection nulled");
             }
-
-            Debug.Log(dungeon.tileIndices.dungeonCollection.name);
             dungeon.tileIndices.dungeonCollection.name = "ENV_Beyond_Collection";
             Debug.Log("beyond setup 3.6");
 
@@ -221,12 +471,7 @@ namespace BotsMod
 
             dungeon.roomMaterialDefinitions = new DungeonMaterial[] {
                 FinalScenario_MainMaterial,
-                FinalScenario_MainMaterial,
-                FinalScenario_MainMaterial,
-                FinalScenario_MainMaterial,
-                FinalScenario_MainMaterial,
-                FinalScenario_MainMaterial,
-                FinalScenario_MainMaterial,
+                beyondBrickMaterial,
             };
             dungeon.dungeonWingDefinitions = new DungeonWingDefinition[0];
             Debug.Log("beyond setup 4");
@@ -306,17 +551,24 @@ namespace BotsMod
                     {
                         new WeightedInt
                         {
-                            annotation = "brick",
+                            annotation = "cave",
                             value = 0,
-                            weight = 1,
+                            weight = 0.7f,
+                            additionalPrerequisites = new DungeonPrerequisite[0]
+                        },
+                        new WeightedInt
+                        {
+                            annotation = "bricks",
+                            value = 1,
+                            weight = 1f,
                             additionalPrerequisites = new DungeonPrerequisite[0]
                         }
                     },
                 },//RatDungeonPrefab.decoSettings.standardRoomVisualSubtypes,
 
 
-                ambientLightColor = new Color32(170, 150, 180, 255),
-                ambientLightColorTwo = new Color32(169, 134, 180, 255),
+                ambientLightColor = new Color32(70, 62, 74, 255),
+                ambientLightColorTwo = new Color32(122, 98, 130, 255),
                 lowQualityAmbientLightColor = new Color32(255, 255, 255, 255),
                 lowQualityAmbientLightColorTwo = new Color32(255, 255, 255, 255),
                 lowQualityCheapLightVector = new Vector4(1, 0, -1, 0),
@@ -333,7 +585,7 @@ namespace BotsMod
                
 
                 lightCookies = new Texture2D[0],
-                debug_view = true,
+                debug_view = false,
 
 
             };

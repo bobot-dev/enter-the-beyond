@@ -366,7 +366,7 @@ namespace AmmonomiconAPI
 					//self.InitializeDeathPageLeft();
 					break;
 				case AmmonomiconPageRenderer.PageType.DEATH_RIGHT:
-					typeof(AmmonomiconPageRenderer).GetMethod("InitializeDeathPageLeft", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null);
+					typeof(AmmonomiconPageRenderer).GetMethod("InitializeDeathPageRight", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null);
 					//self.InitializeDeathPageRight();
 					break;
 

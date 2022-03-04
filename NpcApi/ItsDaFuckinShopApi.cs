@@ -120,8 +120,8 @@ namespace NpcApi
 
                 tk2dSpriteAnimator spriteAnimator = npcObj.AddComponent<tk2dSpriteAnimator>();
 
-                SpriteBuilder.AddAnimation(spriteAnimator, collection, idleIdsList, name + "_idle", tk2dSpriteAnimationClip.WrapMode.Loop, idleFps);
-                SpriteBuilder.AddAnimation(spriteAnimator, collection, talkIdsList, name + "_talk", tk2dSpriteAnimationClip.WrapMode.Loop, talkFps);
+                SpriteBuilder.AddAnimation(spriteAnimator, collection, idleIdsList, "idle", tk2dSpriteAnimationClip.WrapMode.Loop, idleFps);
+                SpriteBuilder.AddAnimation(spriteAnimator, collection, talkIdsList, "talk", tk2dSpriteAnimationClip.WrapMode.Loop, talkFps);
 
                 SpeculativeRigidbody rigidbody = GenerateOrAddToRigidBody(npcObj, CollisionLayer.BulletBlocker, PixelCollider.PixelColliderGeneration.Manual, true, true, true, false, false, false, false, true, new IntVector2(20, 18), new IntVector2(5, 0));
 
@@ -169,10 +169,10 @@ namespace NpcApi
                 aIAnimator.IdleAnimation = new DirectionalAnimation
                 {
                     Type = DirectionalAnimation.DirectionType.Single,
-                    Prefix = name + "_idle",
+                    Prefix = "idle",
                     AnimNames = new string[]
                     {
-                        ""
+                        name + "_idle"
                     },
                     Flipped = new DirectionalAnimation.FlipType[]
                     {
@@ -184,10 +184,10 @@ namespace NpcApi
                 aIAnimator.TalkAnimation = new DirectionalAnimation
                 {
                     Type = DirectionalAnimation.DirectionType.Single,
-                    Prefix = name + "_talk",
+                    Prefix = "talk",
                     AnimNames = new string[]
                     {
-                        ""
+                       name + "_talk"
                     },
                     Flipped = new DirectionalAnimation.FlipType[]
                     {
@@ -220,6 +220,18 @@ namespace NpcApi
 
                 (fsmStringParams.GetValue(iHaveNoFuckingClueWhatThisIs.FsmStates[12].ActionData) as List<FsmString>)[0].Value = "#COOP_REBUKE";
 
+                foreach (var state in iHaveNoFuckingClueWhatThisIs.Fsm.FsmComponent.FsmStates)
+                {
+                    foreach (var action in state.Actions)
+                    {
+                        if (action is DialogueBox && (action as DialogueBox).dialogue[0].Value == purchaseItemStringKey)
+                        {
+                            //((DialogueBox)action).OverrideTalkAnim = name + "_talk";
+                            //((DialogueBox)action).SuppressDefaultAnims.Value = true;
+                            //((DialogueBox)action).zombieTime = 0.01f;
+                        }
+                    }
+                }
 
                 npcObj.name = prefix + ":" + name;
 

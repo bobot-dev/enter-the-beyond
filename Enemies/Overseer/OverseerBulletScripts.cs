@@ -424,24 +424,50 @@ namespace BotsMod
 				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("3e98ccecf7334ff2800188c417e67c15").bulletBank.GetBullet("disruption"));
 
 			}
+			int numShots = UnityEngine.Random.Range(4, 8);
+			OverseerRemoteBullets.AstralBullet astralBullet = new OverseerRemoteBullets.AstralBullet(numShots);
+			OverseerRemoteBullets.AstralBullet astralBullet2 = new OverseerRemoteBullets.AstralBullet(numShots);
+			OverseerRemoteBullets.AstralBullet astralBullet3 = new OverseerRemoteBullets.AstralBullet(numShots);
+			OverseerRemoteBullets.AstralBullet astralBullet4 = new OverseerRemoteBullets.AstralBullet(numShots);
+			OverseerRemoteBullets.AstralBullet astralBullet5 = new OverseerRemoteBullets.AstralBullet(numShots);
+			OverseerRemoteBullets.AstralBullet astralBullet6 = new OverseerRemoteBullets.AstralBullet(numShots);
+			OverseerRemoteBullets.AstralBullet astralBullet7 = new OverseerRemoteBullets.AstralBullet(numShots);
+			OverseerRemoteBullets.AstralBullet astralBullet8 = new OverseerRemoteBullets.AstralBullet(numShots);
 
-			OverseerRemoteBullets.AstralBullet astralBullet = new OverseerRemoteBullets.AstralBullet();
-			this.Fire(astralBullet);
-			while (!astralBullet.Destroyed)
+			this.Fire(new Offset(0f, 3.4f, 0, string.Empty, DirectionType.Absolute), new Direction(45, DirectionType.Absolute, -1f), new Speed(0f, SpeedType.Absolute), astralBullet);
+			yield return this.Wait(8);
+			this.Fire(new Offset(2.5f, 2.5f, 0, string.Empty, DirectionType.Absolute), new Direction(45, DirectionType.Absolute, -1f), new Speed(0f, SpeedType.Absolute), astralBullet2);
+			yield return this.Wait(8);
+			this.Fire(new Offset(3.4f, 0f, 0, string.Empty, DirectionType.Absolute), new Direction(90, DirectionType.Absolute, -1f), new Speed(0f, SpeedType.Absolute), astralBullet3);
+			yield return this.Wait(8);
+			this.Fire(new Offset(-2.5f, 2.5f, 0, string.Empty, DirectionType.Absolute), new Direction(135, DirectionType.Absolute, -1f), new Speed(0f, SpeedType.Absolute), astralBullet4);
+			yield return this.Wait(8);
+			this.Fire(new Offset(0f, -3.4f, 0, string.Empty, DirectionType.Absolute), new Direction(180, DirectionType.Absolute, -1f), new Speed(0f, SpeedType.Absolute), astralBullet5);
+			yield return this.Wait(8);
+			this.Fire(new Offset(-2.5f, -2.5f, 0, string.Empty, DirectionType.Absolute), new Direction(225, DirectionType.Absolute, -1f), new Speed(0f, SpeedType.Absolute), astralBullet6);
+			yield return this.Wait(8);
+			this.Fire(new Offset(-3.4f, 0f, 0, string.Empty, DirectionType.Absolute), new Direction(270, DirectionType.Absolute, -1f), new Speed(0f, SpeedType.Absolute), astralBullet7);
+			yield return this.Wait(8);
+			this.Fire(new Offset(2.5f, -2.5f, 0, string.Empty, DirectionType.Absolute), new Direction(315, DirectionType.Absolute, -1f), new Speed(0f, SpeedType.Absolute), astralBullet8);
+
+			while (!astralBullet.Destroyed || !astralBullet2.Destroyed || !astralBullet3.Destroyed || !astralBullet4.Destroyed || !astralBullet5.Destroyed || !astralBullet6.Destroyed || !astralBullet7.Destroyed || !astralBullet8.Destroyed)
 			{
 				yield return null;
 			}
 			yield break;
 		}
 
+		
+
 		// Token: 0x0200021B RID: 539
 		public class AstralBullet : Bullet
 		{
 
-			public AstralBullet() : base("disruption", false, false, false)
+			public AstralBullet(int shotCount) : base("disruption", false, false, false)
 			{
+				numShots = shotCount;
 			}
-
+			int numShots;
 
 			protected override IEnumerator Top()
 			{
@@ -453,7 +479,7 @@ namespace BotsMod
 				this.Projectile.specRigidbody.CollideWithOthers = true;
 				this.Direction = this.AimDirection;
 				this.Speed = 0f;
-				int numShots = UnityEngine.Random.Range(2, 6);
+
 				for (int i = 0; i < numShots; i++)
 				{
 					yield return this.Wait(UnityEngine.Random.Range(20, 70));
@@ -467,6 +493,9 @@ namespace BotsMod
 					this.Fire(new Direction(-16, DirectionType.Aim, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
 					this.Fire(new Direction(0, DirectionType.Aim, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
 					this.Fire(new Direction(16, DirectionType.Aim, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
+					yield return this.Wait(5);
+					this.Fire(new Direction(0, DirectionType.Aim, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
+
 				}
 				yield return this.Wait(30);
 				this.Vanish(false);
