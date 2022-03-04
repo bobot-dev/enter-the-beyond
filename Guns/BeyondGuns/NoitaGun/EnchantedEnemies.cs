@@ -36,7 +36,7 @@ namespace BotsMod
 			if (target.healthHaver != null)
 			{
 
-
+				/*
 				Material material = target.sprite.renderer.material;
 
 				var mat = new Material(BeyondPrefabs.AHHH.LoadAsset<Shader>("Chained"));
@@ -44,7 +44,7 @@ namespace BotsMod
 				mat.SetTexture("_Gradient", ResourceExtractor.GetTextureFromResource("BotsMod/sprites/gradient.png"));
 
 				target.sprite.renderer.material = mat;
-				target.sprite.usesOverrideMaterial = true;
+				target.sprite.usesOverrideMaterial = true;*/
 				//material.SetFloat("_PhantomGradientScale", 1);
 
 				target.behaviorSpeculator.CooldownScale *= 0.2f;

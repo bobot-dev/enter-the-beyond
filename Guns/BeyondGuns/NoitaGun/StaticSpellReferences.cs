@@ -48,9 +48,9 @@ namespace BotsMod
             Projectile sparkBoltProj = Tools.SetupProjectile(61);
 
 
-            var sparkBoltTrail = UnityEngine.Object.Instantiate(BeyondPrefabs.AHHH.LoadAsset<GameObject>("VFX_Sprark_Bolt"), sparkBoltProj.transform);
-            sparkBoltTrail.transform.localPosition = Vector3.zero;
-            sparkBoltTrail.transform.position = sparkBoltProj.sprite.WorldTopCenter;
+            //var sparkBoltTrail = UnityEngine.Object.Instantiate(BeyondPrefabs.AHHH.LoadAsset<GameObject>("VFX_Sprark_Bolt"), sparkBoltProj.transform);
+            //sparkBoltTrail.transform.localPosition = Vector3.zero;
+            //sparkBoltTrail.transform.position = sparkBoltProj.sprite.WorldTopCenter;
 
             sparkBoltProj.CanTransmogrify = false;
             sparkBoltProj.baseData = new ProjectileData
@@ -83,9 +83,9 @@ namespace BotsMod
 
             Projectile fireballProj = Tools.SetupProjectile(125);
 
-            var fireBallTrail = UnityEngine.Object.Instantiate(BeyondPrefabs.AHHH.LoadAsset<GameObject>("VFX_Fireball"), fireballProj.transform);
-            fireBallTrail.transform.localPosition = Vector3.zero;
-            fireBallTrail.transform.position = fireballProj.specRigidbody.UnitTopCenter;
+            //var fireBallTrail = UnityEngine.Object.Instantiate(BeyondPrefabs.AHHH.LoadAsset<GameObject>("VFX_Fireball"), fireballProj.transform);
+            //fireBallTrail.transform.localPosition = Vector3.zero;
+            //fireBallTrail.transform.position = fireballProj.specRigidbody.UnitTopCenter;
 
             fireballProj.baseData = new ProjectileData
             {
@@ -176,7 +176,7 @@ namespace BotsMod
 
             validSpells.Add(SpellTypes.flamethrower, new Spell { name = "Fireball", impactOnFireRate = -0.3f, isCombatSpell = true, spellProj = fireballProj, weight = 70f });
 
-            validSpells.Add(SpellTypes.sawBlade, new Spell { name = "Saw Blade", isCombatSpell = true, spellProj = sawbladeProj, weight = 0f });
+            //validSpells.Add(SpellTypes.sawBlade, new Spell { name = "Saw Blade", isCombatSpell = true, spellProj = sawbladeProj, weight = 0f });
 
             validSpells.Add(SpellTypes.nuke, new Spell { name = "Nuke", impactOnFireRate = -0.7f, impactOnReload = 0.8f, maxUses = 5, useMaxUses = true, isCombatSpell = true, spellProj = nukeProj, weight = 10f });
 

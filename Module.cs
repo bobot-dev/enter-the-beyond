@@ -38,7 +38,7 @@ namespace BotsMod
     public class BotsModule : ETGModule
     {
         public static readonly string MOD_NAME = "Enter The Beyond";
-        public static readonly string VERSION = "0.5.5";
+        public static readonly string VERSION = "0.6.0";
         public static readonly string TEXT_COLOR = "#e01279";
         public static readonly string LOST_COLOR = "#7732a8";
         public static readonly string LOCKED_CHARACTOR_COLOR = "#ba0c00";
@@ -293,7 +293,7 @@ namespace BotsMod
 
                 EnchantedEnemies.Init();
 
-                CustomAmmo.Init();
+                if (debugMode) CustomAmmo.Init();
 
 
                 if (debugMode) TestPassive.Init();

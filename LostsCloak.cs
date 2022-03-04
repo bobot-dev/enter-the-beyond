@@ -44,7 +44,7 @@ namespace BotsMod
             {
                 if (po != null && po.PickupObjectId >= BotsItemIds.BeyondMasteryToken && po.PickupObjectId <= BotsItemIds.Stairway)
                 {
-                    itemList.Add(new LootModData { AssociatedPickupId = po.PickupObjectId, DropRateMultiplier = 5 });
+                    itemList.Add(new LootModData { AssociatedPickupId = po.PickupObjectId, DropRateMultiplier = 10 });
                 }
             }
             item.associatedItemChanceMods = itemList.ToArray();
