@@ -16,7 +16,7 @@ namespace BotsMod
 
 		public static void Add()
 		{
-			Gun gun = ETGMod.Databases.Items.NewGun("beyond sniper", "beyond_sniper");
+			Gun gun = ETGMod.Databases.Items.NewGun("Beyond Sniper", "beyond_sniper");
 			Game.Items.Rename("outdated_gun_mods:beyond_sniper", "bot:beyond_sniper");
 			gun.gameObject.AddComponent<BeyondSniper>();
 			gun.SetShortDescription("Aim High");
@@ -90,6 +90,8 @@ namespace BotsMod
 			gun.DefaultModule.cooldownTime = 1.1f;
 			gun.InfiniteAmmo = false;
 			gun.DefaultModule.numberOfShotsInClip = 1;
+
+			
 
 			gun.SetBaseMaxAmmo(50);
 			gun.gunHandedness = GunHandedness.TwoHanded;

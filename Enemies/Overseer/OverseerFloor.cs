@@ -30,54 +30,18 @@ namespace BotsMod
 		public static GameObject Eye;
 		public static GameObject RightArmBand;
 		public static GameObject LeftArmBand;
+
+		public static GameObject BigBeamLeft;
+		public static GameObject BigBeamRight;
+
 		//make teleport ring turn around and go back the other way after like a second
-
-
-
-
-
-
-		private static string[] spritePaths = new string[]
-		{
-			
-			//idles
-			"BotsMod/sprites/overseer_floor/overseerf_idle_001.png",
-			"BotsMod/sprites/overseer_floor/overseerf_idle_002.png",
-			"BotsMod/sprites/overseer_floor/overseerf_idle_003.png",
-			"BotsMod/sprites/overseer_floor/overseerf_idle_004.png",
-
-			//"attack"
-			"BotsMod/sprites/overseer_floor/overseerf_spin_001.png",
-			"BotsMod/sprites/overseer_floor/overseerf_spin_002.png",
-			"BotsMod/sprites/overseer_floor/overseerf_spin_003.png",
-			"BotsMod/sprites/overseer_floor/overseerf_spin_004.png",
-			"BotsMod/sprites/overseer_floor/overseerf_spin_005.png",
-			"BotsMod/sprites/overseer_floor/overseerf_spin_006.png",
-			"BotsMod/sprites/overseer_floor/overseerf_spin_007.png",
-			"BotsMod/sprites/overseer_floor/overseerf_spin_008.png",
-
-
-			//intro
-
-			"BotsMod/sprites/overseer_floor/the overseer_intro1",
-			"BotsMod/sprites/overseer_floor/the overseer_intro2",
-			"BotsMod/sprites/overseer_floor/the overseer_intro3",
-			"BotsMod/sprites/overseer_floor/the overseer_intro4",
-			"BotsMod/sprites/overseer_floor/the overseer_intro5",
-			"BotsMod/sprites/overseer_floor/the overseer_intro6",
-			"BotsMod/sprites/overseer_floor/the overseer_intro7",
-			"BotsMod/sprites/overseer_floor/the overseer_intro8",
-
-
-
-		};
 
 		public static void Init()
 		{
 			
 			OverseerFloor.BuildPrefab();
 
-			GameObject overseerShield = SpriteBuilder.SpriteFromResource("BotsMod/sprites/overseer_floor/Shield/OverseerShield", new GameObject("OverseerShield"));
+			/*GameObject overseerShield = SpriteBuilder.SpriteFromResource("BotsMod/sprites/overseer_floor/Shield/OverseerShield", new GameObject("OverseerShield"));
 			overseerShield.SetActive(false);
 			ItemAPI.FakePrefab.MarkAsFakePrefab(overseerShield);
 			UnityEngine.Object.DontDestroyOnLoad(overseerShield);
@@ -100,7 +64,7 @@ namespace BotsMod
 			SpriteOutlineManager.AddOutlineToSprite(overseerShield.GetComponent<tk2dSprite>(), Color.black);
 
 			OverseerShield shield = overseerShield.gameObject.AddComponent<OverseerShield>();
-			BotsModule.overseerShield = shield;
+			BotsModule.overseerShield = shield;*/
 		}
 
 		public static void BuildPrefab()
@@ -111,7 +75,7 @@ namespace BotsMod
 			if (!flag2)
 			{
 				
-				OverseerPrefab = BossBuilder.BuildPrefab("Overseer", guid, spritePaths[0], new IntVector2(0, 0), new IntVector2(8, 9), false, true);
+				OverseerPrefab = BossBuilder.BuildPrefab("Overseer", guid, "BotsMod/sprites/overseer_floor/overseerf_idle_001.png", new IntVector2(0, 0), new IntVector2(8, 9), false, true);
 
 				OverseerPrefab.layer = 28;
 
@@ -139,7 +103,7 @@ namespace BotsMod
 				BotsModule.Strings.Enemies.Set("#THE_OVERSEER", "Overseer");
 				BotsModule.Strings.Enemies.Set("#BOT_????", "???");
 				BotsModule.Strings.Enemies.Set("#BOT_SUBTITLE", "All Seeing Eye");
-				BotsModule.Strings.Enemies.Set("#BOT_QUOTE", "ahhhh");
+				BotsModule.Strings.Enemies.Set("#BOT_QUOTE", "");
 				enemy.aiActor.healthHaver.overrideBossName = "#THE_OVERSEER";
 				enemy.aiActor.OverrideDisplayName = "#THE_OVERSEER";
 				enemy.aiActor.ActorName = "#THE_OVERSEER";
@@ -153,9 +117,9 @@ namespace BotsMod
 				miniBossIntroDoer.initialDelay = 0.15f;
 				miniBossIntroDoer.cameraMoveSpeed = 14;
 				miniBossIntroDoer.specifyIntroAiAnimator = null;
-				miniBossIntroDoer.BossMusicEvent = "Play_MUS_Boss_Theme_Beholster";
+				miniBossIntroDoer.BossMusicEvent = "Play_MUS_Ending_Pilot_01";
 				miniBossIntroDoer.PreventBossMusic = false;
-				miniBossIntroDoer.InvisibleBeforeIntroAnim = false;
+				miniBossIntroDoer.InvisibleBeforeIntroAnim = true;
 				miniBossIntroDoer.preIntroAnim = string.Empty;
 				miniBossIntroDoer.preIntroDirectionalAnim = string.Empty;
 				miniBossIntroDoer.introAnim = "intro";
@@ -174,7 +138,7 @@ namespace BotsMod
 					bossSpritePxOffset = IntVector2.Zero,
 					topLeftTextPxOffset = IntVector2.Zero,
 					bottomRightTextPxOffset = IntVector2.Zero,
-					bgColor = new Color32(163, 0, 106, 255)
+					bgColor = new Color32(255, 0, 247, 255)
 				};
 				if (BossCardTexture)
 				{
@@ -194,7 +158,7 @@ namespace BotsMod
 
 				/////
 
-				SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/OverseerIcon", SpriteBuilder.ammonomiconCollection);
+				SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/OverseerIconFloor", SpriteBuilder.ammonomiconCollection);
 				if (enemy.GetComponent<EncounterTrackable>() != null)
 				{
 					UnityEngine.Object.Destroy(enemy.GetComponent<EncounterTrackable>());
@@ -207,7 +171,7 @@ namespace BotsMod
 				enemy.encounterTrackable.journalData.IsEnemy = true;
 				enemy.encounterTrackable.journalData.SuppressInAmmonomicon = false;
 				enemy.encounterTrackable.ProxyEncounterGuid = "";
-				enemy.encounterTrackable.journalData.AmmonomiconSprite = "BotsMod/sprites/OverseerIcon";
+				enemy.encounterTrackable.journalData.AmmonomiconSprite = "BotsMod/sprites/OverseerIconFloor";
 				enemy.encounterTrackable.journalData.enemyPortraitSprite = ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod\\sprites\\overseer_floor\\ammonomicon_enemy_overseer_001.png");
 
 				BotsModule.Strings.Enemies.Set("#BOT_OVERSEER_SHORTDESC", "All Seeing Eye");
@@ -304,13 +268,40 @@ namespace BotsMod
 				LeftArmBand.transform.position = new Vector2(3f, 3.25f);//48, 52
 
 
+				RightArmBand = new GameObject("OverseerRightArmBand");
+				RightArmBand.transform.parent = enemy.transform;
+				RightArmBand.transform.position = new Vector2(8, 4.5f);//80, 52
+
+				BigBeamLeft = new GameObject("OverseerBigBeamLeft");
+				BigBeamLeft.transform.parent = enemy.transform;
+				BigBeamLeft.transform.position = new Vector2(0, 4.5f);//80, 52
+
 				GameObject OverseersEye = enemy.transform.Find("OverseersEye").gameObject;
 				GameObject OverseersRightArmBand = enemy.transform.Find("OverseersRightArmBand").gameObject;
 				GameObject OverseersLeftArmBand = enemy.transform.Find("OverseersLeftArmBand").gameObject;
 
 
-				var beams = Tools.ExtremeLaziness(OverseerPrefab, Eye.transform, 5, new List<string> { "fuckyoulaser1", "fuckyoulaser2", "fuckyoulaser3", "fuckyoulaser4", "fuckyoulaser5", "fuckyoulaser6", });
+				var beams = Tools.ExtremeLaziness(OverseerPrefab, Eye.transform, 6, new List<string> { "fuckyoulaser1", "fuckyoulaser2", "fuckyoulaser3", "fuckyoulaser4", "fuckyoulaser5", "fuckyoulaser6", });
 
+
+				Projectile beamProjectile = null;
+				AIActor orLoadByGuid = EnemyDatabase.GetOrLoadByGuid("b98b10fca77d469e80fb45f3c5badec5");
+				foreach (Component component2 in orLoadByGuid.GetComponentsInChildren(typeof(Component)))
+				{
+					BossFinalRogueLaserGun bossFinalRogueLaserGun = component2 as BossFinalRogueLaserGun;
+					bool flag6 = bossFinalRogueLaserGun != null;
+					if (flag6)
+					{
+						bool flag7 = bossFinalRogueLaserGun.beamProjectile;
+						if (flag7)
+						{
+							beamProjectile = bossFinalRogueLaserGun.beamProjectile;
+							break;
+						}
+					}
+				}
+				AIBeamShooter2 item = Tools.AddAIBeamShooter(enemy.aiActor, RightArmBand.transform, "BigBeam1", beamProjectile, null, 180);
+				AIBeamShooter2 item2 = Tools.AddAIBeamShooter(enemy.aiActor, BigBeamLeft.transform, "BigBeam2", beamProjectile, null, 180f);
 
 
 				AIBeamShooter2 bholsterbeam1 = enemy.gameObject.AddComponent<AIBeamShooter2>();
@@ -385,7 +376,103 @@ namespace BotsMod
 
 				OverseerPrefab.AddAnimation("idle", "BotsMod/sprites/overseer_floor/idle", 3, AnimationType.Idle, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
 
-				OverseerPrefab.AddAnimation("intro", "BotsMod/sprites/overseer_floor/intro", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
+				var introAnim = OverseerPrefab.AddAnimation("intro", "BotsMod/sprites/overseer_floor/intro", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None);
+
+
+				introAnim.wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
+				introAnim.frames[2].eventAudio = "Play_BOSS_agunim_charge_02";
+				introAnim.frames[2].triggerEvent = true;
+
+				introAnim.frames[5].eventAudio = "Play_WPN_tiger_swipe_01";
+				introAnim.frames[5].triggerEvent = true;
+
+				introAnim.frames[8].eventAudio = "Play_BOSS_agunim_charge_01";
+				introAnim.frames[8].triggerEvent = true;
+
+				introAnim.frames[9].eventAudio = "Play_BOSS_agunim_charge_01";
+				introAnim.frames[9].triggerEvent = true;
+
+				introAnim.frames[10].eventAudio = "Play_BOSS_agunim_charge_01";
+				introAnim.frames[10].triggerEvent = true;
+
+				introAnim.frames[11].eventAudio = "Play_BOSS_agunim_charge_01";
+				introAnim.frames[11].triggerEvent = true;
+
+				introAnim.frames[12].eventAudio = "Play_WPN_tiger_swipe_01";
+				introAnim.frames[12].triggerEvent = true;
+
+				introAnim.frames[13].eventAudio = "Play_WPN_tiger_swipe_01";
+				introAnim.frames[13].triggerEvent = true;
+
+				introAnim.frames[14].eventAudio = "Play_WPN_tiger_swipe_01";
+				introAnim.frames[14].triggerEvent = true;
+
+				introAnim.frames[15].eventAudio = "Play_BOSS_agunim_charge_01";
+				introAnim.frames[15].triggerEvent = true;
+
+				introAnim.frames[16].eventAudio = "Play_BOSS_agunim_charge_01";
+				introAnim.frames[16].triggerEvent = true;
+
+				introAnim.frames[17].eventAudio = "Play_BOSS_agunim_charge_01";
+				introAnim.frames[17].triggerEvent = true;
+
+				introAnim.frames[18].eventAudio = "Play_WPN_tiger_swipe_01";
+				introAnim.frames[18].triggerEvent = true;
+
+				introAnim.frames[19].eventAudio = "Play_WPN_tiger_swipe_01";
+				introAnim.frames[19].triggerEvent = true;
+
+				introAnim.frames[20].eventAudio = "Play_WPN_tiger_swipe_01";
+				introAnim.frames[20].triggerEvent = true;
+
+				introAnim.frames[21].eventAudio = "Play_BOSS_agunim_charge_02";
+				introAnim.frames[21].triggerEvent = true;
+
+				introAnim.frames[24].eventAudio = "Play_WPN_tiger_swipe_01";
+				introAnim.frames[24].triggerEvent = true;
+
+				introAnim.frames[25].eventAudio = "Play_BOSS_agunim_charge_02";
+				introAnim.frames[25].triggerEvent = true;
+
+				introAnim.frames[26].eventAudio = "Play_BOSS_agunim_charge_02";
+				introAnim.frames[26].triggerEvent = true;
+
+				introAnim.frames[41].eventAudio = "Play_BOSS_agunim_charge_01";
+				introAnim.frames[41].triggerEvent = true;
+
+				introAnim.frames[42].eventAudio = "Play_BOSS_agunim_charge_01";
+				introAnim.frames[42].triggerEvent = true;
+
+				introAnim.frames[45].eventAudio = "Play_WPN_tiger_swipe_01";
+				introAnim.frames[45].triggerEvent = true;
+
+				introAnim.frames[46].eventAudio = "Play_BOSS_agunim_charge_01";
+				introAnim.frames[46].triggerEvent = true;
+
+				introAnim.frames[47].eventAudio = "Play_BOSS_agunim_charge_01";
+				introAnim.frames[47].triggerEvent = true;
+
+				introAnim.frames[48].eventAudio = "Play_WPN_tiger_swipe_01";
+				introAnim.frames[48].triggerEvent = true;
+
+				introAnim.frames[49].eventAudio = "Play_WPN_tiger_swipe_01";
+				introAnim.frames[49].triggerEvent = true;
+
+				introAnim.frames[50].eventAudio = "Play_TRP_flame_torch_01";
+				introAnim.frames[50].triggerEvent = true;
+
+				introAnim.frames[51].eventAudio = "Play_WPN_tiger_swipe_01";
+				introAnim.frames[51].triggerEvent = true;
+
+				introAnim.frames[52].eventAudio = "Play_WPN_tiger_swipe_01";
+				introAnim.frames[52].triggerEvent = true;
+
+				introAnim.frames[54].eventAudio = "Play_TRP_flame_torch_01";
+				introAnim.frames[54].triggerEvent = true;
+
+				introAnim.frames[62].eventAudio = "Play_WPN_bsg_shot_01";
+				introAnim.frames[62].triggerEvent = true;
+
 				OverseerPrefab.AddAnimation("death", "BotsMod/sprites/overseer_floor/death", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
 
 				OverseerPrefab.AddAnimation("blank", "BotsMod/sprites/overseer_floor/blank", 4, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
@@ -537,10 +624,42 @@ namespace BotsMod
 						NickName = "Beam Teleport Magic bs"
 
 					},*/
+					new AttackBehaviorGroup.AttackGroupItem()
+					{
+						Probability = 0f,
+
+						Behavior = new RhulkAttackIStole
+						{
+							InitialCooldown = 0f,
+							firingTime = 10f,
+							Cooldown = 12f,
+							AttackCooldown = 2f,
+							RequiresLineOfSight = false,
+							UsesBeamProjectileWithoutModule = true,
+							chargeTime = 0.3f,
+							UsesBaseSounds = false,
+							ChargeAnimation = "",
+							FireAnimation = "",
+							PostFireAnimation = "",
+							beamSelection =  ShootBeamBehavior.BeamSelection.Specify,
+							BulletScript = null,
+							ShootPoint = shootpoint.transform,
+							maxTurnRate = 50f,
+							turnRateAcceleration = 24,
+							turnRateMultiplier = 1.5f,
+							LockInPlaceWhileAttacking = true,
+							beamToUse = new List<AIBeamShooter2>
+                            {
+								item,
+								item2
+                            }
+						},
+						NickName = "attack i stole from d2"
+					},
 
 					new AttackBehaviorGroup.AttackGroupItem()
 					{
-						Probability = 6,
+						Probability = 1f,
 
 						Behavior = new SequentialAttackBehaviorGroup()
 						{
@@ -609,9 +728,101 @@ namespace BotsMod
 									ChargeAnimation = "beam_tell",
 									FireAnimation = "beam",
 									PostFireAnimation = "",
+									beamSelection = ShootBeamBehavior.BeamSelection.Specify,
+									//initialAimType = CustomShootBeamBehavior.InitialAimType.Aim,
+									maxTurnRate = 29f,
+									turnRateAcceleration = 24,
+									turnRateMultiplier = 1.5f,
+									LockInPlaceWhileAttacking = true,
+									ShootPoint = m_CachedGunAttachPoint.transform,
+									specificBeamShooters = beams,
+									//BulletScript = new CustomBulletScriptSelector(typeof(Wailer.Wail))
+									MinWallDistance = 5,
+								},
+							},
+							OverrideCooldowns = new List<float>
+							{
+								0
+							},
+							RunInClass = false,
+
+						},
+						NickName = "Beam Teleport Magic bs"
+
+					},
+
+					new AttackBehaviorGroup.AttackGroupItem()
+					{
+						Probability = 1f,
+
+						Behavior = new SequentialAttackBehaviorGroup()
+						{
+
+							AttackBehaviors = new List<AttackBehaviorBase>
+							{
+								new TeleportToMiddleBehavior()
+								{
+
+									AttackableDuringAnimation = true,
+									AllowCrossRoomTeleportation = false,
+									teleportRequiresTransparency = false,
+									hasOutlinesDuringAnim = true,
+									ManuallyDefineRoom = false,
+									MaxHealthThreshold = 1f,
+									GoneTime = 1f,
+									OnlyTeleportIfPlayerUnreachable = false,
+									teleportInAnim = "",
+									teleportOutAnim = "",
+									AttackCooldown = 1f,
+									InitialCooldown = 1f,
+									RequiresLineOfSight = false,
+									roomMax = new Vector2(0,0),
+									roomMin = new Vector2(0,0),
+
+									teleportOutBulletScript = new CustomBulletScriptSelector(typeof(OverseerTeleportStartFourLinesScript)),
+									//teleportInBulletScript = new CustomBulletScriptSelector(typeof(OverseerBeam)),
+									//teleportInBulletScript = new CustomBulletScriptSelector(typeof(BEAM
+									GlobalCooldown = 0.5f,
+									Cooldown = 4f,
+									CooldownVariance = 1f,
+									InitialCooldownVariance = 0f,
+									goneAttackBehavior = null,
+									IsBlackPhantom = false,
+
+
+									GroupName = null,
+									GroupCooldown = 0,
+									MinRange = 0,
+									Range = 0,
+									MinHealthThreshold = 0,
+									MaxEnemiesInRoom = 1,
+									MaxUsages = 0,
+									AccumulateHealthThresholds = true,
+									//shadowInAnim = null,
+									//shadowOutAnim = null,
+									targetAreaStyle = null,
+									HealthThresholds = new float[0],
+									MinWallDistance = 0,
+									//resetCooldownOnDamage = null,
+									//shadowSupport = (TeleportBehavior.ShadowSupport)1,
+								},
+								new TwinBeams() {
+									//ShootPoint = m_CachedGunAttachPoint,
+									InitialCooldown = 2f,
+									firingTime = 14f,
+									AttackCooldown = 2f,
+									RequiresLineOfSight = true,
+									BulletScript =  new CustomBulletScriptSelector(typeof(SixBeamScriptNoRing)),
+									chargeTime = 2f,
+									UsesBaseSounds = true,
+									LaserFiringSound = "Play_ENM_deathray_shot_01",
+									StopLaserFiringSound = "Stop_ENM_deathray_loop_01",
+									ChargeAnimation = "beam_tell",
+									FireAnimation = "beam",
+									PostFireAnimation = "",
 									beamSelection = ShootBeamBehavior.BeamSelection.All,
 									//initialAimType = CustomShootBeamBehavior.InitialAimType.Aim,
-									maxTurnRate = 32f,
+									maxTurnRate = 50f,
 									turnRateAcceleration = 24,
 									turnRateMultiplier = 1.5f,
 									LockInPlaceWhileAttacking = true,
@@ -631,6 +842,7 @@ namespace BotsMod
 						NickName = "Beam Teleport Magic bs"
 
 					},
+
 
 					//secondBulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines2)),
 					new AttackBehaviorGroup.AttackGroupItem()
@@ -833,195 +1045,8 @@ namespace BotsMod
 								},
 								#endregion
 								//5
-								#region dash1
-								new DashButGoodBehavior
-								{
-									dashDirection = DashButGoodBehavior.DashDirection.PerpendicularToTarget,
-									quantizeDirection = 0,
-									dashDistance = 5,
-									dashTime = 0.3f,
-									postDashSpeed = 0,
-									doubleDashChance = 0.3f,
-									avoidTarget = true,
-									ShootPoint = m_CachedGunAttachPoint,
-									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
-									fireAtDashStart = true,
-									stopOnCollision = false,
-									warpDashAnimLength = false,
-									hideGun = false,
-									hideShadow = false,
-									toggleTrailRenderer = true,
-									enableShadowTrail = true,
-									Cooldown = 1,
-									CooldownVariance = 2,
-									GlobalCooldown = 0.5f,
-									InitialCooldown = 2,
-									InitialCooldownVariance = 0,
-									GroupCooldown = 0,
-									GroupName = "",
-									Range = 0,
-									MinRange = 0,
-									MinWallDistance = 0,
-									MaxEnemiesInRoom = 0,
-									MinHealthThreshold = 0,
-									MaxHealthThreshold = 1,
-									HealthThresholds = new float[0],
-									AccumulateHealthThresholds = true,
-									targetAreaStyle = null,
-									IsBlackPhantom = false,
-									resetCooldownOnDamage = null,
-									RequiresLineOfSight = false,
-									MaxUsages = 0,
-									AttackCooldown = 0,
-									doDodgeDustUp = false,
-									chargeAnim = "",
-									dashAnim = "idle",
-								},
-								#endregion
-								//8
-								#region dash2
-
-
-								new DashButGoodBehavior
-								{
-									dashDirection = DashButGoodBehavior.DashDirection.Random,
-									quantizeDirection = 0,
-									dashDistance = 8,
-									dashTime = 0.3f,
-									postDashSpeed = 0,
-									doubleDashChance = 0,
-									avoidTarget = true,
-									ShootPoint = m_CachedGunAttachPoint,
-									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
-									fireAtDashStart = true,
-									stopOnCollision = false,
-									warpDashAnimLength = false,
-									hideGun = false,
-									hideShadow = false,
-									toggleTrailRenderer = true,
-									enableShadowTrail = true,
-									Cooldown = 1,
-									CooldownVariance = 2,
-									GlobalCooldown = 0.5f,
-									InitialCooldown = 2,
-									InitialCooldownVariance = 0,
-									GroupCooldown = 0,
-									GroupName = "",
-									Range = 0,
-									MinRange = 0,
-									MinWallDistance = 0,
-									MaxEnemiesInRoom = 0,
-									MinHealthThreshold = 0,
-									MaxHealthThreshold = 1,
-									HealthThresholds = new float[0],
-									AccumulateHealthThresholds = true,
-									targetAreaStyle = null,
-									IsBlackPhantom = false,
-									resetCooldownOnDamage = null,
-									RequiresLineOfSight = false,
-									MaxUsages = 0,
-									AttackCooldown = 0,
-									doDodgeDustUp = false,
-									chargeAnim = "",
-									dashAnim = "idle",
-								},
-								#endregion
-								//5
-								#region dash1
-								new DashButGoodBehavior
-								{
-									dashDirection = DashButGoodBehavior.DashDirection.PerpendicularToTarget,
-									quantizeDirection = 0,
-									dashDistance = 5,
-									dashTime = 0.3f,
-									postDashSpeed = 0,
-									doubleDashChance = 0.3f,
-									avoidTarget = true,
-									ShootPoint = m_CachedGunAttachPoint,
-									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines)),
-									fireAtDashStart = true,
-									stopOnCollision = false,
-									warpDashAnimLength = false,
-									hideGun = false,
-									hideShadow = false,
-									toggleTrailRenderer = true,
-									enableShadowTrail = true,
-									Cooldown = 1,
-									CooldownVariance = 2,
-									GlobalCooldown = 0.5f,
-									InitialCooldown = 2,
-									InitialCooldownVariance = 0,
-									GroupCooldown = 0,
-									GroupName = "",
-									Range = 0,
-									MinRange = 0,
-									MinWallDistance = 0,
-									MaxEnemiesInRoom = 0,
-									MinHealthThreshold = 0,
-									MaxHealthThreshold = 1,
-									HealthThresholds = new float[0],
-									AccumulateHealthThresholds = true,
-									targetAreaStyle = null,
-									IsBlackPhantom = false,
-									resetCooldownOnDamage = null,
-									RequiresLineOfSight = false,
-									MaxUsages = 0,
-									AttackCooldown = 0,
-									doDodgeDustUp = false,
-									chargeAnim = "",
-									dashAnim = "idle",
-								},
-								#endregion
-								//8
-								#region dash2
-
-
-								new DashButGoodBehavior
-								{
-									dashDirection = DashButGoodBehavior.DashDirection.Random,
-									quantizeDirection = 0,
-									dashDistance = 8,
-									dashTime = 0.3f,
-									postDashSpeed = 0,
-									doubleDashChance = 0,
-									avoidTarget = true,
-									ShootPoint = m_CachedGunAttachPoint,
-									bulletScript = new CustomBulletScriptSelector(typeof(OverseerRapidFireLines2)),
-									fireAtDashStart = true,
-									stopOnCollision = false,
-									warpDashAnimLength = false,
-									hideGun = false,
-									hideShadow = false,
-									toggleTrailRenderer = true,
-									enableShadowTrail = true,
-									Cooldown = 1,
-									CooldownVariance = 2,
-									GlobalCooldown = 0.5f,
-									InitialCooldown = 2,
-									InitialCooldownVariance = 0,
-									GroupCooldown = 0,
-									GroupName = "",
-									Range = 0,
-									MinRange = 0,
-									MinWallDistance = 0,
-									MaxEnemiesInRoom = 0,
-									MinHealthThreshold = 0,
-									MaxHealthThreshold = 1,
-									HealthThresholds = new float[0],
-									AccumulateHealthThresholds = true,
-									targetAreaStyle = null,
-									IsBlackPhantom = false,
-									resetCooldownOnDamage = null,
-									RequiresLineOfSight = false,
-									MaxUsages = 0,
-									AttackCooldown = 0,
-									doDodgeDustUp = false,
-									chargeAnim = "",
-									dashAnim = "idle",
-								},
-								#endregion
 							},
-							OverrideCooldowns = new List<float>{ 0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.01f, 0.5f },
+							OverrideCooldowns = new List<float>{ 0.01f, 0.01f, 0.01f, 0.5f },
 							RunInClass = false,
 						},
 					},

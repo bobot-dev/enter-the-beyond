@@ -38,6 +38,9 @@ namespace AmmonomiconAPI
 
                 atlas.AddNewItemToAtlas(Tools.GetTextureFromResource("BotsMod/sprites/Ammonomicon/bookmark_beyond_select_hover_001.png"), "bookmark_beyond_select_hover_001");
 
+                atlas.AddNewItemToAtlas(Tools.GetTextureFromResource("BotsMod/sprites/Ammonomicon/Item_Picture_Beyond_001.png"), "Item_Picture_Beyond_001");
+
+
                 StringHandler.AddDFStringDefinition("#AMMONOMICON_BEYOND", "SPELLS");
 
                 var page = FakePrefab.Clone(BraveResources.Load<GameObject>("Global Prefabs/Ammonomicon Pages/Guns Page Left", ".prefab"));

@@ -113,7 +113,7 @@ namespace BotsMod
  
                 BeyondSettings.Instance.allowSpindownInsanity = !BeyondSettings.Instance.allowSpindownInsanity;
 
-                BotsModule.Log($"allowSpindownInsanity enabled: {BeyondSettings.Instance.allowSpindownInsanity}");
+                BotsModule.Log($"allowSpindownInsanity enabled: {BeyondSettings.Instance.allowSpindownInsanity}", debug: false);
                 BeyondSettings.Save();
             });
             
@@ -126,7 +126,7 @@ namespace BotsMod
 
                 BeyondSettings.Instance.debug = !BeyondSettings.Instance.debug;
 
-                BotsModule.Log($"debug enabled: {BeyondSettings.Instance.debug}");
+                BotsModule.Log($"debug enabled: {BeyondSettings.Instance.debug}", debug: false);
                 BeyondSettings.Save();
             });
 
@@ -139,11 +139,59 @@ namespace BotsMod
 
                 BeyondSettings.Instance.titleScreenOverrideEnabled = !BeyondSettings.Instance.titleScreenOverrideEnabled;
 
-                BotsModule.Log($"custom titlescreen enabled: {BeyondSettings.Instance.titleScreenOverrideEnabled}");
+                BotsModule.Log($"custom titlescreen enabled: {BeyondSettings.Instance.titleScreenOverrideEnabled}", debug: false);
                 BeyondSettings.Save();
             });
 
+            ETGModConsole.Commands.GetGroup("etb").AddUnit("printSettings", delegate (string[] args)
+            {
+                if (!BeyondSettings.HasInstance)
+                {
+                    BeyondSettings.Load();
+                }
+
+                BotsModule.Log($"allowSpindownInsanity enabled: {BeyondSettings.Instance.allowSpindownInsanity}", debug: false);
+                BotsModule.Log($"debug enabled: {BeyondSettings.Instance.debug}", debug: false);
+                BotsModule.Log($"custom titlescreen enabled: {BeyondSettings.Instance.titleScreenOverrideEnabled}", debug: false);
+            });
+
             ETGModConsole.Commands.AddGroup("bot");
+
+
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("decryptCharApiSave", (args) =>
+            {
+                string save = "敶獲潩㩮〠⬊ᥗਫᐛٔ挃䄉ᐁᄓ列ᔱᴒȐᕟ㹁̖䬀ᕕ̂ሕ匇啑䵛㬱❳㠠㘦㙿⤳⑫乤䕓奇ᙕ呆呂䕜䄖቙䡐㥋⁥㸩甭✸㨶㙣归屃䥛䴐㨂㔰收ⴽ㱡㴱㕭㨰啖ᩊဎ䝢ㄷ㉮⍿∩‫缰⨻琪㐰㉴坍ᑝ䕝䩏杺散㼬⥬㜼ԡፉ塃䭘嬓坚剆䁞᱔奥㙖∼攫㴽❿Ⅹ㐰䡇娒䩘升䜌⨪ⴡ㨱⨪昱⸼㴤䤂ᅞ孙ፂ升啂ቄ䑓ᙐɍ㰢㘹㜩Ɀ㌤ⴰȡ幎䬑䕔灖㰽ㄲ⭦㼹渱㤰㨫䰦፝๗䥄ㅚ⩮椿㘭欧⠬ㄥ倫ሔ紘啋Ɉ漵␧⴯㬨⹮☼⁣氾ⰶ‹兤偏ᥞḀ儌椻‥㨡㙵ち⠧缡⸼㐺℠䜽戔䑛䭘⸺Ɑ缽氲ㄺ⨯攤㸰⠧氡䰠䙙䁗䭘㬨⍮⌾挺⨸つ∠䤂佔䍋䌌‰ⱡ㭿㔬⌤缫⠮℠☺㥩Ȫ啟婜䐙奟቗䝘䕄崗䥉㩌␫⑲⭴㜷活ⴼ❦㘰䝤塞彚౞档㘋㜱㑿㽮‪‹缰ⰼ栭㤰⩥⼰氰〿㬷ᐌฟ䍃㰂〤戩缠⌵㔤⭰䰫呉䍀౉〛㘭∼攫⌽⽥㡿㰼㜩䁤䉛升䥝์ēᤙ䴈孔⥒㐺㙨琼㘰爧␠⤩瘶㸤ᩇ๐䕜㥖㘣㝴㸣⬥猹✫⥥䬠ፎ塚䱍╭✦欫⤪ㄶ⬡搫ᩃ䭇塈∂猽㨼渽⤠ㄠⴼ楥ɬ℠ᩆᅐ䭂ན噉㑍ᔃࡁȁ㑉ᠰ๝";
+                string text = (string)typeof(SaveManager).GetMethod("Decrypt", BindingFlags.NonPublic | BindingFlags.Static).Invoke(null, new object[] { save });
+                ETGModConsole.Log(text);
+                var a = File.Create("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Enter the Gungeon\\helpme.txt");
+                a.Close();
+                File.WriteAllText("C:\\Program Files (x86)\\Steam\\steamapps\\common\\Enter the Gungeon\\helpme.txt", text);
+            });
+
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("npcparadise", (args) =>
+            {
+                GameManager.Instance.LoadCustomFlowForDebug("Bossrush_06_BulletHell", "Base_BulletHell", "tt_bullethell");
+            });
+
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("scanForTalkDoers", (args) =>
+            {
+                foreach(var talkDoer in UnityEngine.Object.FindObjectsOfType<TalkDoerLite>())
+                {
+                    ETGModConsole.Log($"[{talkDoer.gameObject.name}]: ({talkDoer.transform.position}) - {talkDoer.gameObject.activeSelf}");
+                }
+            });
+
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("playmus", (args) =>
+            {
+                var source = GameManager.Instance.PrimaryPlayer.gameObject;
+                AkSoundEngine.PostEvent("Stop_MUS_All", source);
+                AkSoundEngine.PostEvent(args[0], source);
+                if (args.Length > 1)
+                {
+                    AkSoundEngine.PostEvent(args[1], source);
+                }
+            });
+
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("showheadshot", (args) =>
             {
@@ -494,7 +542,7 @@ namespace BotsMod
 
                 ;
 
-
+                forgeDungeon = null;
                 //GameManager.Instance.PrimaryPlayer.CurrentRoom.RegisterInteractable(shopObj.GetComponent<TalkDoerLite>());
 
                 //BotsModule.Log();
@@ -1513,7 +1561,10 @@ namespace BotsMod
             {
 
                 int i = 0;
-                foreach (var room in GungeonAPI.OfficialFlows.GetDungeonPrefab("base_resourcefulrat").PatternSettings.flows[0].AllNodes[18].overrideRoomTable.includedRooms.elements)
+
+                var ratFloorPrefab = DungeonDatabase.GetOrLoadByName("base_resourcefulrat");
+
+                foreach (var room in ratFloorPrefab.PatternSettings.flows[0].AllNodes[18].overrideRoomTable.includedRooms.elements)
                 {
                     BotsModule.Log(room.room.name);
                     if (room.room.placedObjects != null)
@@ -1529,7 +1580,7 @@ namespace BotsMod
                     }
                 }
                 //BotsModule.Log("aaaa");
-                foreach (var node in GungeonAPI.OfficialFlows.GetDungeonPrefab("base_resourcefulrat").PatternSettings.flows[0].AllNodes)
+                foreach (var node in ratFloorPrefab.PatternSettings.flows[0].AllNodes)
                 {
                     if (node.overrideExactRoom != null && node.overrideExactRoom.placedObjects != null)
                     {
@@ -1613,7 +1664,13 @@ namespace BotsMod
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("chest", delegate (string[] args)
             {
-                Chest.Spawn(BeyondPrefabs.beyondChestPrefab.GetComponent<Chest>(), (GameManager.Instance.PrimaryPlayer.CenterPosition + new Vector2(1f, 0f)).ToIntVector2(VectorConversions.Round), GameManager.Instance.Dungeon.data.GetRoomFromPosition(GameManager.Instance.PrimaryPlayer.CenterPosition.ToIntVector2(VectorConversions.Round)), true);
+                var c = Chest.Spawn(BeyondPrefabs.beyondChestPrefab.GetComponent<Chest>(), (GameManager.Instance.PrimaryPlayer.CenterPosition + new Vector2(0f, 2f)).ToIntVector2(VectorConversions.Round), GameManager.Instance.Dungeon.data.GetRoomFromPosition(GameManager.Instance.PrimaryPlayer.CenterPosition.ToIntVector2(VectorConversions.Round)), true);
+                c.spawnAnimName = "bot:beyond_chest_appear";
+                //typeof(Chest).GetMethod("HandleSpawnBehavior", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(c, null);                
+                //c.ConfigureOnPlacement(GameManager.Instance.Dungeon.data.GetAbsoluteRoomFromPosition(c.sprite.WorldCenter.ToIntVector2()));
+                //c.sprite.SetSprite("bot:beyond_chest_idle_001");
+                //c.overrideSpawnAnimName = "bot:beyond_chest_idle";
+                //c.spriteAnimator.Play($"bot:beyond_chest_idle");
             });
 
 

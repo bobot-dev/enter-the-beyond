@@ -262,7 +262,7 @@ namespace BotsMod
 			var ring = this.m_radialIndicator.GetComponent<HeatIndicatorController>();
 			ring.IsFire = false;
 			ring.CurrentRadius = Radius;
-			ring.CurrentColor = new Color32(255, 82, 249, 255);
+			ring.CurrentColor = new Color(255, 82, 249, 5);
 
 
 

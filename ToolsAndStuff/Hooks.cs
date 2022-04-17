@@ -306,9 +306,12 @@ namespace BotsMod
 					typeof(TK2DDungeonAssembler).GetMethod("BuildShadowIndex", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(Hooks).GetMethod("BuildShadowIndexHook", BindingFlags.Static | BindingFlags.NonPublic));
 
-				var AmmoPickupHook = new Hook(
-					typeof(AmmoPickup).GetMethod("Pickup", BindingFlags.Instance | BindingFlags.Public),
-					typeof(Hooks).GetMethod("AmmoPickupHook", BindingFlags.Static | BindingFlags.Public));
+				if (BotsModule.debugMode)
+				{
+					var AmmoPickupHook = new Hook(
+						typeof(AmmoPickup).GetMethod("Pickup", BindingFlags.Instance | BindingFlags.Public),
+						typeof(Hooks).GetMethod("AmmoPickupHook", BindingFlags.Static | BindingFlags.Public));
+				} 
 
 				var ExplodeHook = new Hook(
 					typeof(ExplosiveModifier).GetMethod("Explode", BindingFlags.Instance | BindingFlags.Public),
@@ -329,7 +332,13 @@ namespace BotsMod
 				/*var ConfigureOnPlacementHook = new Hook(
 					typeof(FloorChestPlacer).GetMethod("ConfigureOnPlacement", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("ConfigureOnPlacementHook", BindingFlags.Static | BindingFlags.Public));
+				
+
+				new Hook(
+					typeof(PlayerController).GetMethod("HandleGunAttachPointInternal", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("HandleGunAttachPointInternalHook", BindingFlags.Static | BindingFlags.NonPublic));
 				*/
+
 				BotsModule.Log("hooks set up hopefully");
 
 			}
@@ -340,6 +349,9 @@ namespace BotsMod
 
 			}
 		}
+
+
+		
 
 		public static void ConfigureOnPlacementHook(Action<FloorChestPlacer, RoomHandler> orig, FloorChestPlacer self, RoomHandler room)
 		{
@@ -459,7 +471,7 @@ namespace BotsMod
 		{
 			if (self.gameObject.GetComponent<NukeModifer>() == null)
             {
-				BotsModule.Log("norm (1)");
+				//BotsModule.Log("norm (1)");
 				orig(self, sourceNormal, ignoreDamageCaps, cd);
 			}
 			else if (self.projectile && self.projectile.Owner && self.projectile.Owner is PlayerController)
@@ -469,7 +481,7 @@ namespace BotsMod
 			}
 			else
             {
-				BotsModule.Log("norm (2)");
+				//BotsModule.Log("norm (2)");
 				orig(self, sourceNormal, ignoreDamageCaps, cd);
 			}
 		}
@@ -491,8 +503,8 @@ namespace BotsMod
 		}
 
 
-		public delegate void Action<T1, T2, T3, T4, T5, T6>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
-		private static void BuildShadowIndexHook(Action<TK2DDungeonAssembler, CellData, Dungeon, tk2dTileMap, int, int> orig, TK2DDungeonAssembler self, CellData current, Dungeon d, tk2dTileMap map, int ix, int iy)
+		public delegate void ActionC<T1, T2, T3, T4, T5, T6>(T1 arg1, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6);
+		private static void BuildShadowIndexHook(ActionC<TK2DDungeonAssembler, CellData, Dungeon, tk2dTileMap, int, int> orig, TK2DDungeonAssembler self, CellData current, Dungeon d, tk2dTileMap map, int ix, int iy)
 		{
 			if (d.tileIndices.tilesetId != (GlobalDungeonData.ValidTilesets)CustomValidTilesets.BEYOND && current.cellVisualData.roomVisualTypeIndex == 0)
 			{
@@ -1169,7 +1181,107 @@ namespace BotsMod
 			return orig(self, p);
 		}
 
-		public static void ApplyDamageDirectionalHook(Action<HealthHaver, float, Vector2, string, CoreDamageTypes, DamageCategory, bool, PixelCollider, bool> orig, HealthHaver self, float damage, Vector2 direction, string damageSource, CoreDamageTypes damageTypes, DamageCategory damageCategory = DamageCategory.Normal, bool ignoreInvulnerabilityFrames = false, PixelCollider hitPixelCollider = null, bool ignoreDamageCaps = false)
+		public delegate TResult FuncC<T, T2, T3, T4, T5, TResult>(T arg, T2 arg2, T3 arg3, T4 arg4, T5 arg5);
+		private static string GetBaseAnimationNameHook(FuncC<PlayerController, Vector2, float, bool, bool, string> orig, PlayerController self, Vector2 v, float gunAngle, bool invertThresholds = false, bool forceTwoHands = false)
+        {
+			if (self.characterIdentity == (PlayableCharacters)274131)
+            {
+
+            
+
+			
+
+				string text = string.Empty;
+				bool flag = self.CurrentGun != null;
+				if (flag && self.CurrentGun.Handedness == GunHandedness.NoHanded)
+				{
+					forceTwoHands = true;
+				}
+				if (GameManager.Instance.CurrentLevelOverrideState == GameManager.LevelOverrideState.END_TIMES)
+				{
+					flag = false;
+				}
+				float num = 155f;
+				float num2 = 25f;
+				if (invertThresholds)
+				{
+					num = -155f;
+					num2 -= 50f;
+				}
+				float num3 = 120f;
+				float num4 = 60f;
+				float num5 = -60f;
+				float num6 = -120f;
+				bool flag2 = gunAngle <= num && gunAngle >= num2;
+				if (invertThresholds)
+				{
+					flag2 = (gunAngle <= num || gunAngle >= num2);
+				}
+
+				var renderBodyHand = !self.ForceHandless && self.CurrentSecondaryGun == null && (self.CurrentGun == null || self.CurrentGun.Handedness != GunHandedness.TwoHanded);
+
+
+
+				if (!self.IsGhost && self.IsFlying && !self.IsPetting && (v == Vector2.zero || self.IsStationary))
+				{
+					if (flag2)
+					{
+						if (gunAngle < num3 && gunAngle >= num4)
+						{
+							string text2 = ((!forceTwoHands && flag) || self.ForceHandless) ? ((!renderBodyHand) ? "idle_backward" : "idle_backward_hand") : "idle_backward_twohands";
+							text = text2;
+						}
+						else
+						{
+							string text3 = ((!forceTwoHands && flag) || self.ForceHandless) ? "idle_bw" : "idle_bw_twohands";
+							text = text3;
+						}
+					}
+					else if (gunAngle <= num5 && gunAngle >= num6)
+					{
+						string text4 = ((!forceTwoHands && flag) || self.ForceHandless) ? ((!renderBodyHand) ? "idle_forward" : "idle_forward_hand") : "idle_forward_twohands";
+						text = text4;
+					}
+					else
+					{
+						string text5 = ((!forceTwoHands && flag) || self.ForceHandless) ? ((!renderBodyHand) ? "idle" : "idle_hand") : "idle_twohands";
+						text = text5;
+					}
+				}
+				else if (flag2 && !self.IsGhost && self.IsFlying)
+				{
+					string text6 = ((!forceTwoHands && flag) || self.ForceHandless) ? "run_right_bw" : "run_right_bw_twohands";
+					if (gunAngle < num3 && gunAngle >= num4)
+					{
+						text6 = (((!forceTwoHands && flag) || self.ForceHandless) ? ((!renderBodyHand) ? "run_up" : "run_up_hand") : "run_up_twohands");
+					}
+					text = text6;
+				}
+				else if (!self.IsGhost && self.IsFlying)
+				{
+					string text7 = "run_right";
+					if (gunAngle <= num5 && gunAngle >= num6)
+					{
+						text7 = "run_down";
+					}
+					if ((forceTwoHands || !flag) && !self.ForceHandless)
+					{
+						text7 += "_twohands";
+					}
+					else if (renderBodyHand)
+					{
+						text7 += "_hand";
+					}
+					text = text7;
+				}
+
+				return string.IsNullOrEmpty(text) ? orig(self, v, gunAngle, invertThresholds, forceTwoHands) : text;
+			}
+			return orig(self, v, gunAngle, invertThresholds, forceTwoHands);
+		}
+		
+
+		public static void ApplyDamageDirectionalHook(ActionC<HealthHaver, float, Vector2, string, CoreDamageTypes, DamageCategory, bool, PixelCollider, bool> orig, HealthHaver self, float damage, Vector2 direction, string damageSource, CoreDamageTypes damageTypes, DamageCategory damageCategory = DamageCategory.Normal, bool ignoreInvulnerabilityFrames = false, PixelCollider hitPixelCollider = null, bool ignoreDamageCaps = false)
 		{
 
 			FieldInfo isPlayerCharacter = typeof(HealthHaver).GetField("isPlayerCharacter", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -1989,7 +2101,7 @@ namespace BotsMod
         #endregion
 
 
-        public delegate void Action<T, T2, T3, T4, T5, T6, T7, T8, T9>(T arg, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9);
+        public delegate void ActionC<T, T2, T3, T4, T5, T6, T7, T8, T9>(T arg, T2 arg2, T3 arg3, T4 arg4, T5 arg5, T6 arg6, T7 arg7, T8 arg8, T9 arg9);
         #region old shop hooks
         public static void DoSetupHook(Action<BaseShopController> orig, BaseShopController self)
 		{
@@ -2418,8 +2530,9 @@ namespace BotsMod
 
 		private static void DoNotificationInternalHook(Action<UINotificationController, NotificationParams> orig, UINotificationController self, NotificationParams notifyParams)
 		{
-			
-			if ((!string.IsNullOrEmpty(notifyParams.EncounterGuid) && Tools.BeyondItems.Contains(EncounterDatabase.GetEntry(notifyParams.EncounterGuid).pickupObjectId) &&  GameStatsManager.Instance.QueryEncounterable(notifyParams.EncounterGuid) != 1))
+			//SpellPickupObject
+			if ((!string.IsNullOrEmpty(notifyParams.EncounterGuid) && ((Tools.BeyondItems.Contains(EncounterDatabase.GetEntry(notifyParams.EncounterGuid).pickupObjectId) && GameStatsManager.Instance.QueryEncounterable(notifyParams.EncounterGuid) != 1)) ||
+				EncounterDatabase.GetEntry(notifyParams.EncounterGuid) != null && PickupObjectDatabase.GetById(EncounterDatabase.GetEntry(notifyParams.EncounterGuid).pickupObjectId) is SpellPickupObject))
             {
 				FieldInfo _queuedNotifications = typeof(UINotificationController).GetField("m_queuedNotifications", BindingFlags.NonPublic | BindingFlags.Instance);
 				FieldInfo _queuedNotificationParams = typeof(UINotificationController).GetField("m_queuedNotificationParams", BindingFlags.NonPublic | BindingFlags.Instance);

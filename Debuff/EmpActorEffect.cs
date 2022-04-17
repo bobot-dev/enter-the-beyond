@@ -52,10 +52,17 @@ namespace BotsMod
 
 				if (this.DamageMultiplier != 1f)
 				{
-
-					actor.healthHaver.AllDamageMultiplier *= DamageMultiplier;
-					
+					if (actor.healthHaver.IsBoss && bossDamageMultiplier != 1f)
+                    {
+						actor.healthHaver.AllDamageMultiplier *= bossDamageMultiplier;
+					}
+					else
+                    {
+						actor.healthHaver.AllDamageMultiplier *= DamageMultiplier;
+					}
+								
 				}
+
 			}
 		}
 
@@ -132,6 +139,8 @@ namespace BotsMod
 		public float CooldownMultiplier;
 		public float initalAmount;
 		public float DamageMultiplier;
+		public float bossDamageMultiplier;
+
 
 		private float m_particleTimer;
 	}

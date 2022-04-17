@@ -49,7 +49,11 @@ namespace BotsMod
         }
         protected override void OnDestroy()
         {
-            FracturedRounds.DecrementFlag(GameManager.Instance.PrimaryPlayer, typeof(FracturedRounds));
+            if (GameManager.Instance.PrimaryPlayer != null)
+            {
+                FracturedRounds.DecrementFlag(GameManager.Instance.PrimaryPlayer, typeof(FracturedRounds));
+            }
+                
             base.OnDestroy();
         }
 

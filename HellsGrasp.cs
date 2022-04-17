@@ -47,6 +47,8 @@ namespace BotsMod
             var forgeDungeon = DungeonDatabase.GetOrLoadByName("Base_Forge");
             hellDrag = forgeDungeon.PatternSettings.flows[0].AllNodes.Where(node => node.overrideExactRoom != null && node.overrideExactRoom.name.Contains("EndTimes")).First().overrideExactRoom.placedObjects
             .Where(ppod => ppod != null && ppod.nonenemyBehaviour != null).First().nonenemyBehaviour.gameObject.GetComponentsInChildren<HellDragZoneController>()[0];
+
+            forgeDungeon = null;
         }
 
 

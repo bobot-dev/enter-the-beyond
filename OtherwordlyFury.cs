@@ -108,7 +108,7 @@ namespace BotsMod
 
 			material.SetTexture("_MainTex", item.sprite.renderer.material.mainTexture);
 			material.SetColor("_EmissiveColor", new Color32(255, 69, 245, 255));
-			material.SetFloat("_EmissiveColorPower", 1.25f);
+			material.SetFloat("_EmissiveColorPower", 0.75f);
 			material.SetFloat("_EmissivePower", 35);
 			item.sprite.renderer.material = material;
 
@@ -144,12 +144,15 @@ namespace BotsMod
 
         protected override void OnDestroy()
         {
-			foreach (var obj in orbitals)
-			{
-				UnityEngine.Object.DestroyImmediate(obj);
+			if (orbitals != null)
+            {
+				foreach (var obj in orbitals)
+				{
+					UnityEngine.Object.DestroyImmediate(obj);
+				}
+				orbitals.Clear();
 			}
-			orbitals.Clear();
-			this.LastOwner.OnNewFloorLoaded -= FloorLoaded;
+			if (this.LastOwner != null) this.LastOwner.OnNewFloorLoaded -= FloorLoaded;
 			base.OnDestroy();
         }
 

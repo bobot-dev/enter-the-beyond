@@ -347,7 +347,7 @@ namespace NpcApi
                 //shopObj.
 
                 /*if (isBreachShop)
-                {
+                
                     shopObj.gameObject.AddComponent<BreachShopComp>().offset = breachPos;
                     BreachShopTools.registeredShops.Add(prefix + ":" + name, shopObj.gameObject);
 
@@ -366,7 +366,7 @@ namespace NpcApi
 
 
                     shopObj.ExampleBlueprintPrefab = shared_auto_001.LoadAsset<GameObject>("NPC_Beetle_Merchant_Foyer").GetComponent<BaseShopController>().ExampleBlueprintPrefab;
-                }*/
+                */
 
                 npcObj.transform.parent = shopObj.gameObject.transform;
                 npcObj.transform.position = new Vector3(1.9375f, 3.4375f, 5.9375f);

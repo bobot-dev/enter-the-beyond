@@ -495,85 +495,15 @@ namespace CustomCharacters
                         }
                         //ETGModConsole.Log(sprite.name);
                     }
-                    /*
-                    orig.spriteDefinitions[appearAnimIds[0]].position0 = new Vector3(-0.3f, 0, 0);
-                    orig.spriteDefinitions[appearAnimIds[0]].position1 = new Vector3(0.3f, 0, 0);
-                    orig.spriteDefinitions[appearAnimIds[0]].position2 = new Vector3(-0.3f, 2.4f, 0);
-                    orig.spriteDefinitions[appearAnimIds[0]].position3 = new Vector3(0.3f, 2.4f, 0);
 
-                    orig.spriteDefinitions[appearAnimIds[1]].position0 = new Vector3(-0.9f, 0.1f, 0);
-                    orig.spriteDefinitions[appearAnimIds[1]].position1 = new Vector3(0.8f, 0.1f, 0);
-                    orig.spriteDefinitions[appearAnimIds[1]].position2 = new Vector3(-0.9f, 2.4f, 0);
-                    orig.spriteDefinitions[appearAnimIds[1]].position3 = new Vector3(0.8f, 2.4f, 0);
+                    ETGModConsole.Log($"anchors done");
 
-                    orig.spriteDefinitions[appearAnimIds[2]].position0 = new Vector3(-1.2f, 0.1f, 0);
-                    orig.spriteDefinitions[appearAnimIds[2]].position1 = new Vector3(1.2f, 0.1f, 0);
-                    orig.spriteDefinitions[appearAnimIds[2]].position2 = new Vector3(-1.2f, 2.5f, 0);
-                    orig.spriteDefinitions[appearAnimIds[2]].position3 = new Vector3(1.2f, 2.5f, 0);
-
-                    orig.spriteDefinitions[appearAnimIds[3]].position0 = new Vector3(-0.9f, 0.2f, 0);
-                    orig.spriteDefinitions[appearAnimIds[3]].position1 = new Vector3(0.8f, 0.2f, 0);
-                    orig.spriteDefinitions[appearAnimIds[3]].position2 = new Vector3(-0.9f, 2.6f, 0);
-                    orig.spriteDefinitions[appearAnimIds[3]].position3 = new Vector3(0.8f, 2.6f, 0);
-
-                    orig.spriteDefinitions[appearAnimIds[4]].position0 = new Vector3(-0.3f, 0.3f, 0);
-                    orig.spriteDefinitions[appearAnimIds[4]].position1 = new Vector3(0.3f, 0.3f, 0);
-                    orig.spriteDefinitions[appearAnimIds[4]].position2 = new Vector3(-0.3f, 2.6f, 0);
-                    orig.spriteDefinitions[appearAnimIds[4]].position3 = new Vector3(0.3f, 2.6f, 0);
-
-                    orig.spriteDefinitions[appearAnimIds[5]].position0 = new Vector3(-0.9f, 0.3f, 0);
-                    orig.spriteDefinitions[appearAnimIds[5]].position1 = new Vector3(0.8f, 0.3f, 0);
-                    orig.spriteDefinitions[appearAnimIds[5]].position2 = new Vector3(-0.9f, 2.6f, 0);
-                    orig.spriteDefinitions[appearAnimIds[5]].position3 = new Vector3(0.8f, 2.6f, 0);
-
-                    orig.spriteDefinitions[appearAnimIds[6]].position0 = new Vector3(-1.2f, 0.3f, 0);
-                    orig.spriteDefinitions[appearAnimIds[6]].position1 = new Vector3(1.2f, 0.3f, 0);
-                    orig.spriteDefinitions[appearAnimIds[6]].position2 = new Vector3(-1.2f, 2.6f, 0);
-                    orig.spriteDefinitions[appearAnimIds[6]].position3 = new Vector3(1.2f, 2.6f, 0);
-
-                    orig.spriteDefinitions[appearAnimIds[7]].position0 = new Vector3(-0.9f, 0.2f, 0);
-                    orig.spriteDefinitions[appearAnimIds[7]].position1 = new Vector3(0.8f, 0.2f, 0);
-                    orig.spriteDefinitions[appearAnimIds[7]].position2 = new Vector3(-0.9f, 2.6f, 0);
-                    orig.spriteDefinitions[appearAnimIds[7]].position3 = new Vector3(0.8f, 2.6f, 0);
-
-                    orig.spriteDefinitions[appearAnimIds[8]].position0 = new Vector3(-0.3f, 0.2f, 0);
-                    orig.spriteDefinitions[appearAnimIds[8]].position1 = new Vector3(0.3f, 0.2f, 0);
-                    orig.spriteDefinitions[appearAnimIds[8]].position2 = new Vector3(-0.3f, 2.6f, 0);
-                    orig.spriteDefinitions[appearAnimIds[8]].position3 = new Vector3(0.3f, 2.6f, 0);
-
-                    orig.spriteDefinitions[appearAnimIds[9]].position0 = new Vector3(-0.9f, 0.1f, 0);
-                    orig.spriteDefinitions[appearAnimIds[9]].position1 = new Vector3(0.8f, 0.1f, 0);
-                    orig.spriteDefinitions[appearAnimIds[9]].position2 = new Vector3(-0.9f, 2.5f, 0);
-                    orig.spriteDefinitions[appearAnimIds[9]].position3 = new Vector3(0.8f, 2.5f, 0);
-
-                    orig.spriteDefinitions[appearAnimIds[10]].position0 = new Vector3(-1.2f, 0.1f, 0);
-                    orig.spriteDefinitions[appearAnimIds[10]].position1 = new Vector3(1.2f, 0.1f, 0);
-                    orig.spriteDefinitions[appearAnimIds[10]].position2 = new Vector3(-1.2f, 2.4f, 0);
-                    orig.spriteDefinitions[appearAnimIds[10]].position3 = new Vector3(1.2f, 2.4f, 0);
-                    
-                    for(int i = 11; i < appearAnimIds.Count; i++)
-                    {
-                        orig.spriteDefinitions[appearAnimIds[i]].position0 = new Vector3(-1.2f, 0.1f, 0);
-                        orig.spriteDefinitions[appearAnimIds[i]].position1 = new Vector3(1.2f, 0.1f, 0);
-                        orig.spriteDefinitions[appearAnimIds[i]].position2 = new Vector3(-1.2f, 2.4f, 0);
-                        orig.spriteDefinitions[appearAnimIds[i]].position3 = new Vector3(1.2f, 2.4f, 0);
-                    }
-
-                    for (int i = 5; i < idleAnimIds.Count; i++)
-                    {
-                        orig.spriteDefinitions[idleAnimIds[i]].position0 = new Vector3(-1.2f, 0.1f, 0);
-                        orig.spriteDefinitions[idleAnimIds[i]].position1 = new Vector3(1.2f, 0.1f, 0);
-                        orig.spriteDefinitions[idleAnimIds[i]].position2 = new Vector3(-1.2f, 2.4f, 0);
-                        orig.spriteDefinitions[idleAnimIds[i]].position3 = new Vector3(1.2f, 2.4f, 0);
-                    }
-
-                    var mat = new Material(orig.spriteDefinitions[0].material);*/
                     for (int i = 0; i < appearAnimIds.Count; i++)
                     {
-                        orig.spriteDefinitions[appearAnimIds[i]].position0 = orig.spriteDefinitions[toCopyAppearAnimIds[i]] == null ? orig.spriteDefinitions[toCopyAppearAnimIds[10]].position0 : orig.spriteDefinitions[toCopyAppearAnimIds[i]].position0;
-                        orig.spriteDefinitions[appearAnimIds[i]].position1 = orig.spriteDefinitions[toCopyAppearAnimIds[i]] == null ? orig.spriteDefinitions[toCopyAppearAnimIds[10]].position1 : orig.spriteDefinitions[toCopyAppearAnimIds[i]].position1;
-                        orig.spriteDefinitions[appearAnimIds[i]].position2 = orig.spriteDefinitions[toCopyAppearAnimIds[i]] == null ? orig.spriteDefinitions[toCopyAppearAnimIds[10]].position2 : orig.spriteDefinitions[toCopyAppearAnimIds[i]].position2;
-                        orig.spriteDefinitions[appearAnimIds[i]].position3 = orig.spriteDefinitions[toCopyAppearAnimIds[i]] == null ? orig.spriteDefinitions[toCopyAppearAnimIds[10]].position3 : orig.spriteDefinitions[toCopyAppearAnimIds[i]].position3;
+                        orig.spriteDefinitions[appearAnimIds[i]].position0 = i >= toCopyAppearAnimIds.Count || orig.spriteDefinitions[toCopyAppearAnimIds[i]] == null ? orig.spriteDefinitions[toCopyAppearAnimIds[9]].position0 : orig.spriteDefinitions[toCopyAppearAnimIds[i]].position0;
+                        orig.spriteDefinitions[appearAnimIds[i]].position1 = i >= toCopyAppearAnimIds.Count || orig.spriteDefinitions[toCopyAppearAnimIds[i]] == null ? orig.spriteDefinitions[toCopyAppearAnimIds[9]].position1 : orig.spriteDefinitions[toCopyAppearAnimIds[i]].position1;
+                        orig.spriteDefinitions[appearAnimIds[i]].position2 = i >= toCopyAppearAnimIds.Count || orig.spriteDefinitions[toCopyAppearAnimIds[i]] == null ? orig.spriteDefinitions[toCopyAppearAnimIds[9]].position2 : orig.spriteDefinitions[toCopyAppearAnimIds[i]].position2;
+                        orig.spriteDefinitions[appearAnimIds[i]].position3 = i >= toCopyAppearAnimIds.Count || orig.spriteDefinitions[toCopyAppearAnimIds[i]] == null ? orig.spriteDefinitions[toCopyAppearAnimIds[9]].position3 : orig.spriteDefinitions[toCopyAppearAnimIds[i]].position3;
 
                         /*
                         var safeForLaterName = orig.spriteDefinitions[appearAnimIds[i]].name;
@@ -595,13 +525,15 @@ namespace CustomCharacters
                         orig.spriteDefinitions[appearAnimIds[i]] = def;*/
                     }
 
+                    ETGModConsole.Log($"appearAnimIds position0-3 done");
+
                     for (int i = 0; i < idleAnimIds.Count; i++)
                     {
 
-                        orig.spriteDefinitions[idleAnimIds[i]].position0 = orig.spriteDefinitions[toCopyIdleAnimIds[i]] == null ? orig.spriteDefinitions[toCopyIdleAnimIds[10]].position0 : orig.spriteDefinitions[toCopyIdleAnimIds[i]].position0;
-                        orig.spriteDefinitions[idleAnimIds[i]].position1 = orig.spriteDefinitions[toCopyIdleAnimIds[i]] == null ? orig.spriteDefinitions[toCopyIdleAnimIds[10]].position1 : orig.spriteDefinitions[toCopyIdleAnimIds[i]].position1;
-                        orig.spriteDefinitions[idleAnimIds[i]].position2 = orig.spriteDefinitions[toCopyIdleAnimIds[i]] == null ? orig.spriteDefinitions[toCopyIdleAnimIds[10]].position2 : orig.spriteDefinitions[toCopyIdleAnimIds[i]].position2;
-                        orig.spriteDefinitions[idleAnimIds[i]].position3 = orig.spriteDefinitions[toCopyIdleAnimIds[i]] == null ? orig.spriteDefinitions[toCopyIdleAnimIds[10]].position3 : orig.spriteDefinitions[toCopyIdleAnimIds[i]].position3;
+                        orig.spriteDefinitions[idleAnimIds[i]].position0 = i >= toCopyIdleAnimIds.Count || orig.spriteDefinitions[toCopyIdleAnimIds[i]] == null ? orig.spriteDefinitions[toCopyIdleAnimIds[3]].position0 : orig.spriteDefinitions[toCopyIdleAnimIds[i]].position0;
+                        orig.spriteDefinitions[idleAnimIds[i]].position1 = i >= toCopyIdleAnimIds.Count || orig.spriteDefinitions[toCopyIdleAnimIds[i]] == null ? orig.spriteDefinitions[toCopyIdleAnimIds[3]].position1 : orig.spriteDefinitions[toCopyIdleAnimIds[i]].position1;
+                        orig.spriteDefinitions[idleAnimIds[i]].position2 = i >= toCopyIdleAnimIds.Count || orig.spriteDefinitions[toCopyIdleAnimIds[i]] == null ? orig.spriteDefinitions[toCopyIdleAnimIds[3]].position2 : orig.spriteDefinitions[toCopyIdleAnimIds[i]].position2;
+                        orig.spriteDefinitions[idleAnimIds[i]].position3 = i >= toCopyIdleAnimIds.Count || orig.spriteDefinitions[toCopyIdleAnimIds[i]] == null ? orig.spriteDefinitions[toCopyIdleAnimIds[3]].position3 : orig.spriteDefinitions[toCopyIdleAnimIds[i]].position3;
 
                         /*
                         var safeForLaterName = orig.spriteDefinitions[idleAnimIds[i]].name;
@@ -622,7 +554,7 @@ namespace CustomCharacters
 
                         orig.spriteDefinitions[idleAnimIds[i]] = def;*/
                     }
-
+                    ETGModConsole.Log($"idleAnimIds position0-3 done");
 
                     foreach (var def in orig.spriteDefinitions)
                     {
@@ -636,16 +568,17 @@ namespace CustomCharacters
 
                     SpriteBuilder.AddAnimation(facecard.spriteAnimator, orig, idleAnimIds, idleAnimName, tk2dSpriteAnimationClip.WrapMode.Loop, 4);
                     var name = SpriteBuilder.AddAnimation(facecard.spriteAnimator, orig, appearAnimIds, appearAnimName, tk2dSpriteAnimationClip.WrapMode.Once, 17);
-
+                    ETGModConsole.Log($"anims added");
                     facecard.spriteAnimator.DefaultClipId = facecard.spriteAnimator.Library.GetClipIdByName(appearAnimName);
 
                     foreach(var anim in facecard.spriteAnimator.Library.clips)
                     {
                         //ETGModConsole.Log($"{anim.name}: {anim.frames.Length}");
                     }
-
+                    
                     facecard.appearAnimation = appearAnimName;
                     facecard.coreIdleAnimation = idleAnimName;
+                    ETGModConsole.Log($"foyer card done");
                 }
 
                     //selectCharacter.CreateOverheadElement();
@@ -656,98 +589,6 @@ namespace CustomCharacters
             {
                 ETGModConsole.Log("overhead thing broke: " + e);
             }
-            /*
-            if (nameLabel.Text == "The Lost")
-            {
-                if (GameStatsManager.Instance.GetCharacterSpecificFlag(data.identity, CharacterSpecificGungeonFlags.KILLED_PAST))
-                {
-                    pastKilledLabel.Text = "(Past Killed)";
-                } 
-                else
-                {
-                    pastKilledLabel.Text = "(Past (Not) Killed)";
-                }
-                
-                try
-                {
-                    Tools.ReplaceSpriteInAtlas("lost_sidearm_charselect_001", ResourceExtractor.GetTextureFromResource("BotsMod/sprites/UI/lost_sidearm_charselect.png"), infoPanel.itemsPanel.Atlas.Texture, infoPanel.itemsPanel.Atlas.Items[0].region, infoPanel.itemsPanel.Atlas);
-                    Tools.ReplaceSpriteInAtlas("lost_cloak_charselect_001", ResourceExtractor.GetTextureFromResource("BotsMod/sprites/UI/lost_cloak_charselect.png"), infoPanel.itemsPanel.Atlas.Texture, infoPanel.itemsPanel.Atlas.Items[1].region, infoPanel.itemsPanel.Atlas);
-                    Tools.ReplaceSpriteInAtlas("heart_full_purple_001", ResourceExtractor.GetTextureFromResource("BotsMod/sprites/UI/heart_full_purple_001.png"), infoPanel.itemsPanel.Atlas.Texture, infoPanel.itemsPanel.Atlas.Items[2].region, infoPanel.itemsPanel.Atlas);
-                    //Tools.ReplaceSpriteInAtlas("Sack", ResourceExtractor.GetTextureFromResource("FrostAndGunfireItems/Resources/char_select/sack_select.png"), infoPanel.itemsPanel.Atlas.Texture, infoPanel.itemsPanel.Atlas.Items[3].region, infoPanel.itemsPanel.Atlas);
-                    var stupidlist = new List<dfSprite>();
-                    for (int i = 0; i < infoPanel.itemsPanel.Controls.Count; i++)
-                    {
-                        stupidlist.Add(infoPanel.itemsPanel.Controls[i] as dfSprite);
-                    }
-                    stupidlist[2].SpriteName = "lost_sidearm_charselect_001";
-                    stupidlist[2].Size = new Vector2(69, 39);
-
-                    stupidlist[1].SpriteName = "lost_cloak_charselect_001";
-                    stupidlist[1].Size = new Vector2(48, 63);
-
-                    stupidlist[0].SpriteName = "heart_full_purple_001";
-                    stupidlist[0].Size = new Vector2(78, 21);
-
-                    //stupidlist[3].SpriteName = "Sack";
-                    //stupidlist[3].Size = new Vector2(51, 48);
-                }
-                catch (Exception e)
-                {
-                    BotsMod.BotsModule.Log("stupid stupid Atlas: " + e, BotsMod.BotsModule.LOCKED_CHARACTOR_COLOR);
-                }
-
-            }
-            */
-
-            //Swap out face sprites
- 
-
-                /*
-                var copyCollection = GameObject.Instantiate(orig);
-
-                tk2dSpriteDefinition[] copyDefinitions = new tk2dSpriteDefinition[orig.spriteDefinitions.Length];
-                for (int i = 0; i < copyCollection.spriteDefinitions.Length; i++)
-                {
-                    copyDefinitions[i] = orig.spriteDefinitions[i].Copy();
-                }
-                copyCollection.spriteDefinitions = copyDefinitions;
-
-                for (int i = 0; i < data.foyerCardSprites.Count; i++)
-                {
-                    var tex = data.foyerCardSprites[i];
-                    var def = copyCollection.GetSpriteDefinition(tex.name);
-
-					if (def != null) {
-						def.ReplaceTexture(tex);
-						Console.WriteLine($"REPLACED {def.name} {def.material.mainTexture.width} {def.material.mainTexture.height}");
-					}
-                }
-                facecard.sprite.Collection = copyCollection;
-
-                facecard.spriteAnimator.Library = GameObject.Instantiate(facecard.spriteAnimator.Library);
-                GameObject.DontDestroyOnLoad(facecard.spriteAnimator.Library);
-                foreach (var clip in facecard.spriteAnimator.Library.clips)
-                {
-                    for (int i = 0; i < clip.frames.Length; i++)
-                    {
-                        clip.frames[i].spriteCollection = copyCollection;
-                    }
-                }
-
-				Console.WriteLine($"FOYERCARDDBG");
-				for (int i = 0; i < copyCollection.spriteDefinitions.Length; i++)
-				{
-					var def = copyCollection.spriteDefinitions[i];
-					Console.WriteLine(def.name);
-					if (!def.name.Contains("facecard")) continue;
-                    Console.WriteLine("FACECARD");
-					Console.WriteLine($"{def.material.mainTexture.width} {def.material.mainTexture.height} {def.uvs[0].x},{def.uvs[0].y} {def.uvs[1].x},{def.uvs[1].y} {def.uvs[2].x},{def.uvs[2].y} {def.uvs[3].x},{def.uvs[3].y} ");
-
-
-				}*/
-
-            
-            //selectCharacter.OverheadElement.SetActive(false);
         }
 
         private static void OnPlayerCharacterChanged(PlayerController player, FoyerCharacterSelectFlag selectCharacter, string characterPath)

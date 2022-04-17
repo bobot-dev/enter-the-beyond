@@ -67,17 +67,13 @@ namespace GungeonAPI
             return -1;
         }
 
-        public static Dungeon GetDungeonPrefab(string floor)
-        {
-            return DungeonDatabase.GetOrLoadByName(floor);
-        }
 
         public static Dungeon GetDungeonPrefab(int floor)
         { return DungeonDatabase.GetOrLoadByName(dungeonPrefabNames[floor]); }
 
         public static List<PrototypeDungeonRoom> GetRoomsFromRoomTables(string floor)
         {
-            var dungeon = GetDungeonPrefab(floor);
+            var dungeon = DungeonDatabase.GetOrLoadByName(floor);
             var rooms = new List<PrototypeDungeonRoom>();
             for (int i = 0; i < dungeon.PatternSettings.flows.Count; i++)
             {
@@ -142,7 +138,7 @@ namespace GungeonAPI
 
         public static List<DungeonFlowNode> GetAllFlowNodes(string floor)
         {
-            var dungeon = GetDungeonPrefab(floor);
+            var dungeon = DungeonDatabase.GetOrLoadByName(floor);
             var nodes = dungeon.PatternSettings.flows[0].AllNodes;
             for (int i = 1; i < dungeon.PatternSettings.flows.Count; i++)
             {

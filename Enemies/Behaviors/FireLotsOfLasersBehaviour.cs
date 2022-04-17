@@ -21,10 +21,10 @@ public class FireLotsOfLasersBehaviour : BasicAttackBehavior
 				this.m_laserBeam = null;
 			}
 		};
-		FuckYouEdmund = FakePrefab.Clone((GameObject)BraveResources.Load("Global VFX/VFX_LaserSight", ".prefab")); 
+		//FuckYouEdmund = FakePrefab.Clone((GameObject)BraveResources.Load("Global VFX/VFX_LaserSight", ".prefab")); 
 	}
 
-	GameObject FuckYouEdmund;
+	//GameObject FuckYouEdmund;
 
 	private bool ShowSpecificBeamShooter()
 	{
@@ -139,7 +139,7 @@ public class FireLotsOfLasersBehaviour : BasicAttackBehavior
 		}
 		else if (this.beamSelection == ShootBeamBehavior.BeamSelection.Specify)
 		{
-			this.m_currentBeamShooters.Add(this.specificBeamShooter);
+			this.m_currentBeamShooters2 = specificBeamShooters;
 		}
 
 		if (!string.IsNullOrEmpty(this.ChargeAnimation))
@@ -207,27 +207,37 @@ public class FireLotsOfLasersBehaviour : BasicAttackBehavior
 						}
 
 
-						var gameObject = SpawnManager.SpawnVFX(FuckYouEdmund, false);
+						GameObject gameObject = SpawnManager.SpawnVFX(BeyondPrefabs.laserSight, false);
+						tk2dTiledSprite component2 = gameObject.GetComponent<tk2dTiledSprite>();
+						component2.transform.position = new Vector3(pos.x, pos.y, pos.y);
+						component2.transform.localRotation = Quaternion.Euler(0f, 0f, this.LaserAngle + (j * 60));
+						component2.dimensions = new Vector2(1000f, 1f);
+						component2.UpdateZDepth();
+						component2.HeightOffGround = -2f;
+						
+						component2.usesOverrideMaterial = true;
+						component2.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
+						component2.sprite.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_ON");
 
-						var component = gameObject.GetComponent<tk2dTiledSprite>();
-
-						component.usesOverrideMaterial = true;
-						component.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTintableTiltedCutoutEmissive");
-						component.sprite.renderer.material.EnableKeyword("BRIGHTNESS_CLAMP_ON");
-
-						component.renderer.material.SetFloat("_EmissivePower", 150);
-						component.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
+						component2.renderer.material.SetFloat("_EmissivePower", 150);
+						component2.renderer.material.SetFloat("_EmissiveColorPower", 1.55f);
 						//Color laser = new Color(92f, 9f, 140f, 1);
 						Color laser = new Color(2f, 0f, 1.94f, 1);
 
-						component.renderer.material.SetColor("_OverrideColor", laser);
-						component.renderer.material.SetColor("_EmissiveColor", laser);
+						component2.renderer.material.SetColor("_OverrideColor", laser);
+						component2.renderer.material.SetColor("_EmissiveColor", laser);
 
+						/*var gameObject = SpawnManager.SpawnVFX(FuckYouEdmund, false);
+
+						var component = gameObject.GetComponent<tk2dTiledSprite>();
+
+
+						
 
 						component.transform.position = new Vector3(pos.x, pos.y, pos.y);// + (Vector3)BraveMathCollege.DegreesToVector(this.LaserAngle + (j * 60), 2f);
 						component.transform.localRotation = Quaternion.Euler(0f, 0f, this.LaserAngle + (j * 60));
 						component.dimensions = new Vector2((num3 - 3f) * 16f, 5f);
-
+						*/
 
 						/*GameObject gameObject = SpawnManager.SpawnVFX(tellThing, false);
 
@@ -324,7 +334,6 @@ public class FireLotsOfLasersBehaviour : BasicAttackBehavior
 		}
 		return ContinuousBehaviorResult.Continue;
 	}
-
 	public override void EndContinuousUpdate()
 	{
 		base.EndContinuousUpdate();
@@ -582,12 +591,14 @@ public class FireLotsOfLasersBehaviour : BasicAttackBehavior
 				}
 			}
 		}
+
+
 		if (!this.IsfiringLaser && beamCont != null)
 		{
 			beamCont.DestroyBeam();
 			beamCont = null;
 		}
-
+		
 
 		yield break;
 	}
@@ -638,6 +649,7 @@ public class FireLotsOfLasersBehaviour : BasicAttackBehavior
 
 	public ShootBeamBehavior.BeamSelection beamSelection;
 	public AIBeamShooter specificBeamShooter;
+	public List<AIBeamShooter2> specificBeamShooters;
 	private List<AIBeamShooter> m_allBeamShooters;
 	private readonly List<AIBeamShooter> m_currentBeamShooters = new List<AIBeamShooter>();
 	private List<AIBeamShooter2> m_currentBeamShooters2 = new List<AIBeamShooter2>();

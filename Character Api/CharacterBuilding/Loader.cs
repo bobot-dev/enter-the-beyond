@@ -23,6 +23,9 @@ namespace CustomCharacters
 
         public static List<CustomCharacterData> characterData = new List<CustomCharacterData>();
 
+
+        public static List<PlayableCharacters> myPlayableCharacters = new List<PlayableCharacters>();
+
         /*public static void Init()
         {
             try
@@ -258,6 +261,7 @@ namespace CustomCharacters
                 try
                 {
                     CharacterBuilder.BuildCharacter(data, hasAltSkin, paradoxUsesSprites, removeFoyerExtras, hasArmourlessAnimations, usesArmourNotHealth, hasCustomPast, customPast, metaCost, useGlow, glowVars, altGlowVars);
+                    myPlayableCharacters.Add((PlayableCharacters)data.identity);
                 }
                 catch (Exception e)
                 {
@@ -391,7 +395,6 @@ namespace CustomCharacters
                         data.punchoutSprites = new Dictionary<string, Texture2D>();
                         foreach (var tex in ToolsCharApi.GetTexturesFromResource(punchoutSpritesDir))
                         {
-                            ETGModConsole.Log(tex.name);
                             data.punchoutSprites.Add(tex.name, tex);
                         }
 

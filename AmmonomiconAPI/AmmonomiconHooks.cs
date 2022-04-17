@@ -10,6 +10,7 @@ using GungeonAPI;
 using BotsMod;
 using System.Collections;
 using ItemAPI;
+using CustomCharacters;
 
 namespace AmmonomiconAPI
 {
@@ -26,10 +27,10 @@ namespace AmmonomiconAPI
 
 				//BotsModule.Log("AH: startHook Setup", "#03fc0b");
 
-				var ammonomiconInitializeHook = new Hook(
+				/*var ammonomiconInitializeHook = new Hook(
 					typeof(AmmonomiconPageRenderer).GetMethod("Initialize", BindingFlags.Instance | BindingFlags.Public),
 					typeof(AmmonomiconHooks).GetMethod("AmmonomiconInitializeHook", BindingFlags.Static | BindingFlags.Public));
-
+				*/
 				//BotsModule.Log("AH: ammonomiconInitializeHook Setup", "#03fc0b");
 
 				var toggleHeaderImageHook = new Hook(
@@ -53,15 +54,24 @@ namespace AmmonomiconAPI
 					typeof(AmmonomiconController).GetMethod("LoadPageUIAtPath", BindingFlags.Instance | BindingFlags.NonPublic),
 					typeof(AmmonomiconHooks).GetMethod("LoadPageUIAtPathHook", BindingFlags.Static | BindingFlags.NonPublic));
 				//BotsModule.Log("AH: LoadPageUIAtPathHook Setup", "#03fc0b");
-				var UpdateEncounterStateHook = new Hook(
+				/*var UpdateEncounterStateHook = new Hook(
 					typeof(AmmonomiconPokedexEntry).GetMethod("UpdateEncounterState", BindingFlags.Instance | BindingFlags.Public),
 					typeof(AmmonomiconHooks).GetMethod("UpdateEncounterStateHook", BindingFlags.Static | BindingFlags.Public));
+				*/
+				var SetRightDataPageTextsHook = new Hook(
+					typeof(AmmonomiconPageRenderer).GetMethod("SetRightDataPageTexts", BindingFlags.Instance | BindingFlags.Public),
+					typeof(AmmonomiconHooks).GetMethod("SetRightDataPageTextsHook", BindingFlags.Static | BindingFlags.Public));
+
+				var DelayedBuildPageHook = new Hook(
+					typeof(AmmonomiconPageRenderer).GetMethod("DelayedBuildPage", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(AmmonomiconHooks).GetMethod("DelayedBuildPageHook", BindingFlags.Static | BindingFlags.NonPublic));
+
 				//BotsModule.Log("AH: UpdateEncounterStateHook Setup", "#03fc0b");
-				return;
+				/*return;
 				var SetEncounterStateHook = new Hook(
 					typeof(AmmonomiconPokedexEntry).GetMethod("SetEncounterState", BindingFlags.Instance | BindingFlags.Public),
 					typeof(AmmonomiconHooks).GetMethod("SetEncounterStateHook", BindingFlags.Static | BindingFlags.Public));
-				//BotsModule.Log("AH: SetEncounterStateHook Setup", "#03fc0b");
+				//BotsModule.Log("AH: SetEncounterStateHook Setup", "#03fc0b");*/
 			}
 			catch (Exception arg)
 			{
@@ -69,6 +79,125 @@ namespace AmmonomiconAPI
 				//LostItemsMod.Log(string.Format("D:", ), "#eb1313");
 			}
 		}
+
+
+		
+		public static void SetRightDataPageTextsHook(Action<AmmonomiconPageRenderer, tk2dBaseSprite, EncounterDatabaseEntry> orig, AmmonomiconPageRenderer self, tk2dBaseSprite sourceSprite, EncounterDatabaseEntry linkedTrackable)
+		{
+			JournalEntry journalData = linkedTrackable.journalData;
+			AmmonomiconPageRenderer ammonomiconPageRenderer = (!(AmmonomiconController.Instance.ImpendingRightPageRenderer != null)) ? AmmonomiconController.Instance.CurrentRightPageRenderer : AmmonomiconController.Instance.ImpendingRightPageRenderer;
+			dfScrollPanel component = ammonomiconPageRenderer.guiManager.transform.Find("Scroll Panel").GetComponent<dfScrollPanel>();
+			Transform transform = component.transform.Find("Header");
+			if (transform)
+			{
+				dfLabel component2 = transform.Find("Label").GetComponent<dfLabel>();
+				component2.Text = journalData.GetPrimaryDisplayName(false);
+				if (linkedTrackable.ForceEncounterState)
+				{
+					component2.Text = component2.ForceGetLocalizedValue("#AMMONOMICON_UNKNOWN");
+				}
+				component2.PerformLayout();
+				dfSprite component3 = transform.Find("Sprite").GetComponent<dfSprite>();
+				if (component3)
+				{
+					component3.FillDirection = dfFillDirection.Vertical;
+					component3.FillAmount = ((GameManager.Options.CurrentLanguage != StringTableManager.GungeonSupportedLanguages.ENGLISH) ? 0.8f : 1f);
+					component3.InvertFill = true;
+				}
+			}
+			dfLabel component4 = component.transform.Find("Tape Line One").Find("Label").GetComponent<dfLabel>();
+			component4.Text = journalData.GetNotificationPanelDescription();
+			component4.PerformLayout();
+			dfSlicedSprite componentInChildren = component.transform.Find("Tape Line One").GetComponentInChildren<dfSlicedSprite>();
+			componentInChildren.Width = component4.GetAutosizeWidth() / 4f + 12f;
+			dfLabel component5 = component.transform.Find("Tape Line Two").Find("Label").GetComponent<dfLabel>();
+			component5.Text = linkedTrackable.GetSecondTapeDescriptor();
+			component5.PerformLayout();
+			dfSlicedSprite componentInChildren2 = component.transform.Find("Tape Line Two").GetComponentInChildren<dfSlicedSprite>();
+			componentInChildren2.Width = component5.GetAutosizeWidth() / 4f + 12f;
+			dfPanel component6 = component.transform.Find("ThePhoto").Find("Photo").Find("tk2dSpriteHolder").GetComponent<dfPanel>();
+			dfSprite component7 = component.transform.Find("ThePhoto").Find("Photo").Find("ItemShadow").GetComponent<dfSprite>();
+			component7.IsVisible = !journalData.IsEnemy;
+			tk2dSprite tk2dSprite = component6.GetComponentInChildren<tk2dSprite>();
+			dfTextureSprite componentInChildren3 = component.transform.Find("ThePhoto").GetComponentInChildren<dfTextureSprite>();
+			if (linkedTrackable != null && BotsMod.Tools.BeyondItems.Contains(linkedTrackable.pickupObjectId))
+			{
+				component.transform.Find("ThePhoto").Find("Photo").gameObject.GetComponent<dfSprite>().SpriteName = "Item_Picture_Beyond_001";
+
+			}
+			else
+            {
+				component.transform.Find("ThePhoto").Find("Photo").gameObject.GetComponent<dfSprite>().SpriteName = "Item_Picture_Gungeon_002";
+
+			}
+
+
+			if (journalData.IsEnemy && journalData.enemyPortraitSprite != null)
+			{
+				if (tk2dSprite != null)
+				{
+					if (SpriteOutlineManager.HasOutline(tk2dSprite))
+					{
+						SpriteOutlineManager.RemoveOutlineFromSprite(tk2dSprite, true);
+					}
+					tk2dSprite.renderer.enabled = false;
+				}
+				componentInChildren3.IsVisible = true;
+				componentInChildren3.Texture = journalData.enemyPortraitSprite;
+			}
+			else
+			{
+				if (componentInChildren3 != null)
+				{
+					componentInChildren3.IsVisible = false;
+				}
+				if (tk2dSprite == null)
+				{
+					tk2dSprite = self.AddSpriteToPage(sourceSprite);
+					if (!journalData.IsEnemy)
+					{
+						tk2dSprite.scale *= 2f;
+					}
+					tk2dSprite.transform.parent = component6.transform;
+				}
+				else
+				{
+					tk2dSprite.renderer.enabled = true;
+					tk2dSprite.SetSprite(sourceSprite.Collection, sourceSprite.spriteId);
+				}
+				if (SpriteOutlineManager.HasOutline(tk2dSprite))
+				{
+					SpriteOutlineManager.RemoveOutlineFromSprite(tk2dSprite, true);
+				}
+				SpriteOutlineManager.AddScaledOutlineToSprite<tk2dSprite>(tk2dSprite, Color.black, 0.1f, 0.05f);
+				if (journalData.IsEnemy)
+				{
+					tk2dSprite.PlaceAtLocalPositionByAnchor(Vector3.zero, tk2dBaseSprite.Anchor.MiddleCenter);
+				}
+				else
+				{
+					tk2dSprite.PlaceAtLocalPositionByAnchor(Vector3.zero, tk2dBaseSprite.Anchor.LowerCenter);
+				}
+				if (Mathf.RoundToInt(sourceSprite.GetCurrentSpriteDef().GetBounds().size.x / 0.0625f) % 2 == 1)
+				{
+					tk2dSprite.transform.position = tk2dSprite.transform.position.WithX(tk2dSprite.transform.position.x - 0.03125f * tk2dSprite.scale.x);
+				}
+				tk2dSprite.usesOverrideMaterial = true;
+				tk2dSprite.renderer.material.shader = ShaderCache.Acquire("tk2d/CutoutVertexColorTilted");
+			}
+			dfLabel component8 = component.transform.Find("Scroll Panel").Find("Panel").Find("Label").GetComponent<dfLabel>();
+
+			typeof(AmmonomiconPageRenderer).GetMethod("CheckLanguageFonts", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { component8 });
+			component8.Text = linkedTrackable.GetModifiedLongDescription();
+			component8.transform.parent.GetComponent<dfPanel>().Height = component8.Height;
+			component8.PerformLayout();
+			component8.Update();
+			dfScrollPanel component9 = component.transform.Find("Scroll Panel").GetComponent<dfScrollPanel>();
+			component9.ScrollPosition = Vector2.zero;
+			component.PerformLayout();
+			component.Update();
+		}
+		
 
 		public static void SetEncounterStateHook(AmmonomiconPokedexEntry self, AmmonomiconPokedexEntry.EncounterState st)
 		{
@@ -123,11 +252,7 @@ namespace AmmonomiconAPI
 				if ((_extantPageMap.GetValue(self) as Dictionary<AmmonomiconPageRenderer.PageType, AmmonomiconPageRenderer>).ContainsKey(pageType))
 				{
 					ammonomiconPageRenderer = (_extantPageMap.GetValue(self) as Dictionary<AmmonomiconPageRenderer.PageType, AmmonomiconPageRenderer>)[pageType];
-					if (pageType == AmmonomiconPageRenderer.PageType.DEATH_LEFT || pageType == AmmonomiconPageRenderer.PageType.DEATH_RIGHT)
-					{
-						AmmonomiconDeathPageController component = ammonomiconPageRenderer.transform.parent.GetComponent<AmmonomiconDeathPageController>();
-						component.isVictoryPage = isVictory;
-					}
+					
 					//Tools.Log("fff", "#eb1313");
 					ammonomiconPageRenderer.EnableRendering();
 					ammonomiconPageRenderer.DoRefreshData();
@@ -145,11 +270,6 @@ namespace AmmonomiconAPI
 					gameObject2.layer = LayerMask.NameToLayer("SecondaryGUI");
 					MeshRenderer component3 = gameObject2.GetComponent<MeshRenderer>();
 					//Tools.Log("2", "#eb1313");
-					if (isVictory)
-					{
-						AmmonomiconDeathPageController component4 = ammonomiconPageRenderer.transform.parent.GetComponent<AmmonomiconDeathPageController>();
-						component4.isVictoryPage = true;
-					}
 					ammonomiconPageRenderer.Initialize(component3);
 					ammonomiconPageRenderer.EnableRendering();
 					//Tools.Log("3", "#eb1313");
@@ -208,7 +328,7 @@ namespace AmmonomiconAPI
 						typeof(AmmonomiconPageRenderer).GetMethod("SetFirstVisibleTexts", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null);
 						break;
 					case (AmmonomiconPageRenderer.PageType)CustomEnums.CustomPageType.MODS_RIGHT:
-						typeof(AmmonomiconPageRenderer).GetMethod("SetPageDataUnknown", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null);
+						typeof(AmmonomiconPageRenderer).GetMethod("SetFirstVisibleTexts", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null);
 						break;
 				}
 			}
@@ -303,74 +423,31 @@ namespace AmmonomiconAPI
 			matrix.SetRow(3, new Vector4(1f, 1f, 1f, 1f));
 			self.SetMatrix(matrix);
 
-			self.StartCoroutine(DelayedBuildPageHook(self));
+			//self.StartCoroutine(DelayedBuildPageHook(self));
 		}
 
-		private static IEnumerator DelayedBuildPageHook(AmmonomiconPageRenderer self)
+		private static IEnumerator DelayedBuildPageHook(Func<AmmonomiconPageRenderer, IEnumerator> orig, AmmonomiconPageRenderer self)
 		{
-			if (self.pageType == AmmonomiconPageRenderer.PageType.EQUIPMENT_LEFT)
+
+
+			IEnumerator origEnum = orig(self);
+			while (origEnum.MoveNext())
 			{
-				while (GameManager.Instance.IsSelectingCharacter)
+				switch (self.pageType)
 				{
-					yield return null;
+					case (AmmonomiconPageRenderer.PageType)CustomEnums.CustomPageType.MODS_LEFT:
+						Ammonomicon.InitializeItemsPageLeft(self);
+						//self.InitializeItemsPageLeft();
+						//InitializeModsPageLeft(self);
+						break;
+
+					case (AmmonomiconPageRenderer.PageType)CustomEnums.CustomPageType.MODS_RIGHT:
+						typeof(AmmonomiconPageRenderer).GetMethod("SetPageDataUnknown", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { self });
+						break;
 				}
 			}
-			switch (self.pageType)
-			{
-				case AmmonomiconPageRenderer.PageType.EQUIPMENT_LEFT:
-					self.InitializeEquipmentPageLeft();
-					break;
-				case AmmonomiconPageRenderer.PageType.EQUIPMENT_RIGHT:
-					self.InitializeEquipmentPageRight();
-					break;
-				case AmmonomiconPageRenderer.PageType.GUNS_LEFT:
-					self.InitializeGunsPageLeft();
-					break;
-				case AmmonomiconPageRenderer.PageType.GUNS_RIGHT:
 
-					typeof(AmmonomiconPageRenderer).GetMethod("SetPageDataUnknown", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { self });
-					//self.SetPageDataUnknown(self);
-					break;
-				case AmmonomiconPageRenderer.PageType.ITEMS_LEFT:
-					self.InitializeItemsPageLeft();
-					break;
-				case AmmonomiconPageRenderer.PageType.ITEMS_RIGHT:
-					typeof(AmmonomiconPageRenderer).GetMethod("SetPageDataUnknown", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { self });
-					break;
-				case AmmonomiconPageRenderer.PageType.ENEMIES_LEFT:
-					self.InitializeEnemiesPageLeft();
-					break;
-				case AmmonomiconPageRenderer.PageType.ENEMIES_RIGHT:
-					typeof(AmmonomiconPageRenderer).GetMethod("SetPageDataUnknown", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { self });
-					break;
-				case AmmonomiconPageRenderer.PageType.BOSSES_LEFT:
-					self.InitializeBossesPageLeft();
-					break;
-				case AmmonomiconPageRenderer.PageType.BOSSES_RIGHT:
-					typeof(AmmonomiconPageRenderer).GetMethod("SetPageDataUnknown", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { self });
-					break;
-
-				case (AmmonomiconPageRenderer.PageType)CustomEnums.CustomPageType.MODS_LEFT:
-					Ammonomicon.InitializeItemsPageLeft(self);
-					//self.InitializeItemsPageLeft();
-					//InitializeModsPageLeft(self);
-					break;
-
-				case (AmmonomiconPageRenderer.PageType)CustomEnums.CustomPageType.MODS_RIGHT:
-					typeof(AmmonomiconPageRenderer).GetMethod("SetPageDataUnknown", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { self });
-					break;
-
-
-				case AmmonomiconPageRenderer.PageType.DEATH_LEFT:
-					typeof(AmmonomiconPageRenderer).GetMethod("InitializeDeathPageLeft", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null);
-					//self.InitializeDeathPageLeft();
-					break;
-				case AmmonomiconPageRenderer.PageType.DEATH_RIGHT:
-					typeof(AmmonomiconPageRenderer).GetMethod("InitializeDeathPageRight", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null);
-					//self.InitializeDeathPageRight();
-					break;
-
-			}
+			
 			yield break;
 		}
 

@@ -219,6 +219,7 @@ public class AIBeamShooter2 : BraveBehaviour
 	public ProjectileModule beamModule;
 
 	public bool TurnDuringDissipation = true;
+	public bool shouldRotate = true;
 
 	public bool PreventBeamContinuation;
 

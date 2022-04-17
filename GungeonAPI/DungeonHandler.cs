@@ -28,7 +28,7 @@ namespace GungeonAPI
 				bool flag2 = DungeonHandler.debugFlow;
 				if (flag2)
 				{
-
+					ETGModConsole.Log("debug flow set");
 					generator.AssignFlow(flow);
 				}
 				Tools.Print<string>("Dungeon name: " + dungeon.name, "FFFFFF", false);

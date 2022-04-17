@@ -80,7 +80,10 @@ namespace BotsMod
                 }
                 m_hologramSprite.renderer.enabled = true;
                 m_hologramSprite.usesOverrideMaterial = true;
+                m_hologramSprite.renderer.material.shader = BeyondPrefabs.fucktilesets.LoadAsset<Shader>("GayHologramShader");
                 m_hologramSprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/HologramShader");
+                m_hologramSprite.renderer.material.SetFloat("_IsGreen", 1f);
+                //m_hologramSprite.renderer.material.SetColor("_HoloColor", new Color32(255, 0, 179, 255));
                 m_hologramSprite.PlaceAtPositionByAnchor(obj.GetComponent<tk2dSprite>() != null ? obj.GetComponent<tk2dSprite>().WorldTopCenter + new Vector2(0f, 0.25f) : (Vector2)obj.transform.position + new Vector2(0f, 0.5f), tk2dBaseSprite.Anchor.LowerCenter);
                 m_hologramSprite.transform.localPosition = m_hologramSprite.transform.localPosition.Quantize(0.0625f);
 
@@ -90,17 +93,23 @@ namespace BotsMod
 
         public void ApplyHologramShader(tk2dBaseSprite targetSprite, bool isGreen = false, bool usesOverrideMaterial = true)
         {
-            Shader m_cachedShader = Shader.Find("Brave/Internal/HologramShader");
-            Material m_cachedMaterial = new Material(Shader.Find("Brave/Internal/HologramShader"));
+
+            
+
+            Shader m_cachedShader = BeyondPrefabs.fucktilesets.LoadAsset<Shader>("GayHologramShader");
+            Material m_cachedMaterial = new Material(m_cachedShader);
             m_cachedMaterial.name = "HologramMaterial";
             Material m_cachedSharedMaterial = m_cachedMaterial;
 
             m_cachedMaterial.SetTexture("_MainTex", targetSprite.renderer.material.GetTexture("_MainTex"));
             m_cachedSharedMaterial.SetTexture("_MainTex", targetSprite.renderer.sharedMaterial.GetTexture("_MainTex"));
-            if (isGreen)
+            if (true)
             {
                 m_cachedMaterial.SetFloat("_IsGreen", 1f);
                 m_cachedSharedMaterial.SetFloat("_IsGreen", 1f);
+
+                m_cachedMaterial.SetColor("_HoloColor", new Color32(255, 0, 179, 255));
+                m_cachedSharedMaterial.SetColor("_HoloColor", new Color32(255, 0, 179, 255));
             }
             targetSprite.renderer.material.shader = m_cachedShader;
             targetSprite.renderer.material = m_cachedMaterial;

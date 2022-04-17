@@ -28,7 +28,15 @@ namespace BotsMod
 
             Mod_Shop_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Shop2.room", isBeyondRoom: true);
             ItsDaFuckinShopApi.RegisterShopRoom(BotsModule.shop.gameObject, Mod_Shop_Room, new UnityEngine.Vector2(5f, 12f));
-            
+
+            Mod_Shop_Room.UseCustomMusic = true;
+            Mod_Shop_Room.UseCustomMusicSwitch = true;
+            Mod_Shop_Room.CustomMusicEvent = "Play_MUS_Dungeon_State_NPC";
+            Mod_Shop_Room.CustomMusicSwitch = "Play_MUS_NPC_State_Beyond";
+            Mod_Shop_Room.UseCustomMusicState = true;
+            Mod_Shop_Room.OverrideMusicState = DungeonFloorMusicController.DungeonMusicState.SHOP;
+
+
 
             Mod_Entrance_Room.category = PrototypeDungeonRoom.RoomCategory.ENTRANCE;
 
@@ -119,6 +127,8 @@ namespace BotsMod
             Mod_Boss.usesProceduralLighting = false;
             Mod_Boss.usesProceduralDecoration = false;
             Mod_Boss.rewardChestSpawnPosition = new IntVector2(25, 20); //Where the reward pedestal spawns, should be changed based on room size
+            Mod_Boss.usesCustomAmbientLight = true;
+            //Mod_Boss.customAmbientLight = new Color32(80, 80, 80, 255);
             //Mod_Boss.overriddenTilesets = GlobalDungeonData.ValidTilesets.BELLYGEON;
 
             Mod_Boss_Past = RoomFactory.BuildFromResource("BotsMod/rooms/Past/LostPastBossRoom.room");
@@ -135,12 +145,11 @@ namespace BotsMod
             Mod_Boss_Past.usesProceduralLighting = false;
             Mod_Boss_Past.usesProceduralDecoration = false;
             Mod_Boss_Past.rewardChestSpawnPosition = new IntVector2(25, 20); //Where the reward pedestal spawns, should be changed based on room size
-            Mod_Boss_Past.overriddenTilesets = GlobalDungeonData.ValidTilesets.BELLYGEON;
 
 
             var Play_Test_Boss = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/overseerbossroombutround.room", isBeyondRoom: true);
             Play_Test_Boss.category = PrototypeDungeonRoom.RoomCategory.BOSS;
-            Play_Test_Boss.subCategoryBoss = PrototypeDungeonRoom.RoomBossSubCategory.MINI_BOSS;
+            Play_Test_Boss.subCategoryBoss = PrototypeDungeonRoom.RoomBossSubCategory.FLOOR_BOSS;
             Play_Test_Boss.subCategoryNormal = PrototypeDungeonRoom.RoomNormalSubCategory.COMBAT;
             Play_Test_Boss.subCategorySpecial = PrototypeDungeonRoom.RoomSpecialSubCategory.STANDARD_SHOP;
             Play_Test_Boss.subCategorySecret = PrototypeDungeonRoom.RoomSecretSubCategory.UNSPECIFIED_SECRET;
@@ -152,7 +161,6 @@ namespace BotsMod
             Play_Test_Boss.usesProceduralLighting = false;
             Play_Test_Boss.usesProceduralDecoration = false;
             Play_Test_Boss.rewardChestSpawnPosition = new IntVector2(25, 20); //Where the reward pedestal spawns, should be changed based on room size
-            Play_Test_Boss.overriddenTilesets = GlobalDungeonData.ValidTilesets.CASTLEGEON;
 
             StairWayRoom = RoomFactory.BuildFromResource("BotsMod/rooms/StairWayNpcRoom.room");
             ItsDaFuckinShopApi.RegisterShopRoom(BotsModule.shop2.gameObject, StairWayRoom, new UnityEngine.Vector2(4f, 17));

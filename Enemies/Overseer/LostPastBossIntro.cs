@@ -55,7 +55,6 @@ namespace BotsMod
         {
             ModifyCamera(true);
             yield return StartCoroutine(WaitForSecondsInvariant(3.2f));
-            AkSoundEngine.PostEvent("Play_WPN_bsg_shot_01", base.aiActor.gameObject);
             yield break;
         }
 

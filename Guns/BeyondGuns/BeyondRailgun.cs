@@ -18,8 +18,8 @@ namespace BotsMod
 			Gun gun = ETGMod.Databases.Items.NewGun("Beyond Railgun", "beyond_railgun");
 			Game.Items.Rename("outdated_gun_mods:beyond_railgun", "bot:beyond_railgun");
 			gun.gameObject.AddComponent<BeyondRailgun>();
-			gun.SetShortDescription("");
-			gun.SetLongDescription("a gun only for testing");
+			gun.SetShortDescription("My Point Is...");
+			gun.SetLongDescription("This gun fires a high speed metal spike with an explosive charge inside, the explosion it creates weakens the defence of whatever is caught in its blast radius.\n\nA powerful railgun designed to shoot a metal spike loaded with a powerful explosive stolen from some a reality of chaotic space combat.");
 			GunExt.SetupSprite(gun, null, "beyond_railgun_idle_001", 8);
 
 
@@ -35,6 +35,18 @@ namespace BotsMod
 				def.position2 += offset;
 				def.position3 += offset;
 			}
+
+			animationclip.frames[1].triggerEvent = true;
+			animationclip.frames[1].eventAudio = "Play_WPN_tiger_swipe_01";
+
+			animationclip.frames[3].triggerEvent = true;
+			animationclip.frames[3].eventAudio = "Play_WPN_Railgun_Click";
+
+			animationclip.frames[5].triggerEvent = true;
+			animationclip.frames[5].eventAudio = "Play_WPN_Railgun_Click";
+
+			animationclip.frames[7].triggerEvent = true;
+			animationclip.frames[7].eventAudio = "Play_WPN_Railgun_Click";
 
 			animationclip = gun.sprite.spriteAnimator.GetClipByName("beyond_railgun_fire");
 			offsetsX = new float[] { -0.8750f, -0.9375f, -0.8750f };
@@ -65,6 +77,37 @@ namespace BotsMod
 				def.position3 += offset;
 			}
 
+
+			animationclip.frames[2].triggerEvent = true;
+			animationclip.frames[2].eventAudio = "Play_WPN_Railgun_Click";
+
+			animationclip.frames[3].triggerEvent = true;
+			animationclip.frames[3].eventAudio = "Play_WPN_Railgun_Click";
+
+			animationclip.frames[4].triggerEvent = true;
+			animationclip.frames[4].eventAudio = "Play_WPN_Railgun_Click";
+
+			animationclip.frames[5].triggerEvent = true;
+			animationclip.frames[5].eventAudio = "Play_WPN_Railgun_Click";
+
+			/*animationclip.frames[10].triggerEvent = true;
+			animationclip.frames[10].eventAudio = "Play_WPN_Railgun_Click";
+
+			animationclip.frames[10].triggerEvent = true;
+			animationclip.frames[10].eventAudio = "Play_WPN_Railgun_Click";
+
+			animationclip.frames[11].triggerEvent = true;
+			animationclip.frames[11].eventAudio = "Play_WPN_Railgun_Click";
+
+			animationclip.frames[12].triggerEvent = true;
+			animationclip.frames[12].eventAudio = "Play_WPN_Railgun_Click";
+
+			animationclip.frames[13].triggerEvent = true;
+			animationclip.frames[13].eventAudio = "Play_WPN_Railgun_Click";
+
+			animationclip.frames[15].triggerEvent = true;
+			animationclip.frames[15].eventAudio = "Play_WPN_Railgun_Click";
+			*/
 			animationclip = gun.sprite.spriteAnimator.GetClipByName("beyond_railgun_idle");
 			offsetsX = new float[] { -0.6875f };
 			offsetsY = new float[] { -0.2500f };
@@ -94,7 +137,12 @@ namespace BotsMod
 			gun.SetBaseMaxAmmo(25);
 			gun.gunHandedness = GunHandedness.HiddenOneHanded;
 
-			gun.quality = PickupObject.ItemQuality.EXCLUDED;
+			gun.DefaultModule.ammoType = GameUIAmmoType.AmmoType.CUSTOM;
+			gun.DefaultModule.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType("Emp Railgun Spear", "BotsMod/sprites/CustomGunAmmoTypes/beyond_railgun_clip_001", "BotsMod/sprites/CustomGunAmmoTypes/beyond_railgun_clip_002");
+
+
+
+			gun.quality = PickupObject.ItemQuality.A;
 
 			ETGMod.Databases.Items.Add(gun, null, "ANY");
 
@@ -137,8 +185,8 @@ namespace BotsMod
 
 
 			var sAnimator = spikeVfx.AddComponent<tk2dSpriteAnimator>();
-
-			SpriteHandler.AddAnimation(sAnimator, spikeSprite.Collection, new List<int>
+			var sprite10 = SpriteHandler.AddSpriteToCollection(ResourceExtractor.GetTextureFromResource("BotsMod/sprites/VFX/Spike/railgun_spike_010.png"), spikeSprite.Collection, "railgun_spike_010");
+			var anim = SpriteHandler.AddAnimation(sAnimator, spikeSprite.Collection, new List<int>
 			{
 				baseSpriteID,
 				SpriteHandler.AddSpriteToCollection(ResourceExtractor.GetTextureFromResource("BotsMod/sprites/VFX/Spike/railgun_spike_002.png"), spikeSprite.Collection, "railgun_spike_002"),
@@ -149,11 +197,20 @@ namespace BotsMod
 				SpriteHandler.AddSpriteToCollection(ResourceExtractor.GetTextureFromResource("BotsMod/sprites/VFX/Spike/railgun_spike_007.png"), spikeSprite.Collection, "railgun_spike_007"),
 				SpriteHandler.AddSpriteToCollection(ResourceExtractor.GetTextureFromResource("BotsMod/sprites/VFX/Spike/railgun_spike_008.png"), spikeSprite.Collection, "railgun_spike_008"),
 				SpriteHandler.AddSpriteToCollection(ResourceExtractor.GetTextureFromResource("BotsMod/sprites/VFX/Spike/railgun_spike_009.png"), spikeSprite.Collection, "railgun_spike_009"),
-				SpriteHandler.AddSpriteToCollection(ResourceExtractor.GetTextureFromResource("BotsMod/sprites/VFX/Spike/railgun_spike_010.png"), spikeSprite.Collection, "railgun_spike_010"),
+				sprite10,
+				sprite10,
+				sprite10,
+				sprite10,
+				sprite10,
+				sprite10,
 
 			}, "idle", tk2dSpriteAnimationClip.WrapMode.Once, 8);
 
+			
+
 			sAnimator.playAutomatically = true;
+
+			
 
 			FieldInfo _animationStyle = typeof(BuffVFXAnimator).GetField("animationStyle", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -165,7 +222,7 @@ namespace BotsMod
 			vfxAnimator.UsesVFXToSpawnOnDeath = false;
 			vfxAnimator.VFXToSpawnOnDeath = new VFXPool { effects = new VFXComplex[0], type = VFXPoolType.None };
 			vfxAnimator.NonPoolVFX = null;
-			vfxAnimator.DoesSparks = true;
+			vfxAnimator.DoesSparks = false;
 			vfxAnimator.SparksModule = new GlobalSparksModule
 			{
 				emitType = GlobalSparksDoer.EmitRegionStyle.RADIAL,
@@ -178,7 +235,7 @@ namespace BotsMod
 
 			
 
-			//spear.vfx = (PickupObjectDatabase.GetById(4) as Gun).DefaultModule.projectiles[0].gameObject.GetComponent<StickyGrenadeBuff>().vfx;
+			//spear.vfx = (PickupObjectDatabase.GetById(4) as Gun).DefaultModule.projectiles[0].gameObject.GetComponent<OrbitalProjDebuff>().vfx;
 			spear.vfx = spikeVfx;
 			spear.empEffect = new EmpActorEffect
 			{
@@ -209,7 +266,7 @@ namespace BotsMod
 					ChargeTime = 0.8f,
 				},
 			};
-
+			Tools.BeyondItems.Add(gun.PickupObjectId);
 			MeshRenderer component = gun.GetComponent<MeshRenderer>();
 			if (!component)
 			{

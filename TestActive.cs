@@ -394,6 +394,18 @@ namespace BotsMod
 		int i = 0;
 		protected override void DoEffect(PlayerController user)
 		{
+
+			var room = RoomFactory.BuildFromResource("BotsMod/rooms/robotflytestroom.room");
+			RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room, null, DungeonData.LightGenerationStyle.FORCE_COLOR);
+
+			Pathfinder.Instance.InitializeRegion(GameManager.Instance.Dungeon.data, creepyRoom.area.basePosition, creepyRoom.area.dimensions);
+
+
+
+			GameManager.Instance.PrimaryPlayer.WarpToPoint((creepyRoom.area.basePosition + new IntVector2(12, 4)).ToVector2(), false, false);
+
+
+			return;
 			Vector2 vector = user.specRigidbody.HitboxPixelCollider.UnitBottomLeft;
 			Vector2 vector2 = user.specRigidbody.HitboxPixelCollider.UnitTopRight;
 			//(!this.IsGreenFire) ? GlobalSparksDoer.SparksType.STRAIGHT_UP_FIRE : 
@@ -428,7 +440,7 @@ namespace BotsMod
 			goopManagerForGoopType.TimedAddGoopLine(user.CenterPosition + Vector2.right *3 , (user.CenterPosition + (normalized * 8 - normalized2)) , 1, 0.3f);
 			goopManagerForGoopType.TimedAddGoopLine(user.CenterPosition + Vector2.left * 3, (user.CenterPosition + (normalized * 8 + normalized2)) , 1, 0.3f);
 
-			return;
+			
 			GameUIRoot.Instance.heartControllers[0].extantArmors[i].SpriteName = "BrokenHeart";
 			GameUIRoot.Instance.heartControllers[0].extantArmors[i].Atlas = fuckyou;
 
@@ -626,13 +638,13 @@ namespace BotsMod
 
 			AkSoundEngine.PostEvent("Play_Bot_Hammer", user.gameObject);
 
-			var room = RoomFactory.CreateRoomFromTexture(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/cursething.png"));
-			RoomFactory.AddExit(room, new Vector2(room.Width / 2, room.Height), DungeonData.Direction.NORTH);
-			RoomFactory.AddExit(room, new Vector2(room.Width / 2, 0), DungeonData.Direction.SOUTH);
-			RoomFactory.AddExit(room, new Vector2(room.Width, room.Height / 2), DungeonData.Direction.EAST);
-			RoomFactory.AddExit(room, new Vector2(0, room.Height / 2), DungeonData.Direction.WEST);
-			RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room);
-			Pathfinder.Instance.InitializeRegion(GameManager.Instance.Dungeon.data, creepyRoom.area.basePosition, creepyRoom.area.dimensions);
+			var room2 = RoomFactory.CreateRoomFromTexture(ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/cursething.png"));
+			RoomFactory.AddExit(room2, new Vector2(room2.Width / 2, room2.Height), DungeonData.Direction.NORTH);
+			RoomFactory.AddExit(room2, new Vector2(room2.Width / 2, 0), DungeonData.Direction.SOUTH);
+			RoomFactory.AddExit(room2, new Vector2(room2.Width, room2.Height / 2), DungeonData.Direction.EAST);
+			RoomFactory.AddExit(room2, new Vector2(0, room2.Height / 2), DungeonData.Direction.WEST);
+			RoomHandler creepyRoom2 = GameManager.Instance.Dungeon.AddRuntimeRoom(room2);
+			Pathfinder.Instance.InitializeRegion(GameManager.Instance.Dungeon.data, creepyRoom2.area.basePosition, creepyRoom2.area.dimensions);
 
 			
 

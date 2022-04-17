@@ -100,6 +100,24 @@ namespace BotsMod
 			Tools.DefaultPoopulonGoop = EnemyDatabase.GetOrLoadByGuid("116d09c26e624bca8cca09fc69c714b3").GetComponent<GoopDoer>().goopDefinition;
 		}
 
+		public static void AddAudioEventByFrame(this tk2dSpriteAnimationClip clip, int frame, string audio)
+		{
+			clip.frames[frame].eventAudio = audio;
+			clip.frames[frame].triggerEvent = true;
+		}
+
+		public static AIBeamShooter2 AddAIBeamShooter(AIActor enemy, Transform transform, string name, Projectile beamProjectile, ProjectileModule beamModule = null, float angle = 0f)
+		{
+			AIBeamShooter2 aibeamShooter = enemy.gameObject.AddComponent<AIBeamShooter2>();
+			aibeamShooter.beamTransform = transform;
+			aibeamShooter.beamModule = beamModule;
+			aibeamShooter.beamProjectile = beamProjectile.projectile;
+			aibeamShooter.firingEllipseCenter = transform.position;
+			aibeamShooter.name = name;
+			aibeamShooter.northAngleTolerance = angle;
+			return aibeamShooter;
+		}
+
 		public static void SetupTileMetaData(this TilesetIndexMetadata metadata, TilesetIndexMetadata.TilesetFlagType type, float weight = 1, int dungeonRoomSubType = 0, int dungeonRoomSubType2 = -1, int dungeonRoomSubType3 = -1, bool animated = false, bool preventStamps = true)
 		{
 			metadata.type = type;
@@ -611,6 +629,15 @@ namespace BotsMod
 			return proj;
 		}
 
+		public static Projectile SetupProjectileAndObject(Projectile projToCopy)
+		{
+			Projectile proj = UnityEngine.Object.Instantiate(projToCopy.gameObject).GetComponent<Projectile>();
+			proj.gameObject.SetActive(false);
+			ItemAPI.FakePrefab.MarkAsFakePrefab(proj.gameObject);
+			UnityEngine.Object.DontDestroyOnLoad(proj);
+
+			return proj;
+		}
 
 		public static List<Transform> GetChildren(this Transform transform)
 		{
@@ -2807,10 +2834,9 @@ namespace BotsMod
 		{
 			try
 			{
-				
-
+				proj.GetAnySprite().Collection = ETGMod.Databases.Items.ProjectileCollection.inst;
 				proj.GetAnySprite().spriteId = ETGMod.Databases.Items.ProjectileCollection.inst.GetSpriteIdByName(name);
-				
+
 				tk2dSpriteDefinition def = SetupDefinitionForProjectileSprite(name, proj.GetAnySprite().spriteId, pixelWidth, pixelHeight, lightened, overrideColliderPixelWidth, overrideColliderPixelHeight, overrideColliderOffsetX,
 					overrideColliderOffsetY, overrideProjectileToCopyFrom);
 				def.ConstructOffsetsFromAnchor(anchor, def.position3, fixesScale, anchorChangesCollider);

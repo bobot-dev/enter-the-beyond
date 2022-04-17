@@ -228,6 +228,7 @@ namespace BotsMod
             FakePrefab.MarkAsFakePrefab(item.minimapIcon);
 
             Tools.Spells.Add(item.PickupObjectId);
+            Tools.BeyondItems.Add(item.PickupObjectId);
             return item;
         }
 

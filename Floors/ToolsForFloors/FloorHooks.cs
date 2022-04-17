@@ -20,21 +20,18 @@ namespace BotsMod
 
         public static Dungeon GetOrLoadByNameHook(Func<string, Dungeon> orig, string name)
         {
-            Dungeon dungeon = null;
             string dungeonPrefabTemplate = "Base_ResourcefulRat";
             if (name.ToLower() == "base_lostpast")
             {
-                dungeon = LostPastDungeon.LostPastGeon(GetOrLoadByName_Orig(dungeonPrefabTemplate));
-            }
-            if (name.ToLower() == "base_beyond")
-            {
-                dungeon = BeyondDungeon.BeyondGeon(GetOrLoadByName_Orig(dungeonPrefabTemplate));
-            }
-            if (dungeon)
-            {
                 DebugTime.RecordStartTime();
                 DebugTime.Log("AssetBundle.LoadAsset<Dungeon>({0})", new object[] { name });
-                return dungeon;
+                return LostPastDungeon.LostPastGeon(GetOrLoadByName_Orig(dungeonPrefabTemplate));
+            }
+            else if (name.ToLower() == "base_beyond")
+            { 
+                DebugTime.RecordStartTime();
+                DebugTime.Log("AssetBundle.LoadAsset<Dungeon>({0})", new object[] { name });
+                return BeyondDungeon.BeyondGeon(GetOrLoadByName_Orig(dungeonPrefabTemplate));
             }
             else
             {

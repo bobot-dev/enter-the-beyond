@@ -41,7 +41,7 @@ namespace BotsMod
 
 		public static void LoadOptionHook(Action<GameOptions> orig)
 		{
-			orig(GameManager.Options);
+			orig(null);
 
 			if (!BeyondSettings.HasInstance)
 			{

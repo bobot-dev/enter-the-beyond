@@ -79,7 +79,10 @@ namespace BotsMod
         }
         protected override void OnDestroy()
         {
-            StairWay.DecrementFlag(GameManager.Instance.PrimaryPlayer, typeof(StairWay));
+            if (GameManager.Instance.PrimaryPlayer != null)
+            {
+                StairWay.DecrementFlag(GameManager.Instance.PrimaryPlayer, typeof(StairWay));
+            }
             base.OnDestroy();
         }
 

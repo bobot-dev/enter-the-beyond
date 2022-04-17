@@ -167,17 +167,24 @@ namespace CustomCharacters
                     }
                 }
                 //ETGModConsole.Log("added to atlas");
-                var defMatches = collection.spriteDefinitions.Where(def => def.name.Contains(baseName)).Select(def => def);
+                var defMatches = collection.spriteDefinitions.Where(def => def.name.Contains(baseName) && !def.name.Contains("vfx")).Select(def => def);
                 List<int> ids = new List<int>();
                 //ETGModConsole.Log("pre foreach");
                 bool h = false;
                 foreach (var def in defMatches)
                 {
                     //.Log(def.name.Replace(baseName, data.nameShort.ToLower()) +": " + data.punchoutSprites.Where(sprite => sprite.Key == (def.name.Replace(baseName, data.nameShort.ToLower()))).Select(sprite => sprite).Count().ToString());
+                    /*
+                    var sList = data.punchoutSprites.Where(sprite => sprite.Key == (def.name.Replace(baseName, data.nameShort.ToLower()))).ToList();
+                    if (sList == null || sList.Count <= 0)
+                    {
+                        ETGModConsole.Log($"An issue occursed while trying to add the sprite: \"{collection.spriteDefinitions[frame.spriteId].name}\"");
+                    }
+                    */
                     var id = AddSpriteToCollection(data.punchoutSprites.Where(sprite => sprite.Key == (def.name.Replace(baseName, data.nameShort.ToLower()))).First().Value, collection);
                     if (!h)
                     {
-                        ToolsCharApi.ExportTexture(collection.spriteDefinitions[id].material.mainTexture.GetReadable(), "ihateyou", "zatherzyoulittlefucker");
+                        //ToolsCharApi.ExportTexture(collection.spriteDefinitions[id].material.mainTexture.GetReadable(), "ihateyou", "zatherzyoulittlefucker");
                         h = true;
                     }
                     collection.spriteDefinitions[id].CopyToSelf(def);
@@ -186,18 +193,23 @@ namespace CustomCharacters
 
                 }
                 //ETGModConsole.Log("added to collectiom");
-                var animMatches = libary.clips.Where(clip => clip.name.Contains(baseName)).Select(clip => clip);
+                var animMatches = libary.clips.Where(clip => clip.name.Contains(baseName) && !clip.name.Contains("vfx")).Select(clip => clip);
                 
                 foreach (var clip in animMatches)
                 {
                     var newClip = new tk2dSpriteAnimationClip();
 
                     newClip.CopyFrom(clip);
-                    newClip.name = newClip.name.Replace(baseName, data.nameShort.ToLower());
+                    newClip.name = newClip.name.Replace(baseName.ToLower(), data.nameShort.ToLower());
 
                     foreach (var frame in newClip.frames)
                     {
-                        frame.spriteId = collection.spriteDefinitions.IndexOf(collection.spriteDefinitions.Where(def => def.name == collection.spriteDefinitions[frame.spriteId].name.Replace(baseName, data.nameShort.ToLower())).First());
+                        var list = collection.spriteDefinitions.Where(def => def.name == collection.spriteDefinitions[frame.spriteId].name.Replace(baseName.ToLower(), data.nameShort.ToLower()) && !def.name.Contains("vfx")).ToList();
+                        if (list == null || list.Count <= 0)
+                        {
+                            ETGModConsole.Log($"An issue occursed while trying to find sprite info for: \"{collection.spriteDefinitions[frame.spriteId].name}\"");
+                        }
+                        frame.spriteId = collection.spriteDefinitions.IndexOf(list[0]);
                     }
                     //ETGModConsole.Log(newClip.name);
                     libary.clips = libary.clips.Concat(new tk2dSpriteAnimationClip[] { newClip }).ToArray();

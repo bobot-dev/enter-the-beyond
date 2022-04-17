@@ -36,6 +36,7 @@ namespace BotsMod
 			"BotsMod/sprites/beam/LostFriend/lost_friend_laser_flare_002",
 		};
 
+		public static Projectile beamProjectile;
 
 		public static void Init()
 		{
@@ -109,6 +110,8 @@ namespace BotsMod
 			projectile4.baseData.range = 100;
 			projectile4.baseData.speed = 200;
 			projectile4.PenetratesInternalWalls = false;
+
+			
 
 			beamComp.ContinueBeamArtToWall = false;
 			beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
@@ -358,6 +361,8 @@ namespace BotsMod
 				ManualRightY = 0
 			});
 
+			beamProjectile = projectile4;
+
 		}
 		protected override void Update()
 		{
@@ -385,7 +390,7 @@ namespace BotsMod
 				 
 				if (this.GetComponent<AIBeamShooter>() != null && this.GetComponent<AIBeamShooter>().beamProjectile == null)
                 {
-					Projectile projectile4 = UnityEngine.Object.Instantiate<Projectile>((PickupObjectDatabase.GetById(86) as Gun).DefaultModule.projectiles[0]);
+					/*Projectile projectile4 = UnityEngine.Object.Instantiate<Projectile>((PickupObjectDatabase.GetById(86) as Gun).DefaultModule.projectiles[0]);
 					//moonraker bloom material
 					BasicBeamController beamComp = projectile4.GenerateBeamPrefab("BotsMod/sprites/beam/LostFriend/lost_friend_laser_middle_001", new Vector2(32, 4), new Vector2(0, 0), BeamAnimPaths, 8, ImpactAnimPaths, 13, new Vector2(0, 0), new Vector2(0, 0),
 						muzzleVFXAnimationPaths: StartAnimPaths, muzzleVFXColliderDimensions: new Vector2(32, 4), muzzleVFXColliderOffsets: new Vector2(0, 0), glows: true);
@@ -410,7 +415,8 @@ namespace BotsMod
 					beamComp.gameObject.GetOrAddComponent<EmmisiveBeams>().EmissiveColorPower = 7;
 					beamComp.gameObject.GetOrAddComponent<EmmisiveBeams>().EmissivePower = 42;
 
-					this.GetComponent<AIBeamShooter>().beamProjectile = projectile4;
+					this.GetComponent<AIBeamShooter>().beamProjectile = projectile4;*/
+					this.GetComponent<AIBeamShooter>().beamProjectile = LostFriend.beamProjectile;
 				}
 			}
 			public PlayerController Owner;

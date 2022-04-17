@@ -63,13 +63,31 @@ namespace GungeonAPI
             {
                 roomData.waveTriggers = new string[0];
             }
+
+
+
             //ETGModConsole.Log("visualSubtypes: " + roomData.visualSubtypes.ToString());
             var room = Build(texture, roomData, setRoomCategory, autoAssignToFloor, assignDecorationSettings, roomData.weight);
+
+
+            if (isBeyondRoom)
+            {
+                //room.UseCustomMusic = true;
+                //room.CustomMusicEvent = "Play_MUS_Ending_Marine_01";
+                //room.UseCustomMusicSwitch = false;
+
+                ///room.UseCustomMusic = true;
+               // room.CustomMusicEvent = "Play_MUS_Dungeon_State_NPC";
+                //room.CustomMusicSwitch = "Play_MUS_NPC_State_Curse";
+                //room.UseCustomMusicSwitch = true;
+
+            }
+
             if (isBeyondRoom) room.overrideRoomVisualType = -1;
             return room;
         }
 
-        public static PrototypeDungeonRoom Build(Texture2D texture, RoomData roomData, bool SetRoomCategory, bool AutoAssignToFloor, bool AssignDecorationProperties, float? Weight)
+        public static PrototypeDungeonRoom Build(Texture2D texture, RoomData roomData, bool SetRoomCategory, bool AutoAssignToFloor, bool AssignDecorationProperties, float? Weight = 1)
         {
             try
             {

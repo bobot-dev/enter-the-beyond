@@ -11,13 +11,20 @@ namespace BotsMod
     {
         public static DungeonFlow LoadCustomFlow(Func<string, DungeonFlow> orig, string target)
         {
+
+            Debug.LogWarning($"searching for the \"{target}\" flow");
+
             string flowName = target;
             if (flowName.Contains("/")) { flowName = target.Substring(target.LastIndexOf("/") + 1); }
             if (KnownFlows != null && KnownFlows.Count > 0)
             {
                 foreach (DungeonFlow flow in KnownFlows)
                 {
-                    if (flow.name != null && flow.name != string.Empty)
+
+                    if (flow == null) Debug.LogWarning($"found a null flow while looking for \"{target}\"");
+
+
+                    if (flow != null && flow.name != null && flow.name != string.Empty)
                     {
                         if (flowName.ToLower() == flow.name.ToLower())
                         {
@@ -55,7 +62,6 @@ namespace BotsMod
 
         public static List<DungeonFlow> KnownFlows;
 
-        public static DungeonFlow Foyer_Flow;
 
         // Default stuff to use with custom Flows
         public static SharedInjectionData BaseSharedInjectionData;
@@ -168,26 +174,13 @@ namespace BotsMod
             return m_CachedInjectionDataList;
         }
 
-        public static ProceduralFlowModifierData RickRollSecretRoomInjector;
-
-        public static SharedInjectionData CustomSecretFloorSharedInjectionData;
-
-
         // Initialize KnownFlows array with custom + official flows.
         public static void InitDungeonFlows(bool refreshFlows = false)
         {
-
-            Dungeon TutorialPrefab = DungeonDatabase.GetOrLoadByName("Base_Tutorial");
             Dungeon CastlePrefab = DungeonDatabase.GetOrLoadByName("Base_Castle");
             Dungeon SewerPrefab = DungeonDatabase.GetOrLoadByName("Base_Sewer");
             Dungeon GungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Gungeon");
-            Dungeon CathedralPrefab = DungeonDatabase.GetOrLoadByName("Base_Cathedral");
-            Dungeon MinesPrefab = DungeonDatabase.GetOrLoadByName("Base_Mines");
-            Dungeon ResourcefulRatPrefab = DungeonDatabase.GetOrLoadByName("Base_ResourcefulRat");
             Dungeon CatacombsPrefab = DungeonDatabase.GetOrLoadByName("Base_Catacombs");
-            Dungeon NakatomiPrefab = DungeonDatabase.GetOrLoadByName("Base_Nakatomi");
-            Dungeon ForgePrefab = DungeonDatabase.GetOrLoadByName("Base_Forge");
-            Dungeon BulletHellPrefab = DungeonDatabase.GetOrLoadByName("Base_BulletHell");
 
             BaseSharedInjectionData = BeyondPrefabs.shared_auto_002.LoadAsset<SharedInjectionData>("Base Shared Injection Data");
             GungeonInjectionData = GungeonPrefab.PatternSettings.flows[0].sharedInjectionData[1];
@@ -235,8 +228,7 @@ namespace BotsMod
             CastleInjectionData.InjectionData.Add(SecretBeyondEntranceInjector);
 
             // Don't build/add flows until injection data is created!
-            Foyer_Flow = FlowHelpers.DuplicateDungeonFlow(BeyondPrefabs.shared_auto_002.LoadAsset<DungeonFlow>("Foyer Flow"));
-
+            
             // List<DungeonFlow> m_knownFlows = new List<DungeonFlow>();
             KnownFlows = new List<DungeonFlow>();
 
@@ -247,12 +239,8 @@ namespace BotsMod
 
 
             // Fix issues with nodes so that things other then MainMenu can load Foyer flow
-            Foyer_Flow.name = "Foyer_Flow";
-            Foyer_Flow.AllNodes[1].handlesOwnWarping = true;
-            Foyer_Flow.AllNodes[2].handlesOwnWarping = true;
-            Foyer_Flow.AllNodes[3].handlesOwnWarping = true;
 
-            KnownFlows.Add(Foyer_Flow);
+            /*KnownFlows.Add(Foyer_Flow);
 
             // Add official flows to list (flows found in Dungeon asset bundles after AG&D)
             for (int i = 0; i < TutorialPrefab.PatternSettings.flows.Count; i++)
@@ -298,20 +286,20 @@ namespace BotsMod
             for (int i = 0; i < BulletHellPrefab.PatternSettings.flows.Count; i++)
             {
                 KnownFlows.Add(FlowHelpers.DuplicateDungeonFlow(BulletHellPrefab.PatternSettings.flows[i]));
-            }
+            }*/
 
 
-            TutorialPrefab = null;
+            //TutorialPrefab = null;
             CastlePrefab = null;
             SewerPrefab = null;
             GungeonPrefab = null;
-            CathedralPrefab = null;
-            MinesPrefab = null;
-            ResourcefulRatPrefab = null;
+            //CathedralPrefab = null;
+            //MinesPrefab = null;
+            //ResourcefulRatPrefab = null;
             CatacombsPrefab = null;
-            NakatomiPrefab = null;
-            ForgePrefab = null;
-            BulletHellPrefab = null;
+            //NakatomiPrefab = null;
+            //ForgePrefab = null;
+            //BulletHellPrefab = null;
         }
 
         public static DungeonFlow F1b_Beyond_flow_01()

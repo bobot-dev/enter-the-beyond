@@ -208,10 +208,10 @@ namespace ItemAPI
             aiAnimator.AssignDirectionalAnimation(name, animation, type);
             BuildAnimations(aiAnimator, name, enemyName, directionType, spriteDirectory, fps, wrapMode);
 
-            for(int i = 0; i < DirectionalAnimation.m_combined[(int)directionType].Length; i++)
-            {
-                animation.AnimNames[i] = $"{name.ToLower()}_{DirectionalAnimation.m_combined[(int)directionType][i].suffix}";
-            }
+            //for(int i = 0; i < DirectionalAnimation.m_combined[(int)directionType].Length; i++)
+            //{
+                //animation.AnimNames[i] = $"{name.ToLower()}_{DirectionalAnimation.m_combined[(int)directionType][i].suffix}";
+            //}
         }
 
         public static void BuildAnimations(AIAnimator aiAnimator, string name, string enemyName, DirectionType directionType, string spriteDirectory, int fps, tk2dSpriteAnimationClip.WrapMode wrapMode)

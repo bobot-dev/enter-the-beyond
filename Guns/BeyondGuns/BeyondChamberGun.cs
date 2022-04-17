@@ -19,8 +19,66 @@ namespace BotsMod
 			gun.SetShortDescription("");
 			gun.SetLongDescription("a gun only for testing");
 			GunExt.SetupSprite(gun, null, "beyond_chamber_gun_idle_001", 8);
-			gun.SetAnimationFPS(gun.shootAnimation, 12);
-			gun.SetAnimationFPS(gun.shootAnimation, 12);
+			gun.SetAnimationFPS(gun.shootAnimation, 18);
+			gun.SetAnimationFPS(gun.chargeAnimation, 12);
+
+			//gun.carryPixelOffset = new IntVector2(-3, -6);
+
+			tk2dSpriteAnimationClip animationclip = gun.sprite.spriteAnimator.GetClipByName("beyond_chamber_gun_charge");
+			float[] offsetsX = new float[] { 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f };
+			float[] offsetsY = new float[] { 0.0000f, 0.0000f, 0.0000f, -0.0625f, -0.0625f, -0.0625f, -0.0625f, -0.0625f, -0.0625f, -0.0625f, -0.0625f, -0.0625f, -0.0625f, -0.0625f, -0.0625f, -0.0625f, -0.0625f };
+
+			animationclip.wrapMode = tk2dSpriteAnimationClip.WrapMode.LoopSection;
+			animationclip.loopStart = 13;
+			for (int i = 0; i < offsetsX.Length && i < offsetsY.Length && i < animationclip.frames.Length; i++)
+			{
+				int id = animationclip.frames[i].spriteId; tk2dSpriteDefinition def = animationclip.frames[i].spriteCollection.spriteDefinitions[id];
+				Vector3 offset = new Vector2(offsetsX[i], offsetsY[i]);
+				def.position0 += offset;
+				def.position1 += offset;
+				def.position2 += offset;
+				def.position3 += offset;
+			}
+			
+			animationclip = gun.sprite.spriteAnimator.GetClipByName("beyond_chamber_gun_fire");
+			offsetsX = new float[] { 0.0000f, -0.0625f, -0.0625f, -0.0625f, -0.3125f, -0.3125f, -0.1250f };
+			offsetsY = new float[] { -0.0625f, 0.0000f, 0.0000f, -0.0625f, -0.1875f, -0.1875f, -0.1875f };
+			for (int i = 0; i < offsetsX.Length && i < offsetsY.Length && i < animationclip.frames.Length; i++)
+			{
+				int id = animationclip.frames[i].spriteId; tk2dSpriteDefinition def = animationclip.frames[i].spriteCollection.spriteDefinitions[id];
+				Vector3 offset = new Vector2(offsetsX[i], offsetsY[i]);
+				def.position0 += offset;
+				def.position1 += offset;
+				def.position2 += offset;
+				def.position3 += offset;			
+			}
+
+			animationclip = gun.sprite.spriteAnimator.GetClipByName(gun.reloadAnimation);
+			offsetsX = new float[] { 0.0000f, 0.0625f, 0.0000f, 0.0000f, -0.1250f, 0.0000f, 0.0000f, 0.0000f, 0.0000f, 0.0000f };
+			offsetsY = new float[] { -0.1875f, -0.1875f, -0.1875f, -0.3125f, -0.3125f, -0.1875f, -0.2500f, -0.1875f, -0.1875f, 0.0000f };
+
+			for (int i = 0; i < offsetsX.Length && i < offsetsY.Length && i < animationclip.frames.Length; i++)
+			{
+				int id = animationclip.frames[i].spriteId; tk2dSpriteDefinition def = animationclip.frames[i].spriteCollection.spriteDefinitions[id];
+				Vector3 offset = new Vector2(offsetsX[i], offsetsY[i]);
+				def.position0 += offset;
+				def.position1 += offset;
+				def.position2 += offset;
+				def.position3 += offset;
+			}
+			animationclip = gun.sprite.spriteAnimator.GetClipByName("beyond_chamber_gun_idle");
+			offsetsX = new float[] { 0 };
+			offsetsY = new float[] { 0 };
+
+			for (int i = 0; i < offsetsX.Length && i < offsetsY.Length && i < animationclip.frames.Length; i++)
+			{
+				int id = animationclip.frames[i].spriteId; tk2dSpriteDefinition def = animationclip.frames[i].spriteCollection.spriteDefinitions[id];
+				Vector3 offset = new Vector2(offsetsX[i], offsetsY[i]);
+				def.position0 += offset;
+				def.position1 += offset;
+				def.position2 += offset;
+				def.position3 += offset;
+			}
 
 
 			gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(15) as Gun, true, false);
@@ -36,7 +94,7 @@ namespace BotsMod
 
 			gun.DefaultModule.cooldownTime = 0.1f;
 			gun.InfiniteAmmo = false;
-			gun.DefaultModule.numberOfShotsInClip = 10;
+			gun.DefaultModule.numberOfShotsInClip = 1;
 
 			gun.SetBaseMaxAmmo(500);
 			gun.gunHandedness = GunHandedness.OneHanded;
@@ -62,7 +120,7 @@ namespace BotsMod
 				new List<IntVector2> { new IntVector2(8, 4), new IntVector2(15, 4), new IntVector2(22, 4), new IntVector2(29, 4), new IntVector2(29, 4) }, Tools.ConstructListOfSameValues(false, 5), Tools.ConstructListOfSameValues(tk2dBaseSprite.Anchor.MiddleCenter, 5),
 				Tools.ConstructListOfSameValues(true, 5), Tools.ConstructListOfSameValues(false, 5), Tools.ConstructListOfSameValues<Vector3?>(null, 7), colliderSize, offsets,
 				Tools.ConstructListOfSameValues<Projectile>(null, 7));
-			var id = ETGMod.Databases.Items.ProjectileCollection.inst.GetSpriteIdByName("beyond_chamber_gun_projectile_001");
+			ETGMod.Databases.Items.ProjectileCollection.inst.GetSpriteIdByName("beyond_chamber_gun_projectile_001");
 			projectile.baseData.speed = 40;
 			projectile.baseData.UsesCustomAccelerationCurve = true;
 			projectile.baseData.AccelerationCurve = new AnimationCurve

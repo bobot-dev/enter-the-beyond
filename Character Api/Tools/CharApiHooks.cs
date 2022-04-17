@@ -84,10 +84,10 @@ namespace CustomCharacters
 					typeof(Hooks).GetMethod("SetWinPicHook", BindingFlags.Static | BindingFlags.NonPublic)
 				);
 
-				Hook interactHook = new Hook(
-					typeof(ArkController).GetMethod("Interact", BindingFlags.Instance | BindingFlags.Public),
-					typeof(Hooks).GetMethod("InteractHook", BindingFlags.Static | BindingFlags.Public)
-				);
+				//Hook interactHook = new Hook(
+				//	typeof(ArkController).GetMethod("Interact", BindingFlags.Instance | BindingFlags.Public),
+				//	typeof(Hooks).GetMethod("InteractHook", BindingFlags.Static | BindingFlags.Public)
+				//);
 
 				//Hook getNumMetasToQuickRestartHook = new Hook(
 				//	typeof(AmmonomiconDeathPageController).GetMethod("GetNumMetasToQuickRestart", BindingFlags.Static | BindingFlags.Public),
@@ -127,6 +127,11 @@ namespace CustomCharacters
 				Hook GetPlayerStatValueHook = new Hook(
 					typeof(GameStatsManager).GetMethod("GetPlayerStatValue", BindingFlags.Instance | BindingFlags.Public),
 					typeof(Hooks).GetMethod("GetPlayerStatValueHook", BindingFlags.Static | BindingFlags.Public)
+				);
+
+				Hook ClearStatValueGlobalHook = new Hook(
+					typeof(GameStatsManager).GetMethod("ClearStatValueGlobal", BindingFlags.Instance | BindingFlags.Public),
+					typeof(Hooks).GetMethod("ClearStatValueGlobalHook", BindingFlags.Static | BindingFlags.Public)
 				);
 
 				Hook LoadHook = new Hook(
@@ -179,6 +184,11 @@ namespace CustomCharacters
 					typeof(Hooks).GetMethod("InitHook", BindingFlags.Static | BindingFlags.Public)
 				);
 
+				Hook HandleClockhairHook = new Hook(
+					typeof(ArkController).GetMethod("HandleClockhair", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("HandleClockhairHook", BindingFlags.Static | BindingFlags.Public)
+				);
+
 				Hook hook3 = new Hook(typeof(PlayerController).GetProperty("LocalShaderName", BindingFlags.Instance | BindingFlags.Public).GetGetMethod(), typeof(Hooks).GetMethod("LocalShaderNameGetHook"));
 				//BotsModule.Log("hooks done");
 			}
@@ -188,7 +198,231 @@ namespace CustomCharacters
 			}
 		}
 
-		
+
+		public static IEnumerator HandleClockhairHook(Func<ArkController, PlayerController, IEnumerator> orig, ArkController self, PlayerController interactor)
+		{
+
+			if (interactor.GetComponent<CustomCharacter>() == null)
+			{
+				IEnumerator origEnum = orig(self, interactor);
+				while (origEnum.MoveNext()) { }
+			}
+			else
+			{
+				FieldInfo _heldPastGun = typeof(ArkController).GetField("m_heldPastGun", BindingFlags.NonPublic | BindingFlags.Instance);
+
+				Transform clockhairTransform = ((GameObject)UnityEngine.Object.Instantiate(BraveResources.Load("Clockhair", ".prefab"))).transform;
+				ClockhairController clockhair = clockhairTransform.GetComponent<ClockhairController>();
+				float elapsed = 0f;
+				float duration = clockhair.ClockhairInDuration;
+				Vector2 clockhairTargetPosition = interactor.CenterPosition;
+				Vector2 clockhairStartPosition = clockhairTargetPosition + new Vector2(-20f, 5f);
+				clockhair.renderer.enabled = true;
+				clockhair.spriteAnimator.alwaysUpdateOffscreen = true;
+				clockhair.spriteAnimator.Play("clockhair_intro");
+				clockhair.hourAnimator.Play("hour_hand_intro");
+				clockhair.minuteAnimator.Play("minute_hand_intro");
+				clockhair.secondAnimator.Play("second_hand_intro");
+				BraveInput currentInput = BraveInput.GetInstanceForPlayer(interactor.PlayerIDX);
+				while (elapsed < duration)
+				{
+					typeof(ArkController).GetMethod("UpdateCameraPositionDuringClockhair", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { interactor.CenterPosition });
+
+
+					if (GameManager.INVARIANT_DELTA_TIME == 0f)
+					{
+						elapsed += 0.05f;
+					}
+					elapsed += GameManager.INVARIANT_DELTA_TIME;
+					float t = elapsed / duration;
+					float smoothT = Mathf.SmoothStep(0f, 1f, t);
+					if (currentInput == null)
+					{
+						ETGModConsole.Log("currentInput null");
+					}
+
+					if (clockhairTargetPosition == null)
+					{
+						ETGModConsole.Log("clockhairTargetPosition null");
+					}
+					clockhairTargetPosition = (Vector2)typeof(ArkController).GetMethod("GetTargetClockhairPosition", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { currentInput, clockhairTargetPosition });
+					//clockhairTargetPosition = self.GetTargetClockhairPosition(currentInput, clockhairTargetPosition);
+					Vector3 currentPosition = Vector3.Slerp(clockhairStartPosition, clockhairTargetPosition, smoothT);
+					clockhairTransform.position = currentPosition.WithZ(0f);
+					if (t > 0.5f)
+					{
+						clockhair.renderer.enabled = true;
+					}
+					if (t > 0.75f)
+					{
+						clockhair.hourAnimator.GetComponent<Renderer>().enabled = true;
+						clockhair.minuteAnimator.GetComponent<Renderer>().enabled = true;
+						clockhair.secondAnimator.GetComponent<Renderer>().enabled = true;
+						GameCursorController.CursorOverride.SetOverride("ark", true, null);
+					}
+					clockhair.sprite.UpdateZDepth();
+					typeof(ArkController).GetMethod("PointGunAtClockhair", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { interactor, clockhairTransform });
+					yield return null;
+				}
+				clockhair.SetMotionType(1f);
+				float shotTargetTime = 0f;
+				float holdDuration = 4f;
+				PlayerController shotPlayer = null;
+				bool didShootHellTrigger = false;
+				Vector3 lastJitterAmount = Vector3.zero;
+				bool m_isPlayingChargeAudio = false;
+				for (; ; )
+				{
+					typeof(ArkController).GetMethod("UpdateCameraPositionDuringClockhair", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { interactor.CenterPosition });
+					clockhair.transform.position = clockhair.transform.position - lastJitterAmount;
+					clockhair.transform.position = (Vector2)typeof(ArkController).GetMethod("GetTargetClockhairPosition", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { currentInput, clockhair.transform.position.XY() });
+					clockhair.sprite.UpdateZDepth();
+					bool isTargetingValidTarget = (bool)typeof(ArkController).GetMethod("CheckPlayerTarget", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { GameManager.Instance.PrimaryPlayer, clockhairTransform });
+					shotPlayer = GameManager.Instance.PrimaryPlayer;
+					if (!isTargetingValidTarget && GameManager.Instance.CurrentGameType == GameManager.GameType.COOP_2_PLAYER)
+					{
+						isTargetingValidTarget = (bool)typeof(ArkController).GetMethod("CheckPlayerTarget", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { GameManager.Instance.SecondaryPlayer, clockhairTransform });
+						shotPlayer = GameManager.Instance.SecondaryPlayer;
+					}
+					if (!isTargetingValidTarget && GameStatsManager.Instance.AllCorePastsBeaten())
+					{
+						isTargetingValidTarget = (bool)typeof(ArkController).GetMethod("CheckHellTarget", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { self.HellCrackSprite, clockhairTransform });
+						didShootHellTrigger = isTargetingValidTarget;
+					}
+					if (isTargetingValidTarget)
+					{
+						clockhair.SetMotionType(-10f);
+					}
+					else
+					{
+						clockhair.SetMotionType(1f);
+					}
+					if ((currentInput.ActiveActions.ShootAction.IsPressed || currentInput.ActiveActions.InteractAction.IsPressed) && isTargetingValidTarget)
+					{
+						if (!m_isPlayingChargeAudio)
+						{
+							m_isPlayingChargeAudio = true;
+							AkSoundEngine.PostEvent("Play_OBJ_pastkiller_charge_01", self.gameObject);
+						}
+						shotTargetTime += BraveTime.DeltaTime;
+					}
+					else
+					{
+						shotTargetTime = Mathf.Max(0f, shotTargetTime - BraveTime.DeltaTime * 3f);
+						if (m_isPlayingChargeAudio)
+						{
+							m_isPlayingChargeAudio = false;
+							AkSoundEngine.PostEvent("Stop_OBJ_pastkiller_charge_01", self.gameObject);
+						}
+					}
+					if ((currentInput.ActiveActions.ShootAction.WasReleased || currentInput.ActiveActions.InteractAction.WasReleased) && isTargetingValidTarget && shotTargetTime > holdDuration && !GameManager.Instance.IsPaused)
+					{
+						break;
+					}
+					if (shotTargetTime > 0f)
+					{
+						float distortionPower = Mathf.Lerp(0f, 0.35f, shotTargetTime / holdDuration);
+						float distortRadius = 0.5f;
+						float edgeRadius = Mathf.Lerp(4f, 7f, shotTargetTime / holdDuration);
+						clockhair.UpdateDistortion(distortionPower, distortRadius, edgeRadius);
+						float desatRadiusUV = Mathf.Lerp(2f, 0.25f, shotTargetTime / holdDuration);
+						clockhair.UpdateDesat(true, desatRadiusUV);
+						shotTargetTime = Mathf.Min(holdDuration + 0.25f, shotTargetTime + BraveTime.DeltaTime);
+						float d = Mathf.Lerp(0f, 0.5f, (shotTargetTime - 1f) / (holdDuration - 1f));
+						Vector3 vector = (UnityEngine.Random.insideUnitCircle * d).ToVector3ZUp(0f);
+						BraveInput.DoSustainedScreenShakeVibration(shotTargetTime / holdDuration * 0.8f);
+						clockhair.transform.position = clockhair.transform.position + vector;
+						lastJitterAmount = vector;
+						clockhair.SetMotionType(Mathf.Lerp(-10f, -2400f, shotTargetTime / holdDuration));
+					}
+					else
+					{
+						lastJitterAmount = Vector3.zero;
+						clockhair.UpdateDistortion(0f, 0f, 0f);
+						clockhair.UpdateDesat(false, 0f);
+						shotTargetTime = 0f;
+						BraveInput.DoSustainedScreenShakeVibration(0f);
+					}
+					typeof(ArkController).GetMethod("PointGunAtClockhair", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { interactor, clockhairTransform });
+					yield return null;
+				}
+				BraveInput.DoSustainedScreenShakeVibration(0f);
+				BraveInput.DoVibrationForAllPlayers(Vibration.Time.Normal, Vibration.Strength.Hard);
+				clockhair.StartCoroutine(clockhair.WipeoutDistortionAndFade(0.5f));
+				clockhair.gameObject.SetLayerRecursively(LayerMask.NameToLayer("Unoccluded"));
+				Pixelator.Instance.FadeToColor(1f, Color.white, true, 0.2f);
+				Pixelator.Instance.DoRenderGBuffer = false;
+				clockhair.spriteAnimator.Play("clockhair_fire");
+				clockhair.hourAnimator.GetComponent<Renderer>().enabled = false;
+				clockhair.minuteAnimator.GetComponent<Renderer>().enabled = false;
+				clockhair.secondAnimator.GetComponent<Renderer>().enabled = false;
+				yield return null;
+				TimeTubeCreditsController ttcc = new TimeTubeCreditsController();
+				bool isShortTunnel = didShootHellTrigger || shotPlayer.characterIdentity == PlayableCharacters.CoopCultist || (bool)typeof(ArkController).GetMethod("CharacterStoryComplete", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { shotPlayer.characterIdentity });
+				UnityEngine.Object.Destroy((_heldPastGun.GetValue(self) as Transform).gameObject);
+				interactor.ToggleGunRenderers(true, "ark");
+				GameCursorController.CursorOverride.RemoveOverride("ark");
+				Pixelator.Instance.LerpToLetterbox(0.35f, 0.25f);
+				yield return self.StartCoroutine(ttcc.HandleTimeTubeCredits(clockhair.sprite.WorldCenter, isShortTunnel, clockhair.spriteAnimator, (!didShootHellTrigger) ? shotPlayer.PlayerIDX : 0, false));
+				if (isShortTunnel)
+				{
+					Pixelator.Instance.FadeToBlack(1f, false, 0f);
+					yield return new WaitForSeconds(1f);
+				}
+				if (didShootHellTrigger)
+				{
+					GameManager.DoMidgameSave(GlobalDungeonData.ValidTilesets.HELLGEON);
+					GameManager.Instance.LoadCustomLevel("tt_bullethell");
+				}
+				else if (shotPlayer.characterIdentity == PlayableCharacters.CoopCultist)
+				{
+					GameManager.IsCoopPast = true;
+					typeof(ArkController).GetMethod("ResetPlayers", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { false });
+
+					GameManager.Instance.LoadCustomLevel("fs_coop");
+				}
+				else if ((bool)typeof(ArkController).GetMethod("CharacterStoryComplete", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { shotPlayer.characterIdentity }) && shotPlayer.characterIdentity == PlayableCharacters.Gunslinger)
+				{
+					GameManager.DoMidgameSave(GlobalDungeonData.ValidTilesets.FINALGEON);
+					GameManager.IsGunslingerPast = true;
+					typeof(ArkController).GetMethod("ResetPlayers", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { true });
+					GameManager.Instance.LoadCustomLevel("tt_bullethell");
+				}
+				else if ((bool)typeof(ArkController).GetMethod("CharacterStoryComplete", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { shotPlayer.characterIdentity }))
+				{
+					bool flag = false;
+					GameManager.DoMidgameSave(GlobalDungeonData.ValidTilesets.FINALGEON);
+
+					if (shotPlayer.GetComponent<CustomCharacter>() != null)
+					{
+						flag = true;
+						typeof(ArkController).GetMethod("ResetPlayers", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, new object[] { false });
+						GameManager.Instance.LoadCustomLevel(shotPlayer.GetComponent<CustomCharacter>().past);
+					}
+
+					if (!flag)
+					{
+						AmmonomiconController.Instance.OpenAmmonomicon(true, true);
+					}
+					else
+					{
+						GameUIRoot.Instance.ToggleUICamera(false);
+					}
+				}
+				else
+				{
+					AmmonomiconController.Instance.OpenAmmonomicon(true, true);
+				}
+				for (; ; )
+				{
+					yield return null;
+				}
+				yield break;
+			}
+
+		}
+
+
 
 		//one hook in and im already at the point of wanting to punch my screen thats gotta be a new record!! Update its like 3? (i think, ive lost track couldve been a week) days later and i can say it got worse 
 		public static void InitHook(Action<PunchoutController> orig, PunchoutController self)
@@ -501,12 +735,12 @@ namespace CustomCharacters
             {
 				SaveFileBullShit.Load();
 			}
-
+			ETGModConsole.Log($"{SaveFileBullShit.Instance.m_customCharacterStats.Count} - {GameStatsManager.Instance.m_characterStats.Count}");
 			foreach (var characterStats in SaveFileBullShit.Instance.m_customCharacterStats)
 			{
 				var character = characterStats.Key;
 				var stats = characterStats.Value;
-				//ETGModConsole.Log($"Found custom character \"{character}\" adding them to m_characterStats");
+				ETGModConsole.Log($"Found custom character \"{character}\" adding them to m_characterStats");
 				if (!GameStatsManager.Instance.m_characterStats.ContainsKey((PlayableCharacters)character) && stats != null)
 				{
 					GameStatsManager.Instance.m_characterStats.Add((PlayableCharacters)character, stats);
@@ -534,7 +768,7 @@ namespace CustomCharacters
             {
 				SaveFileBullShit.Load();
 			}
-
+			Dictionary<PlayableCharacters, GameStats> thingsToRemove = new Dictionary<PlayableCharacters, GameStats>();
 			foreach (var characterStats in GameStatsManager.Instance.m_characterStats)
 			{
 				
@@ -551,37 +785,84 @@ namespace CustomCharacters
 					{
 						SaveFileBullShit.Instance.m_customCharacterStats[(CustomPlayableCharacters)character] = stats;				
 					}
+					else if (SaveFileBullShit.Instance.m_customCharacterStats.ContainsKey((CustomPlayableCharacters)character) && stats == null)
+					{
+						SaveFileBullShit.Instance.m_customCharacterStats[(CustomPlayableCharacters)character] = new GameStats();
+					}
+					thingsToRemove.Add(character, SaveFileBullShit.Instance.m_customCharacterStats[(CustomPlayableCharacters)character]);
 				}
 				
 			}
 			SaveFileBullShit.Save();
-			//foreach(var character in thingsToRemove)
-			//{
-			//	if (GameStatsManager.Instance.m_characterStats.ContainsKey(character))
-			//    {
-			//		GameStatsManager.Instance.m_characterStats.Remove(character);
-			//	}
-			//	
-			//}
-			return orig(GameStatsManager.Instance);
+			foreach(var character in thingsToRemove)
+			{
+				if (GameStatsManager.Instance.m_characterStats.ContainsKey(character.Key))
+			    {
+					GameStatsManager.Instance.m_characterStats.Remove(character.Key);
+				}
+				
+			}
+			var result = orig(GameStatsManager.Instance);
+
+			foreach (var character in thingsToRemove)
+			{
+				if (!GameStatsManager.Instance.m_characterStats.ContainsKey(character.Key))
+				{
+					GameStatsManager.Instance.m_characterStats.Add(character.Key, character.Value);
+				}
+
+			}
+
+			return result;
+
 		}
 
 
 		public static float GetPlayerStatValueHook(Func<GameStatsManager, TrackedStats, float> orig, GameStatsManager self, TrackedStats stat)
 		{			
 			float statValue = orig(self, stat);
-
-			foreach(var whydodgerollmustyouhurtmelikethis in self.m_characterStats)
-            {				
-				if(whydodgerollmustyouhurtmelikethis.Key > (PlayableCharacters)10)
+			foreach (var whydodgerollmustyouhurtmelikethis in self.m_characterStats)
+			{
+				if(Loader.myPlayableCharacters.Contains(whydodgerollmustyouhurtmelikethis.Key))
                 {
-					statValue += whydodgerollmustyouhurtmelikethis.Value.GetStatValue(stat);
+
+					if (whydodgerollmustyouhurtmelikethis.Value != null)
+					{
+						statValue += whydodgerollmustyouhurtmelikethis.Value.GetStatValue(stat);
+					}
+
+					// statValue += whydodgerollmustyouhurtmelikethis.Value.GetStatValue(stat);					
 				}				
 			}
-
+			/*
+			foreach (var character in Loader.myPlayableCharacters)
+			{
+				GameStats gameStats;
+				if (self.m_characterStats.TryGetValue(character, out gameStats))
+				{
+					statValue += gameStats.GetStatValue(stat);
+				}
+			}*/
 			return statValue;
 		}
 
+
+		public static void ClearStatValueGlobalHook(Action<GameStatsManager, TrackedStats> orig, GameStatsManager self, TrackedStats stat)
+		{
+			orig(self, stat);
+			foreach (var whydodgerollmustyouhurtmelikethis in self.m_characterStats)
+			{
+				if (Loader.myPlayableCharacters.Contains(whydodgerollmustyouhurtmelikethis.Key))
+				{
+
+					if (whydodgerollmustyouhurtmelikethis.Value != null)
+					{
+						whydodgerollmustyouhurtmelikethis.Value.SetStat(stat, 0);
+					}
+			
+				}
+			}
+		}
 
 		public static void ClearOverheadElementHook(Action<FoyerCharacterSelectFlag> orig, FoyerCharacterSelectFlag self)
 		{

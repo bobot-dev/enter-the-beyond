@@ -21,18 +21,11 @@ namespace BotsMod
 		public static GameObject pastControllerObject;
 		public static GameObject laserCutterParticles;
 		public static GameObject beyondChestPrefab;
+		public static GameObject laserSight;
+		public static GameObject BeyondTableH;
+		public static GameObject BeyondTableV;
 
 		public static PlayerHandController basicBeyondHands;
-
-		private static Dungeon TutorialDungeonPrefab;
-		private static Dungeon SewerDungeonPrefab;
-		private static Dungeon MinesDungeonPrefab;
-		private static Dungeon ratDungeon;
-		private static Dungeon CathedralDungeonPrefab;
-		private static Dungeon BulletHellDungeonPrefab;
-		private static Dungeon ForgeDungeonPrefab;
-		private static Dungeon CatacombsDungeonPrefab;
-		private static Dungeon NakatomiDungeonPrefab;
 
 		public static PrototypeDungeonRoom reward_room;
 		public static PrototypeDungeonRoom gungeon_rewardroom_1;
@@ -75,6 +68,10 @@ namespace BotsMod
 			EtbAssetBundle = BotsModule.LoadAssetBundleFromLiterallyAnywhere("enterthebeyond");
 			BotsAssetBundle = BotsModule.LoadAssetBundleFromLiterallyAnywhere("botsassetbundle");
 
+
+
+			var castlePrefab = DungeonDatabase.GetOrLoadByName("base_castle");
+
 			Material[] materials = fucktilesets.LoadAllAssets<Material>();
 			foreach (Material m in materials)
 			{
@@ -107,19 +104,14 @@ namespace BotsMod
 			shared_auto_001 = assetBundle;
 			shared_auto_002 = assetBundle2;
 			braveResources = ResourceManager.LoadAssetBundle("brave_resources_001");
+
+
+			laserSight = (braveResources.LoadAsset("assets/resourcesbundle/global vfx/vfx_lasersight.prefab") as GameObject);
+
 			if (ModAssets is null)
 			{
 				ETGModConsole.Log("ModAssets is null!");
 			}
-			TutorialDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Tutorial");
-			SewerDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Sewer");
-			MinesDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Mines");
-			ratDungeon = DungeonDatabase.GetOrLoadByName("base_resourcefulrat");
-			CathedralDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Cathedral");
-			BulletHellDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_BulletHell");
-			ForgeDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Forge");
-			CatacombsDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_Catacombs");
-			NakatomiDungeonPrefab = DungeonDatabase.GetOrLoadByName("base_nakatomi");
 
 			reward_room = shared_auto_002.LoadAsset<PrototypeDungeonRoom>("reward room");
 			gungeon_rewardroom_1 = shared_auto_002.LoadAsset<PrototypeDungeonRoom>("gungeon_rewardroom_1");
@@ -136,12 +128,7 @@ namespace BotsMod
 
 			CastleRoomTable = shared_auto_002.LoadAsset<GenericRoomTable>("Castle_RoomTable");
 			Gungeon_RoomTable = shared_auto_002.LoadAsset<GenericRoomTable>("Gungeon_RoomTable");
-			SewersRoomTable = SewerDungeonPrefab.PatternSettings.flows[0].fallbackRoomTable;
-			AbbeyRoomTable = CathedralDungeonPrefab.PatternSettings.flows[0].fallbackRoomTable;
-			MinesRoomTable = MinesDungeonPrefab.PatternSettings.flows[0].fallbackRoomTable;
-			CatacombsRoomTable = CatacombsDungeonPrefab.PatternSettings.flows[0].fallbackRoomTable;
-			ForgeRoomTable = ForgeDungeonPrefab.PatternSettings.flows[0].fallbackRoomTable;
-			BulletHellRoomTable = BulletHellDungeonPrefab.PatternSettings.flows[0].fallbackRoomTable;
+			
 
 			doublebeholsterroom01 = BeyondDungeonFlows.LoadOfficialFlow("Secret_DoubleBeholster_Flow").AllNodes[2].overrideExactRoom;
 			
@@ -270,7 +257,11 @@ namespace BotsMod
 
 			//ETGModConsole.Log($"{.GetComponent<UvStorer>().uvArray.Length}");
 			//
-			var beyondCollectionObject = FakePrefab.Clone(FloorHooks.GetOrLoadByName_Orig("Finalscenario_Soldier").tileIndices.dungeonCollection.gameObject);
+
+			var marinePastPrefab = DungeonDatabase.GetOrLoadByName("Finalscenario_Soldier");
+
+
+			var beyondCollectionObject = FakePrefab.Clone(marinePastPrefab.tileIndices.dungeonCollection.gameObject);
 			beyondCollectionObject.name = "BeyondCollection";
 			beyondCollection = beyondCollectionObject.GetComponent<tk2dSpriteCollectionData>();
 
@@ -652,8 +643,7 @@ namespace BotsMod
 					beyondCollection.spriteDefinitions[577].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
 					beyondCollection.spriteDefinitions[599].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 1);
 
-
-					var waterMat = new Material(FloorHooks.GetOrLoadByName_Orig("base_castle").tileIndices.dungeonCollection.materials[5]);
+					var waterMat = new Material(castlePrefab.tileIndices.dungeonCollection.materials[5]);
 					waterMat.SetColor("_CausticColor", new Color(0.4f, 0.11f, 0.41f, 0.672f));
 					waterMat.SetTexture("_MainTex", tex);
 					waterMat.SetTexture("_MaskTex", fucktilesets.LoadAsset<Texture2D>("atlasrefl0"));
@@ -728,53 +718,24 @@ namespace BotsMod
 			}
 
 
-			beyondChestPrefab = ChestInitStuff.InitChest(
-				"beyond",
-				"bot",
-				"BotsMod/sprites/chest/chest_beyond_idle_001.png",
-				new List<string> { "BotsMod/sprites/chest/chest_beyond_open_001.png", "BotsMod/sprites/chest/chest_beyond_open_002.png", "BotsMod/sprites/chest/chest_beyond_open_003.png", "BotsMod/sprites/chest/chest_beyond_open_004.png", "BotsMod/sprites/chest/chest_beyond_open_005.png" },
-				12,
-				new List<string> { "BotsMod/sprites/chest/chest_beyond_appear_001.png", "BotsMod/sprites/chest/chest_beyond_appear_002.png", "BotsMod/sprites/chest/chest_beyond_appear_003.png", "BotsMod/sprites/chest/chest_beyond_appear_004.png", "BotsMod/sprites/chest/chest_beyond_appear_005.png" },
-				11,
-				new List<string> { "BotsMod/sprites/chest/chest_beyond_break_001.png", "BotsMod/sprites/chest/chest_beyond_break_001.png", "BotsMod/sprites/chest/chest_beyond_break_001.png", "BotsMod/sprites/chest/chest_beyond_break_001.png" },
-				10,
-				new List<int> { 0 },
-				new LootData
-				{
-					D_Chance = 0.5f,
-					C_Chance = 0.4f,
-					B_Chance = 0.3f,
-					A_Chance = 0.05f,
-					S_Chance = 0.05f,
-					Common_Chance = 0,
-					CompletesSynergy = false,
-					canDropMultipleItems = false,
-					lootTable = beyondLootTable,
-					multipleItemDropChances = new WeightedIntCollection { elements = new WeightedInt[0] },
-					onlyOneGunCanDrop = true,
+			
 
-				},
-				new LootData
-				{
-					D_Chance = 0.2f,
-					C_Chance = 0.8f,
-					B_Chance = 0.1f,
-					A_Chance = 0.025f,
-					S_Chance = 0.025f,
-					Common_Chance = 0,
-					CompletesSynergy = false,
-					canDropMultipleItems = false,
-					lootTable = beyondLootTable,
-					multipleItemDropChances = new WeightedIntCollection { elements = new WeightedInt[0] },
-					onlyOneGunCanDrop = true,
 
-				},
-				null,
-				-1,
-				GameManager.Instance.RewardManager.C_Chest.VFX_PreSpawn,
-				GameManager.Instance.RewardManager.C_Chest.VFX_GroundHit,
-				0.73f
-			);
+			string[] idleTableSpritesH = new string[] { "BotsMod/sprites/table/beyond/beyond_table_horizontal_idle_001.png" };
+			string[] tableOutlinesH = new string[] { "BotsMod/sprites/table/beyond/beyond_table_horizontal_outline_top.png", "BotsMod/sprites/table/beyond/beyond_table_horizontal_outline_left.png", "BotsMod/sprites/table/beyond/beyond_table_horizontal_outline_right.png", "BotsMod/sprites/table/beyond/beyond_table_horizontal_outline_bottom.png" };
+
+
+			//BreakAbleAPI.BreakableAPIToolbox.GenerateTable
+			//(
+			//	"Beyond",
+			//	idleTableSpritesH,
+			//	tableOutlinesH,
+
+
+			//);
+			marinePastPrefab = null;
+			castlePrefab = null;
+
 		}
 	}	
 }

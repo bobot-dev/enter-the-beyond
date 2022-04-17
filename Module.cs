@@ -30,6 +30,7 @@ using static BotsMod.RandomComps;
 using AmmonomiconAPI;
 using BotsMod.NightmareNightmareNightmare;
 using ModdedItemWeightBalancer;
+using SoundAPI;
 //using ChallengeAPI;
 
 
@@ -38,7 +39,7 @@ namespace BotsMod
     public class BotsModule : ETGModule
     {
         public static readonly string MOD_NAME = "Enter The Beyond";
-        public static readonly string VERSION = "0.6.0";
+        public static readonly string VERSION = "0.6.4";
         public static readonly string TEXT_COLOR = "#e01279";
         public static readonly string LOST_COLOR = "#7732a8";
         public static readonly string LOCKED_CHARACTOR_COLOR = "#ba0c00";
@@ -103,7 +104,11 @@ namespace BotsMod
                 ZipFilePath = this.Metadata.Archive;
                 FilePath = this.Metadata.Directory;
 
-                AudioResourceLoader.InitAudio();
+                //AudioResourceLoader.InitAudio();
+
+                SoundManager.Init();
+                SoundManager.LoadBanksFromModProject();
+
 
                 Strings = new AdvancedStringDB();
                 //item api
@@ -115,7 +120,10 @@ namespace BotsMod
                 SettingsHooks.Init();
                 BeyondSettings.Load();
                 debugMode = BeyondSettings.Instance.debug;
-                debugMode = true;
+
+                //BeyondSettings.Instance.debug = false;
+                //debugMode = false;
+
                 //GungeonAP.Init();
 
                 //GameManager.Instance.gameObject.AddComponent<DiscordController>();
@@ -203,6 +211,7 @@ namespace BotsMod
                 if (debugMode) PirmalShotgrub.Init();
                 if (debugMode) BeyondKin.Init();
                 OverseerFloor.Init();
+                if (debugMode) Enforcer.Init();
                 //OverseerDecoy.Init();
                 if (debugMode) TestActive.Init();
                 //SpecialDungeon.Init();
@@ -235,13 +244,22 @@ namespace BotsMod
                 if (debugMode) Alternator.Add();
 
                 CoolAssChargeGun.Add();
+
                 if (debugMode) BeyondRailgun.Add();
 
                 if (debugMode) BreachCutter.Add();
 
+                BeamGun.Add();
+
                 BeyondSmg.Add();
 
                 Judgment.Add();
+
+                BeyondHammer.Add();
+
+                BeyondKnives.Add();
+
+                if (debugMode) BeyondRifle.Add();
 
                 if (debugMode) GunParasite.Add();
 
@@ -399,7 +417,19 @@ namespace BotsMod
 
                 ETGMod.Databases.Strings.Core.Set("#BEYOND_TAKEPLAYERDAMAGE", "The master's fury will not be kind to you!");
 
+                var beyondLootTable = LootTableAPI.LootTableTools.CreateLootTable();
+                foreach (var item in Tools.BeyondItems)
+                {
+                    if (item == BotsItemIds.SpinDownDice)
+                    {
+                        beyondLootTable.AddItemToPool(item, 0.5f);
+                    }
+                    else
+                    {
+                        beyondLootTable.AddItemToPool(item);
+                    }
 
+                }
 
                 //NpcInitShit.Init();
                 //BotsModule.shop = NpcApi.ItsDaFuckinShopApi.SetUpShop("beyond", "bot", testNpcIdleSprites, 6, testNpcTalkSprites, 8, devilLootTable, BaseShopController.AdditionalShopType.TRUCK, "", "", "", "", "", "", false);
@@ -409,7 +439,7 @@ namespace BotsMod
                     new Vector3[] { new Vector3(1.125f, 2.125f, 1), new Vector3(0f, 3.250f, 1), new Vector3(5.250f, 3.250f, 1), new Vector3(4.125f, 2.125f, 1), new Vector3(2.625f, 1f, 1) }, 1, false, null, ShopMerchantStuff.CustomCanBuyWeapons, ShopMerchantStuff.RemoveCurrencyWeapons,
                     ShopMerchantStuff.CustomPriceWeapons, null, null, "BotsMod/sprites/shopguygunmoneyicon.png", "gunTextIcon", true, false).GetComponent<CustomShopController>();
                 //mapiconshop
-                shop = NpcApi.ItsDaFuckinShopApi.SetUpShop("BeyondShopKeep", "bot", beyondNpcIdleSprites, 6, beyondNpcTalkSprites, 8, BeyondPrefabs.beyondLootTable, CustomShopItemController.ShopCurrencyType.CUSTOM, "#BEYOND_RUNBASEDMULTILINE_GENERIC", "#BEYOND_RUNBASEDMULTILINE_STOPPER", "#BEYOND_SHOP_PURCHASED",
+                shop = NpcApi.ItsDaFuckinShopApi.SetUpShop("BeyondShopKeep", "bot", beyondNpcIdleSprites, 6, beyondNpcTalkSprites, 8, beyondLootTable, CustomShopItemController.ShopCurrencyType.CUSTOM, "#BEYOND_RUNBASEDMULTILINE_GENERIC", "#BEYOND_RUNBASEDMULTILINE_STOPPER", "#BEYOND_SHOP_PURCHASED",
                     "#BEYOND_PURCHASE_FAILED", "#BEYOND_INTRO", "#BEYOND_TAKEPLAYERDAMAGE", ItsDaFuckinShopApi.defaultTalkPointOffset, ItsDaFuckinShopApi.defaultItemPositions, 1, false, null, ShopMerchantStuff.CustomCanBuyBeyond, ShopMerchantStuff.RemoveCurrencyBeyond,
                     ShopMerchantStuff.CustomPriceBeyond, null, null, "", "heart_big_idle_001", false, true, "BotsMod/sprites/Npcs/beyond_merch_carpet_001.png", true, "BotsMod/sprites/Npcs/mapiconshop.png", true, 0.01f).GetComponent<CustomShopController>();
 
@@ -549,7 +579,7 @@ namespace BotsMod
                 Loader.SetupCustomBreachAnimation(name, "float_hold", 5, tk2dSpriteAnimationClip.WrapMode.Loop);
                 Loader.SetupCustomBreachAnimation(name, "float_out", 14, tk2dSpriteAnimationClip.WrapMode.Once);
                 Loader.SetupCustomBreachAnimation(name, "select_idle", 12, tk2dSpriteAnimationClip.WrapMode.LoopFidget, 1, 4);
-               
+
                 Loader.AddPhase(name, new CharacterSelectIdlePhase
                 {
                     endVFXSpriteAnimator = null,
@@ -584,6 +614,66 @@ namespace BotsMod
 
                 ChamberGunAPI.Init("EnterTheBeyond");
 
+
+                BeyondPrefabs.beyondChestPrefab = ChestInitStuff.InitChest(
+                "beyond",
+                "bot",
+                "BotsMod/sprites/chest/beyond_chest_idle_001.png",
+                new List<string> { "BotsMod/sprites/chest/beyond_chest_open_001.png", "BotsMod/sprites/chest/beyond_chest_open_001.png", "BotsMod/sprites/chest/beyond_chest_open_001.png", "BotsMod/sprites/chest/beyond_chest_open_001.png", "BotsMod/sprites/chest/beyond_chest_open_001.png", "BotsMod/sprites/chest/beyond_chest_open_001.png", "BotsMod/sprites/chest/beyond_chest_open_001.png", "BotsMod/sprites/chest/beyond_chest_open_001.png", "BotsMod/sprites/chest/beyond_chest_open_002.png", "BotsMod/sprites/chest/beyond_chest_open_003.png", "BotsMod/sprites/chest/beyond_chest_open_004.png", "BotsMod/sprites/chest/beyond_chest_open_005.png", "BotsMod/sprites/chest/beyond_chest_open_006.png", "BotsMod/sprites/chest/beyond_chest_open_007.png", "BotsMod/sprites/chest/beyond_chest_open_008.png", "BotsMod/sprites/chest/beyond_chest_open_009.png", "BotsMod/sprites/chest/beyond_chest_open_010.png", "BotsMod/sprites/chest/beyond_chest_open_011.png", "BotsMod/sprites/chest/beyond_chest_open_012.png", "BotsMod/sprites/chest/beyond_chest_open_013.png", "BotsMod/sprites/chest/beyond_chest_open_014.png", "BotsMod/sprites/chest/beyond_chest_open_015.png", "BotsMod/sprites/chest/beyond_chest_open_016.png", "BotsMod/sprites/chest/beyond_chest_open_017.png", "BotsMod/sprites/chest/beyond_chest_open_018.png", "BotsMod/sprites/chest/beyond_chest_open_019.png", "BotsMod/sprites/chest/beyond_chest_open_020.png", "BotsMod/sprites/chest/beyond_chest_open_021.png", "BotsMod/sprites/chest/beyond_chest_open_022.png", "BotsMod/sprites/chest/beyond_chest_open_023.png", "BotsMod/sprites/chest/beyond_chest_open_024.png", "BotsMod/sprites/chest/beyond_chest_open_025.png" },
+                24,
+                new List<string> { "BotsMod/sprites/chest/beyond_chest_appear_001.png", "BotsMod/sprites/chest/beyond_chest_appear_002.png", "BotsMod/sprites/chest/beyond_chest_appear_003.png", "BotsMod/sprites/chest/beyond_chest_appear_004.png", "BotsMod/sprites/chest/beyond_chest_appear_005.png", "BotsMod/sprites/chest/beyond_chest_appear_006.png", "BotsMod/sprites/chest/beyond_chest_appear_006.png", "BotsMod/sprites/chest/beyond_chest_appear_006.png", "BotsMod/sprites/chest/beyond_chest_appear_006.png", "BotsMod/sprites/chest/beyond_chest_appear_007.png", "BotsMod/sprites/chest/beyond_chest_appear_008.png", "BotsMod/sprites/chest/beyond_chest_appear_009.png", "BotsMod/sprites/chest/beyond_chest_appear_010.png", "BotsMod/sprites/chest/beyond_chest_appear_011.png", },
+                9,
+                new List<string> { "BotsMod/sprites/chest/beyond_chest_break_001.png", "BotsMod/sprites/chest/beyond_chest_break_002.png", "BotsMod/sprites/chest/beyond_chest_break_003.png", "BotsMod/sprites/chest/beyond_chest_break_004.png", "BotsMod/sprites/chest/beyond_chest_break_005.png", "BotsMod/sprites/chest/beyond_chest_break_006.png", "BotsMod/sprites/chest/beyond_chest_break_007.png", "BotsMod/sprites/chest/beyond_chest_break_008.png" },
+                10,
+                "BotsMod/sprites/chest/beyond_chest_minimap_icon.png",
+                new List<string> { "BotsMod/sprites/chest/Lock/beyond_padlock_idle_001.png" },
+                24,
+                new List<string> { "BotsMod/sprites/chest/Lock/beyond_padlock_open_001.png", "BotsMod/sprites/chest/Lock/beyond_padlock_open_002.png", "BotsMod/sprites/chest/Lock/beyond_padlock_open_003.png", "BotsMod/sprites/chest/Lock/beyond_padlock_open_004.png", "BotsMod/sprites/chest/Lock/beyond_padlock_open_005.png", "BotsMod/sprites/chest/Lock/beyond_padlock_open_006.png", "BotsMod/sprites/chest/Lock/beyond_padlock_open_007.png", "BotsMod/sprites/chest/Lock/beyond_padlock_open_008.png", },
+                24,
+                new List<string> { "BotsMod/sprites/chest/Lock/beyond_padlock_broken_001.png" },
+                24,
+
+                new List<string> { "BotsMod/sprites/chest/Lock/beyond_padlock_no_key_001.png", "BotsMod/sprites/chest/Lock/beyond_padlock_no_key_002.png", "BotsMod/sprites/chest/Lock/beyond_padlock_no_key_003.png", "BotsMod/sprites/chest/Lock/beyond_padlock_no_key_004.png", "BotsMod/sprites/chest/Lock/beyond_padlock_no_key_005.png" },
+                16,
+
+                null,
+                new LootData
+                {
+                    D_Chance = 0.5f,
+                    C_Chance = 0.4f,
+                    B_Chance = 0.3f,
+                    A_Chance = 0.05f,
+                    S_Chance = 0.05f,
+                    Common_Chance = 0,
+                    CompletesSynergy = false,
+                    canDropMultipleItems = false,
+                    lootTable = beyondLootTable,
+                    multipleItemDropChances = new WeightedIntCollection { elements = new WeightedInt[0] },
+                    onlyOneGunCanDrop = true,
+
+                },
+                new LootData
+                {
+                    D_Chance = 0.2f,
+                    C_Chance = 0.8f,
+                    B_Chance = 0.1f,
+                    A_Chance = 0.025f,
+                    S_Chance = 0.025f,
+                    Common_Chance = 0,
+                    CompletesSynergy = false,
+                    canDropMultipleItems = false,
+                    lootTable = beyondLootTable,
+                    multipleItemDropChances = new WeightedIntCollection { elements = new WeightedInt[0] },
+                    onlyOneGunCanDrop = true,
+
+                },
+                GameManager.Instance.RewardManager.C_Chest.ShadowSprite,
+                -1,
+                null,
+                GameManager.Instance.RewardManager.C_Chest.VFX_GroundHit,
+                1.5f
+            );
+                
                 //Ammonomicon.Init();              
                 if (debugMode)
                 {
@@ -594,16 +684,16 @@ namespace BotsMod
                     AlphabetSoupEntry TransRights = new AlphabetSoupEntry
                     {
                         Words = new string[]
-    {
-                        "transrights".ToUpper(),
-    },
+                        {
+                            "transrights".ToUpper(),
+                        },
                         BaseProjectile = alphabetSoupSynergyProcessor.Entries[0].BaseProjectile,
                         //BaseProjectile = 
                         RequiredSynergy = CustomSynergyType.ALPHABET_PLUS_ONE,//CustomEnums.CustomCustomSynergyType.LOWER_CASE_R_TEST,
                         AudioEvents = new string[]
-    {
-                        "Play_WPN_rgun_bullet_01"
-    }
+                        {
+                            "Play_WPN_rgun_bullet_01"
+                        }
                     };
 
                     var funnylist = PickupObjectDatabase.GetById(340).gameObject.GetComponent<AlphabetSoupSynergyProcessor>().Entries.ToList();
@@ -615,7 +705,7 @@ namespace BotsMod
 
                 }
 
-
+                //SoundManager.AddCustomSwitchData("", );
 
 
 

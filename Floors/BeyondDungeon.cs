@@ -55,10 +55,9 @@ namespace BotsMod
         public static Dungeon BeyondGeon(Dungeon dungeon)
         {
             Debug.Log("beyond setup 1");
-            Dungeon CastleDungeonPrefab = FloorHooks.GetOrLoadByName_Orig("base_castle");
-            Dungeon CatacombsPrefab = FloorHooks.GetOrLoadByName_Orig("Base_Catacombs");
-            Dungeon MarinePastPrefab = FloorHooks.GetOrLoadByName_Orig("Finalscenario_Soldier");
-            Dungeon RatDungeonPrefab = FloorHooks.GetOrLoadByName_Orig("Base_ResourcefulRat");
+            Dungeon CatacombsPrefab = DungeonDatabase.GetOrLoadByName("Base_Catacombs");
+            Dungeon MarinePastPrefab = DungeonDatabase.GetOrLoadByName("Finalscenario_Soldier");
+            Dungeon RatDungeonPrefab = DungeonDatabase.GetOrLoadByName("Base_ResourcefulRat");
 
             if (gofuckyourself == null)
             {
@@ -464,15 +463,28 @@ namespace BotsMod
             {
                 Debug.LogError("beyond setup dungeon.tileIndices.dungeonCollection nulled");
             }
-            dungeon.tileIndices.dungeonCollection.name = "ENV_Beyond_Collection";
+            if (BeyondSettings.Instance.debug) dungeon.tileIndices.dungeonCollection.name = "ENV_Beyond_Collection";
             Debug.Log("beyond setup 3.6");
 
-            
 
-            dungeon.roomMaterialDefinitions = new DungeonMaterial[] {
-                FinalScenario_MainMaterial,
-                beyondBrickMaterial,
-            };
+
+
+            if (BeyondSettings.Instance.debug)
+            {
+                dungeon.roomMaterialDefinitions = new DungeonMaterial[] {
+                    FinalScenario_MainMaterial,
+                    beyondBrickMaterial,
+                };
+            }
+            else
+            {
+
+                dungeon.roomMaterialDefinitions = new DungeonMaterial[] {
+                    UnityEngine.Object.Instantiate(MarinePastPrefab.roomMaterialDefinitions[0]),
+                    UnityEngine.Object.Instantiate(MarinePastPrefab.roomMaterialDefinitions[0]),
+                };
+
+            }
             dungeon.dungeonWingDefinitions = new DungeonWingDefinition[0];
             Debug.Log("beyond setup 4");
             //This section can be used to take parts from other floors and use them as our own.
@@ -568,13 +580,13 @@ namespace BotsMod
 
 
                 ambientLightColor = new Color32(70, 62, 74, 255),
-                ambientLightColorTwo = new Color32(122, 98, 130, 255),
-                lowQualityAmbientLightColor = new Color32(255, 255, 255, 255),
-                lowQualityAmbientLightColorTwo = new Color32(255, 255, 255, 255),
+                ambientLightColorTwo = new Color32(90, 68, 97, 255),
+                lowQualityAmbientLightColor = new Color32(54, 54, 54, 255),
+                lowQualityAmbientLightColorTwo = new Color32(54, 54, 54, 255),
                 lowQualityCheapLightVector = new Vector4(1, 0, -1, 0),
 
                 UsesAlienFXFloorColor = true,
-                AlienFXFloorColor = new Color32(228, 160, 250, 255),
+                AlienFXFloorColor = new Color32(42, 28, 46, 255),
 
                 generateLights = true,
                 lightCullingPercentage = 0.2f,
@@ -615,18 +627,17 @@ namespace BotsMod
             dungeon.SetTutorialFlag = false;
             dungeon.PlayerIsLight = true;
             dungeon.PlayerLightColor = CatacombsPrefab.PlayerLightColor;
-            dungeon.PlayerLightIntensity = 4;
-            dungeon.PlayerLightRadius = 4;
+            dungeon.PlayerLightIntensity = 3;
+            dungeon.PlayerLightRadius = 5;
             dungeon.PrefabsToAutoSpawn = new GameObject[0];
 
             Debug.Log("beyond setup 8");
             //include this for custom floor audio
-            //dungeon.musicEventName = "play_sound"; 
-
+            dungeon.musicEventName = "Play_MUS_Space_Intro_01";
 
             CatacombsPrefab = null;
-            RatDungeonPrefab = null;
             MarinePastPrefab = null;
+            RatDungeonPrefab = null;
 
             return dungeon;
         }

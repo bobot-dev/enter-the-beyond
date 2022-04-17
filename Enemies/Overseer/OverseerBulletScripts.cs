@@ -76,9 +76,22 @@ namespace BotsMod
 				yield return this.Wait(15);
 			}
 
-			
+			yield return this.Wait(30);
+			base.PostWwiseEvent("Play_FlashTell", null);
+			yield return this.Wait(10);
+			for (int j = 0; j < 9; j++)
+			{
+				for (int i = 0; i < 60; i++)
+				{
+					this.Fire(new Direction((360 / 60) * i, DirectionType.Absolute, -1f), new Speed((float)(8), SpeedType.Absolute), null);
+				}
+				yield return this.Wait(70);
+				base.PostWwiseEvent("Play_FlashTell", null);
+				yield return this.Wait(10);
+			}
 
-			yield return this.Wait(125);
+
+			yield return this.Wait(40);
 		}
 		public class Default : Bullet
 		{
@@ -103,7 +116,7 @@ namespace BotsMod
 
 				//yield return this.Wait(travelTime);
 				this.Speed = 0f;
-				yield return this.Wait(14*60);
+				yield return this.Wait(840);
 				this.Vanish(true);
 			}
 
@@ -214,6 +227,210 @@ namespace BotsMod
 		}
 
 	}
+
+	public class SixBeamScriptNoRing : Script
+	{
+		static SixBeamScriptNoRing()
+		{
+			SixBeamScriptNoRing.RampHeights = new float[]
+			{
+				2f,
+				1f,
+				0f,
+				1f,
+				2f,
+				3f,
+				4f,
+				2f
+			};
+
+			SixBeamScriptNoRing.TargetOffsets = new Vector2[]
+			{
+			new Vector2(0f, 0.0625f),
+			new Vector2(0.0625f, -0.0625f),
+			new Vector2(0.0625f, 0f),
+			new Vector2(0.0625f, -0.0625f),
+			new Vector2(0.0625f, 0.0625f),
+			new Vector2(0f, 0f),
+			new Vector2(0.0625f, 0f),
+			new Vector2(0.125f, -0.125f)
+			};
+		}
+
+		private static Vector2[] TargetOffsets;
+		private static float[] RampHeights;
+
+
+		protected override IEnumerator Top()
+		{
+
+			if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
+			{
+				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("6c43fddfd401456c916089fdd1c99b1c").bulletBank.GetBullet("sweep"));
+				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("6c43fddfd401456c916089fdd1c99b1c").bulletBank.GetBullet("default"));
+
+			}
+
+			CellArea area = this.BulletBank.aiActor.ParentRoom.area;
+			Vector2 roomLowerLeft = area.UnitBottomLeft;
+			Vector2 roomUpperRight = area.UnitTopRight - new Vector2(0f, 3f);
+			Vector2 roomCenter = this.BulletBank.aiActor.Position;
+
+			for (int j = 0; j < 18; j++)
+			{
+				for (int i = 0; i < 84; i++)
+				{
+					Vector2 vector = this.BulletBank.aiActor.CenterPosition;
+					float angle = base.SubdivideCircle(0f, 84, i, 1f, false);
+					Vector2 vector2 = vector + (BraveMathCollege.DegreesToVector(angle, 5f) * 6);
+					Bullet bullet = new Default(vector, 12 + j);
+					if (j == 0)
+					{
+						bullet = new SkellBullet(vector, 12 + j);
+
+					}
+					base.Fire(Offset.OverridePosition(vector2), bullet);
+				}
+				yield return this.Wait(15);
+			}
+
+			yield return this.Wait(790);
+		}
+		public class Default : Bullet
+		{
+			public Default(Vector2 targetPos, float endingDist) : base("default", false, false, false)
+			{
+				this.m_targetPos = targetPos;
+
+				this.m_endDist = endingDist;
+
+			}
+			protected override IEnumerator Top()
+			{
+				this.Direction = (this.m_targetPos - this.Position).ToAngle();
+				this.Projectile.IgnoreTileCollisionsFor(90f);
+				this.Projectile.IgnoreCollisionsFor(2f);
+
+				this.Speed = 7f;
+				while (Vector3.Distance(m_targetPos, this.Position) > m_endDist)
+				{
+					yield return this.Wait(1);
+				}
+
+				//yield return this.Wait(travelTime);
+				this.Speed = 0f;
+				yield return this.Wait(840);
+				this.Vanish(true);
+			}
+
+			private Vector2 m_targetPos;
+			private float m_endDist;
+		}
+
+
+		public class SkellBullet : Bullet
+		{
+			public SkellBullet(Vector2 targetPos, float endingDist) : base("sweep", false, false, false)
+			{
+				this.m_targetPos = targetPos;
+
+				this.m_endDist = endingDist;
+
+			}
+			protected override IEnumerator Top()
+			{
+				this.Direction = (this.m_targetPos - this.Position).ToAngle();
+				this.Projectile.IgnoreTileCollisionsFor(90f);
+				this.Projectile.IgnoreCollisionsFor(2f);
+
+				this.Speed = 7f;
+				while (Vector3.Distance(m_targetPos, this.Position) > m_endDist)
+				{
+					yield return this.Wait(1);
+				}
+
+				//yield return this.Wait(travelTime);
+				this.Speed = 0f;
+				yield return this.Wait(14 * 60);
+				this.Vanish(true);
+			}
+
+			private Vector2 m_targetPos;
+			private float m_endDist;
+		}
+
+
+		public class CheeseWedgeBullet : Bullet
+		{
+			public CheeseWedgeBullet(SixBeamScript2 parent, float additionalRampHeight, Vector2 targetPos, float endingAngle, float endingDist) : base("sweep", true, false, false)
+			{
+				this.m_parent = parent;
+				this.m_targetPos = targetPos;
+				this.m_endingAngle = endingAngle;
+				this.m_additionalRampHeight = additionalRampHeight;
+				this.m_endDist = endingDist;
+			}
+
+			protected override IEnumerator Top()
+			{
+				for (int i = 0; i < 5; i++)
+				{
+					int travelTime = 136;//UnityEngine.Random.RandomRange(90, 136);
+					this.Projectile.IgnoreTileCollisionsFor(90f);
+					this.Projectile.specRigidbody.AddCollisionLayerIgnoreOverride(CollisionMask.LayerToMask(CollisionLayer.HighObstacle, CollisionLayer.LowObstacle));
+					//this.Projectile.sprite.HeightOffGround = 10f + this.m_additionalRampHeight;
+					this.Projectile.sprite.ForceRotationRebuild();
+					this.Projectile.sprite.UpdateZDepth();
+					int r = 0;//UnityEngine.Random.Range(0, 20);
+					yield return this.Wait(15);
+					this.Speed = 2.5f;
+					yield return this.Wait(50);
+					this.Speed = 0f;
+
+					this.Direction = (this.m_targetPos - this.Position).ToAngle();
+					this.ChangeSpeed(new Speed((this.m_targetPos - this.Position).magnitude / ((float)(travelTime - 15) / 60f), SpeedType.Absolute), 30);
+
+					while (Vector3.Distance(m_targetPos, this.Position) > m_endDist)
+					{
+						yield return this.Wait(1);
+					}
+
+					//yield return this.Wait(travelTime);
+					this.Speed = 0f;
+					//this.Position = this.m_targetPos;
+					this.Direction = this.m_endingAngle;
+					if (this.Projectile && this.Projectile.sprite)
+					{
+						this.Projectile.sprite.HeightOffGround -= 1f;
+						this.Projectile.sprite.UpdateZDepth();
+					}
+					int totalTime = 350;
+					yield return this.Wait(totalTime - this.m_parent.Tick);
+					this.Vanish(true);
+
+					yield return this.Wait(30);
+				}
+
+				yield break;
+			}
+
+			// Token: 0x04000B82 RID: 2946
+			private SixBeamScript2 m_parent;
+
+			// Token: 0x04000B83 RID: 2947
+			private Vector2 m_targetPos;
+			private float m_endDist;
+			// Token: 0x04000B84 RID: 2948
+			private float m_endingAngle;
+
+
+
+			// Token: 0x04000B86 RID: 2950
+			private float m_additionalRampHeight;
+		}
+
+	}
+
 
 	public class SixBeamScript : Script
 	{
@@ -585,6 +802,40 @@ namespace BotsMod
 		}
 	}
 
+	public class OverseerTeleportStartFourLinesScript : Script
+	{
+
+		protected override IEnumerator Top() // This is just a simple example, but bullet scripts can do so much more.
+		{
+			if (this.BulletBank && this.BulletBank.aiActor && this.BulletBank.aiActor.TargetRigidbody)
+			{
+				base.BulletBank.Bullets.Add(EnemyDatabase.GetOrLoadByGuid("6c43fddfd401456c916089fdd1c99b1c").bulletBank.GetBullet("sweep"));
+
+			}
+			var bulletCount = 4;
+
+			for (int i = 0; i <= 5; i++)
+			{
+				for (int j = 0; j <= (bulletCount); j++)
+				{
+					this.Fire(new Direction((float)(j * (360 / bulletCount)), DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
+				}
+				yield return this.Wait(4);
+			}
+
+			yield break;
+		}
+
+		public class SkellBullet : Bullet
+		{
+			public SkellBullet() : base("sweep", false, false, false)
+			{
+
+
+			}
+		}
+	}
+
 	public class OverseerTeleportStartLinesScript : Script
 	{
 
@@ -621,6 +872,7 @@ namespace BotsMod
 				}
 				yield return this.Wait(4);
 			}
+			yield return this.Wait(4);
 			for (int j = 0; j <= (bulletCount); j++)
 			{
 				this.Fire(new Direction((float)((j * (360 / bulletCount)) + 360 / (bulletCount * 2)), DirectionType.Absolute, -1f), new Speed(11f, SpeedType.Absolute), new SkellBullet());
@@ -892,8 +1144,8 @@ namespace BotsMod
 				for (int j = 0; j < 5; j++)
 				{
 					float num = offset + 20f + (float)j * 10f;
-					this.Fire(new Offset("right eye"), new Direction(currentAngle + num, DirectionType.Absolute, -1f), new Speed(18f, SpeedType.Absolute), new Bullet("default_novfx", false, false, false));
-					this.Fire(new Offset("left eye"), new Direction(currentAngle - num, DirectionType.Absolute, -1f), new Speed(18f, SpeedType.Absolute), new Bullet("default_novfx", false, false, false));
+					this.Fire(new Offset("right eye"), new Direction(currentAngle + num, DirectionType.Absolute, -1f), new Speed(14f, SpeedType.Absolute), new Bullet("default_novfx", false, false, false));
+					this.Fire(new Offset("left eye"), new Direction(currentAngle - num, DirectionType.Absolute, -1f), new Speed(14f, SpeedType.Absolute), new Bullet("default_novfx", false, false, false));
 				}
 				if (i > 30 && i % 30 == 29)
 				{
@@ -902,7 +1154,7 @@ namespace BotsMod
 				if (i > 60)
 				{
 					float num2 = Vector2.Distance(this.BulletManager.PlayerPosition(), this.Position);
-					float num3 = num2 / 18f * 30f;
+					float num3 = num2 / 14f * 25f;
 					if (num3 > (float)(i - 60))
 					{
 						num3 = (float)Mathf.Max(0, i - 60);

@@ -49,15 +49,15 @@ namespace BotsMod
 			gun.reloadTime = 1.3f;
 
 			gun.DefaultModule.ammoType = GameUIAmmoType.AmmoType.CUSTOM;
-			gun.DefaultModule.customAmmoType = other.DefaultModule.customAmmoType;
-
+			gun.DefaultModule.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType("Lost Sidearm", "BotsMod/sprites/CustomGunAmmoTypes/lost_sidearm_clip_001", "BotsMod/sprites/CustomGunAmmoTypes/lost_sidearm_clip_002"); ;
+			gun.barrelOffset.localPosition = new Vector3(1.375f, 0.5f, 0f);
 
 			//gun.DefaultModule.usesOptionalFinalProjectile = true;
 			//gun.DefaultModule.numberOfFinalProjectiles = 1;
 
 			//Projectile replacementProjectile = gun2.DefaultModule.projectiles[0];
 
-			
+
 
 			//gun.DefaultModule.finalProjectile = replacementProjectile;
 			//gun.DefaultModule.finalCustomAmmoType = gun2.DefaultModule.customAmmoType;
@@ -66,9 +66,10 @@ namespace BotsMod
 			//gun.DefaultModule.finalProjectile.statusEffectsToApply.Add(Debuffs.decayEffect);
 			//gun.DefaultModule.finalProjectile.ChanceToTransmogrify = 0;
 
-			Gun gun5 = PickupObjectDatabase.GetById(37) as Gun;
+			//Gun gun5 = PickupObjectDatabase.GetById(37) as Gun;
+			Gun gun6 = PickupObjectDatabase.GetById(32) as Gun;
 			
-			gun.finalMuzzleFlashEffects = gun5.muzzleFlashEffects;
+			gun.muzzleFlashEffects = gun6.muzzleFlashEffects;
 
 			gun.DefaultModule.cooldownTime = 0.15f;
 			gun.DefaultModule.numberOfShotsInClip = 10;
@@ -91,14 +92,14 @@ namespace BotsMod
 			gun.shellsToLaunchOnFire = 0;
 
 			//projectile.transform.parent = gun.barrelOffset;
-			projectile.hitEffects = gun4.DefaultModule.projectiles[0].hitEffects;
+			projectile.hitEffects = gun6.DefaultModule.projectiles[0].hitEffects;
 			projectile.baseData.damage = 5f;
 			projectile.baseData.speed = 16f;
 			projectile.baseData.force = 10f;
 			projectile.baseData.range = 16f;
 
 
-
+			projectile.SetProjectileSpriteRight("lost_sidearm_projectile_001", 8, 8, true, tk2dBaseSprite.Anchor.MiddleCenter, 6, 2, false, false, 0, 0);
 
 
 			ETGMod.Databases.Items.Add(gun, null, "ANY");

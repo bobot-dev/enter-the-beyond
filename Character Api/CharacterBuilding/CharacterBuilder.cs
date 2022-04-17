@@ -59,10 +59,13 @@ namespace CustomCharacters
             CustomizeCharacter(playerController, data, paradoxUsesSprites);
 
             data.useGlow = useGlow;
-            data.emissiveColor = glowVars.emissiveColor;
-            data.emissiveColorPower = glowVars.emissiveColorPower;
-            data.emissivePower = glowVars.emissivePower;
 
+            if (useGlow)
+            {
+                data.emissiveColor = glowVars.emissiveColor;
+                data.emissiveColorPower = glowVars.emissiveColorPower;
+                data.emissivePower = glowVars.emissivePower;
+            }
             data.removeFoyerExtras = removeFoyerExtras;
             data.metaCost = metaCost;
 
@@ -151,8 +154,8 @@ namespace CustomCharacters
             //BotsModule.Strings.Core.Set("#PLAYER_NICK_LOST", "Dead Thing");
             //BotsModule.Strings.Core.Set("#PLAYER_NAME_LOST", "Lost");
 
-            StringHandler.AddStringDefinition("#PLAYER_NAME_" + data.nameShort.ToString().ToUpper(), data.name);
-            StringHandler.AddStringDefinition("#PLAYER_NICK_" + data.nameShort.ToString().ToUpper(), data.nickname);
+            StringHandler.AddStringDefinition("#PLAYER_NAME_" + player.characterIdentity.ToString().ToUpperInvariant(), data.name);
+            StringHandler.AddStringDefinition("#PLAYER_NICK_" + player.characterIdentity.ToString().ToUpperInvariant(), data.nickname);
 
             StringHandler.AddDFStringDefinition("#CHAR_" + data.nameShort.ToString().ToUpper(), data.name);
             StringHandler.AddDFStringDefinition("#CHAR_" + data.nameShort.ToString().ToUpper() + "_SHORT", data.nameShort);

@@ -383,7 +383,6 @@ namespace BotsMod
 		{
 			PrepNextAttack();
 			gun.PreventNormalFireAudio = true;
-			//AkSoundEngine.PostEvent("Play_WPN_smileyrevolver_shot_01", base.gameObject);
 		}
 
 		private bool HasReloaded;

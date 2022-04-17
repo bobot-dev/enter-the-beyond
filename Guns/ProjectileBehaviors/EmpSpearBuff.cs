@@ -27,10 +27,7 @@ public class EmpSpearBuff : AppliedEffectBase
 				this.m_player = (component.PossibleSourceGun.CurrentOwner as PlayerController);
 				Gun possibleSourceGun = component.PossibleSourceGun;
 				//possibleSourceGun.OnReloadPressed += this.ExplodeOnReload;
-				if (this.m_player)
-				{
-					this.m_player.GunChanged += this.GunChanged;
-				}
+				//this.gameObject.GetComponent<tk2dSpriteAnimator>().AnimationEventTriggered += HandleAnimationEvent;
 			}
 			else if (component && component.Owner && component.Owner.CurrentGun)
 			{
@@ -38,22 +35,34 @@ public class EmpSpearBuff : AppliedEffectBase
 				this.m_player = (component.Owner as PlayerController);
 				Gun currentGun = component.Owner.CurrentGun;
 				//currentGun.OnReloadPressed += this.ExplodeOnReload;
-				if (this.m_player)
-				{
-					this.m_player.GunChanged += this.GunChanged;
-				}
 			}
+
+			
 		}
 		else
 		{
 			UnityEngine.Object.Destroy(this);
 		}
 	}
+
+	void HandleAnimationEvent(tk2dSpriteAnimator animator, tk2dSpriteAnimationClip clip, int frameNo)
+	{
+		tk2dSpriteAnimationFrame frame = clip.GetFrame(frameNo);
+
+		if (frame?.eventInfo == "explode")
+		{
+			this.Disconnect();
+			this.DoEffect();
+		}
+
+	}
+
+
 	private void Disconnect()
 	{
 		if (this.m_player)
 		{
-			this.m_player.GunChanged -= this.GunChanged;
+			//this.m_player.GunChanged -= this.GunChanged;
 		}
 		if (this.m_attachedGun)
 		{
@@ -83,6 +92,16 @@ public class EmpSpearBuff : AppliedEffectBase
 				this.instantiatedVFX = SpawnManager.SpawnVFX(EmpSpearBuff.vfx, base.transform.position, Quaternion.identity, true);
 				tk2dSprite component = this.instantiatedVFX.GetComponent<tk2dSprite>();
 				tk2dSprite component2 = base.GetComponent<tk2dSprite>();
+			
+				var animator = instantiatedVFX.gameObject.GetComponent<tk2dSpriteAnimator>();
+				var anim = animator.Library.clips[0];
+
+				anim.frames[14].eventInfo = "explode";
+				anim.frames[14].triggerEvent = true;
+
+				animator.AnimationEventTriggered += HandleAnimationEvent;
+
+
 				if (component != null && component2 != null)
 				{
 					component2.AttachRenderer(component);
@@ -144,6 +163,7 @@ public class EmpSpearBuff : AppliedEffectBase
 				OutlineTintColor = new Color(0.414f, 1.8f, 1.545f, 1),
 				AppliesTint = false,
 				DamageMultiplier = 2,
+				bossDamageMultiplier = 1.5f,
 				duration = 5,
 				DamagePerSecondToEnemies = 0f,
 				stackMode = GameActorEffect.EffectStackingMode.Refresh,

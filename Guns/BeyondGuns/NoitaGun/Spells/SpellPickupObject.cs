@@ -44,8 +44,11 @@ namespace BotsMod
 					BotsModule.Log($"{this.spellToGive.homingModifier == null}");
                 }
 				Wand.GainNewSpell(this.spellToGive);
-			}	
-			
+			}
+
+			GameUIRoot.Instance.notificationController.DoCustomNotification(this.encounterTrackable.journalData.GetPrimaryDisplayName(false), this.encounterTrackable.journalData.GetNotificationPanelDescription(), base.GetComponent<tk2dBaseSprite>().Collection, base.GetComponent<tk2dBaseSprite>().spriteId, UINotificationController.NotificationColor.SILVER, false, false);
+
+
 
 
 			this.m_pickedUp = true;
