@@ -190,6 +190,8 @@ namespace BotsMod
 
             validSpells.Add(SpellTypes.piercing, new Spell { name = "Piercing", impactOnPiercing = 2, isCombatSpell = false, weight = 70f });
 
+            validSpells.Add(SpellTypes.spawnSelfDuringFlight, new Spell { name = "Self Spiral", addsComponents = true, addsSpawnProj = true, isCombatSpell = false, weight = 30f });
+
             //validSpells.Add(SpellTypes.chainLightning, new Spell { name = "Chain Lightning", isChainLightning = true, isCombatSpell = false, weight = 0.5f });
             //validSpells.Add(SpellTypes.arrow, new Spell { name = "Arrow", isCombatSpell = false });
 
@@ -256,5 +258,6 @@ namespace BotsMod
         increaseSpeed,
         piercing,
         chainLightning,
+        spawnSelfDuringFlight,
     }
 }

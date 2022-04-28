@@ -4,15 +4,15 @@ using Gungeon;
 using ItemAPI;
 using UnityEngine;
 //using DirectionType = DirectionalAnimation.DirectionType;
-using AnimationType = ItemAPI.BossBuilder.AnimationType;
 using System.Collections;
 using Dungeonator;
 using System.Linq;
 using Brave.BulletScript;
 using GungeonAPI;
-using FrostAndGunfireItems;
+
 using System.Runtime.CompilerServices;
 using BotsMod;
+using EnemyAPI;
 //using EnemyAPI;
 
 namespace BotsMod
@@ -108,7 +108,7 @@ namespace BotsMod
 				miniBossIntroDoer.SkipFinalizeAnimation = true;
 				miniBossIntroDoer.RegenerateCache();
 				ETGModConsole.Log("2");
-				SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/Enemies/MiniBosses/Enforcer/EnforcerIcon", SpriteBuilder.ammonomiconCollection, "EnforcerIcon");
+				SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/Enemies/MiniBosses/Enforcer/EnforcerIcon", BeyondPrefabs.ammonomiconCollection, "EnforcerIcon");
 				if (enemy.GetComponent<EncounterTrackable>() != null)
 				{
 					UnityEngine.Object.Destroy(enemy.GetComponent<EncounterTrackable>());
@@ -190,9 +190,9 @@ namespace BotsMod
 				EnforcerPrefab.GetOrAddComponent<AIAnimator>().OtherVFX = EnemyDatabase.GetOrLoadByGuid("19b420dec96d4e9ea4aebc3398c0ba7a").gameObject.GetComponent<AIAnimator>().OtherVFX;
 
 
-				EnforcerPrefab.AddAnimation("idle", "BotsMod/sprites/Enemies/MiniBosses/Enforcer/Idle", 3, AnimationType.Idle, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
+				EnforcerPrefab.AddAnimation("idle", "BotsMod/sprites/Enemies/MiniBosses/Enforcer/Idle", 3, EnemyBuilder.AnimationType.Idle, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
 
-				var introAnim = EnforcerPrefab.AddAnimation("intro", "BotsMod/sprites/Enemies/MiniBosses/Enforcer/Intro", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None);
+				var introAnim = EnforcerPrefab.AddAnimation("intro", "BotsMod/sprites/Enemies/MiniBosses/Enforcer/Intro", 8, EnemyBuilder.AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None);
 
 
 				introAnim.wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;

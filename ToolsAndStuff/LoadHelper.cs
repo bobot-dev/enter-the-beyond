@@ -10,7 +10,7 @@ using FullInspector;
 using Gungeon;
 
 //using DirectionType = DirectionalAnimation.DirectionType;
-using AnimationType = ItemAPI.EnemyBuilder.AnimationType;
+
 using System.Collections;
 
 using Brave.BulletScript;

@@ -1,4 +1,4 @@
-﻿using FrostAndGunfireItems;
+﻿
 using GungeonAPI;
 using ItemAPI;
 
@@ -29,6 +29,7 @@ using ChamberGunApi;
 using static BotsMod.RandomComps;
 using AmmonomiconAPI;
 using ModdedItemWeightBalancer;
+using EnemyAPI;
 //using ChallengeAPI;
 
 namespace BotsMod
@@ -181,6 +182,13 @@ namespace BotsMod
                 }
             });
 
+
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("forceUnlockAltGuns", (args) =>
+            {
+                GameStatsManager.Instance.SetCharacterSpecificFlag(PlayableCharacters.Guide, CharacterSpecificGungeonFlags.KILLED_PAST, true);
+            });
+
+
             ETGModConsole.Commands.GetGroup("bot").AddUnit("playmus", (args) =>
             {
                 var source = GameManager.Instance.PrimaryPlayer.gameObject;
@@ -189,6 +197,17 @@ namespace BotsMod
                 if (args.Length > 1)
                 {
                     AkSoundEngine.PostEvent(args[1], source);
+                }
+            });
+
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("findWhereTheFuckTheHandIs", (args) =>
+            {
+                foreach(var sprite in GameManager.Instance.PrimaryPlayer.sprite.Collection.spriteDefinitions)
+                {
+                    if (sprite.name.Contains("hand"))
+                    {
+                        ETGModConsole.Log(sprite.name);
+                    }
                 }
             });
 
@@ -747,7 +766,7 @@ namespace BotsMod
 
                 BotsModule.Log("2");
                 return;
-                var room = RoomFactory.BuildFromResource("BotsMod/rooms/customnpctest.room");
+                var room = RoomFactory.BuildFromResource("BotsMod/rooms/customnpctest.room").room;
 
 
                 RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room, null, DungeonData.LightGenerationStyle.STANDARD);
@@ -884,7 +903,7 @@ namespace BotsMod
             ETGModConsole.Commands.GetGroup("bot").AddUnit("breachRoom", delegate (string[] args)
             {
                 var orLoadByName_Orig5 = SpecialDungeon.GetOrLoadByNameOrig("Base_ResourcefulRat");
-                var room = RoomFactory.BuildFromResource("BotsMod/rooms/breachRoom.room");
+                var room = RoomFactory.BuildFromResource("BotsMod/rooms/breachRoom.room").room;
                 room.overriddenTilesets = GlobalDungeonData.ValidTilesets.HELLGEON;
                 RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room, null, DungeonData.LightGenerationStyle.FORCE_COLOR);
 
@@ -1084,7 +1103,7 @@ namespace BotsMod
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("flytest", delegate (string[] args)
             {
-                var room = RoomFactory.BuildFromResource("BotsMod/rooms/robotflytestroom.room");
+                var room = RoomFactory.BuildFromResource("BotsMod/rooms/robotflytestroom.room").room;
                 RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room, null, DungeonData.LightGenerationStyle.FORCE_COLOR);
 
                 Pathfinder.Instance.InitializeRegion(GameManager.Instance.Dungeon.data, creepyRoom.area.basePosition, creepyRoom.area.dimensions);
@@ -1193,7 +1212,7 @@ namespace BotsMod
                 devilLootTable2.AddItemToPool(336);
                 devilLootTable2.AddItemToPool(285);
 
-                var room = RoomFactory.BuildFromResource("BotsMod/rooms/npctest.room");
+                var room = RoomFactory.BuildFromResource("BotsMod/rooms/npctest.room").room;
 
 
                 RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room, null, DungeonData.LightGenerationStyle.FORCE_COLOR);
@@ -1703,13 +1722,13 @@ namespace BotsMod
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("exportFloorToPng", delegate (string[] args)
             {
-                GungeonAPI.Tools.LogDungeonToPNGFile();
+                GungeonAPI.ShrineTools.LogDungeonToPNGFile();
 
             });
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("exportRoomToPng", delegate (string[] args)
             {
-                GungeonAPI.Tools.LogRoomHandlerToPNGFile(GameManager.Instance.PrimaryPlayer.CurrentRoom);
+                GungeonAPI.ShrineTools.LogRoomHandlerToPNGFile(GameManager.Instance.PrimaryPlayer.CurrentRoom);
             });
 
            

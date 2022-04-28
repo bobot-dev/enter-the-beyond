@@ -395,7 +395,7 @@ namespace BotsMod
 		protected override void DoEffect(PlayerController user)
 		{
 
-			var room = RoomFactory.BuildFromResource("BotsMod/rooms/robotflytestroom.room");
+			var room = RoomFactory.BuildFromResource("BotsMod/rooms/robotflytestroom.room").room;
 			RoomHandler creepyRoom = GameManager.Instance.Dungeon.AddRuntimeRoom(room, null, DungeonData.LightGenerationStyle.FORCE_COLOR);
 
 			Pathfinder.Instance.InitializeRegion(GameManager.Instance.Dungeon.data, creepyRoom.area.basePosition, creepyRoom.area.dimensions);

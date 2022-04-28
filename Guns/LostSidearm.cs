@@ -46,7 +46,7 @@ namespace BotsMod
 			
 			
 			//gun.damageModifier = 1;
-			gun.reloadTime = 1.3f;
+			gun.reloadTime = 1f;
 
 			gun.DefaultModule.ammoType = GameUIAmmoType.AmmoType.CUSTOM;
 			gun.DefaultModule.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType("Lost Sidearm", "BotsMod/sprites/CustomGunAmmoTypes/lost_sidearm_clip_001", "BotsMod/sprites/CustomGunAmmoTypes/lost_sidearm_clip_002"); ;
@@ -71,8 +71,8 @@ namespace BotsMod
 			
 			gun.muzzleFlashEffects = gun6.muzzleFlashEffects;
 
-			gun.DefaultModule.cooldownTime = 0.15f;
-			gun.DefaultModule.numberOfShotsInClip = 10;
+			gun.DefaultModule.cooldownTime = 0.17f;
+			gun.DefaultModule.numberOfShotsInClip = 7;
 			gun.quality = PickupObject.ItemQuality.SPECIAL;
 			Guid.NewGuid().ToString();
 			gun.gunClass = GunClass.SHITTY;
@@ -85,6 +85,7 @@ namespace BotsMod
 			UnityEngine.Object.DontDestroyOnLoad(projectile);
 
 			gun.DefaultModule.projectiles[0] = projectile;
+			gun.DefaultModule.angleVariance = 7;
 
 			gun.shellsToLaunchOnReload = gun.DefaultModule.numberOfShotsInClip;
 			gun.shellCasing = gun3.shellCasing;

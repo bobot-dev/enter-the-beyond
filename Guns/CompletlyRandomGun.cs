@@ -94,7 +94,7 @@ namespace BotsMod
 					var material = def.material == null ? def.materialInst : def.material;
 					if (material == null || material.mainTexture == null)
 					{
-						ItemAPI.Tools.PrintError($"Failed to edit {defName} in {collectionName}: No valid material");
+						BotsModule.Log($"Failed to edit {defName} in {collectionName}: No valid material", BotsModule.LOCKED_CHARACTOR_COLOR, false);
 						continue;
 					}
 
@@ -109,7 +109,7 @@ namespace BotsMod
 					var uvs = def.uvs;
 					if (def.uvs == null || def.uvs.Length < 4)
 					{
-						ItemAPI.Tools.PrintError($"Failed to edit {defName} in {collectionName}: Invalid UV's");
+						BotsModule.Log($"Failed to edit {defName} in {collectionName}: Invalid UV's", BotsModule.LOCKED_CHARACTOR_COLOR, false);
 						continue;
 					}
 
@@ -123,7 +123,7 @@ namespace BotsMod
 
 					if (w <= 0 || h <= 0)
 					{
-						ItemAPI.Tools.PrintError($"Failed to edit {defName} in {collectionName}: To small");
+						BotsModule.Log($"Failed to edit {defName} in {collectionName}: To small", BotsModule.LOCKED_CHARACTOR_COLOR, false);
 						continue;
 					};
 

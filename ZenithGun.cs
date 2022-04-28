@@ -117,7 +117,7 @@ public class ZenithGun : GunBehaviour
             if (!setup)
             {
                 setup = true;
-                //Tools.Print(source.Owner.FacingDirection);
+                //DebugUtility.Print(source.Owner.FacingDirection);
                 initialRot = source.Owner.FacingDirection;
                 startPosition = source.Owner.CenterPosition;
                 source.transform.position = startPosition;

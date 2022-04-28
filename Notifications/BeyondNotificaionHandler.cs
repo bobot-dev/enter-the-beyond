@@ -1,4 +1,5 @@
-﻿using ItemAPI;
+﻿using CustomCharacters;
+using ItemAPI;
 using NpcApi;
 using System;
 using System.Collections;

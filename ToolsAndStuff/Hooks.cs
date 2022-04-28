@@ -3,9 +3,10 @@
 using Brave.BulletScript;
 using CustomCharacters;
 using Dungeonator;
+using EnemyAPI;
 using ETGGUI;
 using ETGGUI.Inspector;
-using FrostAndGunfireItems;
+
 using GungeonAPI;
 using HutongGames.PlayMaker;
 using InControl;
@@ -397,6 +398,7 @@ namespace BotsMod
 			FieldInfo _cachedBodySpriteCount = typeof(AIActor).GetField("m_cachedBodySpriteCount", BindingFlags.NonPublic | BindingFlags.Instance);
 			FieldInfo _cachedBodySpriteShader = typeof(AIActor).GetField("m_cachedBodySpriteShader", BindingFlags.NonPublic | BindingFlags.Instance);
 			FieldInfo _cachedGunSpriteShader = typeof(AIActor).GetField("m_cachedGunSpriteShader", BindingFlags.NonPublic | BindingFlags.Instance);
+
 
 			if (self.healthHaver.bodySprites.Count != (int)_cachedBodySpriteCount.GetValue(self))
 			{

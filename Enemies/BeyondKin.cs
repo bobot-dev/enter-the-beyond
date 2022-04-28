@@ -4,13 +4,13 @@ using Gungeon;
 using ItemAPI;
 using UnityEngine;
 //using DirectionType = DirectionalAnimation.DirectionType;
-using AnimationType = ItemAPI.EnemyBuilder.AnimationType;
+using AnimationType = EnemyAPI.EnemyBuilder.AnimationType;
 using System.Collections;
 using Dungeonator;
 using System.Linq;
 using Brave.BulletScript;
 using GungeonAPI;
-using FrostAndGunfireItems;
+using EnemyAPI;
 
 namespace BotsMod
 {

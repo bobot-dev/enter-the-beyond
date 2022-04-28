@@ -1,8 +1,9 @@
 ﻿using CustomCharacters;
 using Dungeonator;
-using FerryMansOar;
+
 using Gungeon;
 using ItemAPI;
+using Misc;
 using Pathfinding;
 //using Pathfinding;
 using System;
@@ -98,6 +99,14 @@ namespace BotsMod
 			Tools.DefaultCheeseGoop = (PickupObjectDatabase.GetById(626) as Gun).DefaultModule.projectiles[0].cheeseEffect.CheeseGoop;
 			Tools.DefaultBlobulonGoop = EnemyDatabase.GetOrLoadByGuid("0239c0680f9f467dbe5c4aab7dd1eca6").GetComponent<GoopDoer>().goopDefinition;
 			Tools.DefaultPoopulonGoop = EnemyDatabase.GetOrLoadByGuid("116d09c26e624bca8cca09fc69c714b3").GetComponent<GoopDoer>().goopDefinition;
+		}
+
+		public static PrototypeDungeonRoom BuildRoomForTheBeyond(string path)
+        {
+            var room = GungeonAPI.RoomFactory.BuildFromResource(path).room;
+			room.overrideRoomVisualType = -1;
+
+			return room;
 		}
 
 		public static void AddAudioEventByFrame(this tk2dSpriteAnimationClip clip, int frame, string audio)
@@ -2324,13 +2333,13 @@ namespace BotsMod
 			string key = name.ToLower();
 			if (!timers.ContainsKey(key))
 			{
-				Tools.PrintError($"Could not stop timer {name}, no such timer exists");
+				DebugUtility.PrintError($"Could not stop timer {name}, no such timer exists");
 				return;
 			}
 			float timerStart = timers[key];
 			int elapsed = (int)((Time.realtimeSinceStartup - timerStart) * 1000);
 			timers.Remove(key);
-			Tools.Print($"{name} finished in " + elapsed + "ms");
+			DebugUtility.Print($"{name} finished in " + elapsed + "ms");
 		}
 
 		public static void PrintException(Exception e, string color = "FF0000")
@@ -2356,7 +2365,7 @@ namespace BotsMod
 		{
 			if (!Directory.Exists(directoryPath))
 			{
-				//Tools.PrintError(directoryPath + " not found.");
+				//DebugUtility.PrintError(directoryPath + " not found.");
 				return null;
 			}
 
@@ -3594,9 +3603,18 @@ int? overrideColliderPixelHeight = null, int? overrideColliderOffsetX = null, in
 
 		public static void AddComplex(this StringDBTable stringdb, string key, string value)
 		{
-			StringTableManager.ComplexStringCollection stringCollection = new StringTableManager.ComplexStringCollection();
-			stringCollection.AddString(value, 1f);
-			stringdb[key] = stringCollection;
+
+			if (!stringdb.ContainsKey(key))
+			{
+				StringTableManager.ComplexStringCollection stringCollection = new StringTableManager.ComplexStringCollection();
+				stringCollection.AddString(value, 1f);
+				stringdb[key] = stringCollection;
+			}
+			else
+            {
+				stringdb[key].AddString(value, 1f);
+			}
+			
 		}
 
 		public static DungeonFlowNode GenerateFlowNode(DungeonFlow flow, PrototypeDungeonRoom.RoomCategory category, PrototypeDungeonRoom overrideRoom = null, GenericRoomTable overrideRoomTable = null, bool loopTargetIsOneWay = false, bool isWarpWing = false,
@@ -3729,15 +3747,18 @@ int? overrideColliderPixelHeight = null, int? overrideColliderOffsetX = null, in
 			return component;
 		}
 
-		public static TileIndexGrid DeserializeTileIndexGrid(string assetPath)
-		{
-			TileIndexGrid m_TileIndexGridData = ScriptableObject.CreateInstance<TileIndexGrid>();
-			string serializedData = ResourceExtractor.BuildStringFromEmbeddedResource("SerializedData/" + assetPath);
-			JsonUtility.FromJsonOverwrite(serializedData, m_TileIndexGridData);
-			return m_TileIndexGridData;
-		}
+		//public static TileIndexGrid DeserializeTileIndexGrid(string assetPath)
+		//{
+		//	TileIndexGrid m_TileIndexGridData = ScriptableObject.CreateInstance<TileIndexGrid>();
+		//	string serializedData = ResourceExtractor.BuildStringFromEmbeddedResource("SerializedData/" + assetPath);
+		//	JsonUtility.FromJsonOverwrite(serializedData, m_TileIndexGridData);
+		//	return m_TileIndexGridData;
+		//}
 
-		
+		public static void SetColor(this tk2dSprite sprite, Color color)
+		{
+			sprite.renderer.material.SetColor("_OverrideColor", color);
+		}
 
 		public static void GenerateSpriteAnimator(GameObject targetObject, tk2dSpriteAnimation library = null, int DefaultClipId = 0, float AdditionalCameraVisibilityRadius = 0f, bool AnimateDuringBossIntros = false, bool AlwaysIgnoreTimeScale = false, bool ignoreTimeScale = false, bool ForceSetEveryFrame = false, bool playAutomatically = false, bool IsFrameBlendedAnimation = false, float clipTime = 0f, float ClipFps = 15f, bool deferNextStartClip = false, bool alwaysUpdateOffscreen = false, bool maximumDeltaOneFrame = false)
 		{

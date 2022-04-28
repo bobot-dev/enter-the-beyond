@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using Gungeon;
 using ItemAPI;
 using UnityEngine;
-using AnimationType = ItemAPI.EnemyBuilder.AnimationType;
+
 using System.Collections;
 using Dungeonator;
 using System.Linq;
 using Brave.BulletScript;
 using GungeonAPI;
-using FrostAndGunfireItems;
+using EnemyAPI;
 
 namespace BotsMod
 {
@@ -104,9 +104,9 @@ namespace BotsMod
 					companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid("31a3ea0c54a745e182e22ea54844a82d").CorpseObject;
 					companion.aiActor.PreventBlackPhantom = false;
 
-					companion.gameObject.AddAnimation("dead_eye", "idle", "BotsMod/sprites/Enemies/DeadEye/Idle", 6, AnimationType.Idle, DirectionalAnimation.DirectionType.SixWay, DirectionalAnimation.FlipType.Mirror, tk2dSpriteAnimationClip.WrapMode.Loop);
-					companion.gameObject.AddAnimation("teleport", "BotsMod/sprites/Enemies/DeadEye/StartTeleport", 6, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
-					companion.gameObject.AddAnimation("teleport_end", "BotsMod/sprites/Enemies/DeadEye/EndTeleport", 6, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
+					companion.gameObject.AddAnimation("dead_eye", "idle", "BotsMod/sprites/Enemies/DeadEye/Idle", 6, EnemyBuilder.AnimationType.Idle, DirectionalAnimation.DirectionType.SixWay, DirectionalAnimation.FlipType.Mirror, tk2dSpriteAnimationClip.WrapMode.Loop);
+					companion.gameObject.AddAnimation("teleport", "BotsMod/sprites/Enemies/DeadEye/StartTeleport", 6, EnemyBuilder.AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
+					companion.gameObject.AddAnimation("teleport_end", "BotsMod/sprites/Enemies/DeadEye/EndTeleport", 6, EnemyBuilder.AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
 
 
 					var bs = prefab.GetComponent<BehaviorSpeculator>();

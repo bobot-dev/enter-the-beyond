@@ -1,4 +1,4 @@
-﻿using FrostAndGunfireItems;
+﻿
 using GungeonAPI;
 using ItemAPI;
 
@@ -31,6 +31,7 @@ using AmmonomiconAPI;
 using BotsMod.NightmareNightmareNightmare;
 using ModdedItemWeightBalancer;
 using SoundAPI;
+using NpcApi;
 //using ChallengeAPI;
 
 
@@ -132,13 +133,13 @@ namespace BotsMod
                 var array = Tools.ReflectionHelpers.ReflectGetField<Type[]>(typeof(GameManager), "BraveLevelLoadedListeners", GameManager.Instance).ToList();
                 array.Add(typeof(FuckYouThisIsAnAwfulIdea));
                 Tools.ReflectionHelpers.ReflectSetField(typeof(GameManager), "BraveLevelLoadedListeners", array.ToArray(), GameManager.Instance);
-                */
+               
                 //enemy api
                 EnemyBuilder.Init();
                 BossBuilder.Init();
                 FrostAndGunfireItems.EnemyTools.Init();
                 FrostAndGunfireItems.Hooks.Init();
-
+                 */
                 CharApi.Init("Bot");
 
                 //funny book api
@@ -188,7 +189,7 @@ namespace BotsMod
                 //StuffIStoleFromApacheForChallengeMode.Init();
                 if (debugMode)
                 {
-                    var testroom = RoomFactory.BuildFromResource("BotsMod/rooms/a.room", true, true);
+                    var testroom = RoomFactory.BuildFromResource("BotsMod/rooms/a.room", true, true).room;
                     testroom.usesCustomAmbientLight = true;
                     testroom.customAmbientLight = new Color32(75, 5, 122, 255);
                     ChestInitStuff.Init();
@@ -196,7 +197,7 @@ namespace BotsMod
                 //GlobalWarning.Init();
 
                 BeyondMasteryToken.Init();
-                if (debugMode) BeyondSniper.Add();
+                BeyondSniper.Add();
                 BeyondChamberGun.Add();
 
                 //ScrapBook.Init();
@@ -279,7 +280,9 @@ namespace BotsMod
                     TheMessanger.Add();
                     HellsGrasp.Init();
                 }
-               
+
+                (PickupObjectDatabase.GetById(210) as Gun).DefaultModule.chargeProjectiles[0].UsedProperties |= ProjectileModule.ChargeProjectileProperties.vfx;
+                (PickupObjectDatabase.GetById(693) as Gun).DefaultModule.chargeProjectiles[0].UsedProperties |= ProjectileModule.ChargeProjectileProperties.vfx;
 
                 //CompletlyRandomGun.Add();
 
@@ -435,12 +438,12 @@ namespace BotsMod
                 //BotsModule.shop = NpcApi.ItsDaFuckinShopApi.SetUpShop("beyond", "bot", testNpcIdleSprites, 6, testNpcTalkSprites, 8, devilLootTable, BaseShopController.AdditionalShopType.TRUCK, "", "", "", "", "", "", false);
                 //BreachShopTools.Init();
 
-                shop2 = NpcApi.ItsDaFuckinShopApi.SetUpShop("ItemForGuns", "bot", testNpcIdleSprites, 6, testNpcTalkSprites, 8, Tools.shared_auto_001.LoadAsset<GenericLootTable>("All_Item_Loot_Table"), CustomShopItemController.ShopCurrencyType.CUSTOM, "a", "a", "a", "a", "a", "a", ItsDaFuckinShopApi.defaultTalkPointOffset,
+                shop2 = ShopAPI.SetUpShop("ItemForGuns", "bot", testNpcIdleSprites, 6, testNpcTalkSprites, 8, Tools.shared_auto_001.LoadAsset<GenericLootTable>("All_Item_Loot_Table"), CustomShopItemController.ShopCurrencyType.CUSTOM, "a", "a", "a", "a", "a", "a", ShopAPI.defaultTalkPointOffset,
                     new Vector3[] { new Vector3(1.125f, 2.125f, 1), new Vector3(0f, 3.250f, 1), new Vector3(5.250f, 3.250f, 1), new Vector3(4.125f, 2.125f, 1), new Vector3(2.625f, 1f, 1) }, 1, false, null, ShopMerchantStuff.CustomCanBuyWeapons, ShopMerchantStuff.RemoveCurrencyWeapons,
                     ShopMerchantStuff.CustomPriceWeapons, null, null, "BotsMod/sprites/shopguygunmoneyicon.png", "gunTextIcon", true, false).GetComponent<CustomShopController>();
                 //mapiconshop
-                shop = NpcApi.ItsDaFuckinShopApi.SetUpShop("BeyondShopKeep", "bot", beyondNpcIdleSprites, 6, beyondNpcTalkSprites, 8, beyondLootTable, CustomShopItemController.ShopCurrencyType.CUSTOM, "#BEYOND_RUNBASEDMULTILINE_GENERIC", "#BEYOND_RUNBASEDMULTILINE_STOPPER", "#BEYOND_SHOP_PURCHASED",
-                    "#BEYOND_PURCHASE_FAILED", "#BEYOND_INTRO", "#BEYOND_TAKEPLAYERDAMAGE", ItsDaFuckinShopApi.defaultTalkPointOffset, ItsDaFuckinShopApi.defaultItemPositions, 1, false, null, ShopMerchantStuff.CustomCanBuyBeyond, ShopMerchantStuff.RemoveCurrencyBeyond,
+                shop = ShopAPI.SetUpShop("BeyondShopKeep", "bot", beyondNpcIdleSprites, 6, beyondNpcTalkSprites, 8, beyondLootTable, CustomShopItemController.ShopCurrencyType.CUSTOM, "#BEYOND_RUNBASEDMULTILINE_GENERIC", "#BEYOND_RUNBASEDMULTILINE_STOPPER", "#BEYOND_SHOP_PURCHASED",
+                    "#BEYOND_PURCHASE_FAILED", "#BEYOND_INTRO", "#BEYOND_TAKEPLAYERDAMAGE", ShopAPI.defaultTalkPointOffset, ShopAPI.defaultItemPositions, 1, false, null, ShopMerchantStuff.CustomCanBuyBeyond, ShopMerchantStuff.RemoveCurrencyBeyond,
                     ShopMerchantStuff.CustomPriceBeyond, null, null, "", "heart_big_idle_001", false, true, "BotsMod/sprites/Npcs/beyond_merch_carpet_001.png", true, "BotsMod/sprites/Npcs/mapiconshop.png", true, 0.01f).GetComponent<CustomShopController>();
 
                 shop.gameObject.GetComponentInChildren<tk2dSpriteAnimator>().Library.clips[1].wrapMode = tk2dSpriteAnimationClip.WrapMode.LoopSection;
@@ -549,7 +552,7 @@ namespace BotsMod
                 StairWay.Init();
 
                 metadata = this.Metadata;
-
+                //GameStatsManager.Instance.SetFlag(GungeonFlags.ITEMSPECIFIC_ALTERNATE_GUNS_UNLOCKED, true);
                 //GUI.Init();
 
                 //CatogreyText = GUI.CreateText(null, new Vector2(15f, 265), "", TextAnchor.MiddleLeft, font_size: FontSize);
@@ -560,7 +563,7 @@ namespace BotsMod
 
                 //var name = Loader.BuildCharacter("BotsMod/Characters/Lost", CustomPlayableCharacters.Lost, new Vector3(15.8f, 26.6f, 27.1f), true, new Vector3(15.3f, 24.8f, 25.3f), true, false, false, true, true, new Color32(175, 19, 30, 255), 4.55f, 55, 2, true, "botfs_lost").nameInternal;
                 var data = Loader.BuildCharacter("BotsMod/Characters/Lost", CustomPlayableCharacters.Lost, new Vector3(15.8f, 26.6f, 27.1f), true, new Vector3(15.3f, 24.8f, 25.3f), true, false, false, true, true, new GlowMatDoer (new Color32(255, 0, 38, 255), 4.55f, 55),
-                    new GlowMatDoer(new Color32(255, 69, 248, 255), 1.55f, 55), 0, true, "botfs_lost");
+                    new GlowMatDoer(new Color32(255, 69, 248, 255), 1.55f, 35), 0, true, "botfs_lost");
                 data.prerequisites = new DungeonPrerequisite[1]
                 {
                     new CustomDungeonPrerequisite
@@ -597,6 +600,9 @@ namespace BotsMod
 
                 Loader.AddCoopBlankOverride(name, CoopBlankOverrides.LostOverrideBlank);
                 Loader.GetAnimation(name, "pitfall_return").fps *= 2;
+                Loader.GetAnimation(name, "slide_right", true).fps *= 8;
+                Loader.GetAnimation(name, "slide_up", true).fps *= 8;
+                Loader.GetAnimation(name, "slide_down", true).fps *= 8;
 
                 var first = SpriteBuilder.SpriteFromResource("BotsMod/Characters/Lost/groundthings/randomstuffthatgoonground_001.png");
 
@@ -728,9 +734,9 @@ namespace BotsMod
 
                 Commands.Init();
 
-                CollectionDumper.DumpdfAtlas(ResourceManager.LoadAssetBundle("enemies_base_001").LoadAsset<GameObject>("MetalGearRat").GetComponent<AIActor>().GetComponent<MetalGearRatDeathController>().PunchoutMinigamePrefab.GetComponent<PunchoutController>()
-                    .Player.PlayerUiSprite.Atlas)
-               ;
+                //CollectionDumper.DumpdfAtlas(ResourceManager.LoadAssetBundle("enemies_base_001").LoadAsset<GameObject>("MetalGearRat").GetComponent<AIActor>().GetComponent<MetalGearRatDeathController>().PunchoutMinigamePrefab.GetComponent<PunchoutController>()
+                //    .Player.PlayerUiSprite.Atlas)
+               //;
 
 
                 ETGMod.StartGlobalCoroutine(this.DelayedStartCR());

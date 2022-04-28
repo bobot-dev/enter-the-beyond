@@ -74,8 +74,6 @@ namespace BotsMod
 
             FinalScenario_MainMaterial.supportsDiagonalWalls = true;
 
-
-
             var pitGridCave = Tools.CreateBlankIndexGrid();
             pitGridCave.topLeftIndices = new TileIndexList { indices = new List<int> { 58 }, indexWeights = new List<float> { 1f } };
             pitGridCave.topIndices = new TileIndexList { indices = new List<int> { 58 }, indexWeights = new List<float> { 1f } };
@@ -148,7 +146,9 @@ namespace BotsMod
             beyondBrickMaterial.sidewallLightStamps = FinalScenario_MainMaterial.sidewallLightStamps;
             beyondBrickMaterial.wallShards = FinalScenario_MainMaterial.wallShards;
             beyondBrickMaterial.bigWallShards = FinalScenario_MainMaterial.bigWallShards;
-            
+
+
+
             beyondBrickMaterial.bigWallShardDamageThreshold = 10;
             beyondBrickMaterial.fallbackVerticalTileMapEffects = FinalScenario_MainMaterial.fallbackVerticalTileMapEffects;
             beyondBrickMaterial.fallbackHorizontalTileMapEffects = FinalScenario_MainMaterial.fallbackHorizontalTileMapEffects;
@@ -281,12 +281,17 @@ namespace BotsMod
 
             beyondBrickMaterial.roomFloorBorderGrid = pitBorderGridBrick;
 
-            //beyondBrickMaterial.outerCeilingBorderGrid = ceilingBorderGrid;
-            /// CastleDungeonPrefab.roomMaterialDefinitions[3]..outerCeilingBorderGrid.roomTypeRestriction = -1;
-            //beyondBrickMaterial.outerCeilingBorderGrid = CastleDungeonPrefab.roomMaterialDefinitions[3].outerCeilingBorderGrid;
-            beyondBrickMaterial.floorSquareDensity = 0.05f;
-            beyondBrickMaterial.floorSquares = null;
-            
+
+            var floorSquares = Tools.CreateBlankIndexGrid();
+
+            floorSquares.topLeftIndices = new TileIndexList { indices = new List<int> { 99 }, indexWeights = new List<float> { 1f } };
+            floorSquares.topRightIndices = new TileIndexList { indices = new List<int> { 100 }, indexWeights = new List<float> { 1f } };
+            floorSquares.bottomLeftIndices = new TileIndexList { indices = new List<int> { 121 }, indexWeights = new List<float> { 1f } };
+            floorSquares.bottomRightIndices = new TileIndexList { indices = new List<int> { 122 }, indexWeights = new List<float> { 1f } };
+
+
+            beyondBrickMaterial.floorSquares = new TileIndexGrid[] { floorSquares };
+            beyondBrickMaterial.floorSquareDensity = 0.5f;
 
 
             var brickFaceWallGrid = Tools.CreateBlankIndexGrid();

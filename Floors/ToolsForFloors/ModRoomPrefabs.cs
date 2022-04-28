@@ -20,14 +20,14 @@ namespace BotsMod
                 //the names of all of our rooms once we make them.
                 //"Beyond_Entrance2.room"
             };
-            //Mod_Entrance_Room = RoomFactory.BuildFromResource("Mod/Resources/ModRooms/floorEntrance.room");
-            Mod_Exit_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Exit.room", isBeyondRoom: true);
+            //Mod_Entrance_Room = Tools.BuildRoomForTheBeyond("Mod/Resources/ModRooms/floorEntrance.room");
+            Mod_Exit_Room = Tools.BuildRoomForTheBeyond("BotsMod/rooms/Beyond/Beyond_Exit.room");
 
-            Mod_Entrance_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Entrance2.room", isBeyondRoom: true);
+            Mod_Entrance_Room = Tools.BuildRoomForTheBeyond("BotsMod/rooms/Beyond/Beyond_Entrance2.room");
 
 
-            Mod_Shop_Room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/Beyond_Shop2.room", isBeyondRoom: true);
-            ItsDaFuckinShopApi.RegisterShopRoom(BotsModule.shop.gameObject, Mod_Shop_Room, new UnityEngine.Vector2(5f, 12f));
+            Mod_Shop_Room = Tools.BuildRoomForTheBeyond("BotsMod/rooms/Beyond/Beyond_Shop2.room");
+            ShopAPI.RegisterShopRoom(BotsModule.shop.gameObject, Mod_Shop_Room, new UnityEngine.Vector2(5f, 12f));
 
             Mod_Shop_Room.UseCustomMusic = true;
             Mod_Shop_Room.UseCustomMusicSwitch = true;
@@ -40,7 +40,7 @@ namespace BotsMod
 
             Mod_Entrance_Room.category = PrototypeDungeonRoom.RoomCategory.ENTRANCE;
 
-            EnterTheBeyond = RoomFactory.BuildFromResource("BotsMod/rooms/RoomUsedToGetToBeyond.room");
+            EnterTheBeyond = Tools.BuildRoomForTheBeyond("BotsMod/rooms/RoomUsedToGetToBeyond.room");
             DungeonPrerequisite[] array = new DungeonPrerequisite[0];
             //Vector2 vector = new Vector2((float)(protoroom.Width / 2) + offset.x, (float)(protoroom.Height / 2) + offset.y);
             var vector = new Vector2(5, 6);
@@ -70,7 +70,7 @@ namespace BotsMod
             });
             InitRooms();
 
-            Mod_Entrance_Room_Past = RoomFactory.BuildFromResource("BotsMod/rooms/Past/LostPastRoom1.room");
+            Mod_Entrance_Room_Past = Tools.BuildRoomForTheBeyond("BotsMod/rooms/Past/LostPastRoom1.room");
             Mod_Entrance_Room_Past.category = PrototypeDungeonRoom.RoomCategory.ENTRANCE;
 
             Mod_Entrance_Room_Past.placedObjectPositions.Add(vector);
@@ -102,7 +102,7 @@ namespace BotsMod
 
             foreach (string name in Mod_RoomList)
             {
-                PrototypeDungeonRoom m_room = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/" + name, isBeyondRoom: true);
+                PrototypeDungeonRoom m_room = Tools.BuildRoomForTheBeyond("BotsMod/rooms/Beyond/" + name);
                 m_feyondRooms.Add(m_room);
             }
 
@@ -113,7 +113,7 @@ namespace BotsMod
                 BeyondPrefabs.BeyondRoomTable.includedRooms.elements.Add(GenerateWeightedRoom(room, 1));
             }
 
-            Mod_Boss = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/overseerbossroombutround.room", isBeyondRoom: true);
+            Mod_Boss = Tools.BuildRoomForTheBeyond("BotsMod/rooms/Beyond/overseerbossroombutround.room");
             Mod_Boss.category = PrototypeDungeonRoom.RoomCategory.BOSS;
             Mod_Boss.subCategoryBoss = PrototypeDungeonRoom.RoomBossSubCategory.FLOOR_BOSS;
             Mod_Boss.subCategoryNormal = PrototypeDungeonRoom.RoomNormalSubCategory.COMBAT;
@@ -131,7 +131,7 @@ namespace BotsMod
             //Mod_Boss.customAmbientLight = new Color32(80, 80, 80, 255);
             //Mod_Boss.overriddenTilesets = GlobalDungeonData.ValidTilesets.BELLYGEON;
 
-            Mod_Boss_Past = RoomFactory.BuildFromResource("BotsMod/rooms/Past/LostPastBossRoom.room");
+            Mod_Boss_Past = Tools.BuildRoomForTheBeyond("BotsMod/rooms/Past/LostPastBossRoom.room");
             Mod_Boss_Past.category = PrototypeDungeonRoom.RoomCategory.BOSS;
             Mod_Boss_Past.subCategoryBoss = PrototypeDungeonRoom.RoomBossSubCategory.FLOOR_BOSS;
             Mod_Boss_Past.subCategoryNormal = PrototypeDungeonRoom.RoomNormalSubCategory.COMBAT;
@@ -147,7 +147,7 @@ namespace BotsMod
             Mod_Boss_Past.rewardChestSpawnPosition = new IntVector2(25, 20); //Where the reward pedestal spawns, should be changed based on room size
 
 
-            var Play_Test_Boss = RoomFactory.BuildFromResource("BotsMod/rooms/Beyond/overseerbossroombutround.room", isBeyondRoom: true);
+            var Play_Test_Boss = Tools.BuildRoomForTheBeyond("BotsMod/rooms/Beyond/overseerbossroombutround.room");
             Play_Test_Boss.category = PrototypeDungeonRoom.RoomCategory.BOSS;
             Play_Test_Boss.subCategoryBoss = PrototypeDungeonRoom.RoomBossSubCategory.FLOOR_BOSS;
             Play_Test_Boss.subCategoryNormal = PrototypeDungeonRoom.RoomNormalSubCategory.COMBAT;
@@ -162,8 +162,8 @@ namespace BotsMod
             Play_Test_Boss.usesProceduralDecoration = false;
             Play_Test_Boss.rewardChestSpawnPosition = new IntVector2(25, 20); //Where the reward pedestal spawns, should be changed based on room size
 
-            StairWayRoom = RoomFactory.BuildFromResource("BotsMod/rooms/StairWayNpcRoom.room");
-            ItsDaFuckinShopApi.RegisterShopRoom(BotsModule.shop2.gameObject, StairWayRoom, new UnityEngine.Vector2(4f, 17));
+            StairWayRoom = Tools.BuildRoomForTheBeyond("BotsMod/rooms/StairWayNpcRoom.room");
+            ShopAPI.RegisterShopRoom(BotsModule.shop2.gameObject, StairWayRoom, new UnityEngine.Vector2(4f, 17));
 
 
             GameObject noteObject = FakePrefab.Clone(GameManager.Instance.RewardManager.BowlerNoteOtherSource);

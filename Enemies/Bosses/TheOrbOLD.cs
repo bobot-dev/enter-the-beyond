@@ -4,14 +4,15 @@ using Gungeon;
 using ItemAPI;
 using UnityEngine;
 //using DirectionType = DirectionalAnimation.DirectionType;
-using AnimationType = ItemAPI.EnemyBuilder.AnimationType;
+
 using System.Collections;
 using Dungeonator;
 using System.Linq;
 using Brave.BulletScript;
 using GungeonAPI;
-using FrostAndGunfireItems;
+
 using static BotsMod.RandomComps;
+using EnemyAPI;
 
 namespace BotsMod
 {
@@ -109,7 +110,7 @@ namespace BotsMod
 				companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid("5f3abc2d561b4b9c9e72b879c6f10c7e").CorpseObject;
 				companion.aiActor.PreventBlackPhantom = false;
 
-				companion.gameObject.AddAnimation("idle", "BotsMod/sprites/Enemies/Orb/", 3, AnimationType.Idle, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
+				companion.gameObject.AddAnimation("idle", "BotsMod/sprites/Enemies/Orb/", 3, EnemyBuilder.AnimationType.Idle, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
 
 				companion.sprite.renderer.enabled = false;
 

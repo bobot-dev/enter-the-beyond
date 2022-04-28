@@ -6,7 +6,7 @@ using ItemAPI;
 using UnityEngine;
 using DirectionType = DirectionalAnimation.DirectionType;
 using AnimationType = ItemAPI.CompanionBuilder.AnimationType;
-using FrostAndGunfireItems;
+
 using static BotsMod.PirmalShotgrub;
 using System.Net.NetworkInformation;
 

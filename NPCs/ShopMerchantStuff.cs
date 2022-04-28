@@ -1,4 +1,5 @@
 ﻿using NpcApi;
+using NpcApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;

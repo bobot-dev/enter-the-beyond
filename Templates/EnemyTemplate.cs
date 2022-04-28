@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using Gungeon;
 using ItemAPI;
 using UnityEngine;
-using AnimationType = ItemAPI.EnemyBuilder.AnimationType;
+
 using System.Collections;
 using Dungeonator;
 using System.Linq;
 using Brave.BulletScript;
 using GungeonAPI;
-using FrostAndGunfireItems;
+using EnemyAPI;
 
 namespace BotsMod.Templates
 {
@@ -100,7 +100,7 @@ namespace BotsMod.Templates
 				companion.aiActor.CorpseObject = EnemyDatabase.GetOrLoadByGuid("5f3abc2d561b4b9c9e72b879c6f10c7e").CorpseObject;
 				companion.aiActor.PreventBlackPhantom = false;
 
-				companion.gameObject.AddAnimation("idle", "BotsMod/sprites/", 3, AnimationType.Idle, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
+				companion.gameObject.AddAnimation("idle", "BotsMod/sprites/", 3, EnemyBuilder.AnimationType.Idle, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
 
 				var bs = prefab.GetComponent<BehaviorSpeculator>();
 				BehaviorSpeculator behaviorSpeculator = EnemyDatabase.GetOrLoadByGuid("5f3abc2d561b4b9c9e72b879c6f10c7e").behaviorSpeculator;

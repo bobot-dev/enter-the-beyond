@@ -1,5 +1,5 @@
 ﻿using Brave.BulletScript;
-using FrostAndGunfireItems;
+using EnemyAPI;
 using FullInspector;
 using System;
 using System.Collections;
@@ -56,6 +56,14 @@ namespace BotsMod
 			}
 		}
 
+		public Vector2 BeamCircleCenter
+		{
+			get
+			{
+				return this.m_aiActor.specRigidbody.GetUnitCenter(ColliderType.HitBox);
+			}
+		}
+
 		// Token: 0x06004705 RID: 18181 RVA: 0x00198978 File Offset: 0x00196B78
 		public override BehaviorResult Update()
 		{
@@ -83,6 +91,20 @@ namespace BotsMod
 			else
 			{
 				this.StartBlanking();
+
+				/*IntVector2 intVector2 = PhysicsEngine.UnitToPixel(this.BeamCircleCenter - this.m_aiActor.transform.position.XY());
+				int num2 = PhysicsEngine.UnitToPixel(this.Radius);
+				this.m_beamReflector = new PixelCollider();
+				this.m_beamReflector.ColliderGenerationMode = PixelCollider.PixelColliderGeneration.Circle;
+				this.m_beamReflector.CollisionLayer = CollisionLayer.BeamBlocker;
+				this.m_beamReflector.IsTrigger = false;
+				this.m_beamReflector.ManualOffsetX = intVector2.x - num2;
+				this.m_beamReflector.ManualOffsetY = intVector2.y - num2;
+				this.m_beamReflector.ManualDiameter = num2 * 2;
+				this.m_beamReflector.Regenerate(this.m_aiActor.transform, true, true);
+				this.m_aiActor.specRigidbody.PixelColliders.Add(this.m_beamReflector);
+				*/
+				//this.m_aiActor.specRigidbody.OnTriggerCollision = (SpeculativeRigidbody.OnTriggerDelegate)Delegate.Combine(this.m_aiActor.specRigidbody.OnTriggerCollision, new SpeculativeRigidbody.OnTriggerDelegate(this.OnTriggerCollision));
 			}
 			this.m_aiActor.ClearPath();
 			if (this.m_aiActor && this.m_aiActor.knockbackDoer)
@@ -94,6 +116,8 @@ namespace BotsMod
 		}
 		GameObject m_radialIndicator;
 		Vector2 centerPoint;
+
+
 
 		// Token: 0x06004706 RID: 18182 RVA: 0x00198A54 File Offset: 0x00196C54
 		public override ContinuousBehaviorResult ContinuousUpdate()
@@ -185,6 +209,7 @@ namespace BotsMod
 						callback(list[j]);
 					}
 					list[j].DieInAir(false, true, true, true);
+					GameManager.Instance.Dungeon.StartCoroutine(this.HandleBulletSuck(list[j]));
 				}
 			}
 			List<BasicTrapController> allTriggeredTraps = StaticReferenceManager.AllTriggeredTraps;
@@ -258,7 +283,7 @@ namespace BotsMod
 
 			centerPoint = this.m_aiActor.specRigidbody.HitboxPixelCollider.UnitCenter;
 
-			this.m_radialIndicator = ((GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/HeatIndicator"), centerPoint, Quaternion.identity, this.m_aiActor.transform));
+			this.m_radialIndicator = ((GameObject)UnityEngine.Object.Instantiate(ResourceCache.Acquire("Global VFX/HeatIndicator"), (Vector3)centerPoint + new Vector3(0, 0, 16), Quaternion.identity, this.m_aiActor.transform));
 			var ring = this.m_radialIndicator.GetComponent<HeatIndicatorController>();
 			ring.IsFire = false;
 			ring.CurrentRadius = Radius;
@@ -268,6 +293,50 @@ namespace BotsMod
 
 			this.m_timer = this.BlankTime;
 			this.m_state = EnemyBlankBehavior.State.Blanking;
+		}
+
+		private IEnumerator HandleBulletSuck(Projectile target)
+		{
+			Transform copySprite = this.CreateEmptySprite(target);
+			Vector3 startPosition = copySprite.transform.position;
+			float elapsed = 0f;
+			float duration = 0.5f;
+			while (elapsed < duration)
+			{
+				elapsed += BraveTime.DeltaTime;
+				if (copySprite)
+				{
+					Vector3 position = ShootPoint.transform.position;
+					float t = elapsed / duration * (elapsed / duration);
+					copySprite.position = Vector3.Lerp(startPosition, position, t);
+					copySprite.rotation = Quaternion.Euler(0f, 0f, 360f * BraveTime.DeltaTime) * copySprite.rotation;
+					copySprite.localScale = Vector3.Lerp(Vector3.one, new Vector3(0.1f, 0.1f, 0.1f), t);
+				}
+				yield return null;
+			}
+			if (copySprite)
+			{
+				UnityEngine.Object.Destroy(copySprite.gameObject);
+			}
+			yield break;
+		}
+
+		private Transform CreateEmptySprite(Projectile target)
+		{
+			if (target.sprite)
+            {
+				GameObject gameObject = new GameObject("suck image");
+				gameObject.layer = target.gameObject.layer;
+				tk2dSprite tk2dSprite = gameObject.AddComponent<tk2dSprite>();
+				gameObject.transform.parent = SpawnManager.Instance.VFX;
+				tk2dSprite.SetSprite(target.sprite.Collection, target.sprite.spriteId);
+				tk2dSprite.transform.position = target.sprite.transform.position;
+				GameObject gameObject2 = new GameObject("image parent");
+				gameObject2.transform.position = tk2dSprite.WorldCenter;
+				tk2dSprite.transform.parent = gameObject2.transform;
+				return gameObject2.transform;
+			}
+			return null;
 		}
 
 		private void Fire()
@@ -280,6 +349,8 @@ namespace BotsMod
 			this.m_bulletSource.BulletScript = new CustomBulletScriptSelector(typeof(RingScript));
 			this.m_bulletSource.Initialize();
 		}
+
+		private PixelCollider m_beamReflector;
 
 		private BulletScriptSource m_bulletSource;
 
@@ -318,6 +389,8 @@ namespace BotsMod
 
 		// Token: 0x040039EB RID: 14827
 		private float m_timer;
+
+
 
 		// Token: 0x02000D24 RID: 3364
 		private enum State

@@ -4,15 +4,15 @@ using Gungeon;
 using ItemAPI;
 using UnityEngine;
 //using DirectionType = DirectionalAnimation.DirectionType;
-using AnimationType = ItemAPI.BossBuilder.AnimationType;
 using System.Collections;
 using Dungeonator;
 using System.Linq;
 using Brave.BulletScript;
 using GungeonAPI;
-using FrostAndGunfireItems;
+
 using System.Runtime.CompilerServices;
 using BotsMod;
+using EnemyAPI;
 //using EnemyAPI;
 
 namespace BotsMod
@@ -70,9 +70,7 @@ namespace BotsMod
 		public static void BuildPrefab()
 		{
 			// source = EnemyDatabase.GetOrLoadByGuid("c50a862d19fc4d30baeba54795e8cb93");
-			bool flag = OverseerPrefab != null || BossBuilder.Dictionary.ContainsKey(guid);
-			bool flag2 = flag;
-			if (!flag2)
+			if (OverseerPrefab == null || !BossBuilder.Dictionary.ContainsKey(guid))
 			{
 				
 				OverseerPrefab = BossBuilder.BuildPrefab("Overseer", guid, "BotsMod/sprites/overseer_floor/overseerf_idle_001.png", new IntVector2(0, 0), new IntVector2(8, 9), false, true);
@@ -158,7 +156,7 @@ namespace BotsMod
 
 				/////
 
-				SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/OverseerIconFloor", SpriteBuilder.ammonomiconCollection);
+				SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/OverseerIconFloor", BeyondPrefabs.ammonomiconCollection);
 				if (enemy.GetComponent<EncounterTrackable>() != null)
 				{
 					UnityEngine.Object.Destroy(enemy.GetComponent<EncounterTrackable>());
@@ -374,9 +372,9 @@ namespace BotsMod
 				OverseerPrefab.GetOrAddComponent<AIAnimator>().OtherVFX = EnemyDatabase.GetOrLoadByGuid("19b420dec96d4e9ea4aebc3398c0ba7a").gameObject.GetComponent<AIAnimator>().OtherVFX;
 
 
-				OverseerPrefab.AddAnimation("idle", "BotsMod/sprites/overseer_floor/idle", 3, AnimationType.Idle, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
+				OverseerPrefab.AddAnimation("idle", "BotsMod/sprites/overseer_floor/idle", 3, EnemyBuilder.AnimationType.Idle, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
 
-				var introAnim = OverseerPrefab.AddAnimation("intro", "BotsMod/sprites/overseer_floor/intro", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None);
+				var introAnim = OverseerPrefab.AddAnimation("intro", "BotsMod/sprites/overseer_floor/intro", 8, EnemyBuilder.AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None);
 
 
 				introAnim.wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
@@ -470,23 +468,29 @@ namespace BotsMod
 				introAnim.frames[54].eventAudio = "Play_TRP_flame_torch_01";
 				introAnim.frames[54].triggerEvent = true;
 
+				introAnim.frames[56].triggerEvent = true;
+				introAnim.frames[56].eventLerpEmissive = true;
+				introAnim.frames[56].eventLerpEmissivePower = 50;
+				introAnim.frames[56].eventLerpEmissiveTime = 3.9f;
+
+
 				introAnim.frames[62].eventAudio = "Play_WPN_bsg_shot_01";
 				introAnim.frames[62].triggerEvent = true;
 
-				OverseerPrefab.AddAnimation("death", "BotsMod/sprites/overseer_floor/death", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
+				OverseerPrefab.AddAnimation("death", "BotsMod/sprites/overseer_floor/death", 8, EnemyBuilder.AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
 
-				OverseerPrefab.AddAnimation("blank", "BotsMod/sprites/overseer_floor/blank", 4, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
+				OverseerPrefab.AddAnimation("blank", "BotsMod/sprites/overseer_floor/blank", 4, EnemyBuilder.AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
 
-				OverseerPrefab.AddAnimation("beam_tell", "BotsMod/sprites/overseer_floor/TelBeam", 16, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
+				OverseerPrefab.AddAnimation("beam_tell", "BotsMod/sprites/overseer_floor/TelBeam", 16, EnemyBuilder.AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
 
-				OverseerPrefab.AddAnimation("beam", "BotsMod/sprites/overseer_floor/beam", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
+				OverseerPrefab.AddAnimation("beam", "BotsMod/sprites/overseer_floor/beam", 8, EnemyBuilder.AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
 
-				OverseerPrefab.AddAnimation("gaurd", "BotsMod/sprites/overseer_floor/gaurd", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
+				OverseerPrefab.AddAnimation("gaurd", "BotsMod/sprites/overseer_floor/gaurd", 8, EnemyBuilder.AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
 				
-				OverseerPrefab.AddAnimation("remote_end", "BotsMod/sprites/overseer_floor/remoteEnd", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Single;
+				OverseerPrefab.AddAnimation("remote_end", "BotsMod/sprites/overseer_floor/remoteEnd", 8, EnemyBuilder.AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Single;
 
 
-				var beamTel = OverseerPrefab.AddAnimation("remote_tell", "BotsMod/sprites/overseer_floor/remoteTell", 8, AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None);
+				var beamTel = OverseerPrefab.AddAnimation("remote_tell", "BotsMod/sprites/overseer_floor/remoteTell", 8, EnemyBuilder.AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None);
 				beamTel.wrapMode = tk2dSpriteAnimationClip.WrapMode.LoopSection;
 				beamTel.loopStart = 6;
 

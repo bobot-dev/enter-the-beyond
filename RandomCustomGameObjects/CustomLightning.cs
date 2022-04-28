@@ -1,4 +1,4 @@
-﻿using FerryMansOar;
+﻿
 using Gungeon;
 using ItemAPI;
 using System;

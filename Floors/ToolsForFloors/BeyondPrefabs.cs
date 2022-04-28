@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using ItemAPI;
+using System.Reflection;
 
 namespace BotsMod
 {
@@ -59,6 +60,8 @@ namespace BotsMod
 		public static tk2dSpriteCollectionData beyondCollection;
 		public static GenericLootTable beyondLootTable;
 
+		public static tk2dSpriteCollectionData itemCollection = PickupObjectDatabase.GetByEncounterName("singularity").sprite.Collection;
+		public static tk2dSpriteCollectionData ammonomiconCollection = AmmonomiconController.ForceInstance.EncounterIconCollection;
 		public static void InitCustomPrefabs()
 		{
 
@@ -135,7 +138,7 @@ namespace BotsMod
 			lostFigurePlaceable = FakePrefab.Clone(shared_auto_002.LoadAsset<GameObject>("RatFigure_Bullet"));
 			lostFigurePlaceable.SetActive(false);
 			var tksprite = lostFigurePlaceable.GetComponent<tk2dSprite>();
-			tksprite.SetSprite(SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/loststatuethatlooksawful", lostFigurePlaceable.GetComponent<tk2dSprite>().Collection));
+			tksprite.SetSprite(ItemAPI.SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/loststatuethatlooksawful", lostFigurePlaceable.GetComponent<tk2dSprite>().Collection));
 			var spriteDef = tksprite.Collection.spriteDefinitions[tksprite.spriteId];
 			spriteDef.position0 = new Vector3(0.125f, 0.3125f, 0);
 			spriteDef.position1 = new Vector3(1.125f, 0.3125f, 0);
@@ -220,7 +223,7 @@ namespace BotsMod
 			pastControllerObject.AddComponent<LostPastController>();
 
 
-			basicBeyondHands = SpriteBuilder.SpriteFromResource("BotsMod/sprites/Enemies/hand.png", new GameObject("BeyondHand")).AddComponent<PlayerHandController>();
+			basicBeyondHands = ItemAPI.SpriteBuilder.SpriteFromResource("BotsMod/sprites/Enemies/hand.png", new GameObject("BeyondHand")).AddComponent<PlayerHandController>();
 			FakePrefab.MarkAsFakePrefab(basicBeyondHands.gameObject);
 			basicBeyondHands.ForceRenderersOff = false;
 			var handSprite = basicBeyondHands.gameObject.GetComponent<tk2dSprite>();
@@ -365,6 +368,11 @@ namespace BotsMod
 					beyondCollection.SetMaterial(86, 1);
 					beyondCollection.SetMaterial(87, 1);
 
+					beyondCollection.SetMaterial(99, 1);
+					beyondCollection.SetMaterial(100, 1);
+					beyondCollection.SetMaterial(121, 1);
+					beyondCollection.SetMaterial(122, 1);
+
 					beyondCollection.SetMaterial(242, 2);
 					beyondCollection.SetMaterial(243, 2);
 					beyondCollection.SetMaterial(264, 2);
@@ -484,6 +492,11 @@ namespace BotsMod
 					beyondCollection.spriteDefinitions[81].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
 					beyondCollection.spriteDefinitions[82].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
 					beyondCollection.spriteDefinitions[83].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+
+					beyondCollection.spriteDefinitions[99].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[100].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[121].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
+					beyondCollection.spriteDefinitions[122].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
 
 					beyondCollection.spriteDefinitions[102].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);
 					beyondCollection.spriteDefinitions[103].metadata.SetupTileMetaData((TilesetIndexMetadata.TilesetFlagType)0, 1, 0);

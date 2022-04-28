@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
+using ItemAPI;
 
 namespace BotsMod
 {
@@ -173,10 +174,10 @@ namespace BotsMod
 			//to any modders looking at this code do not use it please its fucking awful
 
 
-			var baseSpriteID = SpriteHandler.AddSpriteToCollection(ResourceExtractor.GetTextureFromResource("BotsMod/sprites/VFX/Spike/railgun_spike_001.png"), SpriteBuilder.itemCollection, "railgun_spike_001");
+			var baseSpriteID = SpriteHandler.AddSpriteToCollection(ResourceExtractor.GetTextureFromResource("BotsMod/sprites/VFX/Spike/railgun_spike_001.png"), BeyondPrefabs.itemCollection, "railgun_spike_001");
 
 			var spikeSprite = spikeVfx.AddComponent<tk2dSprite>();
-			spikeSprite.SetSprite(SpriteBuilder.itemCollection, baseSpriteID);
+			spikeSprite.SetSprite(BeyondPrefabs.itemCollection, baseSpriteID);
 			spikeSprite.SortingOrder = 0;
 
 			spikeSprite.IsPerpendicular = true;

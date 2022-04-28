@@ -27,8 +27,8 @@ namespace BotsMod
 			gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(15) as Gun, true, false);
 			gun.AddProjectileModuleFrom(PickupObjectDatabase.GetById(15) as Gun, true, false);
 
-			gun.barrelOffset.localPosition = new Vector3(1.5f, 0.4375f, 0f);
-			foreach(var module in gun.Volley.projectiles)			
+			gun.barrelOffset.localPosition = new Vector3(1.75f, 0.5625f, 0f);
+			foreach (var module in gun.Volley.projectiles)			
             {
 				module.ammoCost = 1;
 				module.shootStyle = ProjectileModule.ShootStyle.Beam;
@@ -42,13 +42,16 @@ namespace BotsMod
 
 			}
 
-			gun.Volley.projectiles[3].positionOffset = new Vector3(-8f, -5f, 0);			
-			gun.Volley.projectiles[4].positionOffset = new Vector3(-8f, 5f, 0);
+			gun.DefaultModule.ammoCost = 1;
+			gun.DefaultModule.shootStyle = ProjectileModule.ShootStyle.Beam;
+			gun.DefaultModule.sequenceStyle = ProjectileModule.ProjectileSequenceStyle.Random;
+			gun.DefaultModule.cooldownTime = 0.5f;
+			gun.DefaultModule.numberOfShotsInClip = 100;
+			gun.DefaultModule.angleVariance = 0;
 
-			//
+			gun.DefaultModule.ammoType = GameUIAmmoType.AmmoType.CUSTOM;
+			gun.DefaultModule.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType("Chain Beam", "BotsMod/sprites/CustomGunAmmoTypes/chain_beam_clip_001", "BotsMod/sprites/CustomGunAmmoTypes/chain_beam_clip_002");
 
-			//gun.Volley.projectiles[3].positionOffset = new Vector3(-0.5f, -0.3125f, 0);
-			//gun.Volley.projectiles[4].positionOffset = new Vector3(-0.5f, 0.3125f, 0);
 
 			gun.reloadTime = 0f;
 
@@ -99,6 +102,8 @@ namespace BotsMod
 			beamComp.ContinueBeamArtToWall = false;
 			beamComp.boneType = BasicBeamController.BeamBoneType.Projectile;
 			beamComp.endType = BasicBeamController.BeamEndType.Vanish;
+			beamComp.chargeDelay = 0.3f;
+			beamComp.usesChargeDelay = true;
 
 			var projectile2 = Tools.SetupProjectileAndObject(projectile);
 			var projectile3 = Tools.SetupProjectileAndObject(projectile);
@@ -115,7 +120,7 @@ namespace BotsMod
 
 			};
 
-
+			projectile3.gameObject.GetComponent<BeamController>().chargeDelay = 0.35f;
 
 			var projectile4 = Tools.SetupProjectileAndObject(projectile3);
 
@@ -134,7 +139,8 @@ namespace BotsMod
 			beamComp2.ContinueBeamArtToWall = false;
 			beamComp2.boneType = BasicBeamController.BeamBoneType.Projectile;
 			beamComp2.endType = BasicBeamController.BeamEndType.Vanish;
-
+			beamComp2.chargeDelay = 0.25f;
+			beamComp2.usesChargeDelay = true;
 
 
 			var projectile5 = Tools.SetupProjectileAndObject(projectile4);
@@ -195,6 +201,23 @@ namespace BotsMod
 
 			//gun.Volley.projectiles[1].angleVariance = 0;
 			id = gun.PickupObjectId;
+
+			Tools.BeyondItems.Add(gun.PickupObjectId);
+			MeshRenderer component = gun.GetComponent<MeshRenderer>();
+			if (!component)
+			{
+				return;
+			}
+			Material[] sharedMaterials = component.sharedMaterials;
+			Array.Resize<Material>(ref sharedMaterials, sharedMaterials.Length + 1);
+			Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+
+			material.SetTexture("_MainTex", sharedMaterials[0].GetTexture("_MainTex"));
+			material.SetColor("_EmissiveColor", new Color32(255, 69, 245, 255));
+			material.SetFloat("_EmissiveColorPower", 1.55f);
+			material.SetFloat("_EmissivePower", 55);
+			sharedMaterials[sharedMaterials.Length - 1] = material;
+			component.sharedMaterials = sharedMaterials;
 
 		}
 

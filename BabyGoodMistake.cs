@@ -6,8 +6,10 @@ using ItemAPI;
 using UnityEngine;
 using DirectionType = DirectionalAnimation.DirectionType;
 using AnimationType = ItemAPI.CompanionBuilder.AnimationType;
-using FrostAndGunfireItems;
+
 using static BotsMod.PirmalShotgrub;
+using ItemAPI;
+using EnemyAPI;
 
 namespace BotsMod
 {

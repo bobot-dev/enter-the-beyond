@@ -2,6 +2,7 @@
 using GungeonAPI;
 using HutongGames.PlayMaker;
 using ItemAPI;
+using Misc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,7 +58,7 @@ namespace NpcApi
         public static void PlaceBreachShops()
         {
             BreachShopTools.CleanupBreachShops();
-            GungeonAPI.Tools.Print<string>("Placing breach shops: ", "FFFFFF", true);
+            DebugUtility.Print<string>("Placing breach shops: ", "FFFFFF", true);
             foreach (GameObject gameObject in BreachShopTools.registeredShops.Values)
             {
                 try

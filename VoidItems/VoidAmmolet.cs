@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using NpcApi;
+using CustomCharacters;
 
 namespace BotsMod
 {

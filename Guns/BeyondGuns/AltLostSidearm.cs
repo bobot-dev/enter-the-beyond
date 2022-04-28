@@ -12,26 +12,53 @@ namespace BotsMod
 	{
 		private bool HasReloaded;
 
-
-		private static Gun lostSidearm;
-
 		public static void Add()
 		{
-
+			
 			Gun gun2 = PickupObjectDatabase.GetById(221) as Gun;
 			Gun gun3 = PickupObjectDatabase.GetById(99) as Gun;
 			Gun gun4 = PickupObjectDatabase.GetById(57) as Gun;
-			Gun gun = ETGMod.Databases.Items.NewGun("Lost Sidearm", "lost_revolver_alt");
+			Gun gun = ETGMod.Databases.Items.NewGun("Lost Sidearm", "lost_revolver_b");
 			Game.Items.Rename("outdated_gun_mods:lost_sidearm", "bot:lost_sidearm_alt");
 			gun.gameObject.AddComponent<AltLostSidearm>();
 			gun.SetShortDescription("Decay");
 			gun.SetLongDescription("Add text here before releasing");
 			
-			gun.SetupSprite(null, "lost_revolver_alt_idle_001", 8);
+			gun.SetupSprite(null, "lost_revolver_b_idle_001", 8);
 			gun.SetAnimationFPS(gun.shootAnimation, 12);
-			gun.SetAnimationFPS(gun.reloadAnimation, 10);
-			
-			
+			gun.SetAnimationFPS(gun.reloadAnimation, 12);
+
+
+			tk2dSpriteAnimationClip animationclip = gun.sprite.spriteAnimator.GetClipByName("lost_revolver_b_reload");
+			float[] offsetsX = new float[] { 0.1250f, 0.0000f, -1.1250f, -1.3750f, -0.1875f, 0.0000f, 0.6875f, 0.1875f, 0.0000f, -0.1250f, 0.0000f, 0.0625f };
+			float[] offsetsY = new float[] { -0.3750f, -0.1250f, 0.9375f, -0.0625f, 0.5625f, 0.0000f, 1.5000f, 1.2500f, 0.8750f, 0.5625f, -1.0625f, -0.7500f };
+
+
+
+			for (int i = 0; i < offsetsX.Length && i < offsetsY.Length && i < animationclip.frames.Length; i++)
+			{
+				int id = animationclip.frames[i].spriteId; tk2dSpriteDefinition def = animationclip.frames[i].spriteCollection.spriteDefinitions[id];
+				Vector3 offset = new Vector2(offsetsX[i], offsetsY[i]);
+				def.position0 += offset;
+				def.position1 += offset;
+				def.position2 += offset;
+				def.position3 += offset;
+			}
+			//lost_revolver_b_fire_001
+
+			animationclip = gun.sprite.spriteAnimator.GetClipByName(gun.shootAnimation);
+			offsetsX = new float[] { 0.0000f, -0.1875f, -0.0625f, 0.0000f };
+			offsetsY = new float[] { -0.0625f, 0.1250f, -0.0625f, 0.0000f };
+			for (int i = 0; i < offsetsX.Length && i < offsetsY.Length && i < animationclip.frames.Length; i++)
+			{
+				int id = animationclip.frames[i].spriteId; tk2dSpriteDefinition def = animationclip.frames[i].spriteCollection.spriteDefinitions[id];
+				Vector3 offset = new Vector2(offsetsX[i], offsetsY[i]);
+				def.position0 += offset;
+				def.position1 += offset;
+				def.position2 += offset;
+				def.position3 += offset;
+			}
+
 			Gun other = PickupObjectDatabase.GetById(810) as Gun;
 			gun.AddProjectileModuleFrom(other, true, false);
 			gun.SetBaseMaxAmmo(27616);
@@ -46,18 +73,18 @@ namespace BotsMod
 			
 			
 			//gun.damageModifier = 1;
-			gun.reloadTime = 1.3f;
+			gun.reloadTime = 1f;
+
 
 			gun.DefaultModule.ammoType = GameUIAmmoType.AmmoType.CUSTOM;
-			gun.DefaultModule.customAmmoType = other.DefaultModule.customAmmoType;
-
+			gun.DefaultModule.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType("Lost Sidearm Alt", "BotsMod/sprites/CustomGunAmmoTypes/lost_sidearm_clip_alt_001", "BotsMod/sprites/CustomGunAmmoTypes/lost_sidearm_clip_alt_002");
 
 			//gun.DefaultModule.usesOptionalFinalProjectile = true;
 			//gun.DefaultModule.numberOfFinalProjectiles = 1;
 
 			//Projectile replacementProjectile = gun2.DefaultModule.projectiles[0];
 
-			
+
 
 			//gun.DefaultModule.finalProjectile = replacementProjectile;
 			//gun.DefaultModule.finalCustomAmmoType = gun2.DefaultModule.customAmmoType;
@@ -66,12 +93,12 @@ namespace BotsMod
 			//gun.DefaultModule.finalProjectile.statusEffectsToApply.Add(Debuffs.decayEffect);
 			//gun.DefaultModule.finalProjectile.ChanceToTransmogrify = 0;
 
-			Gun gun5 = PickupObjectDatabase.GetById(37) as Gun;
+			Gun gun5 = PickupObjectDatabase.GetById(128) as Gun;
 			
-			gun.finalMuzzleFlashEffects = gun5.muzzleFlashEffects;
+			gun.muzzleFlashEffects = gun5.muzzleFlashEffects;
 
-			gun.DefaultModule.cooldownTime = 0.15f;
-			gun.DefaultModule.numberOfShotsInClip = 10;
+			gun.DefaultModule.cooldownTime = 0.17f;
+			gun.DefaultModule.numberOfShotsInClip = 7;
 			gun.quality = PickupObject.ItemQuality.EXCLUDED;
 			Guid.NewGuid().ToString();
 			gun.gunClass = GunClass.SHITTY;
@@ -79,16 +106,23 @@ namespace BotsMod
 			gun.PreventStartingOwnerFromDropping = true;
 			Projectile projectile = UnityEngine.Object.Instantiate<Projectile>(other.DefaultModule.projectiles[0]);
 			
+
 			projectile.gameObject.SetActive(false);
 			ItemAPI.FakePrefab.MarkAsFakePrefab(projectile.gameObject);
 			UnityEngine.Object.DontDestroyOnLoad(projectile);
 
 			gun.DefaultModule.projectiles[0] = projectile;
 
+			gun.DefaultModule.angleVariance = 7;
+
 			gun.shellsToLaunchOnReload = gun.DefaultModule.numberOfShotsInClip;
 			gun.shellCasing = gun3.shellCasing;
 
 			gun.shellsToLaunchOnFire = 0;
+
+
+			projectile.SetProjectileSpriteRight("lost_sidearm_projectile_alt_001", 8, 8, true, tk2dBaseSprite.Anchor.MiddleCenter, 6, 2, false, false, 0, 0);
+
 
 			//projectile.transform.parent = gun.barrelOffset;
 			projectile.hitEffects = gun4.DefaultModule.projectiles[0].hitEffects;
@@ -96,6 +130,7 @@ namespace BotsMod
 			projectile.baseData.speed = 16f;
 			projectile.baseData.force = 10f;
 			projectile.baseData.range = 16f;
+			projectile.shouldRotate = true;
 
 
 			//gun.additionalHandState = AdditionalHandState.HideBoth;
@@ -133,47 +168,6 @@ namespace BotsMod
 			//Tools.BeyondItems.Add(gun.PickupObjectId);
 		}
 
-		static TrailRenderer tr;
-
-		public override void PostProcessProjectile(Projectile projectile)
-		{
-			base.PostProcessProjectile(projectile);
-
-
-			if (setup)
-			{
-				setup = true;
-
-				
-
-				projectile.sprite.renderer.enabled = true;
-
-				var tro = projectile.gameObject.AddChild("trail object");
-				tro.transform.position = projectile.transform.position;
-				tro.transform.localPosition = new Vector3(1f, 0.2f, 0f);
-
-				tr = tro.AddComponent<TrailRenderer>();
-				tr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-				tr.receiveShadows = false;
-				var mat = new Material(Shader.Find("Sprites/Default"));
-				mat.mainTexture = ItemAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/wip.png");
-				mat.SetColor("_Color", new Color32(107, 0, 173, 255));
-				tr.material = mat;
-				tr.time = 0.2f;
-				tr.minVertexDistance = 0.1f;
-				tr.startWidth = 1f;
-				tr.endWidth = 0f;
-				tr.startColor = Color.white;
-				tr.endColor = new Color(1f, 1f, 1f, 0f);
-			}
-
-			
-
-			//projectile.OverrideMotionModule = new LostProjectile(ItemAPI.ResourceExtractor.GetTextureFromResource("ExampleMod/Resources/Other/squaregrad.png"));
-
-			//projectile.OnHitEnemy += ApplyDecay;
-		}
-
 		protected void Update()
 		{
 			bool flag = this.gun.CurrentOwner;
@@ -192,19 +186,8 @@ namespace BotsMod
 			}
 		}
 
-		bool setup;
+		bool setup;		
 
-		
-
-
-		public static void ApplyDecay(Projectile projectile, SpeculativeRigidbody hitRigidbody, bool fatal)
-		{
-			if (hitRigidbody.aiActor != null)
-			{
-				hitRigidbody.aiActor.ApplyEffect(Debuffs.decayEffect);
-
-			}
-		}
 
 		public override void OnReloadPressed(PlayerController player, Gun gun, bool bSOMETHING)
 		{
@@ -227,79 +210,5 @@ namespace BotsMod
 			gun.PreventNormalFireAudio = true;
 			AkSoundEngine.PostEvent("Play_WPN_smileyrevolver_shot_01", base.gameObject);
 		}
-
-		public class ThisThingIsAsUselessAsMe : MonoBehaviour
-		{
-		}
-
-		public class LostProjectile : ProjectileMotionModule
-		{
-			Texture2D _gradTexture;
-
-			public LostProjectile(Texture2D gradTexture)
-			{
-				_gradTexture = gradTexture;
-			}
-
-			public override void UpdateDataOnBounce(float angleDiff)
-			{
-				//throw new NotImplementedException();
-			}
-
-			bool setup = false;
-			float initialRot = 0f;
-			Vector2 targetPosition;
-			Vector2 startPosition;
-
-			float startOpacity = 0f;
-			float additionalMagnitude = 0f;
-			float additionalMagnitude2 = 0f;
-			int direction = 1;
-
-			TrailRenderer tr;
-
-			public override void Move(Projectile source, Transform projectileTransform, tk2dBaseSprite projectileSprite, SpeculativeRigidbody specRigidbody, ref float m_timeElapsed, ref Vector2 m_currentDirection, bool Inverted, bool shouldRotate)
-			{
-				
-			}
-
-			Color GetColorFromSprite(int ind)
-			{
-				switch (ind)
-				{
-					case 2:
-						return new Color32(242, 244, 245, 255);
-					case 3:
-						return new Color32(211, 212, 184, 255);
-					case 4:
-						return new Color32(255, 140, 140, 255);
-					case 5:
-						return new Color32(135, 135, 135, 255);
-					case 6:
-						return new Color32(255, 254, 219, 255);
-					case 7:
-						return new Color32(255, 181, 102, 255);
-					default:
-						return new Color32(137, 215, 232, 255);
-				}
-			}
-
-			void ResetTargetPosition(Projectile source)
-			{
-				if (source.Owner is PlayerController player)
-				{
-					targetPosition = player.unadjustedAimPoint.XY();
-				}
-				else if (source.Owner is AIActor ai)
-				{
-					targetPosition = ai.PlayerTarget.CenterPosition;
-				}
-				else
-				{
-					targetPosition = new Vector2(10f, 0f).Rotate(initialRot);
-				}
-			}
-		}
-
 	}
 }

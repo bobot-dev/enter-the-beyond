@@ -49,7 +49,7 @@ namespace BotsMod
 
             prefab.GetComponent<BraveBehaviour>().sprite = sprite;
 
-            ItsDaFuckinShopApi.GenerateOrAddToRigidBody(prefab, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, false, false, true, false, false, false, true, true, new IntVector2(5, 8));
+            ShopAPI.GenerateOrAddToRigidBody(prefab, CollisionLayer.HighObstacle, PixelCollider.PixelColliderGeneration.Manual, false, false, true, false, false, false, true, true, new IntVector2(5, 8));
 
             return prefab;
         }

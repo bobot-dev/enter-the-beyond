@@ -4,14 +4,15 @@ using Gungeon;
 using ItemAPI;
 using UnityEngine;
 //using DirectionType = DirectionalAnimation.DirectionType;
-using AnimationType = ItemAPI.EnemyBuilder.AnimationType;
+
 using System.Collections;
 using Dungeonator;
 using System.Linq;
 using Brave.BulletScript;
 using GungeonAPI;
-using FrostAndGunfireItems;
+
 using static BotsMod.RandomComps;
+using EnemyAPI;
 
 namespace BotsMod
 {
@@ -127,7 +128,7 @@ namespace BotsMod
 
 				/////
 
-				SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/Enemies/MiniBosses/AnomalyIcon", SpriteBuilder.ammonomiconCollection, "AnomalyIcon");
+				SpriteBuilder.AddSpriteToCollection("BotsMod/sprites/Enemies/MiniBosses/AnomalyIcon", BeyondPrefabs.ammonomiconCollection, "AnomalyIcon");
 				if (enemy.GetComponent<EncounterTrackable>() != null)
 				{
 					UnityEngine.Object.Destroy(enemy.GetComponent<EncounterTrackable>());
@@ -209,7 +210,7 @@ namespace BotsMod
 				orbPrefab.GetOrAddComponent<AIAnimator>().OtherVFX = EnemyDatabase.GetOrLoadByGuid("19b420dec96d4e9ea4aebc3398c0ba7a").gameObject.GetComponent<AIAnimator>().OtherVFX;
 
 
-				orbPrefab.AddAnimation("idle", "BotsMod/sprites/Enemies/Orb", 3, AnimationType.Idle, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
+				orbPrefab.AddAnimation("idle", "BotsMod/sprites/Enemies/Orb", 3, EnemyBuilder.AnimationType.Idle, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Loop;
 
 				var bs = orbPrefab.GetComponent<BehaviorSpeculator>();
 				BehaviorSpeculator behaviorSpeculator = EnemyDatabase.GetOrLoadByGuid("01972dee89fc4404a5c408d50007dad5").behaviorSpeculator;

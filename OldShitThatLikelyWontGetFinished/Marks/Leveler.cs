@@ -158,7 +158,7 @@ namespace BotsMod
                 }
                 catch (Exception e)
                 {
-                    Tools.PrintException(e);
+                    DebugUtility.PrintException(e);
                 }
             }
         }

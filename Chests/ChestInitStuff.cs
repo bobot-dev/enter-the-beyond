@@ -1,6 +1,6 @@
 ﻿using Brave.BulletScript;
 using CustomCharacters;
-using FrostAndGunfireItems;
+
 using Gungeon;
 using ItemAPI;
 using System;
@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Text;
 using UnityEngine;
 using PrefabAPI;
+using EnemyAPI;
 
 namespace BotsMod
 {

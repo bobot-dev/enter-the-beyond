@@ -267,6 +267,9 @@ namespace BotsMod
         {
 			foreach (var spell in Wand.spells)
 			{
+
+				//BotsModule.Log($"{spell.name} - {spell.addsComponents} {spell.addsSpawnProj}");
+
 				if (spell.addsComponents == true)
 				{
 					//BotsModule.Log($"[{spell.name}]: homing {spell.homingModifier == null} - bouncing {spell.bounceProjModifier == null} - piercing {spell.pierceProjModifier == null}");
@@ -286,7 +289,33 @@ namespace BotsMod
 						//projectile.gameObject.AddComponent<HomingModifier>(spell.homingModifier);
 						//BotsModule.Log("added homing");
 					}
-					
+
+					if (spell.addsSpawnProj == true)
+					{
+
+						SpawnProjModifierButItWontCrashTheGameLol spawnProjMod = projectile.gameObject.GetOrAddComponent<SpawnProjModifierButItWontCrashTheGameLol>();
+
+						if (spell.spawnProjMidAir)
+                        {
+							spawnProjMod.useSelfAsProj = true;
+							spawnProjMod.spawnProjectilesInFlight = true;
+							spawnProjMod.spawnOnObjectCollisions = false;
+							spawnProjMod.spawnProjecitlesOnDieInAir = false;
+							spawnProjMod.spawnProjectilesOnCollision = false;
+							spawnProjMod.InFlightSourceTransform = spawnProjMod.transform;
+							spawnProjMod.inFlightSpawnAngle = 360;
+							spawnProjMod.numToSpawnInFlight += 1;
+							spawnProjMod.inFlightSpawnCooldown = 0.125f;
+							spawnProjMod.usesComplexSpawnInFlight = true;
+							spawnProjMod.startAngle = 90;
+							spawnProjMod.fireRandomlyInAngle = true;
+
+						}
+
+						//BotsModule.Log("added SpawnProj");
+
+					}
+
 
 					//if (spell.bounceProjModifier != null)
 					//{
@@ -425,6 +454,10 @@ namespace BotsMod
 		public bool addsComponents;
 		public bool isChainLightning;
 		public bool useMaxUses;
+		[SerializeField]
+		public bool addsSpawnProj;
+		public bool spawnProjMidAir;
+		public bool spawnProjOnHit;
 
 		public float impactOnFireRate;
 		public float impactOnReload;
@@ -472,6 +505,10 @@ namespace BotsMod
 				bounceProjModifier = this.bounceProjModifier,
 				maxUses = this.maxUses,
 				useMaxUses = this.useMaxUses,
+				addsSpawnProj = this.addsSpawnProj,
+				spawnProjMidAir = this.spawnProjMidAir,
+				isChainLightning = this.isChainLightning,
+				spawnProjOnHit = this.spawnProjOnHit,
 			};
 
 
