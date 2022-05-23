@@ -19,7 +19,7 @@ namespace BotsMod
 		private IEnumerator HandleBossKilled()
 		{
 			GameStatsManager.Instance.SetCharacterSpecificFlag((PlayableCharacters)CustomPlayableCharacters.Lost, CharacterSpecificGungeonFlags.KILLED_PAST, true);
-			SaveAPI.SaveAPIManager.SetFlag(SaveAPI.CustomDungeonFlags.BOT_BOSSKILLED_LOST_PAST, true);
+			SaveAPI.SaveAPIManager.SetFlag("bot", SaveFlags.BOT_BOSSKILLED_LOST_PAST, true);
 			GameStatsManager.Instance.RegisterStatChange(TrackedStats.TIMES_KILLED_PAST, 1f);
 
 

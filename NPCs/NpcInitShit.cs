@@ -222,8 +222,8 @@ namespace BotsMod.NPCs
                 UnityEngine.Object.DontDestroyOnLoad(npcObj);
                 npcObj.SetActive(true);                
 
-                var devilLootTable = LootTableAPI.LootTableTools.CreateLootTable();
-                foreach(var item in Tools.BeyondItems)
+                var devilLootTable = Alexandria.Helpers.Misc.LootUtility.CreateLootTable();
+                foreach(var item in AlexandriaTags.GetAllItemsIdsWithTag("beyond"))
                 {
                     devilLootTable.AddItemToPool(item);
                 }

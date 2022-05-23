@@ -48,8 +48,31 @@ namespace BotsMod
                 }
             }
             item.associatedItemChanceMods = itemList.ToArray();
-            //Tools.BeyondItems.Add(item.PickupObjectId);
+            //item.SetTag("beyond");
 
+        }
+
+        public static void Init2()
+        {
+            string itemName = "name";
+            string resourceName = "BotsMod/sprites/sprite";
+            GameObject obj = new GameObject();
+            var item = obj.AddComponent<PegasusBootsItem>();
+
+            var springHealBoots = PickupObjectDatabase.GetById(526) as PegasusBootsItem;
+
+            var springHealBootsFields = typeof(PegasusBootsItem).GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+
+            foreach (var field in springHealBootsFields)
+            {
+                field.SetValue(item, field.GetValue(springHealBoots));
+            }
+
+            ItemBuilder.AddSpriteToObject(itemName, resourceName, obj);
+            string shortDesc = "a";
+            string longDesc = "a";
+            ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
+            item.quality = ItemQuality.SPECIAL;
         }
 
         static PassiveItem m_item;

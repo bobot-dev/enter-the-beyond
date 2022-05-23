@@ -24,7 +24,7 @@ namespace BotsMod
             ItemBuilder.SetupItem(item, shortDesc, longDesc, "bot");
             item.quality = ItemQuality.D;
             item.AddPassiveStatModifier(PlayerStats.StatType.Damage, 0.5f, StatModifier.ModifyMethod.MULTIPLICATIVE);
-            Tools.BeyondItems.Add(item.PickupObjectId);
+            item.SetTag("beyond");
 
             item.sprite.usesOverrideMaterial = true;
             Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);

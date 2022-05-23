@@ -133,7 +133,7 @@ namespace BotsMod
 			slashing.playerKnockback = 5;
 			slashing.playerKnockbackImmutable = true;
 
-			Tools.BeyondItems.Add(gun.PickupObjectId);
+			gun.SetTag("beyond");
 			MeshRenderer component = gun.GetComponent<MeshRenderer>();
 			if (!component)
 			{

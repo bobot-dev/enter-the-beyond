@@ -53,7 +53,7 @@ namespace BotsMod
 			ETGMod.Databases.Items.Add(gun, null, "ANY");
 
 			BotsItemIds.Relic1 = gun.PickupObjectId;
-			Tools.BeyondItems.Add(gun.PickupObjectId);
+			gun.SetTag("beyond");
 		}
 
 		public static void Add2()
@@ -101,7 +101,7 @@ namespace BotsMod
 			ETGMod.Databases.Items.Add(gun, null, "ANY");
 
 			BotsItemIds.Relic2 = gun.PickupObjectId;
-			Tools.BeyondItems.Add(gun.PickupObjectId);
+			gun.SetTag("beyond");
 		}
 
 		public static void Add3()
@@ -149,7 +149,7 @@ namespace BotsMod
 			ETGMod.Databases.Items.Add(gun, null, "ANY");
 
 			BotsItemIds.Relic3 = gun.PickupObjectId;
-			Tools.BeyondItems.Add(gun.PickupObjectId);
+			gun.SetTag("beyond");
 		}
 	}
 }

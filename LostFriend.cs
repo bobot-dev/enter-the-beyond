@@ -63,7 +63,7 @@ namespace BotsMod
 			BuildPrefab();
 			item.PlaceItemInAmmonomiconAfterItemById(664);
 
-			Tools.BeyondItems.Add(item.PickupObjectId);
+			item.SetTag("beyond");
 
 			item.sprite.usesOverrideMaterial = true;
 			Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);

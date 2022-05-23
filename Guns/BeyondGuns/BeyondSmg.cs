@@ -33,6 +33,9 @@ namespace BotsMod
 				animationclip.frames[i].spriteCollection.spriteDefinitions[id].position3.x += offsetsX[i];
 				animationclip.frames[i].spriteCollection.spriteDefinitions[id].position3.y += offsetsY[i]; 
 			}
+
+
+
 			//0.0625
 			gun.barrelOffset.localPosition = new Vector3(0.775f, 0.0625f, 0f);
 			//gun.muzzleOffset.localPosition = new Vector3(0.775f, 0.125f, 0f);
@@ -54,11 +57,11 @@ namespace BotsMod
 			gun.SetBaseMaxAmmo(500);
 			gun.gunHandedness = GunHandedness.OneHanded;
 
-			gun.quality = PickupObject.ItemQuality.B;
+			gun.quality = PickupObject.ItemQuality.C;
 
 			overheat.burnOnOverHeat = true;
-			
 
+			overheat.maxWaitTime = 1.75f;
 
 			ETGMod.Databases.Items.Add(gun, null, "ANY");
 			Projectile projectile = UnityEngine.Object.Instantiate<Projectile>(gun.DefaultModule.projectiles[0]);
@@ -69,7 +72,7 @@ namespace BotsMod
 			gun.DefaultModule.projectiles[0] = projectile;
 
 			projectile.hitEffects = (PickupObjectDatabase.GetById(57) as Gun).DefaultModule.projectiles[0].hitEffects;
-			projectile.baseData.damage = 3.5f;
+			projectile.baseData.damage = 2.5f;
 			projectile.baseData.speed = 23f;
 			projectile.baseData.force = 6f;
 			projectile.baseData.range = 16f;
@@ -79,7 +82,7 @@ namespace BotsMod
 
 			BotsItemIds.BeyondSmg = gun.PickupObjectId;
 
-			Tools.BeyondItems.Add(gun.PickupObjectId);
+			gun.SetTag("beyond");
 			MeshRenderer component = gun.GetComponent<MeshRenderer>();
 			if (!component)
 			{
@@ -103,7 +106,7 @@ namespace BotsMod
         public override void PostProcessProjectile(Projectile projectile)
         {
 			
-			projectile.baseData.damage *= (1 + ((this.heatLevel / this.maxHeat)));
+			projectile.baseData.damage *= (1 + (((this.heatLevel / this.maxHeat))/2));
 
 			if (BotsModule.debugMode) ETGModConsole.Log($"{projectile.baseData.damage}");
 

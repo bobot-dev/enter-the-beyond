@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ItemAPI;
-using Misc;
+using Alexandria.Helpers.Misc;
 using UnityEngine;
 
 namespace GungeonAPI

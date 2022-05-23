@@ -27,7 +27,7 @@ namespace BotsMod
 
             BeyondBattery.negationChance = 0.1f;
 
-            Tools.BeyondItems.Add(item.PickupObjectId);
+            item.SetTag("beyond");
             BotsItemIds.BeyondBattery = item.PickupObjectId;
         }
 

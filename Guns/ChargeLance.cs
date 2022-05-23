@@ -93,7 +93,7 @@ namespace BotsMod
 			ETGMod.Databases.Items.Add(gun, null, "ANY");
 
 
-			//Tools.BeyondItems.Add(gun.PickupObjectId);
+			//gun.SetTag("beyond");
 		}
 	}
 }

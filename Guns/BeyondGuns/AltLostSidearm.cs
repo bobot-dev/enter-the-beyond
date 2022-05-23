@@ -165,7 +165,7 @@ namespace BotsMod
 
 			BotsItemIds.AltLostSidearm = gun.PickupObjectId;
 
-			//Tools.BeyondItems.Add(gun.PickupObjectId);
+			//gun.SetTag("beyond");
 		}
 
 		protected void Update()

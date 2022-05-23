@@ -267,7 +267,7 @@ namespace BotsMod
 					ChargeTime = 0.8f,
 				},
 			};
-			Tools.BeyondItems.Add(gun.PickupObjectId);
+			gun.SetTag("beyond");
 			MeshRenderer component = gun.GetComponent<MeshRenderer>();
 			if (!component)
 			{

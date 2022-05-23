@@ -340,6 +340,20 @@ namespace BotsMod
 					typeof(Hooks).GetMethod("HandleGunAttachPointInternalHook", BindingFlags.Static | BindingFlags.NonPublic));
 				*/
 
+				var SwitchCharacterHook = new Hook(
+					typeof(ETGModConsole).GetMethod("SwitchCharacter", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("SwitchCharacterHook", BindingFlags.Static | BindingFlags.NonPublic));
+
+				/*var GetStringHook = new Hook(
+					typeof(StringTableManager).GetMethod("PostprocessString", BindingFlags.Static | BindingFlags.Public),
+					typeof(Hooks).GetMethod("PostprocessStringHook", BindingFlags.Static | BindingFlags.Public));
+				*/
+
+				var InitializeParticleSystemsHook = new Hook(
+					typeof(DeadlyDeadlyGoopManager).GetMethod("InitializeParticleSystems", BindingFlags.Instance | BindingFlags.NonPublic),
+					typeof(Hooks).GetMethod("InitializeParticleSystemsHook", BindingFlags.Static | BindingFlags.NonPublic));
+
+
 				BotsModule.Log("hooks set up hopefully");
 
 			}
@@ -351,8 +365,137 @@ namespace BotsMod
 			}
 		}
 
+		private static void InitializeParticleSystemsHook(Action<DeadlyDeadlyGoopManager> orig, DeadlyDeadlyGoopManager self)
+		{
+			FieldInfo _fireSystem = typeof(DeadlyDeadlyGoopManager).GetField("m_fireSystem", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _fireIntroSystem = typeof(DeadlyDeadlyGoopManager).GetField("m_fireIntroSystem", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _fireOutroSystem = typeof(DeadlyDeadlyGoopManager).GetField("m_fireOutroSystem", BindingFlags.NonPublic | BindingFlags.Instance);
+			FieldInfo _elecSystem = typeof(DeadlyDeadlyGoopManager).GetField("m_elecSystem", BindingFlags.NonPublic | BindingFlags.Instance);
 
-		
+
+			if (self.goopDefinition.IsPinkFlame())
+            {
+				string name = "Gungeon_Fire_Main_Pink";
+				string name2 = "Gungeon_Fire_Intro_Pink";
+				string name3 = "Gungeon_Fire_Outro_Pink";
+				GameObject gameObject = GameObject.Find(name);
+				if (gameObject == null)
+				{
+					gameObject = (GameObject)UnityEngine.Object.Instantiate(BraveResources.Load("Particles/Gungeon_Fire_Main_green", ".prefab"), Vector3.zero, Quaternion.identity);
+					gameObject.name = name;
+					gameObject.GetComponent<ParticleSystemRenderer>().material = BeyondPrefabs.BeyondFireMat;
+				}
+				_fireSystem.SetValue(self, gameObject.GetComponent<ParticleSystem>());
+				GameObject gameObject2 = GameObject.Find(name2);
+				if (gameObject2 == null)
+				{
+					gameObject2 = (GameObject)UnityEngine.Object.Instantiate(BraveResources.Load("Particles/Gungeon_Fire_Intro_green", ".prefab"), Vector3.zero, Quaternion.identity);
+					gameObject2.name = name2;
+					gameObject2.GetComponent<ParticleSystemRenderer>().material = BeyondPrefabs.BeyondFireMatIn;
+				}
+				_fireIntroSystem.SetValue(self, gameObject2.GetComponent<ParticleSystem>());
+				GameObject gameObject3 = GameObject.Find(name3);
+				if (gameObject3 == null)
+				{
+					gameObject3 = (GameObject)UnityEngine.Object.Instantiate(BraveResources.Load("Particles/Gungeon_Fire_Outro_green", ".prefab"), Vector3.zero, Quaternion.identity);
+					gameObject3.name = name3;
+					gameObject3.GetComponent<ParticleSystemRenderer>().material = BeyondPrefabs.BeyondFireMatOut;
+				}
+				_fireOutroSystem.SetValue(self, gameObject3.GetComponent<ParticleSystem>());				
+				GameObject gameObject4 = GameObject.Find("Gungeon_Elec");
+				if (gameObject4 == null)
+				{
+					gameObject4 = (GameObject)UnityEngine.Object.Instantiate(BraveResources.Load("Particles/Gungeon_Elec_raw", ".prefab"), Vector3.zero, Quaternion.identity);
+					gameObject4.name = "Gungeon_Elec";
+				}
+				_elecSystem.SetValue(self, gameObject4.GetComponent<ParticleSystem>());
+			}
+			else
+            {
+				orig(self);
+			}
+
+			
+			
+			
+		}
+
+		public static string PostprocessStringHook(Func<string, string> orig, string input)
+        {
+			var baseString = orig(input);
+
+			foreach(var word in baseString.Split(' '))
+            {
+
+            }
+
+			baseString = "";
+			return baseString;
+		}
+
+
+
+		private static void SwitchCharacterHook(ETGModConsole self, string[] args)
+        {
+			ETGModConsole.Log("Trying to switch costume", false);
+			if (!ETGModConsole.ArgCount(args, 1, 2))
+			{
+				return;
+			}
+			GameObject gameObject = (GameObject)BraveResources.Load("Player" + args[0], ".prefab");
+			if (gameObject == null)
+			{
+				Debug.Log(args[0] + " is not a mod character, checking if it's one of the standard characters");
+				gameObject = (GameObject)Resources.Load("Player" + args[0]);
+			}
+			if (gameObject == null)
+			{
+				ETGModConsole.Log("Failed getting prefab for " + args[0], false);
+				return;
+			}
+			Pixelator.Instance.FadeToBlack(0.5f, false, 0f);
+			bool flag = false;
+			if (GameManager.Instance.PrimaryPlayer)
+			{
+				flag = GameManager.Instance.PrimaryPlayer.CharacterUsesRandomGuns;
+			}
+			GameManager.Instance.PrimaryPlayer.SetInputOverride("getting deleted");
+			PlayerController primaryPlayer = GameManager.Instance.PrimaryPlayer;
+			Vector3 position = primaryPlayer.transform.position;
+			UnityEngine.Object.Destroy(primaryPlayer.gameObject);
+			GameManager.Instance.ClearPrimaryPlayer();
+			GameManager.PlayerPrefabForNewGame = gameObject;
+			PlayerController component = GameManager.PlayerPrefabForNewGame.GetComponent<PlayerController>();
+			GameStatsManager.Instance.BeginNewSession(component);
+			GameObject gameObject2 = UnityEngine.Object.Instantiate<GameObject>(GameManager.PlayerPrefabForNewGame, position, Quaternion.identity);
+			GameManager.PlayerPrefabForNewGame = null;
+			gameObject2.SetActive(true);
+			PlayerController component2 = gameObject2.GetComponent<PlayerController>();
+			GameManager.Instance.PrimaryPlayer = component2;
+			component2.PlayerIDX = 0;
+			GameManager.Instance.MainCameraController.ClearPlayerCache();
+			GameManager.Instance.MainCameraController.SetManualControl(false, true);
+			if (GameManager.Instance.IsFoyer) Foyer.Instance.PlayerCharacterChanged(component2);
+
+			Pixelator.Instance.FadeToBlack(0.5f, true, 0f);
+			if (flag)
+			{
+				GameManager.Instance.PrimaryPlayer.CharacterUsesRandomGuns = true;
+				while (GameManager.Instance.PrimaryPlayer.inventory.AllGuns.Count > 1)
+				{
+					Gun gun = GameManager.Instance.PrimaryPlayer.inventory.AllGuns[1];
+					GameManager.Instance.PrimaryPlayer.inventory.RemoveGunFromInventory(gun);
+					UnityEngine.Object.Destroy(gun.gameObject);
+				}
+			}
+
+			if (args.Length == 2)
+			{
+				component2.SwapToAlternateCostume(null);
+			}
+
+		}
+
 
 		public static void ConfigureOnPlacementHook(Action<FloorChestPlacer, RoomHandler> orig, FloorChestPlacer self, RoomHandler room)
 		{
@@ -2436,8 +2579,8 @@ namespace BotsMod
 
 				if (self.baseShopType == (BaseShopController.AdditionalShopType)CustomEnums.CustomAdditionalShopType.DEVIL_DEAL)
 				{
-					SaveAPIManager.RegisterStatChange(CustomTrackedStats.MERCHANT_PURCHASES_HEART, 1f);
-					SaveAPIManager.RegisterStatChange(CustomTrackedStats.MONEY_SPENT_AT_HEART_SHOP, (float)item.ModifiedPrice);
+					SaveAPIManager.RegisterStatChange("bot", SaveFlags.MERCHANT_PURCHASES_HEART, 1f);
+					SaveAPIManager.RegisterStatChange("bot", SaveFlags.MONEY_SPENT_AT_HEART_SHOP, (float)item.ModifiedPrice);
 				}
 				if (self.shopkeepFSM != null && self.baseShopType != BaseShopController.AdditionalShopType.RESRAT_SHORTCUT)
 				{
@@ -2533,7 +2676,7 @@ namespace BotsMod
 		private static void DoNotificationInternalHook(Action<UINotificationController, NotificationParams> orig, UINotificationController self, NotificationParams notifyParams)
 		{
 			//SpellPickupObject
-			if ((!string.IsNullOrEmpty(notifyParams.EncounterGuid) && ((Tools.BeyondItems.Contains(EncounterDatabase.GetEntry(notifyParams.EncounterGuid).pickupObjectId) && GameStatsManager.Instance.QueryEncounterable(notifyParams.EncounterGuid) != 1)) ||
+			if ((!string.IsNullOrEmpty(notifyParams.EncounterGuid) && ((AlexandriaTags.GetAllItemsIdsWithTag("beyond").Contains(EncounterDatabase.GetEntry(notifyParams.EncounterGuid).pickupObjectId) && GameStatsManager.Instance.QueryEncounterable(notifyParams.EncounterGuid) != 1)) ||
 				EncounterDatabase.GetEntry(notifyParams.EncounterGuid) != null && PickupObjectDatabase.GetById(EncounterDatabase.GetEntry(notifyParams.EncounterGuid).pickupObjectId) is SpellPickupObject))
             {
 				FieldInfo _queuedNotifications = typeof(UINotificationController).GetField("m_queuedNotifications", BindingFlags.NonPublic | BindingFlags.Instance);

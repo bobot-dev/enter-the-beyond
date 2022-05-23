@@ -5,7 +5,7 @@ using UnityEngine;
 using System.Text;
 using System.Reflection;
 using System.IO;
-using Misc;
+using Alexandria.Helpers.Misc;
 
 namespace AmmonomiconAPI
 {

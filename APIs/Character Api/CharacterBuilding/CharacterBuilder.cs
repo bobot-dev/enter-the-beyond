@@ -73,12 +73,14 @@ namespace CustomCharacters
             if (useGlow)
             {
                 var material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+                //var material = new Material(ShaderCache.Acquire("Brave/UnlitTintableCutoutEmissive"));
                 material.DisableKeyword("BRIGHTNESS_CLAMP_ON");
                 material.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
                 material.SetTexture("_MainTexture", material.GetTexture("_MainTex"));
                 material.SetColor("_EmissiveColor", glowVars.emissiveColor);
                 material.SetFloat("_EmissiveColorPower", glowVars.emissiveColorPower);
                 material.SetFloat("_EmissivePower", glowVars.emissivePower);
+                material.SetFloat("_EmissiveThresholdSensitivity", 0.5f);
 
                 data.glowMaterial = material;
             }
@@ -86,12 +88,14 @@ namespace CustomCharacters
             if (useGlow && hasAltSkin)
             {
                 var material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
+                //var material = new Material(ShaderCache.Acquire("Brave/UnlitTintableCutoutEmissive"));
                 material.DisableKeyword("BRIGHTNESS_CLAMP_ON");
                 material.EnableKeyword("BRIGHTNESS_CLAMP_OFF");
                 material.SetTexture("_MainTexture", material.GetTexture("_MainTex"));
                 material.SetColor("_EmissiveColor", altGlowVars.emissiveColor);
                 material.SetFloat("_EmissiveColorPower", altGlowVars.emissiveColorPower);
                 material.SetFloat("_EmissivePower", altGlowVars.emissivePower);
+                material.SetFloat("_EmissiveThresholdSensitivity", 0.5f);
 
                 data.altGlowMaterial = material;
             }

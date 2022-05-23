@@ -32,7 +32,7 @@ namespace BotsMod
             item.quality = ItemQuality.B;
 
             //PrayerKeep = RoomFactory.BuildFromResource("Planetside/Resources/ShrineRooms/PrayerRooms/PrayerRoomKeep.room").room;
-            Tools.BeyondItems.Add(item.PickupObjectId);
+            item.SetTag("beyond");
             StairWay.InitRooms();
             BotsItemIds.Stairway = item.PickupObjectId;
         }

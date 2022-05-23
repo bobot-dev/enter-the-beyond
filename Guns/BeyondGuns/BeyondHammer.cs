@@ -140,7 +140,7 @@ namespace BotsMod
 				}
 			};
 
-			Tools.BeyondItems.Add(gun.PickupObjectId);
+			gun.SetTag("beyond");
 			MeshRenderer component = gun.GetComponent<MeshRenderer>();
 			if (!component)
 			{

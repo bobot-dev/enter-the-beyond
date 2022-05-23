@@ -52,6 +52,10 @@ namespace BotsMod
             GameManagerObject.GetComponent<GameManager>().customFloors.Add(BeyondDefinition);
         }
 
+
+
+        //static BossFloorEntry beyondBossEntry = new BossFloorEntry { Annotation = "beyond", AssociatedTilesets = (GlobalDungeonData.ValidTilesets) CustomValidTilesets.BEYOND, Bosses = new List<IndividualBossFloorEntry> { new IndividualBossFloorEntry { BossWeight = 1000, GlobalBossPrerequisites = new DungeonPrerequisite[0], TargetRoomTable = BeyondPrefabs.BeyondBossRoomTable } };
+                 
         public static Dungeon BeyondGeon(Dungeon dungeon)
         {
             Debug.Log("beyond setup 1");
@@ -64,7 +68,9 @@ namespace BotsMod
                 gofuckyourself = MarinePastPrefab.tileIndices.dungeonCollection;
             }
 
-            
+            //if (!GameManager.Instance.BossManager.BossFloorData.Contains(beyondBossEntry)) GameManager.Instance.BossManager.BossFloorData.Add(beyondBossEntry);
+
+
             //DungeonMaterial FinalScenario_MainMaterial = UnityEngine.Object.Instantiate(RatDungeonPrefab.roomMaterialDefinitions[0]);
             DungeonMaterial FinalScenario_MainMaterial = UnityEngine.Object.Instantiate(MarinePastPrefab.roomMaterialDefinitions[0]);
             FinalScenario_MainMaterial.supportsPits = true;

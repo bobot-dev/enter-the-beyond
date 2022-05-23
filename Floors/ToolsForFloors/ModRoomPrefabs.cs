@@ -128,6 +128,61 @@ namespace BotsMod
             Mod_Boss.usesProceduralDecoration = false;
             Mod_Boss.rewardChestSpawnPosition = new IntVector2(25, 20); //Where the reward pedestal spawns, should be changed based on room size
             Mod_Boss.usesCustomAmbientLight = true;
+
+            if (Mod_Boss.placedObjects == null) Mod_Boss.placedObjects = new List<PrototypePlacedObjectData>();
+            if (Mod_Boss.placedObjectPositions == null) Mod_Boss.placedObjectPositions = new List<Vector2>();
+
+            DungeonPlaceable dungeonPlaceable = ScriptableObject.CreateInstance<DungeonPlaceable>();
+            dungeonPlaceable.width = 1;
+            dungeonPlaceable.height = 1;
+            dungeonPlaceable.respectsEncounterableDifferentiator = true;
+            dungeonPlaceable.variantTiers = new List<DungeonPlaceableVariant> {
+            new DungeonPlaceableVariant {
+                percentChance = 10000f,
+                nonDatabasePlaceable = BeyondPrefabs.OverseerBossRoomFloor,
+                prerequisites = new DungeonPrerequisite[0],
+                materialRequirements = new DungeonPlaceableRoomMaterialRequirement[0]
+            }};
+            Mod_Boss.placedObjects.Add(new PrototypePlacedObjectData
+            {
+                contentsBasePosition = new Vector2(0, 0),
+                fieldData = new List<PrototypePlacedObjectFieldData>(),
+                instancePrerequisites = new DungeonPrerequisite[0],
+                linkedTriggerAreaIDs = new List<int>(),
+                placeableContents = dungeonPlaceable
+            });
+            Mod_Boss.overrideRoomVisualType = 1;
+
+            /*Mod_Boss.placedObjects.Add(new PrototypePlacedObjectData
+            {
+                placeableContents = null,
+                nonenemyBehaviour = BeyondPrefabs.OverseerBossRoomFloor.GetComponent<DungeonPlaceableBehaviour>(),
+                enemyBehaviourGuid = "",
+                unspecifiedContents = null,
+                contentsBasePosition = new Vector2(25, 20),
+                layer = 0,
+                spawnChance = 1,
+                xMPxOffset = 0,
+                yMPxOffset = 0,
+                fieldData = new List<PrototypePlacedObjectFieldData>(),
+                instancePrerequisites = new DungeonPrerequisite[0],
+                linkedTriggerAreaIDs = new List<int>(),
+                assignedPathIDx = -1,
+                assignedPathStartNode = 0,
+
+            });*/
+
+            Mod_Boss.placedObjectPositions.Add(new Vector2(0, 0));
+
+            BeyondPrefabs.BeyondBossRoomTable.includedRooms.elements.Add(GenerateWeightedRoom(Mod_Boss, 1));
+
+            GameManager.Instance.BossManager.BossFloorData[0].Bosses.Add(new IndividualBossFloorEntry
+            {
+                BossWeight = 1000,
+                GlobalBossPrerequisites = new DungeonPrerequisite[0],
+                TargetRoomTable = BeyondPrefabs.BeyondBossRoomTable
+            });
+
             //Mod_Boss.customAmbientLight = new Color32(80, 80, 80, 255);
             //Mod_Boss.overriddenTilesets = GlobalDungeonData.ValidTilesets.BELLYGEON;
 

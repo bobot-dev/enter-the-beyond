@@ -120,7 +120,7 @@ namespace AmmonomiconAPI
 			component7.IsVisible = !journalData.IsEnemy;
 			tk2dSprite tk2dSprite = component6.GetComponentInChildren<tk2dSprite>();
 			dfTextureSprite componentInChildren3 = component.transform.Find("ThePhoto").GetComponentInChildren<dfTextureSprite>();
-			if (linkedTrackable != null && BotsMod.Tools.BeyondItems.Contains(linkedTrackable.pickupObjectId))
+			if (linkedTrackable != null && AlexandriaTags.GetAllItemsIdsWithTag("beyond").Contains(linkedTrackable.pickupObjectId))
 			{
 				component.transform.Find("ThePhoto").Find("Photo").gameObject.GetComponent<dfSprite>().SpriteName = "Item_Picture_Beyond_001";
 

@@ -49,17 +49,13 @@ namespace BotsMod
 					companion.aiActor.specRigidbody.CollideWithOthers = true;
 					companion.aiActor.specRigidbody.CollideWithTileMap = true;
 					companion.aiActor.PreventFallingInPitsEver = false;
-					companion.aiActor.healthHaver.ForceSetCurrentHealth(30f);
 					companion.aiActor.CollisionKnockbackStrength = 5f;
 					companion.aiActor.CanTargetPlayers = true;
-					companion.aiActor.healthHaver.SetHealthMaximum(55f, null, false);
+					companion.aiActor.healthHaver.SetHealthMaximum(30f, null, false);
 					companion.aiActor.ShadowObject = EnemyDatabase.GetOrLoadByGuid("31a3ea0c54a745e182e22ea54844a82d").ShadowObject;
 
 
 					companion.aiActor.specRigidbody.PixelColliders.Clear();
-
-
-
 					companion.aiActor.specRigidbody.PixelColliders.Add(new PixelCollider
 
 					{
@@ -108,7 +104,6 @@ namespace BotsMod
 					companion.gameObject.AddAnimation("teleport", "BotsMod/sprites/Enemies/DeadEye/StartTeleport", 6, EnemyBuilder.AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
 					companion.gameObject.AddAnimation("teleport_end", "BotsMod/sprites/Enemies/DeadEye/EndTeleport", 6, EnemyBuilder.AnimationType.Other, DirectionalAnimation.DirectionType.Single, DirectionalAnimation.FlipType.None).wrapMode = tk2dSpriteAnimationClip.WrapMode.Once;
 
-
 					var bs = prefab.GetComponent<BehaviorSpeculator>();
 					BehaviorSpeculator behaviorSpeculator = EnemyDatabase.GetOrLoadByGuid("31a3ea0c54a745e182e22ea54844a82d").behaviorSpeculator;
 
@@ -126,9 +121,6 @@ namespace BotsMod
 							PauseTime = 0.25f
 						}
 					};
-
-
-
 					bs.AttackBehaviors = new List<AttackBehaviorBase>() {
 
 						new ShootGunBehavior() {
@@ -177,7 +169,7 @@ namespace BotsMod
 							RequiresLineOfSight = true,
 							MaxUsages = 0,
 						},
-						/*new TeleportBehavior
+						new TeleportBehavior
 						{
 							AttackableDuringAnimation = true,
 							AllowCrossRoomTeleportation = false,
@@ -216,7 +208,7 @@ namespace BotsMod
 							targetAreaStyle = null,
 							HealthThresholds = new float[0],
 							MinWallDistance = 0,
-						}*/
+						}
 					};
 					bs.MovementBehaviors = new List<MovementBehaviorBase>
 					{
@@ -243,19 +235,18 @@ namespace BotsMod
 					bs.StartingFacingDirection = behaviorSpeculator.StartingFacingDirection;
 					bs.SkipTimingDifferentiator = behaviorSpeculator.SkipTimingDifferentiator;
 
-
 					GameObject m_CachedGunAttachPoint = companion.transform.Find("GunAttachPoint").gameObject;
 					m_CachedGunAttachPoint.transform.localPosition = new Vector3(0.5625f, 0.875f, 0);
+
 					EnemyBuilder.DuplicateAIShooterAndAIBulletBank(prefab, aIActor.aiShooter, aIActor.GetComponent<AIBulletBank>(), BotsItemIds.BeyondSniper, m_CachedGunAttachPoint.transform, overrideHandObject: BeyondPrefabs.basicBeyondHands);
 					prefab.GetComponent<AIBulletBank>().Bullets = new List<AIBulletBank.Entry>();
 					prefab.GetComponent<AIBulletBank>().Bullets.Add(EnemyDatabase.GetOrLoadByGuid("31a3ea0c54a745e182e22ea54844a82d").bulletBank.GetBullet("sniper"));
 					var shooter = prefab.GetComponent<AIShooter>();
-
 					shooter.AllowTwoHands = true;
 					shooter.ForceGunOnTop = true;
 
 
-					UnityEngine.Object.Destroy(prefab.transform.Find("BulletManHand(Clone)").gameObject);
+					//UnityEngine.Object.Destroy(prefab.transform.Find("BulletManHand(Clone)").gameObject);
 
 					Game.Enemies.Add("bot:dead_eye", companion.aiActor);
 					//ETGModConsole.Log("cool");

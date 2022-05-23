@@ -202,7 +202,8 @@ namespace BotsMod
 			//gun.Volley.projectiles[1].angleVariance = 0;
 			id = gun.PickupObjectId;
 
-			Tools.BeyondItems.Add(gun.PickupObjectId);
+			gun.SetTag("beyond");
+
 			MeshRenderer component = gun.GetComponent<MeshRenderer>();
 			if (!component)
 			{

@@ -214,31 +214,28 @@ namespace CustomCharacters
 
 		public static void SwapToAlternateCostumeHook(Action<PlayerController, tk2dSpriteAnimation> orig, PlayerController self, tk2dSpriteAnimation overrideTargetLibrary = null)
 		{
-
-			if (self.characterIdentity > (PlayableCharacters)10)
+			
+			if (self?.characterIdentity > (PlayableCharacters)10)
 			{
-				if (!self.IsUsingAlternateCostume && self.gameObject.GetComponent<CustomCharacter>().data.altGlowMaterial != null)
-				{
+				
+				if (self.gameObject.GetComponent<CustomCharacter>().data == null) self.gameObject.GetComponent<CustomCharacter>().GetData();
 
-					if (self.gameObject.GetComponent<CustomCharacter>().data.altGlowMaterial.GetTexture("_MainTex") != self.AlternateCostumeLibrary.clips[0].frames[0].spriteCollection.spriteDefinitions[0].material.GetTexture("_MainTex"))
+				if (!self.IsUsingAlternateCostume && self.gameObject.GetComponent<CustomCharacter>()?.data.altGlowMaterial != null)
+				{
+					if (self.gameObject.GetComponent<CustomCharacter>()?.data?.altGlowMaterial?.GetTexture("_MainTex") != self.AlternateCostumeLibrary?.clips[0]?.frames[0]?.spriteCollection?.spriteDefinitions[0]?.material.GetTexture("_MainTex"))
 					{
 						self.gameObject.GetComponent<CustomCharacter>().data.altGlowMaterial.SetTexture("_MainTexture", self.AlternateCostumeLibrary.clips[0].frames[0].spriteCollection.spriteDefinitions[0].material.GetTexture("_MainTex"));
 					}
 					self.sprite.renderer.material = self.gameObject.GetComponent<CustomCharacter>().data.altGlowMaterial;					
 				}
-				else if (self.gameObject.GetComponent<CustomCharacter>().data.glowMaterial != null)
+				else if (self.gameObject.GetComponent<CustomCharacter>()?.data.glowMaterial != null)
 				{
-
 					if (self.gameObject.GetComponent<CustomCharacter>().data.glowMaterial.GetTexture("_MainTex") != self.sprite.renderer.material.GetTexture("_MainTex"))
 					{
 						self.gameObject.GetComponent<CustomCharacter>().data.glowMaterial.SetTexture("_MainTexture", self.sprite.renderer.material.GetTexture("_MainTex"));
 					}
 					self.sprite.renderer.material = self.gameObject.GetComponent<CustomCharacter>().data.glowMaterial;
 				}
-
-
-
-
 
 				//var v = (((Vector2)typeof(PlayerController).GetMethod("DetermineAimPointInWorld", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(self, null)) - self.specRigidbody.GetUnitCenter(ColliderType.HitBox)).ToAngle();
 				//self.GetBaseAnimationName(v, 0, false, false);

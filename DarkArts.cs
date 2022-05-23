@@ -40,7 +40,7 @@ namespace BotsMod
 			item.consumable = false;
 			item.quality = ItemQuality.A;
 			item.poofVFX = (PickupObjectDatabase.GetById(462) as ConsumableStealthItem).poofVfx;
-			Tools.BeyondItems.Add(item.PickupObjectId);
+			item.SetTag("beyond");
 
 			item.sprite.usesOverrideMaterial = true;
 			Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);

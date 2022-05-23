@@ -37,7 +37,7 @@ namespace BotsMod
 
 			SpriteOutlineManager.AddOutlineToSprite(base.sprite, Color.black, 0.1f, 0f, SpriteOutlineManager.OutlineType.NORMAL);
 
-			if (!BeyondSettings.Instance.debug || SaveAPIManager.GetFlag(CustomDungeonFlags.BOT_EFFIGY_POWERED))
+			if (!BeyondSettings.Instance.debug || SaveAPIManager.GetFlag("bot", SaveFlags.BOT_EFFIGY_POWERED))
             {
 				state = EffigyState.POWERED;
 				animator.DefaultClipId = spriteAnimator.GetClipIdByName("idle");
@@ -107,7 +107,7 @@ namespace BotsMod
 			} 
 			else
             {
-				this.m_canUse = (player.CurrentGun != null && player.CurrentGun.PickupObjectId == BotsItemIds.Relic3 && !SaveAPIManager.GetFlag(CustomDungeonFlags.BOT_EFFIGY_POWERED));
+				this.m_canUse = (player.CurrentGun != null && player.CurrentGun.PickupObjectId == BotsItemIds.Relic3 && !SaveAPIManager.GetFlag("bot", SaveFlags.BOT_EFFIGY_POWERED));
 				base.StartCoroutine(HandleConversation(player));
 			}
 			
@@ -146,7 +146,7 @@ namespace BotsMod
 				if (m_canUse)
                 {
 					interactor.inventory.DestroyCurrentGun();
-					SaveAPIManager.SetFlag(CustomDungeonFlags.BOT_EFFIGY_POWERED, true);					
+					SaveAPIManager.SetFlag("bot", SaveFlags.BOT_EFFIGY_POWERED, true);					
 					animator.Play("charging");
 					animator.AnimationCompleted += OnAnimEnded;
 				}

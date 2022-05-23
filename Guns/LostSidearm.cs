@@ -52,6 +52,19 @@ namespace BotsMod
 			gun.DefaultModule.customAmmoType = CustomClipAmmoTypeToolbox.AddCustomAmmoType("Lost Sidearm", "BotsMod/sprites/CustomGunAmmoTypes/lost_sidearm_clip_001", "BotsMod/sprites/CustomGunAmmoTypes/lost_sidearm_clip_002"); ;
 			gun.barrelOffset.localPosition = new Vector3(1.375f, 0.5f, 0f);
 
+
+			/*var fVolly = ScriptableObject.CreateInstance<ProjectileVolleyData>();
+			fVolly.InitializeFrom(gun.Volley);
+			for (int i = 0; i < 10; i++)
+			{
+				var projMod = ProjectileModule.CreateClone((PickupObjectDatabase.GetById(86) as Gun).DefaultModule);
+				fVolly.projectiles.Add(projMod);
+			}
+			gun.DefaultModule.finalVolley = fVolly;
+
+			gun.DefaultModule.usesOptionalFinalProjectile = true;
+			gun.DefaultModule.numberOfFinalProjectiles = 1;
+			*/
 			//gun.DefaultModule.usesOptionalFinalProjectile = true;
 			//gun.DefaultModule.numberOfFinalProjectiles = 1;
 
@@ -108,7 +121,7 @@ namespace BotsMod
 			lostSidearm = gun;
 			BotsItemIds.LostSidearm = gun.PickupObjectId;
 
-			//Tools.BeyondItems.Add(gun.PickupObjectId);
+			//gun.SetTag("beyond");
 		}
 
 		static TrailRenderer tr;

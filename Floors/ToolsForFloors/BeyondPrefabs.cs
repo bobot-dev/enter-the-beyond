@@ -7,6 +7,7 @@ using System.Text;
 using UnityEngine;
 using ItemAPI;
 using System.Reflection;
+using Alexandria.Helpers.Misc;
 
 namespace BotsMod
 {
@@ -25,6 +26,7 @@ namespace BotsMod
 		public static GameObject laserSight;
 		public static GameObject BeyondTableH;
 		public static GameObject BeyondTableV;
+		public static GameObject OverseerBossRoomFloor;
 
 		public static PlayerHandController basicBeyondHands;
 
@@ -37,6 +39,7 @@ namespace BotsMod
 		public static GenericRoomTable shop_room_table;
 		public static GenericRoomTable boss_foyertable;
 		public static GenericRoomTable BeyondRoomTable;
+		public static GenericRoomTable BeyondBossRoomTable;
 		public static GenericRoomTable SecretRoomTable;
 
 		public static GenericRoomTable CastleRoomTable;
@@ -55,6 +58,15 @@ namespace BotsMod
 		public static AssetBundle EtbAssetBundle;
 		public static AssetBundle BotsAssetBundle;
 
+		public static GoopDefinition BeyondFireGoop;
+
+		public static Material BeyondFireMat;
+		public static Material BeyondFireMatIn;
+		public static Material BeyondFireMatOut;
+
+
+
+
 		public static Shader BeyondJammedShader;
 
 		public static tk2dSpriteCollectionData beyondCollection;
@@ -70,6 +82,101 @@ namespace BotsMod
 			fucktilesets = BotsModule.LoadAssetBundleFromLiterallyAnywhere("fucktilesets");
 			EtbAssetBundle = BotsModule.LoadAssetBundleFromLiterallyAnywhere("enterthebeyond");
 			BotsAssetBundle = BotsModule.LoadAssetBundleFromLiterallyAnywhere("botsassetbundle");
+
+			BeyondFireGoop = ScriptableObject.CreateInstance<GoopDefinition>();
+
+
+			BeyondFireGoop.damagesPlayers = false;
+			BeyondFireGoop.damagesEnemies = false;
+			BeyondFireGoop.baseColor32 = new Color32(225, 0, 247, 225);
+			BeyondFireGoop.fadeColor32 = new Color32(166, 0, 222, 225);
+			BeyondFireGoop.fireColor32 = new Color32(255, 23, 189, 225);
+			BeyondFireGoop.igniteColor32 = new Color32(166, 0, 222, 225);
+			BeyondFireGoop.CanBeIgnited = true;
+			BeyondFireGoop.CanBeElectrified = false;
+			BeyondFireGoop.CanBeFrozen = false;
+			BeyondFireGoop.SelfIgnites = true;
+			BeyondFireGoop.ignitionChangesLifetime = true;
+			BeyondFireGoop.igniteSpreadTime = 0.2f;
+			BeyondFireGoop.selfIgniteDelay = 0.2f;
+			BeyondFireGoop.ignitedLifetime = 3f;
+			BeyondFireGoop.fireBurnsEnemies = false;
+			BeyondFireGoop.fireDamagePerSecondToEnemies = 0;
+
+			BeyondFireMat = new Material(BraveResources.Load<GameObject>("Particles/Gungeon_Fire_Main_green", ".prefab").GetComponent<ParticleSystemRenderer>().material);
+			BeyondFireMat.mainTexture = GungeonAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/VFX/Fire/beyond_fire_001.png");
+
+			BeyondFireMatIn = new Material(BraveResources.Load<GameObject>("Particles/Gungeon_Fire_Intro_green", ".prefab").GetComponent<ParticleSystemRenderer>().material);
+			BeyondFireMatIn.mainTexture = GungeonAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/VFX/Fire/beyond_fire_002.png");
+
+			BeyondFireMatOut = new Material(BraveResources.Load<GameObject>("Particles/Gungeon_Fire_Outro_green", ".prefab").GetComponent<ParticleSystemRenderer>().material);
+			BeyondFireMatOut.mainTexture = GungeonAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/VFX/Fire/beyond_fire_003.png");
+
+
+
+
+			OverseerBossRoomFloor = new GameObject("OverseerRoomFloorPlacable");
+			FakePrefab.MarkAsFakePrefab(OverseerBossRoomFloor);
+			OverseerBossRoomFloor.SetActive(false);
+
+			OverseerBossRoomFloor.transform.localPosition = new Vector3(0, 0, -33.76f);
+			OverseerBossRoomFloor.layer = 19;
+			SpriteBuilder.SpriteFromResource("BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_001.png", OverseerBossRoomFloor);
+			var overseerBossRoomFloorObjSprite = OverseerBossRoomFloor.GetComponent<tk2dSprite>();
+
+			List<int> idList = new List<int>();
+			List<string> floorIntroSpritePaths = new List<string>
+			{
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_001.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_002.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_003.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_004.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_005.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_006.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_007.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_008.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_009.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_010.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_011.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_012.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_013.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_014.png",
+				"BotsMod/sprites/Placeables/overseers_really_fucking_cool_floor_015.png",
+			};
+
+			var overseerBossRoomFloorObjAnimator = OverseerBossRoomFloor.AddComponent<tk2dSpriteAnimator>();
+			overseerBossRoomFloorObjAnimator.playAutomatically = false;
+			overseerBossRoomFloorObjAnimator.ignoreTimeScale = true;
+			foreach (var sprite in floorIntroSpritePaths)
+			{
+				var sid = CustomCharacters.SpriteHandler.AddSpriteToCollection(ItemAPI.ResourceExtractor.GetTextureFromResource(sprite), overseerBossRoomFloorObjSprite.Collection);
+				idList.Add(sid);
+			}
+			CustomCharacters.SpriteHandler.AddAnimation(overseerBossRoomFloorObjAnimator, overseerBossRoomFloorObjSprite.Collection, idList, "intro", tk2dSpriteAnimationClip.WrapMode.Loop, 16);
+
+
+
+			overseerBossRoomFloorObjSprite.usesOverrideMaterial = true;
+			overseerBossRoomFloorObjSprite.renderer.sortingLayerID = LayerMask.NameToLayer("BG_Critical");
+			overseerBossRoomFloorObjSprite.HeightOffGround = 1.76f;
+			overseerBossRoomFloorObjSprite.allowDefaultLayer = false;
+			overseerBossRoomFloorObjSprite.ignoresTiltworldDepth = false;
+			overseerBossRoomFloorObjSprite.depthUsesTrimmedBounds = true;
+			overseerBossRoomFloorObjSprite.automaticallyManagesDepth = true;
+
+			var floorMat = new Material(ShaderCache.Acquire("Brave/LitTk2dCustomFalloffTiltedCutout"));
+			floorMat.SetTexture("_MainTex", overseerBossRoomFloorObjSprite.renderer.material.GetTexture("_MainTex"));
+
+
+			overseerBossRoomFloorObjSprite.renderer.material = floorMat;
+
+
+
+			var overseerBossRoomFloorObjPlaceable = OverseerBossRoomFloor.AddComponent<DungeonPlaceableBehaviour>();
+			overseerBossRoomFloorObjPlaceable.difficulty = DungeonPlaceableBehaviour.PlaceableDifficulty.BASE;
+			overseerBossRoomFloorObjPlaceable.isPassable = true;
+			overseerBossRoomFloorObjPlaceable.placeableHeight = 1;
+			overseerBossRoomFloorObjPlaceable.placeableWidth = 1;
 
 
 
@@ -126,6 +233,11 @@ namespace BotsMod
 			BeyondRoomTable.includedRooms = new WeightedRoomCollection();
 			BeyondRoomTable.includedRooms.elements = new List<WeightedRoom>();
 			BeyondRoomTable.includedRoomTables = new List<GenericRoomTable>(0);
+
+			BeyondBossRoomTable = ScriptableObject.CreateInstance<GenericRoomTable>();
+			BeyondBossRoomTable.includedRooms = new WeightedRoomCollection();
+			BeyondBossRoomTable.includedRooms.elements = new List<WeightedRoom>();
+			BeyondBossRoomTable.includedRoomTables = new List<GenericRoomTable>(0);
 
 			SecretRoomTable = shared_auto_002.LoadAsset<GenericRoomTable>("secret_room_table_01");
 
@@ -716,8 +828,8 @@ namespace BotsMod
 				}
 			}
 
-			beyondLootTable = LootTableAPI.LootTableTools.CreateLootTable();
-			foreach (var item in Tools.BeyondItems)
+			beyondLootTable = LootUtility.CreateLootTable();
+			foreach (var item in AlexandriaTags.GetAllItemsIdsWithTag("beyond"))
 			{
 				if (item == BotsItemIds.SpinDownDice)
 				{

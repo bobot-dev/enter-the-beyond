@@ -53,7 +53,7 @@ namespace BotsMod
         public static void Init()
         {
 
-            var devilLootTable = LootTableAPI.LootTableTools.CreateLootTable();
+            var devilLootTable = Alexandria.Helpers.Misc.LootUtility.CreateLootTable();
             devilLootTable.AddItemToPool(349);
             devilLootTable.AddItemToPool(279);
             devilLootTable.AddItemToPool(500);
@@ -182,6 +182,60 @@ namespace BotsMod
                 }
             });
 
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("dumpAnimInfo", (args) =>
+            {
+                
+                string output = GameManager.Instance.PrimaryPlayer.spriteAnimator.Library.name + "\\n\\n";
+                var collection = GameManager.Instance.PrimaryPlayer.spriteAnimator.Library.clips[0].frames[0].spriteCollection;
+
+                foreach (var clip in GameManager.Instance.PrimaryPlayer.spriteAnimator.Library.clips)
+                {
+
+                    string ids = "";
+                    string spriteNames = "";
+                    string audioEvents = "";
+                    string grounded = "";
+                    string iFrame = "";
+
+                    foreach(var frame in clip.frames)
+                    {
+                        ids += $"{frame.spriteId}, ";
+                        spriteNames += $"\"{frame.spriteCollection.spriteDefinitions[frame.spriteId].name}\", ";
+                        audioEvents += ((frame.triggerEvent) ? $"\"{frame.eventAudio}\", " : $"none, ");
+                        grounded += $"{frame.groundedFrame}, ";
+                        iFrame += $"{frame.invulnerableFrame}, ";
+                    }
+
+                    output += $"---=={clip.name}==---\\n    FPS: {clip.fps} \\n    Wrap Mode: {clip.wrapMode} \\n    IDs: {ids} \\n    Sprite Names: {spriteNames} \\n    Audio Events: {audioEvents} \\n    Is Grounded Frame: {grounded} \\n    Is I-Frame: {iFrame} \\n";
+                }
+
+                string path = $"{ETGMod.ResourcesDirectory}/SpriteInfoDump/{GameManager.Instance.PrimaryPlayer.spriteAnimator.Library.name}.txt";
+
+                if (!File.Exists(path))
+                {
+                    var f = File.Create(path);
+                    f.Close();
+                }
+                File.WriteAllText(path, output.Replace("\\n", Environment.NewLine));
+
+
+                ETGModConsole.Log($"File output to \"{path}\"");
+            });
+
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("checkEnemyStuff", (args) =>
+            {
+                var e = EnemyDatabase.GetOrLoadByGuid(args[0]);
+
+                foreach (Component comp in e.GetComponents<Component>())
+                {
+                    ETGModConsole.Log($"[{e.name}]: (comp) {comp.GetType()}");
+                }
+
+                foreach (Transform child in e.transform)
+                {
+                    ETGModConsole.Log($"[{e.name}]: (child) {child.gameObject.name}");
+                }
+            });
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("forceUnlockAltGuns", (args) =>
             {
@@ -1618,9 +1672,29 @@ namespace BotsMod
 
             });
 
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("getRoomPlaceables", delegate (string[] args)
+            {
+                var room = GameManager.Instance.PrimaryPlayer.CurrentRoom;
+                if (room.area.runtimePrototypeData.placedObjects != null)
+                {
+                    foreach (var placeable in room.area.runtimePrototypeData.placedObjects)
+                    {
+                        if (placeable.placeableContents?.variantTiers[0].nonDatabasePlaceable != null)
+                        {
+
+                            
+
+                            BotsModule.Log($"{placeable.placeableContents.variantTiers[0].nonDatabasePlaceable.name}");
+                        }
+
+                    }
+                }
+
+            });
 
 
-            
+
+
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("listitemchance", delegate (string[] args)
             {
@@ -1731,7 +1805,35 @@ namespace BotsMod
                 GungeonAPI.ShrineTools.LogRoomHandlerToPNGFile(GameManager.Instance.PrimaryPlayer.CurrentRoom);
             });
 
-           
+            ETGModConsole.Commands.GetGroup("bot").AddUnit("spawnGoop", delegate (string[] args)
+            {
+
+                var BeyondFireGoop = ScriptableObject.CreateInstance<GoopDefinition>();
+
+
+                BeyondFireGoop.damagesPlayers = false;
+                BeyondFireGoop.damagesEnemies = false;
+                BeyondFireGoop.baseColor32 = new Color32(225, 0, 247, 225);
+                BeyondFireGoop.fadeColor32 = new Color32(166, 0, 222, 225);
+                BeyondFireGoop.fireColor32 = new Color32(255, 23, 189, 225);
+                BeyondFireGoop.igniteColor32 = new Color32(255, 89, 216, 225);
+                BeyondFireGoop.CanBeIgnited = true;
+                BeyondFireGoop.CanBeElectrified = false;
+                BeyondFireGoop.CanBeFrozen = false;
+                BeyondFireGoop.SelfIgnites = true;
+                BeyondFireGoop.ignitionChangesLifetime = false;
+                BeyondFireGoop.igniteSpreadTime = 0.2f;
+                BeyondFireGoop.selfIgniteDelay = 0.2f;
+                BeyondFireGoop.ignitedLifetime = 3f;
+                BeyondFireGoop.fireBurnsEnemies = false;
+                BeyondFireGoop.lifespan = 30;
+                BeyondFireGoop.fireDamagePerSecondToEnemies = 0;
+
+
+
+                DeadlyDeadlyGoopManager.GetGoopManagerForGoopType(BeyondFireGoop).AddGoopCircle(GameManager.Instance.PrimaryPlayer.specRigidbody.UnitCenter, 10, -1, false, -1);
+            });
+
 
             ETGModConsole.Commands.GetGroup("bot").AddUnit("asset_bundle_objects", delegate (string[] args)
             {
@@ -1750,11 +1852,11 @@ namespace BotsMod
 
                 //part.AddComponent<MakeObjSpin>();
             });
-
+            /*
             ETGModConsole.Commands.AddGroup("bot_saveapi");
             ETGModConsole.Commands.GetGroup("bot_saveapi").AddUnit("get_flag", delegate (string[] args)
             {
-                ETGModConsole.Log("CustomDungeonFlags.BOT_EFFIGY_POWERED's value: " + SaveAPIManager.GetFlag(CustomDungeonFlags.BOT_EFFIGY_POWERED).ToString());
+                ETGModConsole.Log("CustomDungeonFlags.BOT_EFFIGY_POWERED's value: " + SaveAPIManager.GetFlag(SaveFlags.BOT_EFFIGY_POWERED).ToString());
             });
             ETGModConsole.Commands.GetGroup("bot_saveapi").AddUnit("set_flag", delegate (string[] args)
             {
@@ -1762,12 +1864,12 @@ namespace BotsMod
                 {
                     return;
                 }
-                SaveAPIManager.SetFlag(CustomDungeonFlags.BOT_EFFIGY_POWERED, bool.Parse(args[0]));
-                ETGModConsole.Log("CustomDungeonFlags.BOT_EFFIGY_POWERED's new value: " + SaveAPIManager.GetFlag(CustomDungeonFlags.BOT_EFFIGY_POWERED).ToString());
+                SaveAPIManager.SetFlag(SaveFlags.BOT_EFFIGY_POWERED, bool.Parse(args[0]));
+                ETGModConsole.Log("CustomDungeonFlags.BOT_EFFIGY_POWERED's new value: " + SaveAPIManager.GetFlag(SaveFlags.BOT_EFFIGY_POWERED).ToString());
             });
             ETGModConsole.Commands.GetGroup("bot_saveapi").AddUnit("get_stat", delegate (string[] args)
             {
-                ETGModConsole.Log("CustomTrackedStats.BOT_EFFIGY_POWERED's value: " + SaveAPIManager.GetPlayerStatValue(CustomTrackedStats.EXAMPLE_STATS).ToString());
+                ETGModConsole.Log("CustomTrackedStats.BOT_EFFIGY_POWERED's value: " + SaveAPIManager.GetPlayerStatValue(SaveFlags.EXAMPLE_STATS).ToString());
             });
             ETGModConsole.Commands.GetGroup("bot_saveapi").AddUnit("set_stat", delegate (string[] args)
             {
@@ -1776,7 +1878,7 @@ namespace BotsMod
                     return;
                 }
                 SaveAPIManager.SetStat(CustomTrackedStats.EXAMPLE_STATS, float.Parse(args[0]));
-                ETGModConsole.Log("CustomTrackedStats.BOT_EFFIGY_POWERED's new value: " + SaveAPIManager.GetPlayerStatValue(CustomTrackedStats.EXAMPLE_STATS).ToString());
+                ETGModConsole.Log("CustomTrackedStats.BOT_EFFIGY_POWERED's new value: " + SaveAPIManager.GetPlayerStatValue(SaveFlags.EXAMPLE_STATS).ToString());
             });
             ETGModConsole.Commands.GetGroup("bot_saveapi").AddUnit("increment_stat", delegate (string[] args)
             {
@@ -1785,7 +1887,7 @@ namespace BotsMod
                     return;
                 }
                 SaveAPIManager.RegisterStatChange(CustomTrackedStats.EXAMPLE_STATS, float.Parse(args[0]));
-                ETGModConsole.Log("CustomTrackedStats.BOT_EFFIGY_POWERED's new value: " + SaveAPIManager.GetPlayerStatValue(CustomTrackedStats.EXAMPLE_STATS).ToString());
+                ETGModConsole.Log("CustomTrackedStats.BOT_EFFIGY_POWERED's new value: " + SaveAPIManager.GetPlayerStatValue(SaveFlags.EXAMPLE_STATS).ToString());
             });
             ETGModConsole.Commands.GetGroup("bot_saveapi").AddUnit("get_maximum", delegate (string[] args)
             {
@@ -1813,7 +1915,7 @@ namespace BotsMod
                 SaveAPIManager.SetCharacterSpecificFlag(CustomCharacterSpecificGungeonFlags.EXAMPLE_CHARACTER_SPECIFIC_FLAG, bool.Parse(args[0]));
                 ETGModConsole.Log("CustomDungeonFlags.BOT_LOST_UNLOCKED's new value: " + SaveAPIManager.GetCharacterSpecificFlag(CustomCharacterSpecificGungeonFlags.EXAMPLE_CHARACTER_SPECIFIC_FLAG).ToString());
             });
-
+            */
             ETGModConsole.Commands.AddGroup("floor", args =>
             {
             });

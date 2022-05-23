@@ -205,7 +205,7 @@ namespace BotsMod
 			wand.AddSpellToWand(gun, avalableSpells[hnym]);
 
 			wand.ChangeWandProperties(gun);
-			Tools.BeyondItems.Add(gun.PickupObjectId);
+			gun.SetTag("beyond");
 
 			Hook hook = new Hook(typeof(PlayerController).GetMethod("orig_Start", BindingFlags.Public | BindingFlags.Instance), typeof(Wand).GetMethod("SetupWandUi"));
 

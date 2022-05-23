@@ -166,7 +166,7 @@ namespace BotsMod
             sawbladeProj.collidesWithPlayer = true;
 
 
-            spellLootTable = LootTableAPI.LootTableTools.CreateLootTable();
+            spellLootTable = Alexandria.Helpers.Misc.LootUtility.CreateLootTable();
 
 
             validSpells.Add(SpellTypes.emptySlot, new Spell { name = "None", isEmptySlot = true });
@@ -230,7 +230,7 @@ namespace BotsMod
             FakePrefab.MarkAsFakePrefab(item.minimapIcon);
 
             Tools.Spells.Add(item.PickupObjectId);
-            Tools.BeyondItems.Add(item.PickupObjectId);
+            item.SetTag("beyond");
             return item;
         }
 

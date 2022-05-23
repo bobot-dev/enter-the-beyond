@@ -3,7 +3,7 @@ using Dungeonator;
 
 using Gungeon;
 using ItemAPI;
-using Misc;
+using Alexandria.Helpers.Misc;
 using Pathfinding;
 //using Pathfinding;
 using System;
@@ -21,7 +21,7 @@ namespace BotsMod
 	{
 		public static GameObject Mines_Cave_In;
 		public static GameObject Foyer_ElevatorChamber;
-		public static List<int> BeyondItems = new List<int>();
+		//public static List<int> BeyondItems = new List<int>();
 		public static List<int> Spells = new List<int>();
 
 
@@ -99,6 +99,12 @@ namespace BotsMod
 			Tools.DefaultCheeseGoop = (PickupObjectDatabase.GetById(626) as Gun).DefaultModule.projectiles[0].cheeseEffect.CheeseGoop;
 			Tools.DefaultBlobulonGoop = EnemyDatabase.GetOrLoadByGuid("0239c0680f9f467dbe5c4aab7dd1eca6").GetComponent<GoopDoer>().goopDefinition;
 			Tools.DefaultPoopulonGoop = EnemyDatabase.GetOrLoadByGuid("116d09c26e624bca8cca09fc69c714b3").GetComponent<GoopDoer>().goopDefinition;
+		}
+
+
+		public static bool IsPinkFlame(this GoopDefinition goopDef)
+        {
+			return (goopDef.baseColor32.r == 225 && goopDef.baseColor32.g == 0 && goopDef.baseColor32.b == 247 && goopDef.fadeColor32.r == 166 && goopDef.fadeColor32.g == 0 && goopDef.fadeColor32.b == 222);
 		}
 
 		public static PrototypeDungeonRoom BuildRoomForTheBeyond(string path)

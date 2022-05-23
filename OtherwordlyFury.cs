@@ -101,7 +101,7 @@ namespace BotsMod
 
 			beam = projectile4;
 
-			Tools.BeyondItems.Add(item.PickupObjectId);
+			item.SetTag("beyond");
 
 			item.sprite.usesOverrideMaterial = true;
 			Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);

@@ -42,7 +42,7 @@ namespace BotsMod
             item.PlaceItemInAmmonomiconAfterItemById(467);
 
 
-            //Tools.BeyondItems.Add(item.PickupObjectId);
+            //item.SetTag("beyond");
             //item.sprite.renderer.material.shader = ShaderCache.Acquire("Brave/Internal/RainbowChestShader");
             //item.sprite.usesOverrideMaterial = true;
 

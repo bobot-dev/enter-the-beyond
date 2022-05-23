@@ -116,7 +116,7 @@ namespace BotsMod
 
 			BotsItemIds.BeyondSniper = gun.PickupObjectId;
 
-			Tools.BeyondItems.Add(gun.PickupObjectId);
+			gun.SetTag("beyond");
 
 		}
 

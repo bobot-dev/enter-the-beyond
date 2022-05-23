@@ -28,7 +28,7 @@ namespace BotsMod
 			item.consumable = false;
 			item.quality = ItemQuality.S;
 			
-			Tools.BeyondItems.Add(item.PickupObjectId);
+			item.SetTag("beyond");
 
 			item.sprite.usesOverrideMaterial = true;
 			Material material = new Material(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material);
@@ -157,6 +157,7 @@ namespace BotsMod
 			68,
 			67,
 			120,
+			127,
 			137,
 			224,
 			735,
@@ -165,6 +166,9 @@ namespace BotsMod
 		};
 		public static List<int> excludedOutputIds = new List<int>
 		{
+
+			127,
+
 			296,
 			418,
 			429,

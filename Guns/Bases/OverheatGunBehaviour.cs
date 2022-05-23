@@ -84,7 +84,7 @@ namespace BotsMod
 		public bool burnOnOverHeat;
 
 		float waitTime;
-		float maxWaitTime = 1f;
+		public float maxWaitTime = 1f;
 
 	}
 }

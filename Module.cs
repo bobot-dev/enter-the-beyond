@@ -100,6 +100,7 @@ namespace BotsMod
             try
             {
 
+                ETGModConsole.Log("ETB");
                 //GlobalDungeonData.GUNGEON_EXPERIMENTAL = true;
 
                 ZipFilePath = this.Metadata.Archive;
@@ -111,6 +112,8 @@ namespace BotsMod
                 SoundManager.LoadBanksFromModProject();
 
 
+                SaveFlags.Init();
+
                 Strings = new AdvancedStringDB();
                 //item api
                 ItemBuilder.Init();
@@ -121,6 +124,8 @@ namespace BotsMod
                 SettingsHooks.Init();
                 BeyondSettings.Load();
                 debugMode = BeyondSettings.Instance.debug;
+
+                
 
                 //BeyondSettings.Instance.debug = false;
                 //debugMode = false;
@@ -226,9 +231,11 @@ namespace BotsMod
 
                 if (debugMode) BeyondScout.Init();
                 if (debugMode) DeadEye.Init();
+                if (debugMode) Cleanser.Init();
 
 
                 if (debugMode) TestGun.Add();
+                if (debugMode) AlexandriaTestGun.Add();
 
                 //AAAAAAAAAA.a.Init();
 
@@ -297,6 +304,8 @@ namespace BotsMod
 
                 LostsCloak.Init();
 
+                UnstableRelocationStone.Init();
+
                 //LootTables.Init();
 
                 //RedKey.Init();
@@ -326,6 +335,7 @@ namespace BotsMod
                 Sin.Init();
                 if (debugMode) PhyGun.Add();
                 if (debugMode) Roomba.Init();
+                if (debugMode) DdHand.Add();
 
                 if (debugMode) ThrowableTest.Init();
 
@@ -342,12 +352,17 @@ namespace BotsMod
                 List<string> testNpcIdleSprites = new List<string>
                 {
                     "stairway_npc_idle_001.png",
-
-                };
-
-                List<string> testNpcTalkSprites = new List<string>
-                {
-                    "stairway_npc_idle_001.png",
+                    "stairway_npc_idle_002.png",
+                    "stairway_npc_idle_003.png",
+                    "stairway_npc_idle_004.png",
+                    "stairway_npc_idle_005.png",
+                    "stairway_npc_idle_006.png",
+                    "stairway_npc_idle_007.png",
+                    "stairway_npc_idle_008.png",
+                    "stairway_npc_idle_009.png",
+                    "stairway_npc_idle_010.png",
+                    "stairway_npc_idle_011.png",
+                    "stairway_npc_idle_012.png",
 
                 };
 
@@ -373,7 +388,7 @@ namespace BotsMod
                     "shopkeep_talk_005.png",
                 };
 
-                var devilLootTable = LootTableAPI.LootTableTools.CreateLootTable();
+                var devilLootTable = Alexandria.Helpers.Misc.LootUtility.CreateLootTable();
                 devilLootTable.AddItemToPool(349);
                 devilLootTable.AddItemToPool(279);
                 devilLootTable.AddItemToPool(500);
@@ -383,11 +398,6 @@ namespace BotsMod
                 for (int i = 0; i < testNpcIdleSprites.Count; i++)
                 {
                     testNpcIdleSprites[i] = "BotsMod/sprites/Npcs/Stairway/" + testNpcIdleSprites[i];
-                }
-
-                for (int i = 0; i < testNpcTalkSprites.Count; i++)
-                {
-                    testNpcTalkSprites[i] = "BotsMod/sprites/Npcs/Stairway/" + testNpcTalkSprites[i];
                 }
 
                 for (int i = 0; i < beyondNpcIdleSprites.Count; i++)
@@ -420,8 +430,8 @@ namespace BotsMod
 
                 ETGMod.Databases.Strings.Core.Set("#BEYOND_TAKEPLAYERDAMAGE", "The master's fury will not be kind to you!");
 
-                var beyondLootTable = LootTableAPI.LootTableTools.CreateLootTable();
-                foreach (var item in Tools.BeyondItems)
+                var beyondLootTable = Alexandria.Helpers.Misc.LootUtility.CreateLootTable();
+                foreach (var item in AlexandriaTags.GetAllItemsIdsWithTag("beyond"))
                 {
                     if (item == BotsItemIds.SpinDownDice)
                     {
@@ -438,9 +448,23 @@ namespace BotsMod
                 //BotsModule.shop = NpcApi.ItsDaFuckinShopApi.SetUpShop("beyond", "bot", testNpcIdleSprites, 6, testNpcTalkSprites, 8, devilLootTable, BaseShopController.AdditionalShopType.TRUCK, "", "", "", "", "", "", false);
                 //BreachShopTools.Init();
 
-                shop2 = ShopAPI.SetUpShop("ItemForGuns", "bot", testNpcIdleSprites, 6, testNpcTalkSprites, 8, Tools.shared_auto_001.LoadAsset<GenericLootTable>("All_Item_Loot_Table"), CustomShopItemController.ShopCurrencyType.CUSTOM, "a", "a", "a", "a", "a", "a", ShopAPI.defaultTalkPointOffset,
+                shop2 = ShopAPI.SetUpShop("ItemForGuns", "bot", testNpcIdleSprites, 12, testNpcIdleSprites, 12, Tools.shared_auto_001.LoadAsset<GenericLootTable>("All_Item_Loot_Table"), CustomShopItemController.ShopCurrencyType.CUSTOM, "a", "a", "a", "a", "a", "a", ShopAPI.defaultTalkPointOffset,
                     new Vector3[] { new Vector3(1.125f, 2.125f, 1), new Vector3(0f, 3.250f, 1), new Vector3(5.250f, 3.250f, 1), new Vector3(4.125f, 2.125f, 1), new Vector3(2.625f, 1f, 1) }, 1, false, null, ShopMerchantStuff.CustomCanBuyWeapons, ShopMerchantStuff.RemoveCurrencyWeapons,
-                    ShopMerchantStuff.CustomPriceWeapons, null, null, "BotsMod/sprites/shopguygunmoneyicon.png", "gunTextIcon", true, false).GetComponent<CustomShopController>();
+                    ShopMerchantStuff.CustomPriceWeapons, null, null, "BotsMod/sprites/shopguygunmoneyicon.png", "gunTextIcon", true, false, "", true, "BotsMod/sprites/Npcs/stairway_npc_map_icon.png", true, 1111.1f, new DungeonPrerequisite[0], new IntVector2(36, 63), new IntVector2(43, 17)).GetComponent<CustomShopController>();
+
+                var collection = shop2.gameObject.GetComponentInChildren<tk2dSpriteAnimator>().Library.clips[0].frames[0].spriteCollection;
+                foreach (var clip in shop2.gameObject.GetComponentInChildren<tk2dSpriteAnimator>().Library.clips)
+                {
+                    foreach (var frame in clip.frames)
+                    {
+                        collection.spriteDefinitions[frame.spriteId].position0 -= new Vector3(2.1875f, 1);
+                        collection.spriteDefinitions[frame.spriteId].position1 -= new Vector3(2.1875f, 1);
+                        collection.spriteDefinitions[frame.spriteId].position2 -= new Vector3(2.1875f, 1);
+                        collection.spriteDefinitions[frame.spriteId].position3 -= new Vector3(2.1875f, 1);
+                    }
+                }
+                
+
                 //mapiconshop
                 shop = ShopAPI.SetUpShop("BeyondShopKeep", "bot", beyondNpcIdleSprites, 6, beyondNpcTalkSprites, 8, beyondLootTable, CustomShopItemController.ShopCurrencyType.CUSTOM, "#BEYOND_RUNBASEDMULTILINE_GENERIC", "#BEYOND_RUNBASEDMULTILINE_STOPPER", "#BEYOND_SHOP_PURCHASED",
                     "#BEYOND_PURCHASE_FAILED", "#BEYOND_INTRO", "#BEYOND_TAKEPLAYERDAMAGE", ShopAPI.defaultTalkPointOffset, ShopAPI.defaultItemPositions, 1, false, null, ShopMerchantStuff.CustomCanBuyBeyond, ShopMerchantStuff.RemoveCurrencyBeyond,
@@ -476,6 +500,33 @@ namespace BotsMod
                 ForceToSortingLayer m_EXGlitchPortalSortingLayer = m_ParadoxPortal.AddComponent<ForceToSortingLayer>();
                 m_EXGlitchPortalSortingLayer.sortingLayer = DepthLookupManager.GungeonSortingLayer.PLAYFIELD;
                 m_EXGlitchPortalSortingLayer.targetSortingOrder = -1;
+
+                /*GameObject smallParadoxPortal = UnityEngine.Object.Instantiate(BraveResources.Load<GameObject>("Global Prefabs/VFX_ParadoxPortal"));
+                //FakePrefab.MarkAsFakePrefab(smallParadoxPortal);
+                //SpriteBuilder.SpriteFromResource("BotsMod/sprites/fordebuggingandshit.png", smallParadoxPortal);
+
+                //smallParadoxPortal.GetComponent<tk2dSprite>().usesOverrideMaterial = true;
+                
+
+                smallParadoxPortal.transform.localPosition = new Vector3(0f, 0, 0);
+                if (smallParadoxPortal)
+                {
+                    if (smallParadoxPortal.GetComponent<tk2dSprite>().renderer.material)
+                    {
+                        // m_EXGlitchPortalRenderer.materials = new Material[] { new Material(m_ParadoxPortal.GetComponent<MeshRenderer>().materials[0]) };
+                        smallParadoxPortal.GetComponent<tk2dSprite>().renderer.material = new Material(smallParadoxPortal.GetComponent<MeshRenderer>().material);
+                        smallParadoxPortal.GetComponent<tk2dSprite>().renderer.material.SetColor("_EmissionColor", UnityEngine.Color.magenta);
+                        smallParadoxPortal.GetComponent<tk2dSprite>().renderer.material.SetTexture("_PortalTex", GungeonAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/beyond_portal_texture.png"));
+                        smallParadoxPortal.GetComponent<tk2dSprite>().renderer.material.SetFloat("_UVDistCutoff", 12.15f);
+
+
+                    }
+                }
+                ForceToSortingLayer smallEXGlitchPortalSortingLayer = smallParadoxPortal.AddComponent<ForceToSortingLayer>();
+                m_EXGlitchPortalSortingLayer.sortingLayer = DepthLookupManager.GungeonSortingLayer.PLAYFIELD;
+                m_EXGlitchPortalSortingLayer.targetSortingOrder = -1;
+                //shop2.shopItemShadowPrefab = smallParadoxPortal;*/
+
                 //ItsDaFuckinShopApi.SetUpJailedNpc("BeyondShopKeep", "bot", beyondNpcIdleSprites, 6, ItsDaFuckinShopApi.defaultTalkPointOffset, GungeonFlags.ACHIEVEMENT_ACCESS_ABBEY);
 
                 foreach (var frame in shop.gameObject.GetComponentInChildren<tk2dSpriteAnimator>().Library.clips[1].frames)
@@ -562,14 +613,14 @@ namespace BotsMod
                 InitSynergies.Init();
 
                 //var name = Loader.BuildCharacter("BotsMod/Characters/Lost", CustomPlayableCharacters.Lost, new Vector3(15.8f, 26.6f, 27.1f), true, new Vector3(15.3f, 24.8f, 25.3f), true, false, false, true, true, new Color32(175, 19, 30, 255), 4.55f, 55, 2, true, "botfs_lost").nameInternal;
-                var data = Loader.BuildCharacter("BotsMod/Characters/Lost", CustomPlayableCharacters.Lost, new Vector3(15.8f, 26.6f, 27.1f), true, new Vector3(15.3f, 24.8f, 25.3f), true, false, false, true, true, new GlowMatDoer (new Color32(255, 0, 38, 255), 4.55f, 55),
+                var data = Loader.BuildCharacter("BotsMod/Characters/Lost", CustomPlayableCharacters.Lost, new Vector3(15.8f, 26.6f, 27.1f), true, new Vector3(15.8f, 25.2f, 25.3f), true, false, false, true, true, new GlowMatDoer (new Color32(255, 0, 38, 255), 4.55f, 55),
                     new GlowMatDoer(new Color32(255, 69, 248, 255), 1.55f, 35), 0, true, "botfs_lost");
                 data.prerequisites = new DungeonPrerequisite[1]
                 {
                     new CustomDungeonPrerequisite
                     {
                         requireCustomFlag = true,
-                        customFlagToCheck = CustomDungeonFlags.BOT_LOST_UNLOCKED,  
+                        customFlagToCheck = SaveFlags.BOT_LOST_UNLOCKED,  
                     }
                 };
 
@@ -616,11 +667,11 @@ namespace BotsMod
                 first.GetComponent<tk2dSprite>().renderer.material = floorGlowMat;
                 FakePrefab.MarkAsFakePrefab(first);
 
-                Loader.AddFoyerObject(name, first, new Vector3(-0.17f, 0.29f, 19), CustomDungeonFlags.BOT_LOST_UNLOCKED);
+                Loader.AddFoyerObject(name, first, new Vector3(-0.17f, 0.29f, 19), SaveFlags.BOT_LOST_UNLOCKED);
 
                 ChamberGunAPI.Init("EnterTheBeyond");
 
-
+                
                 BeyondPrefabs.beyondChestPrefab = ChestInitStuff.InitChest(
                 "beyond",
                 "bot",
@@ -677,9 +728,11 @@ namespace BotsMod
                 -1,
                 null,
                 GameManager.Instance.RewardManager.C_Chest.VFX_GroundHit,
-                1.5f
-            );
-                
+                1.5f);
+
+
+                ChestApi.ChestSpawnHelper.customChests.Add("beyond", new Tuple<Chest, float>(BeyondPrefabs.beyondChestPrefab.GetComponent<Chest>(), 100));
+
                 //Ammonomicon.Init();              
                 if (debugMode)
                 {
@@ -714,7 +767,7 @@ namespace BotsMod
                 //SoundManager.AddCustomSwitchData("", );
 
 
-
+                ETGModConsole.Log(EnemyDatabase.GetOrLoadByName("GunNut").sprite.renderer.material.shader.name);
 
                 ModLogo = GungeonAPI.ResourceExtractor.GetTextureFromResource("BotsMod/sprites/title_words_beyond_001.png");
                 try
@@ -738,6 +791,10 @@ namespace BotsMod
                 //    .Player.PlayerUiSprite.Atlas)
                //;
 
+                foreach(var a in SaveAPIManager.saveFiles)
+                {
+                    Log(a, TEXT_COLOR, false);
+                }
 
                 ETGMod.StartGlobalCoroutine(this.DelayedStartCR());
                 Log($"{MOD_NAME} v{VERSION} started successfully.", TEXT_COLOR, false);

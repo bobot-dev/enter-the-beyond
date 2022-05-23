@@ -12,7 +12,7 @@ using HutongCharacter = HutongGames.PlayMaker.Actions.ChangeToNewCharacter;
 using ItemAPI;
 using Dungeonator;
 using UnityEngine.SceneManagement;
-using Misc;
+using Alexandria.Helpers.Misc;
 
 namespace CustomCharacters
 

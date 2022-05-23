@@ -8,7 +8,7 @@ using ItemAPI;
 using UnityEngine;
 using MonoMod.RuntimeDetour;
 using Object = UnityEngine.Object;
-using Misc;
+using Alexandria.Helpers.Misc;
 
 namespace GungeonAPI
 {

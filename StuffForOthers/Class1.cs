@@ -1,4 +1,4 @@
-﻿using LootTableAPI;
+﻿using Alexandria.Helpers.Misc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
